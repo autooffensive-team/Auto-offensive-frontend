@@ -13,8 +13,6 @@ interface ArchitectureNodeProps {
   sub: string
   tone: NodeTone
   className: string
-  connectorSide?: 'left' | 'right'
-  connectorClassName?: string
   delay?: number
   bodyFontFamily: string
   displayFontFamily: string
@@ -24,6 +22,12 @@ interface TracePathProps {
   d: string
   tone: NodeTone
   delay?: number
+}
+
+interface SceneDotProps {
+  className: string
+  dark?: boolean
+  side?: 'left' | 'right'
 }
 
 const toneClasses = {
@@ -70,14 +74,31 @@ function TracePath({ d, tone, delay = 0 }: TracePathProps) {
   )
 }
 
+function SceneDot({ className, dark = true, side }: SceneDotProps) {
+  return (
+    <span
+      className={`absolute z-40 h-3.5 w-3.5 -translate-y-1/2 rounded-full border ${
+        dark
+          ? 'border-slate-200 bg-[#0f172a] dark:border-slate-700 dark:bg-slate-100'
+          : 'border-[rgba(255,255,255,0.7)] bg-slate-200/95 dark:border-slate-500 dark:bg-slate-300/90'
+      } ${
+        side === 'right'
+          ? 'translate-x-26.25'
+          : side === 'left'
+            ? '-translate-x-28.75'
+            : '-translate-x-1/2'
+      } ${className}`}
+      aria-hidden="true"
+    />
+  )
+}
+
 function ArchitectureNode({
   icon,
   label,
   sub,
   tone,
   className,
-  connectorSide,
-  connectorClassName,
   delay = 0,
   bodyFontFamily,
   displayFontFamily,
@@ -91,17 +112,8 @@ function ArchitectureNode({
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.45, delay }}
       whileHover={{ y: -6 }}
-      className={`absolute z-20 w-[182px] rounded-[22px] border p-4 ${palette.wrapper} ${className}`}
+      className={`absolute z-20 w-45.5 rounded-[22px] border p-4 ${palette.wrapper} ${className}`}
     >
-      {connectorSide ? (
-        <span
-          className={`absolute top-1/2 z-40 h-3.5 w-3.5 -translate-y-1/2 rounded-full border border-slate-200 bg-[#0f172a] dark:border-slate-700 dark:bg-slate-100 ${
-            connectorSide === 'right' ? '-right-[7px]' : '-left-[7px]'
-          } ${connectorClassName ?? ''}`}
-          aria-hidden="true"
-        />
-      ) : null}
-
       <div
         className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${palette.iconWrap}`}
       >
@@ -124,26 +136,6 @@ function ArchitectureNode({
   )
 }
 
-function ChipPins({ side }: { side: 'left' | 'right' }) {
-  const pinClass =
-    side === 'left'
-      ? 'bg-gradient-to-r from-slate-400 via-slate-300 to-slate-200 dark:from-slate-700 dark:via-slate-500 dark:to-slate-400'
-      : 'bg-gradient-to-l from-slate-400 via-slate-300 to-slate-200 dark:from-slate-700 dark:via-slate-500 dark:to-slate-400'
-
-  return (
-    <div
-      className={`absolute top-1/2 flex -translate-y-1/2 flex-col gap-3 ${side === 'left' ? '-left-2.5' : '-right-2.5'}`}
-    >
-      {[0, 1, 2, 3].map((pin) => (
-        <div
-          key={`${side}-${pin}`}
-          className={`h-3 w-2.5 rounded-sm ${pinClass}`}
-        />
-      ))}
-    </div>
-  )
-}
-
 function CoreChip({
   className,
   bodyFontFamily,
@@ -161,9 +153,6 @@ function CoreChip({
       transition={{ duration: 0.55, delay: 0.15 }}
       className={`absolute z-10 overflow-visible rounded-[28px] border border-[rgba(255,255,255,0.08)] bg-[#0f172a] px-7 py-5 ${className}`}
     >
-      <ChipPins side="left" />
-      <ChipPins side="right" />
-
       <div className="relative overflow-hidden rounded-[24px] border border-white/8 bg-transparent px-5 py-6">
         <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[rgba(0,208,178,0.28)] bg-transparent text-[#00d0b2]">
           <Cpu className="h-6 w-6" />
@@ -272,14 +261,14 @@ export function Architecture() {
           </p>
         </motion.div>
 
-        <div className="relative mx-auto w-full max-w-[1180px]">
-          <div className="h-[225px] sm:h-[300px] md:h-[430px] lg:h-[560px] xl:h-[680px]">
+        <div className="relative mx-auto w-full max-w-295">
+          <div className="h-56.25 sm:h-75 md:h-107.5 lg:h-140 xl:h-170">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.55 }}
-              className="absolute left-1/2 top-0 h-[680px] w-[1100px] origin-top -translate-x-1/2 scale-[0.31] overflow-hidden rounded-[34px] border border-[rgba(0,208,178,0.14)] bg-[linear-gradient(135deg,rgba(0,208,178,0.05),rgba(247,245,240,0.98)_36%,rgba(1,80,158,0.06))] backdrop-blur-md sm:scale-[0.43] md:scale-[0.63] lg:scale-[0.82] xl:scale-100 dark:border-[rgba(255,255,255,0.08)] dark:bg-[linear-gradient(135deg,rgba(0,208,178,0.08),rgba(9,9,11,0.98)_36%,rgba(1,80,158,0.12))]"
+              className="absolute left-1/2 top-0 h-170 w-275 origin-top -translate-x-1/2 scale-[0.31] overflow-hidden rounded-[34px] border border-[rgba(0,208,178,0.14)] bg-[linear-gradient(135deg,rgba(0,208,178,0.05),rgba(247,245,240,0.98)_36%,rgba(1,80,158,0.06))] backdrop-blur-md sm:scale-[0.43] md:scale-[0.63] lg:scale-[0.82] xl:scale-100 dark:border-[rgba(255,255,255,0.08)] dark:bg-[linear-gradient(135deg,rgba(0,208,178,0.08),rgba(9,9,11,0.98)_36%,rgba(1,80,158,0.12))]"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.08),transparent_30%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.14),transparent_32%)]" />
               <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[rgba(0,208,178,0.35)] to-transparent" />
@@ -308,10 +297,23 @@ export function Architecture() {
               </svg>
 
               <CoreChip
-                className="left-1/2 top-1/2 w-[250px] -translate-x-1/2 -translate-y-1/2"
+                className="left-1/2 top-1/2 w-62.5 -translate-x-1/2 -translate-y-1/2"
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
               />
+
+              <SceneDot className="left-[10.73%] top-[17.65%]" side="right" />
+              <SceneDot className="left-[8.73%] top-[44.12%]" side="right" />
+              <SceneDot className="left-[10.73%] top-[82.94%]" side="right" />
+              <SceneDot className="left-[41.45%] top-[36.18%]" dark={false} />
+              <SceneDot className="left-[41.45%] top-[43.82%]" dark={false} />
+              <SceneDot className="left-[41.45%] top-[56.76%]" dark={false} />
+              <SceneDot className="left-[58.55%] top-[36.18%]" dark={false} />
+              <SceneDot className="left-[58.55%] top-[49.41%]" dark={false} />
+              <SceneDot className="left-[58.55%] top-[56.76%]" dark={false} />
+              <SceneDot className="left-[89.27%] top-[17.35%]" side="left" />
+              <SceneDot className="left-[91.27%] top-[44.41%]" side="left" />
+              <SceneDot className="left-[89.27%] top-[82.94%]" side="left" />
 
               <ArchitectureNode
                 icon={<Globe className="h-5 w-5" />}
@@ -319,7 +321,6 @@ export function Architecture() {
                 sub="Dashboard UI and analyst workflows"
                 tone="secondary"
                 className="left-[4.2%] top-[8%]"
-                connectorSide="right"
                 delay={0.05}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
@@ -330,7 +331,6 @@ export function Architecture() {
                 sub="Auth, request routing, and SSE delivery"
                 tone="primary"
                 className="left-[2.4%] top-[34.5%]"
-                connectorSide="right"
                 delay={0.1}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
@@ -341,7 +341,6 @@ export function Architecture() {
                 sub="Parallel summaries, reports, and findings"
                 tone="primary"
                 className="left-[4.8%] top-[68%]"
-                connectorSide="right"
                 delay={0.15}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
@@ -352,7 +351,6 @@ export function Architecture() {
                 sub="Scanner engine and task execution"
                 tone="secondary"
                 className="right-[4.2%] top-[8%]"
-                connectorSide="left"
                 delay={0.2}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
@@ -363,7 +361,6 @@ export function Architecture() {
                 sub="Persistent state, queues, and cache"
                 tone="primary"
                 className="right-[1.9%] top-[35.5%]"
-                connectorSide="left"
                 delay={0.25}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
@@ -374,7 +371,6 @@ export function Architecture() {
                 sub="Static analysis branch for code security"
                 tone="secondary"
                 className="right-[4.8%] top-[68%]"
-                connectorSide="left"
                 delay={0.3}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
