@@ -416,63 +416,6 @@ export function Architecture() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:mt-10 md:grid-cols-2">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.45, delay: 0.1 }}
-            className="rounded-[24px] border border-[rgba(0,208,178,0.24)] bg-transparent p-5 md:p-6"
-          >
-            <p
-              className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#00a896]"
-              style={{ fontFamily: bodyFontFamily }}
-            >
-              Primary Path
-            </p>
-            <h3
-              className="text-[1.15rem] font-bold leading-tight text-slate-900 dark:text-white md:text-[1.4rem]"
-              style={{ fontFamily: displayFontFamily }}
-            >
-              Real-time scan traffic stays fast and visible.
-            </h3>
-            <p
-              className="mt-3 text-[14px] leading-relaxed text-slate-600 dark:text-slate-300 md:text-[16px]"
-              style={{ fontFamily: bodyFontFamily }}
-            >
-              Requests move from the web dashboard into the FastAPI gateway, across the scanner engine, and into
-              persistence services with live feedback flowing back through the same responsive channel.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.45, delay: 0.18 }}
-            className="rounded-[24px] border border-[rgba(1,80,158,0.22)] bg-transparent p-5 md:p-6"
-          >
-            <p
-              className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#01509e] dark:text-[#6ab4ec]"
-              style={{ fontFamily: bodyFontFamily }}
-            >
-              Secondary Path
-            </p>
-            <h3
-              className="text-[1.15rem] font-bold leading-tight text-slate-900 dark:text-white md:text-[1.4rem]"
-              style={{ fontFamily: displayFontFamily }}
-            >
-              AI and SAST analysis branch without slowing the core flow.
-            </h3>
-            <p
-              className="mt-3 text-[14px] leading-relaxed text-slate-600 dark:text-slate-300 md:text-[16px]"
-              style={{ fontFamily: bodyFontFamily }}
-            >
-              Parallel services generate reports, summarize findings, and run code analysis while the main execution
-              path stays focused on collection, streaming, and system coordination.
-            </p>
-          </motion.div>
-        </div>
       </div>
     </section>
   )
