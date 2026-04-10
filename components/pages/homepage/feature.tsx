@@ -186,7 +186,7 @@ const CARDS = [
   {
     num: "01",
     tag: "Recon",
-    title: ["ការស្វែងរកផ្ទៃ", "វាយប្រហារ"],
+    title: ["ការធ្វើ Mapping នៃ", "Attack Surface"],
     hlLine: 1,
     desc: "ប្រើម៉ាស៊ីនស្កេនដែលភ្ជាប់គ្នាដើម្បីស្វែងរក asset ដែលបើកចំហរ ទាំងបណ្តាញ Web App, Cloud និង API។ អ្នកអាចឃើញ ports ដែលបើក សេវាកម្មដែលកំពុងដំណើរការ ប្រព័ន្ធប្រតិបត្តិការ screenshots និងព័ត៌មានជ្រៅបន្ថែមពី subdomain, បច្ចេកវិទ្យាចាស់, reverse DNS, WAF និងឯកសារលាក់។",
     link: "#",

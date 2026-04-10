@@ -141,11 +141,12 @@ const Card: React.FC<{
         </button>
       </div>
 
-      <div className="relative z-2 mx-auto mt-auto w-[72%] max-[1023px]:w-[62%] max-[767px]:w-[68%]">
+      <div className="relative z-2 mt-auto w-full px-3 md:px-4 lg:px-5">
         <Image
           src={card.image}
           alt={`${card.title} ${card.subtitle}`}
           className="block w-full object-contain object-bottom"
+          sizes="(max-width: 1023px) 100vw, 33vw"
           style={{ maxHeight: "min(460px, 42vh)" }}
           draggable={false}
         />
