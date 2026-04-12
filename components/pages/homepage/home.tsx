@@ -15,9 +15,10 @@ export default function Home() {
       <Features />
       <HomeVideo />
       <AIBanner />
-      <Architecture />
-      <TeamShowcase />
+      <Architecture /> 
       <ThreeCards />
+      <TeamShowcase />
+     
       
     </main>
   );
