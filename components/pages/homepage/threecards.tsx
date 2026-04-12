@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import img1 from "@/public/home-image/code1.png";
-import img2 from "@/public/home-image/code2.png";
-import img3 from "@/public/home-image/code3.png";
+import img1 from "@/public/home-image/code1.webp";
+import img2 from "@/public/home-image/code2.webp";
+import img3 from "@/public/home-image/code3.webp";
 
 interface CardData {
   title: string;
