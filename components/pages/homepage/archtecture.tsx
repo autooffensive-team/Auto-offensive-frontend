@@ -140,10 +140,16 @@ function CoreChip({
   className,
   bodyFontFamily,
   displayFontFamily,
+  eyebrow,
+  title,
+  body,
 }: {
   className: string
   bodyFontFamily: string
   displayFontFamily: string
+  eyebrow: string
+  title: string
+  body: string
 }) {
   return (
     <motion.div
@@ -162,19 +168,19 @@ function CoreChip({
           className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#00d0b2]"
           style={{ fontFamily: bodyFontFamily }}
         >
-          Auto Offensive
+          {eyebrow}
         </p>
         <h3
           className="mt-2 text-[1.2rem] font-bold leading-tight text-white md:text-[1.35rem]"
           style={{ fontFamily: displayFontFamily }}
         >
-          Core Control Plane
+          {title}
         </h3>
         <p
           className="mt-2 max-w-55 text-[0.8rem] leading-relaxed text-slate-300 md:text-[0.88rem]"
           style={{ fontFamily: bodyFontFamily }}
         >
-          Gateway orchestration, scan events, AI jobs, and persistence all converge here.
+          {body}
         </p>
       </div>
     </motion.div>
@@ -209,14 +215,70 @@ function PathBadge({
 
 export function Architecture() {
   const locale = useLocale()
+  const isKhmer = locale === 'kh'
   const bodyFontFamily =
-    locale === 'kh'
+    isKhmer
       ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
       : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
   const displayFontFamily =
-    locale === 'kh'
+    isKhmer
       ? 'var(--font-noto-khmer), var(--font-hackdaddy), sans-serif'
       : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
+  const copy = isKhmer
+    ? {
+        eyebrow: 'ស្ថាបត្យកម្មប្រព័ន្ធ',
+        titleLine1: 'Branded Data Paths និង',
+        titleLine2: 'Real-Time System Flow',
+        description:
+          'Web app, gateway, scanner engine, AI service និង storage layer ទាំងអស់ ត្រូវបានភ្ជាប់ទៅកាន់ core control plane តែមួយ។ វាប្រើ circuit-style paths ដើម្បីបង្ហាញពីលំហូរទិន្នន័យ និងការវិភាគ ដែលធ្វើដំណើរនៅលើវេទិកា ក្នុងពេលវេលាជាក់ស្តែង។',
+        coreEyebrow: 'Auto Offensive',
+        coreTitle: 'Core Control Plane',
+        coreBody:
+          'ការគ្រប់គ្រង gateway, scan events, AI jobs និង persistence ទាំងអស់ ប្រមូលផ្តុំគ្នានៅទីនេះ។',
+        nodes: {
+          webApp: ['Web App', 'Dashboard UI និង analyst workflows'],
+          gateway: ['FastAPI Gateway', 'Authentication, request routing និង SSE delivery'],
+          aiService: ['AI Service', 'ការសង្ខេប (summaries), reports និង findings ដំណើរការជា parallel'],
+          grpc: ['gRPC Go Services', 'scanner engine និង task execution'],
+          storage: ['PostgreSQL + Redis', 'persistent state, queues និង cache'],
+          sonar: ['SonarQube', 'សម្រាប់ static analysis នៃ security កូដ'],
+        },
+        badges: {
+          rest: 'REST / SSE',
+          auth: 'Auth / Routing',
+          ai: 'AI Reporting',
+          grpc: 'gRPC',
+          pubsub: 'Pub / Sub',
+          sast: 'SAST',
+        },
+      }
+    : {
+        eyebrow: 'System Architecture',
+        titleLine1: 'Branded Data Paths,',
+        titleLine2: 'Real-Time System Flow',
+        description:
+          'The web app, gateway, scanner engine, AI service, and storage layer all feed through a single core control plane, with circuit-style paths that visualize the way traffic and analysis move across the platform.',
+        coreEyebrow: 'Auto Offensive',
+        coreTitle: 'Core Control Plane',
+        coreBody:
+          'Gateway orchestration, scan events, AI jobs, and persistence all converge here.',
+        nodes: {
+          webApp: ['Web App', 'Dashboard UI and analyst workflows'],
+          gateway: ['FastAPI Gateway', 'Auth, request routing, and SSE delivery'],
+          aiService: ['AI Service', 'Parallel summaries, reports, and findings'],
+          grpc: ['gRPC Go Services', 'Scanner engine and task execution'],
+          storage: ['PostgreSQL + Redis', 'Persistent state, queues, and cache'],
+          sonar: ['SonarQube', 'Static analysis branch for code security'],
+        },
+        badges: {
+          rest: 'REST / SSE',
+          auth: 'Auth / Routing',
+          ai: 'AI Reporting',
+          grpc: 'gRPC',
+          pubsub: 'Pub / Sub',
+          sast: 'SAST',
+        },
+      }
 
   return (
     <section
@@ -241,23 +303,21 @@ export function Architecture() {
             className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#00a896] md:text-[12px]"
             style={{ fontFamily: bodyFontFamily }}
           >
-            System Architecture
+            {copy.eyebrow}
           </p>
           <h2
             className="text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-slate-900 dark:text-white md:text-[3rem] lg:text-[3.7rem]"
             style={{ fontFamily: displayFontFamily }}
           >
-            Branded Data Paths,
+            {copy.titleLine1}
             <br />
-            Real-Time System Flow
+            {copy.titleLine2}
           </h2>
           <p
             className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-slate-600 dark:text-slate-300 md:text-[18px]"
             style={{ fontFamily: bodyFontFamily }}
           >
-            The web app, gateway, scanner engine, AI service, and storage layer all feed through a single core
-            control plane, with circuit-style paths that visualize the way traffic and analysis move across the
-            platform.
+            {copy.description}
           </p>
         </motion.div>
 
@@ -300,6 +360,9 @@ export function Architecture() {
                 className="left-1/2 top-1/2 w-62.5 -translate-x-1/2 -translate-y-1/2"
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
+                eyebrow={copy.coreEyebrow}
+                title={copy.coreTitle}
+                body={copy.coreBody}
               />
 
               <SceneDot className="left-[10.73%] top-[17.65%]" side="right" />
@@ -317,8 +380,8 @@ export function Architecture() {
 
               <ArchitectureNode
                 icon={<Globe className="h-5 w-5" />}
-                label="Web App"
-                sub="Dashboard UI and analyst workflows"
+                label={copy.nodes.webApp[0]}
+                sub={copy.nodes.webApp[1]}
                 tone="secondary"
                 className="left-[4.2%] top-[8%]"
                 delay={0.05}
@@ -327,8 +390,8 @@ export function Architecture() {
               />
               <ArchitectureNode
                 icon={<Zap className="h-5 w-5" />}
-                label="FastAPI Gateway"
-                sub="Auth, request routing, and SSE delivery"
+                label={copy.nodes.gateway[0]}
+                sub={copy.nodes.gateway[1]}
                 tone="primary"
                 className="left-[2.4%] top-[34.5%]"
                 delay={0.1}
@@ -337,8 +400,8 @@ export function Architecture() {
               />
               <ArchitectureNode
                 icon={<Brain className="h-5 w-5" />}
-                label="AI Service"
-                sub="Parallel summaries, reports, and findings"
+                label={copy.nodes.aiService[0]}
+                sub={copy.nodes.aiService[1]}
                 tone="primary"
                 className="left-[4.8%] top-[68%]"
                 delay={0.15}
@@ -347,8 +410,8 @@ export function Architecture() {
               />
               <ArchitectureNode
                 icon={<Server className="h-5 w-5" />}
-                label="gRPC Go Services"
-                sub="Scanner engine and task execution"
+                label={copy.nodes.grpc[0]}
+                sub={copy.nodes.grpc[1]}
                 tone="secondary"
                 className="right-[4.2%] top-[8%]"
                 delay={0.2}
@@ -357,8 +420,8 @@ export function Architecture() {
               />
               <ArchitectureNode
                 icon={<Database className="h-5 w-5" />}
-                label="PostgreSQL + Redis"
-                sub="Persistent state, queues, and cache"
+                label={copy.nodes.storage[0]}
+                sub={copy.nodes.storage[1]}
                 tone="primary"
                 className="right-[1.9%] top-[35.5%]"
                 delay={0.25}
@@ -367,8 +430,8 @@ export function Architecture() {
               />
               <ArchitectureNode
                 icon={<Shield className="h-5 w-5" />}
-                label="SonarQube"
-                sub="Static analysis branch for code security"
+                label={copy.nodes.sonar[0]}
+                sub={copy.nodes.sonar[1]}
                 tone="secondary"
                 className="right-[4.8%] top-[68%]"
                 delay={0.3}
@@ -377,37 +440,37 @@ export function Architecture() {
               />
 
               <PathBadge
-                label="REST / SSE"
+                label={copy.badges.rest}
                 className="left-[24%] top-[14%]"
                 tone="secondary"
                 fontFamily={bodyFontFamily}
               />
               <PathBadge
-                label="Auth / Routing"
+                label={copy.badges.auth}
                 className="left-[22.5%] top-[40%]"
                 tone="primary"
                 fontFamily={bodyFontFamily}
               />
               <PathBadge
-                label="AI Reporting"
+                label={copy.badges.ai}
                 className="left-[24.5%] top-[69%]"
                 tone="primary"
                 fontFamily={bodyFontFamily}
               />
               <PathBadge
-                label="gRPC"
+                label={copy.badges.grpc}
                 className="right-[25.5%] top-[14%]"
                 tone="secondary"
                 fontFamily={bodyFontFamily}
               />
               <PathBadge
-                label="Pub / Sub"
+                label={copy.badges.pubsub}
                 className="right-[23.5%] top-[45%]"
                 tone="primary"
                 fontFamily={bodyFontFamily}
               />
               <PathBadge
-                label="SAST"
+                label={copy.badges.sast}
                 className="right-[27%] top-[69%]"
                 tone="secondary"
                 fontFamily={bodyFontFamily}
