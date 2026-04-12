@@ -46,40 +46,40 @@ type ResourceItem = {
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '#', icon: '/icons/subfinder.png'    },
-  { title: 'Naabu',        href: '#', icon: '/icons/naabu.png'        },
-  { title: 'Nmap',         href: '#', icon: '/icons/nmap.png'         },
-  { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.png'       },
-  { title: 'URL Fuzzer',   href: '#', icon: '/icons/urlfuzzer.png'    },
-  { title: 'WPScan',       href: '#', icon: '/icons/wpscan.png'       },
-  { title: 'SQLi',         href: '#', icon: '/icons/sqli.png'         },
-  { title: 'XSS Strike',   href: '#', icon: '/icons/xssstrike.png'    },
-  { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.png'   },
-  { title: 'Httpx',        href: '#', icon: '/icons/httpx.png'        },
-  { title: 'Katana',       href: '#', icon: '/icons/katana.png'       },
-  { title: 'Katana',       href: '#', icon: '/icons/katana.png'       },
-  { title: 'Amass',        href: '#', icon: '/icons/amass.png'        },
-  { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.png'  },
+  { title: 'Subfinder',    href: '#', icon: '/icons/subfinder.webp'    },
+  { title: 'Naabu',        href: '#', icon: '/icons/nabuu.webp'        },
+  { title: 'Nmap',         href: '#', icon: '/icons/nmap.webp'         },
+  { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.webp'       },
+  { title: 'URL Fuzzer',   href: '#', icon: '/icons/url.webp'    },
+  { title: 'WPScan',       href: '#', icon: '/icons/wpscan.webp'       },
+  { title: 'SQLi',         href: '#', icon: '/icons/sqli.webp'         },
+  { title: 'XSS Strike',   href: '#', icon: '/icons/xss.webp'    },
+  { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.webp'   },
+  { title: 'Httpx',        href: '#', icon: '/icons/httpx.webp'        },
+  { title: 'Katana',       href: '#', icon: '/icons/katana.webp'       },
+  { title: 'Gobuster',       href: '#', icon: '/icons/gobuster.webp'       },
+  { title: 'Amass',        href: '#', icon: '/icons/amass.webp'        },
+  { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.webp'  },
 ];
 
 const featureLinks: FeatureItem[] = [
-  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.png'       },
-  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.png'  },
-  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli', icon: '/icons/feature-cli.png'        },
-  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui', icon: '/icons/feature-automation.png' },
+  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.webp'       },
+  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.webp'  },
+  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli', icon: '/icons/feature-cli.webp'        },
+  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui', icon: '/icons/feature-automation.webp' },
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'CLI Documents',   description: 'Guides for using tools via command line',        href: '/resource/cli',   icon: '/icons/res-cli.png'   },
-  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api',   icon: '/icons/res-api.png'   },
-  { title: 'Tools Documents', description: 'Instructions for using security tools',          href: '/resource/tool',  icon: '/icons/res-tools.png' },
-  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',          href: '/resource/ci-cd', icon: '/icons/res-cicd.png'  },
+  { title: 'CLI Documents',   description: 'Guides for using tools via command line',        href: '/resource/cli',   icon: '/icons/res-cli.webp'   },
+  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api',   icon: '/icons/res-api.webp'   },
+  { title: 'Tools Documents', description: 'Instructions for using security tools',          href: '/resource/tool',  icon: '/icons/res-tools.webp' },
+  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',          href: '/resource/ci-cd', icon: '/icons/res-cicd.webp'  },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
-  { title: 'About Us',    href: '/about-us', icon: '/icons/about_us_icon.png'   },
-  { title: 'Contact Us',  href: '/contact-us',          icon: '/icons/contact_us_icon.png' },
-  { title: 'FAQ',         href: '/help-center',          icon: '/icons/faq_icon.png'     },
+  { title: 'About Us',    href: '/about-us', icon: '/icons/about_us_icon.webp'   },
+  { title: 'Contact Us',  href: '/contact-us',          icon: '/icons/contact_us_icon.webp' },
+  { title: 'FAQ',         href: '/help-center',          icon: '/icons/faq.webp'     },
 ];
 
 // ── Logo ─────────────────────────────────────────────────────────────────────
