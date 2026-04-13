@@ -22,7 +22,7 @@ const MENTORS = [
     img: "/images/teacher_Sokpheng.jpg",
     social: {
       github: "https://github.com/sokpheng001",
-      telegram: "https://t.me/chansokpheng",
+      telegram: "https://t.me/sokpheng001",
       linkedin: "https://www.linkedin.com/in/kim-chansokpheng-6b6513267/",
     },
   },
@@ -38,22 +38,22 @@ const MENTORS = [
     img: "./images/teacher_chipor.png",
     social: {
       github: "https://github.com/jiporCK",
-      telegram: "https://t.me/srengchipor",
+      telegram: "https://t.me/jiporsreng",
       linkedin: "https://linkedin.com/in/srengchipor",
     },
   },
 ];
 
 const TEAM = [
-  { name: "Chheng Panharoth", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", sloganKh: "កសាងម៉ាស៊ីនស្នូល\nនៅពីក្រោយប្រព័ន្ធ។", img: "./images/panharoth.jpg", social: { github: "https://github.com/panharoth", telegram: "https://t.me/panharoth", linkedin: "https://linkedin.com/in/panharoth" } },
-  { name: "Pech Rathanakmony", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", sloganKh: "ការរចនាទាំងអស់\nមានគោលបំណង។", img: "./images/rathanakmony.jpg", social: { github: "https://github.com/rathanakmony", telegram: "https://t.me/rathanakmony", linkedin: "https://linkedin.com/in/rathanakmony" } },
-  { name: "So Bohty", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Ship fast,\nship secure.", sloganKh: "ធ្វើឱ្យលឿន\nនិងមានសុវត្ថិភាព។", img: "./images/bohty.jpg", social: { github: "https://github.com/sobohty", telegram: "https://t.me/sobohty", linkedin: "https://linkedin.com/in/sobohty" } },
-  { name: "Rin Bunvarn", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every threat\nhas a signature.", sloganKh: "គ្រប់ការគំរាមកំហែង\nសុទ្ធតែមានស្នាមសម្គាល់។", img: "./images/bunvarn (2).JPG", social: { github: "https://github.com/rinbunvarn", telegram: "https://t.me/rinbunvarn", linkedin: "https://linkedin.com/in/rinbunvarn" } },
-  { name: "Ey Channim", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Teaching machines\nto hunt.", sloganKh: "បង្រៀនម៉ាស៊ីន\nឱ្យចេះស្វែងរក។", img: "./images/channim.JPG", social: { github: "https://github.com/eychannim", telegram: "https://t.me/eychannim", linkedin: "https://linkedin.com/in/eychannim" } },
-  { name: "Mom Reaksmey", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Security that\nfeels effortless.", sloganKh: "សុវត្ថិភាពដែល\nប្រើងាយស្រួល។", img: "./images/reaksmey.jpg", social: { github: "https://github.com/momreaksmey", telegram: "https://t.me/momreaksmey", linkedin: "https://linkedin.com/in/momreaksmey" } },
+  { name: "Chheng Panharoth", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", sloganKh: "កសាងម៉ាស៊ីនស្នូល\nនៅពីក្រោយប្រព័ន្ធ។", img: "./images/panharoth.jpg", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://linkedin.com/in/panharoth" } },
+  { name: "Pech Rathanakmony", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", sloganKh: "ការរចនាទាំងអស់\nមានគោលបំណង។", img: "./images/rathanakmony.jpg", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://linkedin.com/in/rathanakmony" } },
+  { name: "So Bohty", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Ship fast,\nship secure.", sloganKh: "ធ្វើឱ្យលឿន\nនិងមានសុវត្ថិភាព។", img: "./images/bohty.jpg", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://linkedin.com/in/sobohty" } },
+  { name: "Rin Bunvarn", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every threat\nhas a signature.", sloganKh: "គ្រប់ការគំរាមកំហែង\nសុទ្ធតែមានស្នាមសម្គាល់។", img: "./images/bunvarn (2).JPG", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://linkedin.com/in/rinbunvarn" } },
+  { name: "Ey Channim", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Teaching machines\nto hunt.", sloganKh: "បង្រៀនម៉ាស៊ីន\nឱ្យចេះស្វែងរក។", img: "./images/channim.JPG", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://linkedin.com/in/eychannim" } },
+  { name: "Mom Reaksmey", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Security that\nfeels effortless.", sloganKh: "សុវត្ថិភាពដែល\nប្រើងាយស្រួល។", img: "./images/reaksmey.jpg", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://linkedin.com/in/momreaksmey" } },
   { name: "Hor Ratha", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every endpoint\na fortress.", sloganKh: "គ្រប់ endpoint\nដូចជាបន្ទាយ។", img: "./images/ratha.jpg", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/" } },
-  { name: "Ben Loemheng", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Quality is\nnot optional.", sloganKh: "គុណភាពគឺ\nមិនអាចខ្វះបាន។", img: "./images/loemheng.jpg", social: { github: "https://github.com/benloemheng", telegram: "https://t.me/benloemheng", linkedin: "https://linkedin.com/in/benloemheng" } },
-  { name: "Dina Pisethi", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Find the crack\nbefore they do.", sloganKh: "រកចំណុចខ្សោយ\nមុនអ្នកដទៃ។", img: "./images/pisethi.jpg", social: { github: "https://github.com/dinapisethi", telegram: "https://t.me/dinapisethi", linkedin: "https://linkedin.com/in/dinapisethi" } },
+  { name: "Ben Loemheng", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Quality is\nnot optional.", sloganKh: "គុណភាពគឺ\nមិនអាចខ្វះបាន។", img: "./images/loemheng.jpg", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://linkedin.com/in/benloemheng" } },
+  { name: "Dina Pisethi", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Find the crack\nbefore they do.", sloganKh: "រកចំណុចខ្សោយ\nមុនអ្នកដទៃ។", img: "./images/pisethi.jpg", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://linkedin.com/in/dinapisethi" } },
 ];
 
 function IconGithub() {
