@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import CICDContent from "./ci-cd-content";
 import {
   LeftSidebar,
@@ -9,52 +10,94 @@ import {
   type TocItem,
 } from "./ci-cd-sidebar";
 
-const SIDEBAR_SECTIONS: SidebarSection[] = [
-  {
-    label: "Overview",
-    items: [
-      { id: "overview", title: "Introduction" },
-      { id: "workflow", title: "CI/CD Workflow" },
-      { id: "auth", title: "Authentication" },
-      { id: "endpoints", title: "API Endpoints" },
-    ],
-  },
-  {
-    label: "Pipeline Flow",
-    items: [
-      { id: "trigger", title: "Trigger Scan" },
-      { id: "status", title: "Job Status" },
-      { id: "results", title: "Result Retrieval" },
-      { id: "report", title: "Report Download" },
-    ],
-  },
-  {
-    label: "Guides",
-    items: [
-      { id: "pipeline", title: "Pipeline Example" },
-      { id: "thresholds", title: "Severity Thresholds" },
-      { id: "access", title: "Access Scoping" },
-    ],
-  },
-];
-
-const TOC: TocItem[] = [
-  { id: "overview", label: "Overview" },
-  { id: "workflow", label: "CI/CD Workflow" },
-  { id: "auth", label: "Authentication" },
-  { id: "endpoints", label: "API Endpoints" },
-  { id: "trigger", label: "Triggering a Scan" },
-  { id: "status", label: "Job Status" },
-  { id: "results", label: "Result Retrieval" },
-  { id: "report", label: "Report Download" },
-  { id: "pipeline", label: "Pipeline Example" },
-  { id: "thresholds", label: "Severity Thresholds" },
-  { id: "access", label: "Access Scoping" },
-];
-
-const ALL_SECTION_IDS = TOC.map((item) => item.id);
-
 export default function CICDDocument() {
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+  const sidebarSections: SidebarSection[] = isKhmer
+    ? [
+        {
+          label: "ទិដ្ឋភាពទូទៅ",
+          items: [
+            { id: "overview", title: "សេចក្ដីផ្ដើម" },
+            { id: "workflow", title: "លំហូរ CI/CD" },
+            { id: "auth", title: "Authentication" },
+            { id: "endpoints", title: "API Endpoints" },
+          ],
+        },
+        {
+          label: "លំហូរ Pipeline",
+          items: [
+            { id: "trigger", title: "បើកការស្កេន" },
+            { id: "status", title: "ស្ថានភាព Job" },
+            { id: "results", title: "ទាញយកលទ្ធផល" },
+            { id: "report", title: "ទាញយក Report" },
+          ],
+        },
+        {
+          label: "មគ្គុទេសក៍",
+          items: [
+            { id: "pipeline", title: "ឧទាហរណ៍ Pipeline" },
+            { id: "thresholds", title: "Severity Thresholds" },
+            { id: "access", title: "Access Scoping" },
+          ],
+        },
+      ]
+    : [
+        {
+          label: "Overview",
+          items: [
+            { id: "overview", title: "Introduction" },
+            { id: "workflow", title: "CI/CD Workflow" },
+            { id: "auth", title: "Authentication" },
+            { id: "endpoints", title: "API Endpoints" },
+          ],
+        },
+        {
+          label: "Pipeline Flow",
+          items: [
+            { id: "trigger", title: "Trigger Scan" },
+            { id: "status", title: "Job Status" },
+            { id: "results", title: "Result Retrieval" },
+            { id: "report", title: "Report Download" },
+          ],
+        },
+        {
+          label: "Guides",
+          items: [
+            { id: "pipeline", title: "Pipeline Example" },
+            { id: "thresholds", title: "Severity Thresholds" },
+            { id: "access", title: "Access Scoping" },
+          ],
+        },
+      ];
+  const toc: TocItem[] = isKhmer
+    ? [
+        { id: "overview", label: "ទិដ្ឋភាពទូទៅ" },
+        { id: "workflow", label: "លំហូរ CI/CD" },
+        { id: "auth", label: "Authentication" },
+        { id: "endpoints", label: "API Endpoints" },
+        { id: "trigger", label: "ការបើកការស្កេន" },
+        { id: "status", label: "ស្ថានភាព Job" },
+        { id: "results", label: "ទាញយកលទ្ធផល" },
+        { id: "report", label: "ទាញយក Report" },
+        { id: "pipeline", label: "ឧទាហរណ៍ Pipeline" },
+        { id: "thresholds", label: "Severity Thresholds" },
+        { id: "access", label: "Access Scoping" },
+      ]
+    : [
+        { id: "overview", label: "Overview" },
+        { id: "workflow", label: "CI/CD Workflow" },
+        { id: "auth", label: "Authentication" },
+        { id: "endpoints", label: "API Endpoints" },
+        { id: "trigger", label: "Triggering a Scan" },
+        { id: "status", label: "Job Status" },
+        { id: "results", label: "Result Retrieval" },
+        { id: "report", label: "Report Download" },
+        { id: "pipeline", label: "Pipeline Example" },
+        { id: "thresholds", label: "Severity Thresholds" },
+        { id: "access", label: "Access Scoping" },
+      ];
+  const allSectionIds = toc.map((item) => item.id);
   const [activeId, setActiveId] = useState("overview");
 
   useEffect(() => {
@@ -78,13 +121,13 @@ export default function CICDDocument() {
     );
 
     sections.forEach((section) => {
-      if (ALL_SECTION_IDS.includes(section.id)) {
+      if (allSectionIds.includes(section.id)) {
         observer.observe(section);
       }
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [allSectionIds]);
 
   const navigate = useCallback((id: string) => {
     const element = document.getElementById(id);
@@ -97,7 +140,7 @@ export default function CICDDocument() {
     <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#09090B] transition-colors duration-300">
       <div className="mx-auto flex w-full max-w-7xl items-start pt-22">
         <LeftSidebar
-          sections={SIDEBAR_SECTIONS}
+          sections={sidebarSections}
           activeId={activeId}
           onNavigate={navigate}
         />
@@ -106,7 +149,7 @@ export default function CICDDocument() {
           <CICDContent />
         </main>
 
-        <RightSidebar toc={TOC} activeId={activeId} onNavigate={navigate} />
+        <RightSidebar toc={toc} activeId={activeId} onNavigate={navigate} />
       </div>
     </div>
   );

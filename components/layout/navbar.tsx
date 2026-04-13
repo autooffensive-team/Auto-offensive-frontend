@@ -210,16 +210,15 @@ function ToolItem({ title, href, icon }: ToolItem) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
-      <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+      <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 shadow-sm">
         <Image
           src={icon}
           alt={title}
-          width={74}
-          height={74}
-          style={{ width: 'auto', height: 'auto' }}
-          className="object-cover"
+          width={36}
+          height={36}
+          className="h-9 w-9 object-contain"
         />
       </div>
       <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
@@ -234,19 +233,18 @@ function FeatureItem({ title, description, href, icon }: FeatureItem) {
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-md p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-start gap-3 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
-      <div className="shrink-0 w-10 h-10  bg-background flex items-center justify-center overflow-hidden shadow-sm">
+      <div className="mt-0.5 flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-background/80 shadow-sm">
         <Image
           src={icon}
           alt={title}
-          width={28}
-          height={28}
-          style={{ width: 'auto', height: 'auto' }}
-          className="object-contain"
+          width={32}
+          height={32}
+          className="h-8 w-8 object-contain"
         />
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-foreground">
           {title} <span className="text-muted-foreground font-normal">:</span>
         </p>
@@ -257,57 +255,68 @@ function FeatureItem({ title, description, href, icon }: FeatureItem) {
 }
 
 // ── Resource Doc Item ─────────────────────────────────────────────────────────
-function ResourceDocItem({ title, description, href, icon }: ResourceItem) {
-  return (
-    <NavigationMenuLink asChild>
-      <Link
-        href={href}
-        className="flex items-start gap-3 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-      >
-        <div className="shrink-0 w-9 h-9 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
-          <Image
-            src={icon}
-            alt={title}
-            width={24}
-            height={24}
-            style={{ width: 'auto', height: 'auto' }}
-            className="object-contain"
-          />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-foreground">
-            {title} <span className="text-muted-foreground font-normal">:</span>
-          </p>
-          {description && (
-            <p className="text-xs text-muted-foreground leading-snug">{description}</p>
-          )}
-        </div>
-      </Link>
-    </NavigationMenuLink>
+function ResourceDocItem({
+  title,
+  description,
+  href,
+  icon,
+  asMenuLink = false,
+}: ResourceItem & { asMenuLink?: boolean }) {
+  const content = (
+    <Link
+      href={href}
+      className="flex items-start gap-3 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+    >
+      <div className="shrink-0 w-9 h-9 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+        <Image
+          src={icon}
+          alt={title}
+          width={24}
+          height={24}
+          style={{ width: 'auto', height: 'auto' }}
+          className="object-contain"
+        />
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-foreground">
+          {title} <span className="text-muted-foreground font-normal">:</span>
+        </p>
+        {description && (
+          <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+        )}
+      </div>
+    </Link>
   );
+
+  return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
 
 // ── Resource Misc Item ────────────────────────────────────────────────────────
-function ResourceMiscItem({ title, href, icon }: ResourceItem) {
-  return (
-    <NavigationMenuLink asChild>
-      <Link
-        href={href}
-        className="flex items-center gap-2.5 rounded-md px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-      >
-        <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
-          <Image
-            src={icon}
-            alt={title}
-            width={22}
-            height={22}
-            className="object-contain"
-          />
-        </div>
-        <span className="text-sm font-medium text-foreground">{title}</span>
-      </Link>
-    </NavigationMenuLink>
+function ResourceMiscItem({
+  title,
+  href,
+  icon,
+  asMenuLink = false,
+}: ResourceItem & { asMenuLink?: boolean }) {
+  const content = (
+    <Link
+      href={href}
+      className="flex items-center gap-2.5 rounded-md px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+    >
+      <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+        <Image
+          src={icon}
+          alt={title}
+          width={22}
+          height={22}
+          className="object-contain"
+        />
+      </div>
+      <span className="text-sm font-medium text-foreground">{title}</span>
+    </Link>
   );
+
+  return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
 
 // ── Scroll hook ───────────────────────────────────────────────────────────────
@@ -431,7 +440,7 @@ export function Header() {
                       <ul className="space-y-0.5 border-r border-border pr-2">
                         {resourceDocLinks.map((item, i) => (
                           <li key={i}>
-                            <ResourceDocItem {...item} />
+                            <ResourceDocItem {...item} asMenuLink />
                           </li>
                         ))}
                       </ul>
@@ -439,7 +448,7 @@ export function Header() {
                       <ul className="space-y-0.5 pl-2">
                         {resourceMiscLinks.map((item, i) => (
                           <li key={i}>
-                            <ResourceMiscItem {...item} />
+                            <ResourceMiscItem {...item} asMenuLink />
                           </li>
                         ))}
                       </ul>
@@ -469,9 +478,7 @@ export function Header() {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 md:hidden">
-          <LanguageToggle />
-          <ThemeToggle />
+        <div className="flex items-center md:hidden">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -487,6 +494,17 @@ export function Header() {
       {/* Mobile Menu */}
       <MobileMenu open={open} className="flex flex-col justify-between gap-2 overflow-y-auto">
         <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background/70 p-3 backdrop-blur-md">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
+              <p className="text-sm text-foreground">Language and theme</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+          </div>
+
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
           <div className="grid grid-cols-2 gap-0.5">
             {toolLinks.map((link, i) => (

@@ -1010,9 +1010,26 @@ export default function Features() {
 
       <section
         ref={featureSectionRef}
-        className={`relative pt-12 pb-1.5 ${MAX_WIDTH_CLASSES[CONFIG.MAX_WIDTH as keyof typeof MAX_WIDTH_CLASSES]} ${getAlignmentClass(CONFIG.SECTION_ALIGNMENT)}`}
+        className={`relative -mt-12 pb-1.5 pt-24 md:-mt-20 md:pt-32 ${MAX_WIDTH_CLASSES[CONFIG.MAX_WIDTH as keyof typeof MAX_WIDTH_CLASSES]} ${getAlignmentClass(CONFIG.SECTION_ALIGNMENT)}`}
         id="features"
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 -top-16 h-24 md:-top-24 md:h-32"
+          style={{
+            background: `linear-gradient(to bottom, transparent 0%, ${colors.bg} 78%)`,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-[12%] -top-8 h-16 rounded-full blur-3xl md:-top-12 md:h-24"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(1,80,158,0.12) 24%, rgba(0,208,178,0.16) 52%, rgba(1,80,158,0.1) 78%, transparent 100%)",
+            opacity: isDesktop ? 0.95 : 0.7,
+          }}
+        />
+
         {/* Section Header */}
         <div
           className="flex items-center justify-between py-12 border-b"

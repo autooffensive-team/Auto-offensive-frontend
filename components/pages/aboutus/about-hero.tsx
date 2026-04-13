@@ -121,7 +121,7 @@ export default function AboutHero() {
         titleAccent: "វេទិកាសុវត្ថិភាព",
         titleBottom: "ជំនាន់ថ្មីរបស់យើង",
         subtitle:
-          "Auto-Offensive គឺជា PaaS សម្រាប់ស្កេនសុវត្ថិភាពលើវេបសាយ បណ្ដាញ និងកូដដោយស្វ័យប្រវត្តិ ដំណើរការដោយ AI ហើយមិនចាំបាច់ដំឡើង CLI ទេ។",
+          "Auto-Offensive គឺជា PaaS ដែលប្រើ AI ដើម្បី automate ការស្កេនសុវត្ថិភាពលើ web, network និង code — ដោយមិនចាំបាច់ដំឡើង CLI ឬ setup អ្វីឡើយ។",
         primaryButton: "រឿងរ៉ាវរបស់យើង",
         secondaryButton: "ស្គាល់ក្រុមការងារ",
         stats: ["ទម្រង់របាយការណ៍", "ស្កេនលឿនជាងមុន", "ត្រៀមសម្រាប់ API", "MCP + SonarQube"],
