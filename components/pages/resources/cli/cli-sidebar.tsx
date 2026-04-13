@@ -1,30 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const CLI_REF_LINKS = [
-  { href: "#installation", label: "Installation" },
-  { href: "#auth", label: "Authentication" },
-  { href: "#commands", label: "Commands" },
-  { href: "#tools", label: "Supported Tools" },
-  { href: "#execution", label: "Remote Execution" },
-  { href: "#streaming", label: "Output Streaming" },
-  { href: "#results", label: "Result Handling" },
-  { href: "#jobs", label: "Job Lifecycle" },
-  { href: "#security", label: "Security" },
-  { href: "#concept", label: "How It Works" },
-];
-
-const REPORTING_LINKS = [
-  { href: "#", label: "Report Generation" },
-  { href: "#", label: "Templates" },
-  { href: "#", label: "Export Formats" },
-];
-
-const API_LINKS = [
-  { href: "#", label: "API Reference" },
-  { href: "#", label: "Authentication" },
-];
+import { useLocale } from "next-intl";
 
 function SidebarGroup({
   label,
@@ -81,6 +58,32 @@ function SidebarItem({
 
 export default function Sidebar() {
   const [activeId, setActiveId] = useState("installation");
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+
+  const cliRefLinks = [
+    { href: "#installation", label: isKhmer ? "ការដំឡើង" : "Installation" },
+    { href: "#auth", label: "Authentication" },
+    { href: "#commands", label: "Commands" },
+    { href: "#tools", label: isKhmer ? "Tools ដែលគាំទ្រ" : "Supported Tools" },
+    { href: "#execution", label: "Remote Execution" },
+    { href: "#streaming", label: "Output Streaming" },
+    { href: "#results", label: isKhmer ? "ការគ្រប់គ្រង Results" : "Result Handling" },
+    { href: "#jobs", label: "Job Lifecycle" },
+    { href: "#security", label: "Security" },
+    { href: "#concept", label: isKhmer ? "របៀបដំណើរការ" : "How It Works" },
+  ];
+
+  const reportingLinks = [
+    { href: "#", label: isKhmer ? "ការបង្កើត Report" : "Report Generation" },
+    { href: "#", label: "Templates" },
+    { href: "#", label: "Export Formats" },
+  ];
+
+  const apiLinks = [
+    { href: "#", label: "API Reference" },
+    { href: "#", label: "Authentication" },
+  ];
 
   useEffect(() => {
     const sections = document.querySelectorAll(".doc-section[id]");
@@ -108,9 +111,8 @@ export default function Sidebar() {
       className="w-72 shrink-0 sticky top-22 self-start h-[calc(100vh-5.5rem)] overflow-y-auto py-5.5 border-r border-[#E2DDD5] dark:border-white/10 bg-[#F7F5F0] dark:bg-[#09090B] hidden lg:block"
       style={{ scrollbarWidth: "thin", scrollbarColor: "#E2DDD5 transparent" }}
     >
-      {/* CLI Reference */}
-      <SidebarGroup label="CLI Reference">
-        {CLI_REF_LINKS.map((link) => (
+      <SidebarGroup label={isKhmer ? "ឯកសារ CLI" : "CLI Reference"}>
+        {cliRefLinks.map((link) => (
           <SidebarItem
             key={link.href}
             href={link.href}
@@ -122,9 +124,8 @@ export default function Sidebar() {
         ))}
       </SidebarGroup>
 
-      {/* Reporting */}
       <SidebarGroup label="Reporting">
-        {REPORTING_LINKS.map((link) => (
+        {reportingLinks.map((link) => (
           <SidebarItem
             key={link.label}
             href={link.href}
@@ -134,9 +135,8 @@ export default function Sidebar() {
         ))}
       </SidebarGroup>
 
-      {/* API */}
       <SidebarGroup label="API">
-        {API_LINKS.map((link) => (
+        {apiLinks.map((link) => (
           <SidebarItem
             key={link.label}
             href={link.href}
