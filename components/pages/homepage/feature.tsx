@@ -458,7 +458,7 @@ function DualSpine({
 
 // ─── Center Logo ──────────────────────────────────────────────────────────────
 
-function CenterLogo({ visible }: { visible: boolean }) {
+function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) {
   return (
     <div
       className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-200 pointer-events-none"
@@ -483,7 +483,7 @@ function CenterLogo({ visible }: { visible: boolean }) {
         </div>
       </div>
       <Image
-        src="/Auto-Offensive.webp"
+        src={isDark ? "/Auto-Offensive-dm.webp" : "/Auto-Offensive.webp"}
         alt="Logo"
         className="relative z-10 object-contain"
         style={{ filter: "drop-shadow(0 0 10px rgba(0,188,161,0.18))" }}
@@ -844,6 +844,7 @@ export default function Features() {
   const [logoVisible, setLogoVisible] = useState(false);
 
   const colors = useTheme();
+  const isDark = colors === CONFIG.DARK;
   const mode = useResponsiveMode();
   const isDesktop = mode === "desktop";
   const sectionPaddingX = mode === "mobile" ? "20px" : mode === "tablet" ? "32px" : "52px";
@@ -1006,7 +1007,7 @@ export default function Features() {
       {/* FIX: Pass scrollPct so the bar actually fills */}
       <ProgressBar widthPct={scrollPct} />
       {isDesktop ? <DualSpine fillPct={spineFill} clipPath={spineClip} colors={colors} /> : null}
-      {isDesktop ? <CenterLogo visible={logoVisible} /> : null}
+      {isDesktop ? <CenterLogo visible={logoVisible} isDark={isDark} /> : null}
 
       <section
         ref={featureSectionRef}

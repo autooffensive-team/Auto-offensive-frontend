@@ -94,7 +94,7 @@
       "titleLine3": "for hacker",
       "description": "Continuously scan your infrastructure for vulnerabilities - faster, smarter, and at scale. No manual setup. Just results.",
       "primaryCta": "Start Scanning",
-      "secondaryCta": "View Sample Report",
+      "secondaryCta": "Preview Report",
       "scroll": "Scroll",
       "stats": {
         "completed": "Scans completed",

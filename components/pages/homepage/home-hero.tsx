@@ -888,37 +888,41 @@ export default function HomeHero() {
           </p>
 
           {/* Buttons */}
-          <div className="fade-up-4 flex items-center justify-center gap-3 flex-wrap">
+          <div className="fade-up-4 grid w-full max-w-136 grid-cols-2 gap-3 sm:flex sm:w-auto sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <button className="
               bg-primary text-white border-none
-              px-7.5 py-3.5 rounded-[10px]
-              text-[0.9rem] font-semibold font-[inherit]
+              w-full min-w-0 justify-center
+              px-4 py-3 rounded-xl
+              text-[0.82rem] leading-tight font-semibold font-[inherit]
               flex items-center gap-2 cursor-pointer
               hover:bg-[#00b89c]
               transition-all duration-200
+              sm:w-auto sm:px-7.5 sm:py-3.5 sm:text-[0.9rem]
             ">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
               </svg>
-              {t("primaryCta")}
+              <span className="min-w-0 text-center wrap-break-word">{t("primaryCta")}</span>
             </button>
 
             <button className="
               bg-white dark:bg-[rgba(0,208,178,0.06)]
               text-[oklch(0.145_0_0)] dark:text-[oklch(0.908_0_0)]
               border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)]
-              px-6.5 py-3.5 rounded-[10px]
-              text-[0.9rem] font-medium font-[inherit]
+              w-full min-w-0 justify-center
+              px-4 py-3 rounded-xl
+              text-[0.82rem] leading-tight font-medium font-[inherit]
               flex items-center gap-2 cursor-pointer
               backdrop-blur-sm
               hover:bg-white/90 dark:hover:bg-[rgba(0,208,178,0.12)]
               hover:border-[rgba(0,208,178,0.55)] dark:hover:border-[rgba(0,208,178,0.45)]
               duration-200
+              sm:w-auto sm:px-6.5 sm:py-3.5 sm:text-[0.9rem]
             ">
               <svg className="text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
-              {t("secondaryCta")}
+              <span className="min-w-0 text-center wrap-break-word">{t("secondaryCta")}</span>
             </button>
           </div>
 
