@@ -8,11 +8,11 @@ import TeamAndFooter from "@/components/pages/aboutus/team-and-footer";
 
 export default function AboutUs() {
   return (
-    <>
+    <div className="overflow-x-clip">
       <AboutHero />
       <OurMission />
       <Values />
       <TeamAndFooter/>
-    </>
+    </div>
   );
 }

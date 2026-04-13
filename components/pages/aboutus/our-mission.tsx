@@ -23,7 +23,7 @@ const SLIDES_EN = [
   {
     num: "03",
     tag: "Who We Serve",
-    title: ["Built for real users,", "not just experts."],
+    title: ["Built for real users,", "not just", "experts."],
     accentIndex: 0,
     body: "Software engineers, penetration testers, security researchers, students and learners all get the same enterprise-grade scanning power.",
     visual: "stats",
@@ -31,7 +31,7 @@ const SLIDES_EN = [
   {
     num: "04",
     tag: "Our Vision",
-    title: ["Shift security left", "into every pipeline."],
+    title: ["Shift security left", "into every", "pipeline."],
     accentIndex: 1,
     body: "Auto-Offensive integrates into GitHub, GitLab and CI/CD workflows through API so code quality and vulnerabilities are scanned automatically on every push.",
     visual: "pipeline",
@@ -131,7 +131,7 @@ function ShieldVisual() {
 
 function TerminalVisual({ lines }: { lines: string[] }) {
   return (
-    <div className="w-[320px] overflow-hidden rounded-[10px] border border-[rgba(0,208,178,.14)] bg-[rgba(10,31,26,.06)] dark:bg-[rgba(0,0,0,.5)]">
+    <div className="w-full max-w-[320px] overflow-hidden rounded-[10px] border border-[rgba(0,208,178,.14)] bg-[rgba(10,31,26,.06)] dark:bg-[rgba(0,0,0,.5)]">
       <div className="flex items-center border-b border-[rgba(0,208,178,.14)] bg-[rgba(0,208,178,.04)] px-3.5 py-2">
         <span className="inline-block h-2 w-2 rounded-full bg-[#ff5f57]" />
         <span className="mx-1 inline-block h-2 w-2 rounded-full bg-[#febc2e]" />
@@ -220,7 +220,7 @@ function StatsVisual({ active, labels }: { active: boolean; labels: string[] }) 
 
 function PipelineVisual({ steps }: { steps: string[] }) {
   return (
-    <div className="ms-vis-pipeline flex w-47.5 flex-col items-center">
+    <div className="ms-vis-pipeline flex w-full max-w-[190px] flex-col items-center">
       {steps.map((step, i) => (
         <div key={step} className="flex w-full flex-col items-center">
           <div
@@ -297,8 +297,6 @@ export default function OurMission() {
   const isMobile = useRef(false);
 
   useEffect(() => {
-    isMobile.current = window.innerWidth <= 768;
-
     const outer = outerRef.current;
     const track = trackRef.current;
     const progress = progressRef.current;
@@ -326,15 +324,34 @@ export default function OurMission() {
       const raw = p * (totalSlides - 0.001);
       const idx = Math.min(totalSlides - 1, Math.floor(raw));
       const frac = raw - idx;
-      track.style.transform = `translateX(${-(idx * window.innerWidth + frac * window.innerWidth)}px)`;
+      const slideWidth = outer.clientWidth || window.innerWidth;
+      track.style.transform = `translateX(${-(idx * slideWidth + frac * slideWidth)}px)`;
       if (progress) progress.style.width = p * 100 + "%";
       setSlide(idx);
     }
 
+    function syncViewportMode() {
+      isMobile.current = window.matchMedia("(max-width: 768px)").matches;
+
+      if (isMobile.current) {
+        track.style.transform = "none";
+        if (progress) progress.style.width = "0%";
+        setSlide(0);
+        return;
+      }
+
+      onScroll();
+    }
+
     setSlide(0);
-    onScroll();
+    syncViewportMode();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", syncViewportMode);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", syncViewportMode);
+    };
   }, [slides]);
 
   return (
@@ -445,26 +462,105 @@ export default function OurMission() {
         }
         @media (max-width: 768px) {
           .ms-outer { height: auto !important; }
-          .ms-sticky { position: relative !important; height: auto !important; overflow: visible; }
+          .ms-sticky {
+            position: relative !important;
+            height: auto !important;
+            overflow-x: clip;
+            overflow-y: visible;
+          }
           .ms-bg-grid, .ms-bg-glow { display: none; }
-          .ms-top-strip { position: relative; padding: 18px 5% 12px; }
-          .ms-track-wrap { position: relative; padding: 0; overflow: visible; display: block; height: auto; }
-          .ms-track { display: flex; flex-direction: column; width: 100% !important; height: auto; transform: none !important; }
-          .ms-slide { width: 100% !important; height: auto; min-height: auto; padding: 32px 5% 40px; border-bottom: 1px solid var(--border); }
-          .ms-slide-inner { grid-template-columns: 1fr !important; gap: 20px; max-width: 100%; }
-          .ms-slide-num-col { flex-direction: row; align-items: center; }
-          .ms-slide-dot-line {
+          .ms-top-strip {
+            position: relative;
+            padding: 18px 5% 12px;
+            text-align: center;
+          }
+          .ms-track-wrap {
+            position: relative;
+            padding: 0;
+            overflow-x: clip;
+            overflow-y: visible;
+            display: block;
+            height: auto;
+          }
+          .ms-track {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            width: 100% !important;
+            height: auto;
+            transform: none !important;
+          }
+          .ms-slide {
+            width: 100% !important;
+            height: auto;
+            min-height: auto;
+            padding: 32px 5% 40px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: clip;
+          }
+          .ms-slide-inner {
+            grid-template-columns: 1fr !important;
+            gap: 20px;
+            width: min(100%, 34rem);
+            max-width: 100%;
+            margin-inline: auto;
+            justify-items: center;
+          }
+          .ms-slide-num-col {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             width: 100%;
+            gap: 16px !important;
+          }
+          .ms-slide-dot-line {
+            width: min(100%, 72px);
             height: 1px;
             background: repeating-linear-gradient(to right, rgba(0,208,178,.4) 0px, rgba(0,208,178,.4) 4px, transparent 4px, transparent 10px);
           }
-          .ms-slide-num { font-size: 3rem; }
-          .ms-slide-visual { justify-content: flex-start; }
+          .ms-slide-num {
+            margin-left: 0;
+            text-align: center;
+            font-size: clamp(2.75rem, 16vw, 4rem);
+          }
+          .ms-slide-content,
+          .ms-slide-visual,
+          .ms-slide-body,
+          .ms-bq {
+            min-width: 0;
+            max-width: 100%;
+          }
+          .ms-slide-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .ms-slide-tag { justify-content: center; }
+          .ms-slide-body { margin-inline: auto; }
+          .ms-bq {
+            margin-inline: auto;
+            text-align: center;
+            padding-left: 0;
+            padding-top: 1rem;
+          }
+          .ms-bq-bar {
+            top: 0;
+            bottom: auto;
+            left: 50%;
+            width: 56px;
+            height: 2px;
+            transform: translateX(-50%);
+          }
+          .ms-slide-visual {
+            width: 100%;
+            justify-content: center;
+          }
           .ms-vis-stats { max-width: 100%; }
           .ms-vis-pipeline { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; }
           .ms-vp-step { width: calc(50% - 4px); padding: 7px 10px; font-size: .72rem; }
           .ms-vp-line { display: none; }
-          .ms-progress-wrap { position: relative; }
+          .ms-progress-wrap { display: none; }
           .ms-path-pointer { display: none; }
         }
         @media (max-width: 480px) {
@@ -472,7 +568,7 @@ export default function OurMission() {
         }
       `}</style>
 
-      <div ref={outerRef} className="ms-outer ms-section relative h-[400vh]" style={{ fontFamily: bodyFont }}>
+      <div ref={outerRef} className="ms-outer ms-section relative h-[400vh] overflow-x-clip" style={{ fontFamily: bodyFont }}>
         <div className="ms-sticky sticky top-0 h-screen overflow-hidden transition-[background] duration-400">
           <div className="ms-bg-grid absolute inset-0 pointer-events-none" />
           <div className="ms-bg-glow absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(0,208,178,.04)_0%,transparent_70%)]" />

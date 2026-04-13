@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLocale } from 'next-intl';
 
 interface SidebarItemConfig {
   href: string;
@@ -76,37 +77,71 @@ export const ToolSidebar: React.FC<ToolSidebarProps> = ({
   activeSection,
   onNavigate,
 }) => {
-  const groups: SidebarGroupConfig[] = [
-    {
-      label: 'Tool Reference',
-      items: [
-        { href: '#overview', label: 'Overview', withDot: true },
-        { href: '#subfinder', label: 'subfinder', withDot: true },
-        { href: '#httpx', label: 'httpx', withDot: true },
-        { href: '#naabu', label: 'naabu', withDot: true },
-        { href: '#nuclei', label: 'nuclei', withDot: true },
-        { href: '#versions', label: 'Versions & Status', withDot: true },
-        { href: '#limits', label: 'Rate Limits', withDot: true },
-        { href: '#output', label: 'Output Formats', withDot: true },
-        { href: '#errors', label: 'Error Reference', withDot: true },
-      ],
-    },
-    {
-      label: 'Reporting',
-      items: [
-        { href: '#report-gen', label: 'Report Generation' },
-        { href: '#templates', label: 'Templates' },
-        { href: '#export', label: 'Export Formats' },
-      ],
-    },
-    {
-      label: 'API',
-      items: [
-        { href: '#api-ref', label: 'API Reference' },
-        { href: '#auth', label: 'Authentication' },
-      ],
-    },
-  ];
+  const locale = useLocale();
+  const isKhmer = locale === 'kh';
+  const groups: SidebarGroupConfig[] = isKhmer
+    ? [
+        {
+          label: 'ឯកសារ Tool',
+          items: [
+            { href: '#overview', label: 'ទិដ្ឋភាពទូទៅ', withDot: true },
+            { href: '#subfinder', label: 'subfinder', withDot: true },
+            { href: '#httpx', label: 'httpx', withDot: true },
+            { href: '#naabu', label: 'naabu', withDot: true },
+            { href: '#nuclei', label: 'nuclei', withDot: true },
+            { href: '#versions', label: 'Versions & Status', withDot: true },
+            { href: '#limits', label: 'Rate Limits', withDot: true },
+            { href: '#output', label: 'Output Formats', withDot: true },
+            { href: '#errors', label: 'Error Reference', withDot: true },
+          ],
+        },
+        {
+          label: 'Reporting',
+          items: [
+            { href: '#report-gen', label: 'Report Generation' },
+            { href: '#templates', label: 'Templates' },
+            { href: '#export', label: 'Export Formats' },
+          ],
+        },
+        {
+          label: 'API',
+          items: [
+            { href: '#api-ref', label: 'API Reference' },
+            { href: '#auth', label: 'Authentication' },
+          ],
+        },
+      ]
+    : [
+        {
+          label: 'Tool Reference',
+          items: [
+            { href: '#overview', label: 'Overview', withDot: true },
+            { href: '#subfinder', label: 'subfinder', withDot: true },
+            { href: '#httpx', label: 'httpx', withDot: true },
+            { href: '#naabu', label: 'naabu', withDot: true },
+            { href: '#nuclei', label: 'nuclei', withDot: true },
+            { href: '#versions', label: 'Versions & Status', withDot: true },
+            { href: '#limits', label: 'Rate Limits', withDot: true },
+            { href: '#output', label: 'Output Formats', withDot: true },
+            { href: '#errors', label: 'Error Reference', withDot: true },
+          ],
+        },
+        {
+          label: 'Reporting',
+          items: [
+            { href: '#report-gen', label: 'Report Generation' },
+            { href: '#templates', label: 'Templates' },
+            { href: '#export', label: 'Export Formats' },
+          ],
+        },
+        {
+          label: 'API',
+          items: [
+            { href: '#api-ref', label: 'API Reference' },
+            { href: '#auth', label: 'Authentication' },
+          ],
+        },
+      ];
 
   const smoothScroll = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith('#')) return;
