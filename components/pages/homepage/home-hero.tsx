@@ -948,7 +948,7 @@ export default function HomeHero() {
             <button className="
               group relative inline-flex w-full min-w-0 items-center justify-center
               overflow-hidden rounded-xl border-2 border-primary bg-primary
-              px-4 py-3 text-[15px] font-black leading-none text-white
+              px-3 py-3 text-[14px] sm:px-4 sm:text-[15px] font-black leading-none text-white
               transition-transform duration-200 hover:-translate-y-px
               before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
               before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
@@ -963,7 +963,7 @@ export default function HomeHero() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                 </svg>
-                <span className="min-w-0 text-center wrap-break-word">{t("primaryCta")}</span>
+                <span className="min-w-0 whitespace-nowrap text-center">{t("primaryCta")}</span>
               </span>
             </button>
 
@@ -983,7 +983,7 @@ export default function HomeHero() {
               <svg className="text-black dark:text-white" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
-              <span className="min-w-0 text-center wrap-break-word text-black dark:text-white">{t("secondaryCta")}</span>
+              <span className="min-w-0 whitespace-nowrap text-center text-black dark:text-white">{t("secondaryCta")}</span>
             </button>
           </div>
 

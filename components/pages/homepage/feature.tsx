@@ -631,37 +631,38 @@ function CardRow({
           transition: "transform 0.85s 0.2s cubic-bezier(.16,1,.3,1), opacity 0.85s 0.2s",
         }}
       >
-        {/* Number */}
-        <p
-          className="uppercase mb-5"
-          style={{
-            fontFamily: labelFontFamily,
-            color: colors.accent1,
-            fontSize: labelFontSize,
-            letterSpacing: "0.2em",
-            opacity: 0.6,
-          }}
-        >
-          {card.num}
-        </p>
+        <div className="mb-6 flex items-center gap-3 whitespace-nowrap">
+          <span
+            className="inline-flex items-center justify-center rounded-xl border px-3 py-2"
+            style={{
+              fontFamily: labelFontFamily,
+              color: colors.accent1,
+              borderColor: "rgba(1,80,158,0.18)",
+              backgroundColor: "rgba(1,80,158,0.04)",
+              fontSize: labelFontSize,
+              letterSpacing: "0.2em",
+              opacity: 0.7,
+              textTransform: "uppercase",
+            }}
+          >
+            {card.num}
+          </span>
 
-        {/* Tag */}
-        <span
-          className="inline-flex items-center gap-1.5 mb-6"
-          style={{
-            fontFamily: labelFontFamily,
-            color: colors.accent1,
-            backgroundColor: `rgba(1,80,158,0.07)`,
-            border: `1px solid rgba(1,80,158,0.18)`,
-            borderRadius: 1,
-            padding: "6px 12px",
-            fontSize: labelFontSize,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-          }}
-        >
-          {card.tag}
-        </span>
+          <span
+            className="inline-flex items-center justify-center rounded-xl border px-3 py-2"
+            style={{
+              fontFamily: labelFontFamily,
+              color: colors.accent1,
+              backgroundColor: `rgba(1,80,158,0.07)`,
+              border: `1px solid rgba(1,80,158,0.18)`,
+              fontSize: labelFontSize,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            {card.tag}
+          </span>
+        </div>
 
         {/* Title */}
         <h3
@@ -849,6 +850,7 @@ export default function Features() {
   const isDesktop = mode === "desktop";
   const sectionPaddingX = mode === "mobile" ? "20px" : mode === "tablet" ? "32px" : "52px";
   const sectionHeaderLabelSize = mode === "mobile" ? "9px" : mode === "tablet" ? "10px" : FONT_SIZES.xs.desktop;
+  const sectionTitleLine2 = t("sectionTitleLine2");
 
   const firstCardRef = useRef<HTMLDivElement | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -1063,7 +1065,15 @@ export default function Features() {
             >
               {t("sectionTitleLine1")}
               <br />
-              {t("sectionTitleLine2")}
+              {sectionTitleLine2.includes("Auto Offensive") ? (
+                <>
+                  with{" "}
+                  <span style={{ color: CONFIG.LIGHT.accent2 }}>Auto</span>{" "}
+                  <span style={{ color: CONFIG.LIGHT.accent1 }}>Offensive</span>
+                </>
+              ) : (
+                sectionTitleLine2
+              )}
             </h2>
           </div>
         </div>
