@@ -736,6 +736,57 @@ export default function HomeHero() {
             font-size: 20px; /* desktop */
           }
         }
+
+        /* ── Ripple Animation for Preview Button ── */
+        .ripple-button {
+          position: relative;
+          overflow: hidden;
+        }
+        .ripple-button:before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.25);
+          top: 100%;
+          width: 140%;
+          height: 180%;
+          background-color: rgba(0, 0, 0, 0.05);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:after {
+          content: "";
+          position: absolute;
+          left: 55%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.45);
+          top: 180%;
+          width: 160%;
+          height: 190%;
+          background-color: #39bda7;
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:hover {
+          border-color: #39bda7;
+        }
+        .ripple-button:hover svg {
+          color: black;
+          stroke: black;
+        }
+        .ripple-button:hover:before {
+          top: -35%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .ripple-button:hover:after {
+          top: -45%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
       `}</style>
 
       <section
@@ -914,12 +965,11 @@ export default function HomeHero() {
               text-[0.82rem] leading-tight font-medium font-[inherit]
               flex items-center gap-2 cursor-pointer
               backdrop-blur-sm
-              hover:bg-white/90 dark:hover:bg-[rgba(0,208,178,0.12)]
-              hover:border-[rgba(0,208,178,0.55)] dark:hover:border-[rgba(0,208,178,0.45)]
               duration-200
+              ripple-button
               sm:w-auto sm:px-6.5 sm:py-3.5 sm:text-[0.9rem]
             ">
-              <svg className="text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="text-black dark:text-black" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
               <span className="min-w-0 text-center wrap-break-word">{t("secondaryCta")}</span>

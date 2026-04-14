@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import img1 from "@/public/home-image/code1.webp";
 import img2 from "@/public/home-image/code2.webp";
 import img3 from "@/public/home-image/code3.webp";
+import AnimatedCta from "./animated-cta";
 
 interface CardData {
   title: string;
@@ -64,6 +65,7 @@ const Card: React.FC<{
   displayFontFamily: string;
 }> = ({ card, seeMore, bodyFontFamily, displayFontFamily }) => {
   const [hovered, setHovered] = useState(false);
+  const isTeal = card.accentColor.toLowerCase() === "#00d0b2";
 
   return (
     <div
@@ -109,36 +111,36 @@ const Card: React.FC<{
           {card.description}
         </p>
 
-        <button
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[16px] font-semibold transition-[background,color] duration-200 md:px-5 md:text-[18px] lg:text-[20px]"
-          style={{
-            background: "transparent",
-            border: `1.5px solid ${card.accentColor}`,
-            color: card.accentColor,
-            fontFamily: bodyFontFamily,
-          }}
-          onMouseEnter={(e) => {
-            const btn = e.currentTarget as HTMLButtonElement;
-            btn.style.background = card.accentColor;
-            btn.style.color = "#fff";
-          }}
-          onMouseLeave={(e) => {
-            const btn = e.currentTarget as HTMLButtonElement;
-            btn.style.background = "transparent";
-            btn.style.color = card.accentColor;
-          }}
+        <AnimatedCta
+          className={`w-auto min-w-24 h-10.5! rounded-xl border-2 pl-4! pr-8.5! text-[15px] font-semibold font-[inherit] md:min-w-36 md:pl-4.5! md:pr-10! ${
+            isTeal
+              ? "border-primary bg-primary text-white hover:bg-[#00b89c]"
+              : "border-[#01509e] bg-[#01509e] text-white hover:bg-[#004b92]"
+          }`}
+          iconClassName={
+            isTeal
+              ? "bg-white text-[#00D0B2] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(0,149,126,0.22)]"
+              : "bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)]"
+          }
+          labelClassName="whitespace-nowrap"
+          icon={
+            <svg
+              className="h-3 w-3 flex-none"
+              viewBox="0 0 12 12"
+              fill="none"
+            >
+              <path
+                d="M6 1L11 6L6 11M11 6H1"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
         >
           {seeMore}
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M6 1L11 6L6 11M11 6H1"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        </AnimatedCta>
       </div>
 
       <div className="relative z-2 mt-auto w-full px-3 md:px-4 lg:px-5">

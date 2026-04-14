@@ -371,10 +371,10 @@ export default function AboutHero() {
           </p>
 
           <div ref={hbtnsRef} className="ao-btns mb-[3.2rem] flex flex-wrap items-center justify-center gap-2.5 md:mb-[3.8rem]">
-            <button className="rounded-[8px] border-none bg-primary px-6 py-3.5 text-[0.96rem] font-bold text-white transition-colors duration-200 hover:bg-[#006C52] md:text-[1rem]">
+            <button className="rounded-xl border-none bg-primary px-6 py-3.5 text-[0.96rem] font-bold text-white transition-colors duration-200 hover:bg-[#006C52] md:text-[1rem]">
               {content.primaryButton}
             </button>
-            <button className="rounded-[8px] border border-[color-mix(in_srgb,#00D0B2_18%,transparent)] bg-transparent px-5.5 py-3.5 text-[0.96rem] font-medium text-[oklch(0.145_0_0)] transition-[border-color] duration-200 hover:border-primary dark:text-[oklch(0.985_0_0)] md:text-[1rem]">
+            <button className="rounded-xl border border-[color-mix(in_srgb,#00D0B2_18%,transparent)] bg-transparent px-5.5 py-3.5 text-[0.96rem] font-medium text-[oklch(0.145_0_0)] transition-[border-color] duration-200 hover:border-primary dark:text-[oklch(0.985_0_0)] md:text-[1rem]">
               {content.secondaryButton}
             </button>
           </div>
