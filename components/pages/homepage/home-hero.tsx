@@ -947,7 +947,7 @@ export default function HomeHero() {
           <div className="fade-up-4 grid w-full max-w-136 grid-cols-2 gap-3 sm:flex sm:w-auto sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <button className="
               group relative inline-flex w-full min-w-0 items-center justify-center
-              overflow-hidden rounded-xl border-2 border-[#00D0B2] bg-[#00D0B2]
+              overflow-hidden rounded-xl border-2 border-primary bg-primary
               px-4 py-3 text-[15px] font-black leading-none text-white
               transition-transform duration-200 hover:-translate-y-px
               before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
