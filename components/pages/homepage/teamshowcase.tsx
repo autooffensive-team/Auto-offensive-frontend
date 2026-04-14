@@ -52,8 +52,8 @@ export default function TeamShowcase() {
           <AnimatedCta
             as="a"
             href="about-us"
-            className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-[#09090B] dark:hover:bg-[#00BCA1]"
-            iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-[#09090B] dark:text-[#00BCA1]"
+            className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
+            iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
             icon={
               <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path

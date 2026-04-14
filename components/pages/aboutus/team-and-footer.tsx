@@ -446,7 +446,7 @@ export default function TeamAndFooter() {
             </p>
             <a
               href="#"
-              className="inline-flex items-center gap-2 bg-primary text-[#020f0c] px-8 py-4 rounded-3 text-[0.9rem] font-bold cursor-pointer tracking-[0.04em] transition-colors duration-200 no-underline hover:bg-[#00b894]"
+              className="inline-flex items-center gap-2 bg-primary text-[#020f0c] px-8 py-4 rounded-xl text-[0.9rem] font-bold cursor-pointer tracking-[0.04em] transition-colors duration-200 no-underline hover:bg-[#00b894]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
