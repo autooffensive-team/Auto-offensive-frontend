@@ -79,6 +79,8 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as const },
 });
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
 export default function ResourcePage() {
   return (
     <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#09090B]" style={{ fontFamily: 'var(--font-google-sans), sans-serif' }}>
@@ -103,7 +105,7 @@ export default function ResourcePage() {
             <span className="text-[#00BCA1]">Execute.</span>
           </motion.h1>
 
-          <motion.p {...fadeUp(0.2)} className="text-[#5C5C5C] dark:text-[#9A9A9A] text-lg max-w-2xl mx-auto leading-relaxed">
+          <motion.p {...fadeUp(0.2)} className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-2xl mx-auto ${bodyCopy}`}>
             Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.
           </motion.p>
         </div>
@@ -115,7 +117,7 @@ export default function ResourcePage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-3">
             Documentation Categories
           </h2>
-          <p className="text-[#5C5C5C] dark:text-[#9A9A9A]">
+          <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] ${bodyCopy}`}>
             Explore our organized documentation by topic
           </p>
         </motion.div>
@@ -141,7 +143,7 @@ export default function ResourcePage() {
                     <h3 className="text-lg font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1">
                       {cat.title}
                     </h3>
-                    <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed">
+                    <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${bodyCopy}`}>
                       {cat.description}
                     </p>
                   </div>
@@ -268,7 +270,7 @@ export default function ResourcePage() {
               <h3 className="font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-2 group-hover:text-[#00BCA1] transition-colors">
                 {item.title}
               </h3>
-              <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed mb-4">
+              <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed mb-4 ${bodyCopy}`}>
                 {item.desc}
               </p>
 
@@ -299,7 +301,7 @@ export default function ResourcePage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                 Get new resources in your inbox
               </h2>
-              <p className="text-[#9A9A9A] text-sm">
+              <p className={`text-[#9A9A9A] ${bodyCopy}`}>
                 New guides, tutorials, and updates dropped every week.
               </p>
             </div>

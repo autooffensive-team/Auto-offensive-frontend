@@ -1,4 +1,6 @@
-import { Database, BarChart3, Zap, Code2, Shield, GitBranch } from 'lucide-react'
+import { Database, BarChart3, Zap } from 'lucide-react'
+
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
 
 const paths = [
   {
@@ -29,7 +31,7 @@ export default function QuickStartPaths() {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance">
             Quick Start Paths
           </h2>
-          <p className="text-lg text-foreground/60">
+          <p className={`text-foreground/60 ${bodyCopy}`}>
             Get up and running with these essential pathways
           </p>
         </div>
@@ -44,7 +46,7 @@ export default function QuickStartPaths() {
                 <h3 className="text-xl font-bold text-foreground mb-3">
                   {path.title}
                 </h3>
-                <p className="text-foreground/70 mb-4 leading-relaxed">
+                <p className={`text-foreground/70 mb-4 ${bodyCopy}`}>
                   {path.description}
                 </p>
                 <a href={path.link} className="text-primary font-semibold hover:text-primary/80 transition flex items-center gap-2">

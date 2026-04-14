@@ -1,5 +1,7 @@
 import { FileText, Link2, Code2 } from 'lucide-react'
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
 const resources = [
   {
     title: 'DLL Documents',
@@ -42,7 +44,7 @@ export default function ResourceSections() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   {resource.title}
                 </h3>
-                <p className="text-foreground/70 mb-6 leading-relaxed">
+                <p className={`text-foreground/70 mb-6 ${bodyCopy}`}>
                   {resource.description}
                 </p>
                 <div className="space-y-2">

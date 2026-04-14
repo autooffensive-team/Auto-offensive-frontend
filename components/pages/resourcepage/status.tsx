@@ -2,6 +2,8 @@
 
 import { CheckCircle2, AlertCircle, Clock } from 'lucide-react'
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
 interface StatusItem {
   service: string
   status: 'operational' | 'degraded' | 'maintenance'
@@ -82,7 +84,7 @@ export default function StatusTable() {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Platform Operational Status
           </h2>
-          <p className="text-lg text-foreground/60">
+          <p className={`text-foreground/60 ${bodyCopy}`}>
             Real-time status of all Clinical Precision services and infrastructure
           </p>
         </div>
@@ -124,7 +126,7 @@ export default function StatusTable() {
         </div>
 
         <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
-          <p className="text-sm text-foreground/80">
+          <p className={`text-foreground/80 ${bodyCopy}`}>
             <span className="font-semibold text-foreground">Status Page:</span> For detailed status information and incident history, visit our{' '}
             <a href="#" className="text-primary hover:underline font-semibold">
               dedicated status page

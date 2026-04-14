@@ -1,6 +1,8 @@
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
 export default function Hero() {
   return (
     <section className="bg-white dark:bg-black dark:to-white py-16 md:py-24">
@@ -13,7 +15,7 @@ export default function Hero() {
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight text-balance">
               Clinical Precision <span className='text-primary'>Resource Center</span>
             </h1>
-            <p className="text-lg text-foreground/70 mb-6 leading-relaxed">
+            <p className={`text-foreground/70 mb-6 ${bodyCopy}`}>
               Access technical specifications, integration guides, and best practices for the comprehensive security workflows.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

@@ -71,6 +71,7 @@ const workflowSteps: WorkflowStep[] = [
   },
 ];
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
 
 /* ─── Animation Variants ─────────────────────────────────────── */
 const fadeUp = {
@@ -202,7 +203,7 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={2}
-              className="text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mx-auto"
+              className={`text-slate-500 dark:text-slate-400 max-w-xl mx-auto ${bodyCopy}`}
             >
               Explore our suite of autonomous security tools and AI-driven analysis engines
               designed to protect your entire digital footprint.
@@ -268,7 +269,7 @@ export default function PlatformCapabilities() {
               <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mb-3 leading-snug">
                 Web-Based Pentesting Automation
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+              <p className={`text-slate-500 dark:text-slate-400 leading-relaxed mb-5 ${bodyCopy}`}>
                 Orchestrate complex security workflows without touching a terminal. Launch industrial-grade tools like
                 Subfinder for discovery, Nmap for port mapping, and Nuclei for vulnerability scanning through a
                 unified, high-fidelity interface.
@@ -312,7 +313,7 @@ export default function PlatformCapabilities() {
                 <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-3 leading-snug">
                   AI-Powered Security Analysis
                 </h2>
-                <p className="text-sm text-white/70 leading-relaxed mb-6">
+                <p className={`text-white/70 leading-relaxed mb-6 ${bodyCopy}`}>
                   Our neural engine digests raw scanner output to prioritize critical risks and explain complex
                   vulnerabilities in plain, actionable language.
                 </p>
@@ -385,7 +386,7 @@ export default function PlatformCapabilities() {
                 <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-3 leading-snug">
                   {card.title}
                 </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                <p className={`text-slate-500 dark:text-slate-400 leading-relaxed mb-4 ${bodyCopy}`}>
                   {card.desc}
                 </p>
                 <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-5">
@@ -437,7 +438,7 @@ export default function PlatformCapabilities() {
                   initial="hidden"
                   animate={reportInView ? "visible" : "hidden"}
                   custom={3}
-                  className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed mb-6 max-w-md"
+                  className={`text-slate-500 dark:text-slate-400 leading-relaxed mb-6 max-w-md ${bodyCopy}`}
                 >
                   Generate professional, multi-tier reports with a single click. From high-level Executive
                   summaries to granular Developer fix-lists, our AI tailors the narrative for every stakeholder.
@@ -576,7 +577,7 @@ export default function PlatformCapabilities() {
             <h2 className="text-3xl sm:text-4xl font-black text-primary dark:text-emerald-400 mb-3">
               Integrated Attack Workflow
             </h2>
-            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
+            <p className={`text-slate-500 dark:text-slate-400 ${bodyCopy}`}>
               Seamless transition from identification to exploitation.
             </p>
           </motion.div>

@@ -1,5 +1,7 @@
 import { BookOpen, Code, Users, Shield } from 'lucide-react'
 
+const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
 const deepDives = [
   {
     icon: BookOpen,
@@ -35,7 +37,7 @@ export default function TechnicalDeepDives() {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Technical Deep Dives
           </h2>
-          <p className="text-lg text-foreground/60">
+          <p className={`text-foreground/60 ${bodyCopy}`}>
             Comprehensive guides for advanced implementations
           </p>
         </div>
@@ -50,7 +52,7 @@ export default function TechnicalDeepDives() {
                 <h3 className="text-lg font-bold text-foreground mb-2">
                   {dive.title}
                 </h3>
-                <p className="text-foreground/70 text-sm mb-4 leading-relaxed">
+                <p className={`text-foreground/70 mb-4 ${bodyCopy}`}>
                   {dive.description}
                 </p>
                 <div className="flex flex-wrap gap-2">

@@ -135,6 +135,7 @@ const categoryDot: Record<string, string> = {
 export default function ToolsPage() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
+  const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
 
   const filtered = tools.filter((t) => {
     const matchCat = activeCategory === 'All' || t.category === activeCategory
@@ -159,7 +160,7 @@ export default function ToolsPage() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
               <h1 className="text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">The Auto-Offensive ToolKit</h1>
-              <p className="mt-2 text-[#5C5C5C] dark:text-[#9A9A9A] text-xl max-w-xl">
+              <p className={`mt-2 max-w-xl text-[#5C5C5C] dark:text-[#9A9A9A] ${bodyCopy}`}>
                 Browse and launch industry-standard scanning engines from a single unified interface.
               </p>
             </div>
@@ -208,7 +209,7 @@ export default function ToolsPage() {
               <path d="M32 32L44 44" stroke="#9A9A9A" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             <p className="text-lg font-medium text-[#1A1A1A] dark:text-[#EDEDED]">No tools found</p>
-            <p className="text-sm mt-1">Try a different search or category</p>
+            <p className={`mt-1 ${bodyCopy}`}>Try a different search or category</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -235,7 +236,7 @@ export default function ToolsPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1.5">{tool.name}</h3>
-                  <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed">{tool.description}</p>
+                  <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] ${bodyCopy}`}>{tool.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-auto">
                   {tool.tags.map((tag) => (
