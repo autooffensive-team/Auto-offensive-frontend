@@ -301,7 +301,11 @@ export default function TeamAndFooter() {
         @media (min-width: 1024px) { .tf-body-text { font-size: 20px; } }
       `}</style>
 
-      <div className="relative mx-auto w-full max-w-7xl bg-[#F7F5F0] dark:bg-[#09090B] text-[#0a1f1a] dark:text-[#e6f5f2] overflow-hidden" style={{ fontFamily: bodyFont }}>
+      <div
+        id="team-footer-section"
+        className="relative mx-auto w-full max-w-7xl bg-[#F7F5F0] dark:bg-[#09090B] text-[#0a1f1a] dark:text-[#e6f5f2] overflow-hidden scroll-mt-24"
+        style={{ fontFamily: bodyFont }}
+      >
         <div className="tf-gradient-wrapper">
           <div ref={bgRef} className="tf-gradient-bg">
             <svg width="100%" height="100%" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{ position: "absolute", top: 0, left: 0 }}>

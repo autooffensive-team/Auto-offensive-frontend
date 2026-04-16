@@ -220,7 +220,7 @@ function StatsVisual({ active, labels }: { active: boolean; labels: string[] }) 
 
 function PipelineVisual({ steps }: { steps: string[] }) {
   return (
-    <div className="ms-vis-pipeline flex w-full max-w-[190px] flex-col items-center">
+    <div className="ms-vis-pipeline flex w-full max-w-47.5 flex-col items-center">
       {steps.map((step, i) => (
         <div key={step} className="flex w-full flex-col items-center">
           <div
@@ -317,6 +317,7 @@ export default function OurMission() {
 
     function onScroll() {
       if (isMobile.current) return;
+      if (!outer) return;
       const rect = outer.getBoundingClientRect();
       const total = outer.offsetHeight - window.innerHeight;
       if (total <= 0) return;
@@ -325,7 +326,7 @@ export default function OurMission() {
       const idx = Math.min(totalSlides - 1, Math.floor(raw));
       const frac = raw - idx;
       const slideWidth = outer.clientWidth || window.innerWidth;
-      track.style.transform = `translateX(${-(idx * slideWidth + frac * slideWidth)}px)`;
+      if (track) track.style.transform = `translateX(${-(idx * slideWidth + frac * slideWidth)}px)`;
       if (progress) progress.style.width = p * 100 + "%";
       setSlide(idx);
     }
@@ -334,7 +335,7 @@ export default function OurMission() {
       isMobile.current = window.matchMedia("(max-width: 768px)").matches;
 
       if (isMobile.current) {
-        track.style.transform = "none";
+        if (track) track.style.transform = "none";
         if (progress) progress.style.width = "0%";
         setSlide(0);
         return;

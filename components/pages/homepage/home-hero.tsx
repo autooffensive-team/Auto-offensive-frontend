@@ -948,7 +948,7 @@ export default function HomeHero() {
             <button className="
               group relative inline-flex w-full min-w-0 items-center justify-center
               overflow-hidden rounded-xl border-2 border-primary bg-primary
-              px-3 py-3 text-[14px] sm:px-4 sm:text-[15px] font-black leading-none text-white
+              px-3 py-3 text-[14px] sm:text-[15px] font-black leading-none text-white
               transition-transform duration-200 hover:-translate-y-px
               before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
               before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]

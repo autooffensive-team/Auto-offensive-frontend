@@ -181,6 +181,7 @@ export default function Values() {
     }
 
     function tick() {
+      if (!drum) return;
       currentAngle += (targetAngle - currentAngle) * 0.08;
       drum.style.transform = `rotateX(${currentAngle}deg)`;
       const norm = ((-currentAngle) % 360 + 360) % 360;
@@ -190,6 +191,7 @@ export default function Values() {
     }
 
     function onScroll() {
+      if (!section) return;
       const rect = section.getBoundingClientRect();
       const total = section.offsetHeight - window.innerHeight;
       if (total <= 0) return;

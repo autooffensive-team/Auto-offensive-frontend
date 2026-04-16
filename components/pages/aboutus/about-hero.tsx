@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useLocale } from "next-intl";
+import { ChevronDown } from "lucide-react";
 
 const GradientBackground = () => (
   <>
@@ -122,8 +123,7 @@ export default function AboutHero() {
         titleBottom: "ជំនាន់ថ្មីរបស់យើង",
         subtitle:
           "Auto-Offensive គឺជា PaaS ដែលប្រើ AI ដើម្បី automate ការស្កេនសុវត្ថិភាពលើ web, network និង code — ដោយមិនចាំបាច់ដំឡើង CLI ឬ setup អ្វីឡើយ។",
-        primaryButton: "រឿងរ៉ាវរបស់យើង",
-        secondaryButton: "ស្គាល់ក្រុមការងារ",
+        ctaButton: "↓ ស្វែងយល់រឿងរ៉ាវរបស់យើង",
         stats: ["ទម្រង់របាយការណ៍", "ស្កេនលឿនជាងមុន", "ត្រៀមសម្រាប់ API", "MCP + SonarQube"],
         scroll: "រំកិល",
       }
@@ -134,8 +134,7 @@ export default function AboutHero() {
         titleBottom: "Security Platform",
         subtitle:
           "Auto-Offensive is a PaaS that automates web, network and code security scanning powered by AI, with zero CLI setup required.",
-        primaryButton: "Our Story",
-        secondaryButton: "Meet the Team",
+        ctaButton: "↓ Discover Our Story",
         stats: ["Report Formats", "Faster Scanning", "API Ready", "MCP + SonarQube"],
         scroll: "Scroll",
       };
@@ -146,6 +145,7 @@ export default function AboutHero() {
   const titleFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
     : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+  const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";
 
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const hl0Ref = useRef<HTMLSpanElement>(null);
@@ -371,12 +371,13 @@ export default function AboutHero() {
           </p>
 
           <div ref={hbtnsRef} className="ao-btns mb-[3.2rem] flex flex-wrap items-center justify-center gap-2.5 md:mb-[3.8rem]">
-            <button className="rounded-xl border-none bg-primary px-6 py-3.5 text-[0.96rem] font-bold text-white transition-colors duration-200 hover:bg-[#006C52] md:text-[1rem]">
-              {content.primaryButton}
-            </button>
-            <button className="rounded-xl border border-[color-mix(in_srgb,#00D0B2_18%,transparent)] bg-transparent px-5.5 py-3.5 text-[0.96rem] font-medium text-[oklch(0.145_0_0)] transition-[border-color] duration-200 hover:border-primary dark:text-[oklch(0.985_0_0)] md:text-[1rem]">
-              {content.secondaryButton}
-            </button>
+            <a
+              href="#team-footer-section"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-[14px] font-bold leading-none text-white transition-colors duration-200 hover:bg-[#006C52] dark:bg-primary dark:text-white md:px-7 md:py-3.5 md:text-[15px]"
+            >
+              <ChevronDown size={18} strokeWidth={2.6} aria-hidden="true" />
+              <span className="whitespace-nowrap">{ctaText}</span>
+            </a>
           </div>
 
           <div ref={hstatsRef} className="ao-stats ao-stats-grid overflow-hidden rounded-[14px] border border-[color-mix(in_srgb,#00D0B2_15%,transparent)]">
