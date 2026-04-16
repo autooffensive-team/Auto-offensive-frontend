@@ -253,11 +253,11 @@ export default function OurMission() {
         strip: "// បេសកកម្មរបស់យើង",
         next: "បន្ទាប់",
         terminal: [
-          "ao scan --target app.example.com",
-          "↳ កំពុងដំណើរការការត្រួតពិនិត្យ CVSS ដោយ AI...",
+          "aof scan --target app.example.com",
+          "? Running AI-powered CVSS checks...",
           "✓ 3 critical · 7 high · 12 medium",
-          "↳ កំពុងបង្កើតរបាយការណ៍ PDF តាម SonarQube...",
-          "✓ បានរក្សាទុករបាយការណ៍ scan_report.pdf",
+          "? Generating PDF report via SonarQube...",
+          "? Report saved: scan_report.pdf",
         ],
         stats: [
           "ទម្រង់របាយការណ៍ 5+",
@@ -271,11 +271,11 @@ export default function OurMission() {
         strip: "// Our Mission",
         next: "NEXT",
         terminal: [
-          "ao scan --target app.example.com",
-          "↳ Running AI-powered CVSS checks...",
+          "aof scan --target app.example.com",
+          "? Running AI-powered CVSS checks...",
           "✓ 3 critical · 7 high · 12 medium",
-          "↳ Generating PDF report via SonarQube...",
-          "✓ Report saved: scan_report.pdf",
+          "? Generating PDF report via SonarQube...",
+          "? Report saved: scan_report.pdf",
         ],
         stats: [
           "Report formats (HTML · PDF · Excel · Docs)",
@@ -659,3 +659,4 @@ export default function OurMission() {
     </>
   );
 }
+

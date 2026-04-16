@@ -119,7 +119,7 @@ export default function AboutHero() {
     ? {
         eyebrow: "Auto Offensive",
         titleTop: "ស្គាល់ពី",
-        titleAccent: "វេទិកាសុវត្ថិភាព",
+        titleAccent: "វេទិកា Security",
         titleBottom: "ជំនាន់ថ្មីរបស់យើង",
         subtitle:
           "Auto-Offensive គឺជា PaaS ដែលប្រើ AI ដើម្បី automate ការស្កេនសុវត្ថិភាពលើ web, network និង code — ដោយមិនចាំបាច់ដំឡើង CLI ឬ setup អ្វីឡើយ។",
@@ -358,7 +358,7 @@ export default function AboutHero() {
             </span>
             <span className="block overflow-hidden">
               <span ref={hl2Ref} className="ao-hli block">
-                <span className="font-light text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]">{content.titleBottom}</span>
+                <span className="font-light text-[#01509e] dark:text-[#01509e]">{content.titleBottom}</span>
               </span>
             </span>
           </h1>
