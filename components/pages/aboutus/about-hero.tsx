@@ -229,6 +229,79 @@ export default function AboutHero() {
           transform: translateX(-50%);
           animation: ao-bob 2.5s ease-in-out infinite;
         }
+        .ripple-button {
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+        }
+        .ripple-button:before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.25);
+          top: 100%;
+          width: 140%;
+          height: 180%;
+          background-color: rgba(0, 208, 178, 0.12);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:after {
+          content: "";
+          position: absolute;
+          left: 55%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.45);
+          top: 180%;
+          width: 160%;
+          height: 190%;
+          background-color: rgba(0, 208, 178, 0.42);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:hover {
+          border-color: #39bda7;
+          box-shadow:
+            0 0 0 1px rgba(0, 208, 178, 0.14),
+            0 10px 24px rgba(0, 208, 178, 0.14);
+        }
+        .ripple-button:hover svg {
+          color: black;
+          stroke: black;
+        }
+        .dark .ripple-button:hover svg {
+          color: white;
+          stroke: white;
+        }
+        .ripple-button:hover:before {
+          top: -35%;
+          background-color: rgba(0, 208, 178, 0.88);
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .ripple-button:hover:after {
+          top: -45%;
+          background-color: #00d0b2;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .dark .ripple-button {
+          box-shadow: none;
+        }
+        .dark .ripple-button:before {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        .dark .ripple-button:after {
+          background-color: #39bda7;
+        }
+        .dark .ripple-button:hover {
+          border-color: #39bda7;
+        }
+        .dark .ripple-button:hover:before,
+        .dark .ripple-button:hover:after {
+          background-color: #39bda7;
+        }
         .ao-content {
           width: 100%;
           max-width: 80rem;
@@ -373,7 +446,7 @@ export default function AboutHero() {
           <div ref={hbtnsRef} className="ao-btns mb-[3.2rem] flex flex-wrap items-center justify-center gap-2.5 md:mb-[3.8rem]">
             <a
               href="#team-footer-section"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-[14px] font-bold leading-none text-white transition-colors duration-200 hover:bg-[#006C52] dark:bg-primary dark:text-white md:px-7 md:py-3.5 md:text-[15px]"
+              className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.45)] bg-[rgba(255,255,255,0.95)] px-6 py-3.5 text-[14px] font-bold leading-none text-black transition-all duration-200 hover:-translate-y-px dark:border-[rgba(0,208,178,0.2)] dark:bg-[rgba(0,208,178,0.06)] dark:text-white md:px-7 md:py-3.5 md:text-[15px]"
             >
               <ChevronDown size={18} strokeWidth={2.6} aria-hidden="true" />
               <span className="whitespace-nowrap">{ctaText}</span>

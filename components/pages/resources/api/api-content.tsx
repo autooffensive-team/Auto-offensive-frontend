@@ -485,7 +485,7 @@ export default function ApiContent() {
 
       <CodeBlock
         lang={requestHeaderLabel}
-        code={`Authorization: Bearer ao_live_xxxxxxxxxxxxxxxxxxxx
+        code={`Authorization: Bearer aof_live_xxxxxxxxxxxxxxxxxxxx
 Content-Type: application/json`}
       />
 

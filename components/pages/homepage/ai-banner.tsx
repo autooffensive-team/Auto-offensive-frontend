@@ -40,7 +40,7 @@ export default function AiBanner() {
               style={{ fontFamily: displayFontFamily }}
             >
               <span className="block">{t("titleLine1")}</span>
-              <span className="block font-extrabold text-primary dark:text-[#00BCA1]">{t("titleLine2")}</span>
+              <span className="block font-extrabold text-[#01509e] dark:text-[#4fa3e5]">{t("titleLine2")}</span>
               <span className="block font-extrabold text-primary dark:text-[#00BCA1]">{t("titleLine3")}</span>
             </h2>
 

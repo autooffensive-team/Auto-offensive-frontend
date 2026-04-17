@@ -56,7 +56,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Powerful, connected scanners for mapping exposed network assets and web apps, including cloud and APIs. Get a global view of open ports, running services, operating systems, and screenshots - plus ML-driven insights from subdomains, outdated technologies, reverse DNS, WAFs, and hidden files.",
     link: "#",
-    image: "./home-image/4.webp",
+    image: "/home-image/4.webp",
     imageAlt: "Attack Surface Mapping",
     reverse: false,
     imageW: "520px",
@@ -76,7 +76,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Proprietary web app and API scanner with benchmark-proven detection accuracy - outperforming both commercial and open-source tools. Network scanner combines 4 detection engines, ranked #1 in remote detection accuracy across 128 environments against Qualys, Nessus, and OpenVAS.",
     link: "#",
-    image: "./home-image/1.webp",
+    image: "/home-image/1.webp",
     imageAlt: "Vulnerability Scanning",
     reverse: true,
     imageW: "480px",
@@ -96,7 +96,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Automatic exploitation of new, critical CVEs with Sniper Auto Exploiter for validating risk and extracting evidence. Purpose-built to safely confirm exploitability of SQL injection, XSS, and more - with evidence-rich results including screenshots, network maps, exploit paths, and traffic logs.",
     link: "#",
-    image: "./home-image/3.webp",
+    image: "/home-image/3.webp",
     imageAlt: "Vulnerability Exploitation",
     reverse: false,
     imageW: "500px",
@@ -116,7 +116,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Built-in pentest report generator for creating editable DOCX reports 90% faster. Extensive library of customizable findings with vulnerability descriptions, risk ratings, evidence, and remediation steps. Export as PDF, HTML, CSV, XLSX, or via REST API - with branded templates per client.",
     link: "#",
-    image: "./home-image/2.webp",
+    image: "/home-image/2.webp",
     imageAlt: "Pentest Reporting",
     reverse: true,
     imageW: "460px",
@@ -136,7 +136,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Persistent coverage with scheduled scans that automate recurring tests across assets. Real-time alerts for critical issues via email, Slack, or Webhooks. Hands-off monitoring with Pentest Robots that trigger repeatable scan sequences - plus instant REST API access to all scanning capabilities.",
     link: "#",
-    image: "./home-image/5.webp",
+    image: "/home-image/5.webp",
     imageAlt: "Continuous Monitoring",
     reverse: false,
     imageW: "540px",
@@ -156,7 +156,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Embed offensive security directly into your CI/CD workflow. Auto Offensive triggers scans on every build, blocks deployments on critical findings, and feeds results into your existing DevSecOps toolchain - so vulnerabilities are caught before they ever reach production.",
     link: "#",
-    image: "./home-image/6.webp",
+    image: "/home-image/6.webp",
     imageAlt: "CI/CD Integration",
     reverse: true,
     imageW: "500px",
@@ -190,7 +190,7 @@ const CARDS = [
     hlLine: 1,
     desc: "Powerful scanning tools ដែលភ្ជាប់គ្នា សម្រាប់ mapping exposed assets នៅលើ network, Web App, Cloud និង API។ ទទួលបាន global view នៃ open ports, running services, operating systems, screenshots — រួមជាមួយ ML-driven insights ពី subdomains, outdated technologies, reverse DNS, WAFs និង hidden files។",
     link: "#",
-    image: "./home-image/4.webp",
+    image: "/home-image/4.webp",
     imageAlt: "ការស្វែងរកផ្ទៃវាយប្រហារ",
     reverse: false,
     imageW: "520px",
@@ -210,7 +210,7 @@ const CARDS = [
     hlLine: 1,
     desc: "Proprietary Web App និង API scanner ដែលមាន benchmark-proven detection accuracy — outperforming ទាំង commercial និង open-source tools។ Network scanner រួមបញ្ចូល detection engines ចំនួន 4 ហើយត្រូវបាន ranked #1 ក្នុង remote detection accuracy នៅក្នុង 128 environments ប្រៀបធៀបជាមួយ Qualys, Nessus និង OpenVAS។",
     link: "#",
-    image: "./home-image/1.webp",
+    image: "/home-image/1.webp",
     imageAlt: "ការស្កេនចំណុចខ្សោយ",
     reverse: true,
     imageW: "480px",
@@ -230,7 +230,7 @@ const CARDS = [
     hlLine: 1,
     desc: "ប្រព័ន្ធអាចធ្វើការសាកល្បងវាយប្រហារដោយស្វ័យប្រវត្តិលើ CVE សំខាន់ៗ ដើម្បីផ្ទៀងផ្ទាត់កម្រិតហានិភ័យ និងប្រមូលភស្តុតាង។ វាជួយបញ្ជាក់ safely confirm ថា SQL injection, XSS និងបញ្ហាផ្សេងៗអាច exploit បានឬអត់ ជាមួយលទ្ធផលដែលមាន screenshot, network map, exploit path និង traffic log។",
     link: "#",
-    image: "./home-image/3.webp",
+    image: "/home-image/3.webp",
     imageAlt: "ការផ្ទៀងផ្ទាត់ការវាយប្រហារ",
     reverse: false,
     imageW: "500px",
@@ -250,7 +250,7 @@ const CARDS = [
     hlLine: 1,
     desc: "Built-in pentest report generator ដែលអាចបង្កើត DOCX reports ដែលអាចកែសម្រួលបាន លឿនជាងមុនរហូតដល់ 90%។ មាន extensive library findings ធំទូលាយ ដែលអាច customize បាន រួមមាន vulnerability descriptions, risk ratings, evidence និង remediation steps។អាច export ជា PDF, HTML, CSV, XLSX ឬតាម REST API បាន — ជាមួយ templates ដែលអាចដាក់ branding តាម client នីមួយៗ។",
     link: "#",
-    image: "./home-image/2.webp",
+    image: "/home-image/2.webp",
     imageAlt: "របាយការណ៍ Pentest",
     reverse: true,
     imageW: "460px",
@@ -270,7 +270,7 @@ const CARDS = [
     hlLine: 1,
     desc: "កំណត់ពេលស្កេនជាប្រចាំដើម្បីគ្របដណ្តប់លើ asset ទាំងអស់ដោយស្វ័យប្រវត្តិ។  Real-time alerts សម្រាប់បញ្ហាសំខាន់ៗតាម email, Slack ឬ Webhooks។ Hands-off monitoring ដោយ Pentest Robots ដែល trigger repeatable scan sequences — បូករួមជាមួយការចូលប្រើ REST API ភ្លាមៗសម្រាប់សមត្ថភាពស្កេនទាំងអស់។",
     link: "#",
-    image: "./home-image/5.webp",
+    image: "/home-image/5.webp",
     imageAlt: "ការតាមដានជាបន្តបន្ទាប់",
     reverse: false,
     imageW: "540px",
@@ -290,7 +290,7 @@ const CARDS = [
     hlLine: 1,
     desc: "បញ្ចូលការត្រួតពិនិត្យសុវត្ថិភាពចូលទៅក្នុង workflow CI/CD របស់អ្នកដោយផ្ទាល់។ Auto Offensive អាចបើកការស្កេនរាល់ពេល build ទប់ស្កាត់ deployment នៅពេលមានបញ្ហាសំខាន់ និងបញ្ជូនលទ្ធផលទៅ DevSecOps toolchain ដែលអ្នកកំពុងប្រើ ដើម្បីរកឃើញបញ្ហាមុនពេលឡើង production។",
     link: "#",
-    image: "./home-image/6.webp",
+    image: "/home-image/6.webp",
     imageAlt: "ការភ្ជាប់ CI/CD",
     reverse: true,
     imageW: "500px",
@@ -338,10 +338,23 @@ function useTheme() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
 
-    // Helper: check both the media query AND a .dark class on <html>
+    // Helper: respect the explicit theme class first, then fall back to system preference.
     const check = () => {
-      const hasDarkClass = document.documentElement.classList.contains("dark");
-      setIsDark(mq.matches || hasDarkClass);
+      const root = document.documentElement;
+      const hasDarkClass = root.classList.contains("dark");
+      const hasLightClass = root.classList.contains("light");
+
+      if (hasDarkClass) {
+        setIsDark(true);
+        return;
+      }
+
+      if (hasLightClass) {
+        setIsDark(false);
+        return;
+      }
+
+      setIsDark(mq.matches);
     };
 
     check();
@@ -606,7 +619,6 @@ function CardRow({
   const contentPaddingX = isMobile ? "20px" : isTablet ? "32px" : undefined;
   const contentPaddingY = isCompact ? (isMobile ? "40px" : "48px") : undefined;
   const imageWidth = isCompact ? "min(100%, 420px)" : card.imageW;
-  const imageHeight = isCompact ? "auto" : card.imageH;
   const bodyFontSize = isMobile ? "16px" : isTablet ? "18px" : FONT_SIZES.sm.desktop;
   const labelFontSize = isMobile ? "9px" : isTablet ? "10px" : FONT_SIZES.xs.desktop;
 
@@ -743,7 +755,10 @@ function CardRow({
       }}
     >
       <div
+        className="relative"
         style={{
+          width: imageWidth,
+          aspectRatio: `${parseFloat(card.imageW) / parseFloat(card.imageH)}`,
           transform: isVisible
             ? `translateX(${card.imageOffsetX}) translateY(${card.imageOffsetY}) scale(1)`
             : reverse
@@ -753,15 +768,13 @@ function CardRow({
           transition: "transform 0.9s 0.15s cubic-bezier(.16,1,.3,1), opacity 0.9s 0.15s",
         }}
       >
-        <img
+        <Image
           src={card.image}
           alt={card.imageAlt}
+          fill
+          sizes={isCompact ? "min(100vw, 420px)" : card.imageW}
           style={{
-            width: imageWidth,
-            height: imageHeight,
-            maxWidth: "100%",
             objectFit: "contain",
-            display: "block",
           }}
         />
       </div>

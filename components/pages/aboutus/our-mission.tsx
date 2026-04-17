@@ -131,7 +131,10 @@ function ShieldVisual() {
 
 function TerminalVisual({ lines }: { lines: string[] }) {
   return (
-    <div className="w-full max-w-[320px] overflow-hidden rounded-[10px] border border-[rgba(0,208,178,.14)] bg-[rgba(10,31,26,.06)] dark:bg-[rgba(0,0,0,.5)]">
+    <div
+      className="w-full max-w-[320px] overflow-hidden rounded-[10px] border border-[rgba(0,208,178,.14)] bg-[rgba(10,31,26,.06)] dark:bg-[rgba(0,0,0,.5)]"
+      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+    >
       <div className="flex items-center border-b border-[rgba(0,208,178,.14)] bg-[rgba(0,208,178,.04)] px-3.5 py-2">
         <span className="inline-block h-2 w-2 rounded-full bg-[#ff5f57]" />
         <span className="mx-1 inline-block h-2 w-2 rounded-full bg-[#febc2e]" />
@@ -142,13 +145,13 @@ function TerminalVisual({ lines }: { lines: string[] }) {
           const type = idx === 0 ? "cmd" : idx === 2 || idx === 4 ? "ok" : "out";
           const prompt = idx === 0 ? "$" : " ";
           return (
-            <div key={line} className="flex gap-2 text-[0.72rem] leading-normal" style={{ fontFamily: "var(--font-hackdaddy, monospace)" }}>
+            <div key={line} className="flex gap-2 text-[0.72rem] leading-normal">
               <span className="shrink-0 text-[rgba(0,208,178,.5)]">{prompt}</span>
               <span className={type === "ok" ? "text-primary" : type === "out" ? "italic" : ""}>{line}</span>
             </div>
           );
         })}
-        <div className="flex gap-2 text-[0.72rem] leading-normal" style={{ fontFamily: "var(--font-hackdaddy, monospace)" }}>
+        <div className="flex gap-2 text-[0.72rem] leading-normal">
           <span className="shrink-0 text-[rgba(0,208,178,.5)]">$</span>
           <span className="ms-vt-cursor" />
         </div>
@@ -218,6 +221,7 @@ function StatsVisual({ active, labels }: { active: boolean; labels: string[] }) 
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function PipelineVisual({ steps }: { steps: string[] }) {
   return (
     <div className="ms-vis-pipeline flex w-full max-w-47.5 flex-col items-center">
@@ -229,6 +233,41 @@ function PipelineVisual({ steps }: { steps: string[] }) {
           >
             <div className="ms-vp-icon text-base">□</div>
             <span>{step}</span>
+          </div>
+          {i < steps.length - 1 && <div className="ms-vp-line mx-auto h-3.5 w-px" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PipelineVisualFilled({ steps }: { steps: string[] }) {
+  return (
+    <div className="ms-vis-pipeline flex w-full max-w-47.5 flex-col items-center">
+      {steps.map((step, i) => (
+        <div key={step} className="flex w-full flex-col items-center">
+          <div
+            className={`ms-vp-step flex w-full items-center justify-between gap-3 rounded-[10px] border px-3.5 py-2 text-[0.78rem] font-semibold transition-all duration-[400ms]${i < 3 ? " active" : ""}`}
+            style={{ fontFamily: "var(--font-body, sans-serif)" }}
+          >
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span
+                className={`ms-vp-check flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border${i < 3 ? " ms-vp-check--active" : ""}`}
+                aria-hidden="true"
+              >
+                {i < 3 ? (
+                  <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 6.25L4.75 9L10 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <span className="ms-vp-check-dot h-1.5 w-1.5 rounded-full" />
+                )}
+              </span>
+              <span className="truncate">{step}</span>
+            </div>
+            <span className="ms-vp-step-index shrink-0 text-[0.62rem] font-bold uppercase tracking-[0.16em]">
+              {String(i + 1).padStart(2, "0")}
+            </span>
           </div>
           {i < steps.length - 1 && <div className="ms-vp-line mx-auto h-3.5 w-px" />}
         </div>
@@ -440,6 +479,19 @@ export default function OurMission() {
           background: rgba(0,208,178,.08);
           color: var(--text);
         }
+        .ms-vp-check {
+          border-color: rgba(0,208,178,.16);
+          background: rgba(0,208,178,.05);
+          color: rgba(0,208,178,.35);
+        }
+        .ms-vp-check--active {
+          border-color: rgba(0,208,178,.4);
+          background: rgba(0,208,178,.14);
+          color: #00D0B2;
+        }
+        .ms-vp-check-dot { background: rgba(0,208,178,.35); }
+        .ms-vp-step-index { color: rgba(0,208,178,.35); }
+        .ms-vp-step.active .ms-vp-step-index { color: rgba(0,208,178,.7); }
         .ms-vp-icon { color: rgba(0,208,178,.3); }
         .ms-vp-step.active .ms-vp-icon { color: #00D0B2; }
         .ms-vp-line { background: rgba(0,208,178,.14); }
@@ -626,7 +678,7 @@ export default function OurMission() {
                         {slide.visual === "shield" && <ShieldVisual />}
                         {slide.visual === "terminal" && <TerminalVisual lines={copy.terminal} />}
                         {slide.visual === "stats" && <StatsVisual active={i === 2} labels={copy.stats} />}
-                        {slide.visual === "pipeline" && <PipelineVisual steps={copy.pipeline} />}
+                        {slide.visual === "pipeline" && <PipelineVisualFilled steps={copy.pipeline} />}
                       </div>
                     </div>
                   </div>
