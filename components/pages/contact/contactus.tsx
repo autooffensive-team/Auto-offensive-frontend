@@ -1,14 +1,15 @@
 "use client";
 
   import { useRef, useState, useEffect } from "react";
+  import { useLocale } from "next-intl";
 
   /* ─── Info items ─────────────────────────────────── */
-  const INFO_ITEMS = [
+  const buildInfoItems = (copy: ContactCopyValue): InfoItem[] => [
     {
-      title: "Email",
-      desc: "hello@penshield.io",
-      href: "mailto:hello@penshield.io",
-      meta: "Response within 2 hours",
+      title: copy.info.email.title,
+      desc: "autooffensive@gmail.com",
+      href: "mailto:autooffensive@gmail.com",
+      meta: copy.info.email.meta,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6" strokeWidth={1.5}>
           <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -17,10 +18,10 @@
       ),
     },
     {
-      title: "Live Chat",
-      desc: "Start a conversation",
-      href: "#",
-      meta: "Mon-Fri, 9 AM – 6 PM EST",
+      title: copy.info.contactForm.title,
+      desc: copy.info.contactForm.desc,
+      href: "#contact-form",
+      meta: copy.info.contactForm.meta,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6" strokeWidth={1.5}>
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -28,15 +29,17 @@
       ),
     },
     {
-      title: "Office",
+      title: copy.info.location.title,
       descRaw: (
         <>
-          123 Security Street
+          {copy.info.location.lines[0]}
           <br />
-          San Francisco, CA 94105
+          {copy.info.location.lines[1]}
+          <br />
+          {copy.info.location.lines[2]}
         </>
       ),
-      meta: "HQ Location",
+      meta: copy.info.location.meta,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6" strokeWidth={1.5}>
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -45,10 +48,10 @@
       ),
     },
     {
-      title: "Support Portal",
-      desc: "support.penshield.io",
-      href: "#",
-      meta: "24/7 Assistance Available",
+      title: copy.info.resources.title,
+      desc: copy.info.resources.desc,
+      href: "/resources",
+      meta: copy.info.resources.meta,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6" strokeWidth={1.5}>
           <circle cx="12" cy="12" r="9" />
@@ -57,6 +60,118 @@
       ),
     },
   ];
+
+  type ContactCopyValue = {
+    eyebrow: string;
+    title: string;
+    description: string;
+    followUs: string;
+    info: {
+      email: { title: string; meta: string };
+      contactForm: { title: string; desc: string; meta: string };
+      location: { title: string; lines: [string, string, string]; meta: string };
+      resources: { title: string; desc: string; meta: string };
+    };
+    form: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      company: string;
+      phone: string;
+      subject: string;
+      message: string;
+      firstNamePlaceholder: string;
+      lastNamePlaceholder: string;
+      emailPlaceholder: string;
+      companyPlaceholder: string;
+      phonePlaceholder: string;
+      subjectPlaceholder: string;
+      messagePlaceholder: string;
+      agreementPrefix: string;
+      agreementLink: string;
+      agreementSuffix: string;
+      submit: string;
+      success: string;
+    };
+  };
+
+  type InfoItem = {
+    title: string;
+    meta: string;
+    icon: React.ReactNode;
+    desc?: string;
+    href?: string;
+    descRaw?: React.ReactNode;
+  };
+
+  const CONTACT_COPY: Record<"en" | "kh", ContactCopyValue> = {
+    en: {
+      eyebrow: "Contact Us",
+      title: "Let's Build Something Secure",
+      description: "Have questions? Our team is here to help protect your infrastructure with advanced penetration testing.",
+      followUs: "Follow us",
+      info: {
+        email: { title: "Email", meta: "Best for general inquiries" },
+        contactForm: { title: "Contact Form", desc: "Send us a message below", meta: "Fastest way to reach us" },
+        location: { title: "Location", lines: ["No 40, Street : 273", "SongKat, Khan Toul Kork", "Phnom Penh, Cambodia"], meta: "Local office" },
+        resources: { title: "Resources", desc: "View our guides", meta: "Docs and references" },
+      },
+      form: {
+        firstName: "First Name",
+        lastName: "Last Name",
+        email: "Email Address",
+        company: "Company",
+        phone: "Phone",
+        subject: "Subject",
+        message: "Message",
+        firstNamePlaceholder: "Enter your first name",
+        lastNamePlaceholder: "Enter your last name",
+        emailPlaceholder: "john@company.com",
+        companyPlaceholder: "Your company",
+        phonePlaceholder: "+1 (555) 000-0000",
+        subjectPlaceholder: "How can we help?",
+        messagePlaceholder: "Tell us more about your inquiry...",
+        agreementPrefix: "I agree to the ",
+        agreementLink: "privacy policy",
+        agreementSuffix: " and terms. Auto-Offensive may contact me regarding my inquiry.",
+        submit: "Send Message",
+        success: "Message sent successfully! We'll be in touch soon.",
+      },
+    },
+    kh: {
+      eyebrow: "ទំនាក់ទំនងយើង",
+      title: "តោះបង្កើតអ្វីមួយដែលមានសុវត្ថិភាព",
+      description: "មានសំណួរ? ក្រុមការងាររបស់យើងរីករាយក្នុងការជួយអ្នកការពារប្រព័ន្ធរបស់អ្នកដោយការសាកល្បងសុវត្ថិភាពកម្រិតខ្ពស់។",
+      followUs: "តាមដានពួកយើង",
+      info: {
+        email: { title: "អ៊ីមែល", meta: "ល្អបំផុតសម្រាប់សំណួរទូទៅ" },
+        contactForm: { title: "ទម្រង់ទំនាក់ទំនង", desc: "ផ្ញើសារមកយើងខាងក្រោម", meta: "វិធីលឿនបំផុតដើម្បីទាក់ទងយើង" },
+        location: { title: "ទីតាំង", lines: ["លេខ 40 ផ្លូវ 273", "SongKat, Khan Toul Kork", "ភ្នំពេញ, កម្ពុជា"], meta: "ការិយាល័យក្នុងតំបន់" },
+        resources: { title: "ធនធាន", desc: "មើលមគ្គុទេសក៍របស់យើង", meta: "ឯកសារ និងឯកសារយោង" },
+      },
+      form: {
+        firstName: "នាម",
+        lastName: "នាមត្រកូល",
+        email: "អាសយដ្ឋានអ៊ីមែល",
+        company: "ក្រុមហ៊ុន",
+        phone: "លេខទូរស័ព្ទ",
+        subject: "ប្រធានបទ",
+        message: "សារ",
+        firstNamePlaceholder: "បញ្ចូលនាមរបស់អ្នក",
+        lastNamePlaceholder: "បញ្ចូលនាមត្រកូលរបស់អ្នក",
+        emailPlaceholder: "john@company.com",
+        companyPlaceholder: "ក្រុមហ៊ុនរបស់អ្នក",
+        phonePlaceholder: "+855 12 345 678",
+        subjectPlaceholder: "តើយើងអាចជួយអ្វីបានខ្លះ?",
+        messagePlaceholder: "សូមប្រាប់យើងបន្ថែមអំពីសំណើរបស់អ្នក...",
+        agreementPrefix: "ខ្ញុំយល់ព្រមនឹង ",
+        agreementLink: "គោលការណ៍ឯកជនភាព",
+        agreementSuffix: " និងលក្ខខណ្ឌ។ Auto-Offensive អាចទាក់ទងខ្ញុំអំពីសំណើរបស់ខ្ញុំ។",
+        submit: "ផ្ញើសារ",
+        success: "ផ្ញើសារបានជោគជ័យ! យើងនឹងទាក់ទងអ្នកឆាប់ៗនេះ។",
+      },
+    },
+  };
 
   const SOCIALS = [
     {
@@ -259,6 +374,13 @@
 
   /* ─── Component ─────────────────────────────────── */
   export default function ContactUs() {
+    const locale = useLocale();
+    const copy = CONTACT_COPY[locale === "kh" ? "kh" : "en"];
+    const infoItems = buildInfoItems(copy);
+    const contactFontClass =
+      locale === "kh"
+        ? "font-[var(--font-noto-khmer),sans-serif]"
+        : "font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif]";
     const formRef = useRef<HTMLFormElement>(null);
     const hexLeftRef = useRef<SVGSVGElement>(null);
     const hexRightRef = useRef<SVGSVGElement>(null);
@@ -490,14 +612,14 @@
         `}</style>
 
         <section
-          className="
+          className={`
             relative min-h-screen overflow-hidden
             bg-[#F7F5F0] dark:bg-[#09090B]
             text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
-            font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif]
+            ${contactFontClass}
             transition-[background] duration-500
             pt-35 pb-25 px-[6%]
-          "
+          `}
         >
           {/* ── Soft Blob Background ── */}
           <div className="absolute pointer-events-none inset-0 overflow-hidden">
@@ -512,56 +634,63 @@
           <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
 
           {/* ── Container ── */}
-          <div className="relative z-10 max-w-7xl mx-auto w-full">
+          <div className="relative z-10 max-w-7xl mx-auto w-full lg:pl-12 xl:pl-20">
 
             {/* ── Header ── */}
             <div className="text-center mb-20">
               <div className="contact-header-label inline-block text-[0.75rem] font-bold tracking-[0.06em] uppercase text-[#00BCA1] mb-4 px-4 py-2 border border-[rgba(0,188,161,0.24)] rounded-lg">
-                Contact Us
+                {copy.eyebrow}
               </div>
 
-              <h1 className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.02em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5">
-                Let&apos;s Build Something Secure
+              <h1
+                className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.02em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5"
+                style={
+                  locale === "kh"
+                    ? { fontFamily: 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif' }
+                    : { fontFamily: 'var(--font-google-sans), var(--font-noto-khmer), sans-serif' }
+                }
+              >
+                {copy.title}
               </h1>
 
               <p className="contact-desc text-responsive text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] max-w-155 mx-auto leading-[1.7] font-normal">
-                Have questions? Our team is here to help you protect your infrastructure with advanced penetration testing.
+                {copy.description}
               </p>
             </div>
 
             {/* ── Main Grid ── */}
-            <div className="contact-grid-anim grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-16 lg:gap-20">
+            <div className="contact-grid-anim grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-16 lg:gap-20 lg:translate-x-6 xl:translate-x-10">
 
               {/* ── Form Card ── */}
               <div className="border-b-2 border-[rgba(0,188,161,0.14)] dark:border-[rgba(0,188,161,0.08)] pb-12 lg:pb-0 lg:border-b-0 lg:border-r-2 lg:pr-16">
                 {/* Success message */}
                 {submitted && (
                   <div className="status-msg text-responsive mb-8 p-4 rounded-xl font-semibold bg-[rgba(0,188,161,0.10)] dark:bg-[rgba(0,188,161,0.08)] text-[#00BCA1] border border-[rgba(0,188,161,0.24)] dark:border-[rgba(0,188,161,0.16)]">
-                    ✓ Message sent successfully! We&apos;ll be in touch soon.
+                    ✓ {copy.form.success}
                   </div>
                 )}
 
-                <form ref={formRef} onSubmit={handleSubmit}>
+                <form id="contact-form" ref={formRef} onSubmit={handleSubmit}>
                   {/* Row: First / Last Name */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                     <div className="flex flex-col">
                       <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                        First Name
+                        {copy.form.firstName}
                       </label>
                       <input
                         type="text"
-                        placeholder="John"
+                        placeholder={copy.form.firstNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
                     </div>
                     <div className="flex flex-col">
                       <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                        Last Name
+                        {copy.form.lastName}
                       </label>
                       <input
                         type="text"
-                        placeholder="Doe"
+                        placeholder={copy.form.lastNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
@@ -571,11 +700,11 @@
                   {/* Email */}
                   <div className="flex flex-col mb-8">
                     <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                      Email Address
+                      {copy.form.email}
                     </label>
                     <input
                       type="email"
-                      placeholder="john@company.com"
+                      placeholder={copy.form.emailPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                     />
@@ -585,21 +714,21 @@
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                     <div className="flex flex-col">
                       <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                        Company
+                        {copy.form.company}
                       </label>
                       <input
                         type="text"
-                        placeholder="Your company"
+                        placeholder={copy.form.companyPlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
                     </div>
                     <div className="flex flex-col">
                       <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                        Phone
+                        {copy.form.phone}
                       </label>
                       <input
                         type="tel"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder={copy.form.phonePlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
                     </div>
@@ -608,11 +737,11 @@
                   {/* Subject */}
                   <div className="flex flex-col mb-8">
                     <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                      Subject
+                      {copy.form.subject}
                     </label>
                     <input
                       type="text"
-                      placeholder="How can we help?"
+                      placeholder={copy.form.subjectPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                     />
@@ -621,10 +750,10 @@
                   {/* Message */}
                   <div className="flex flex-col mb-10">
                     <label className="text-label font-semibold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-3 tracking-[0.01em]">
-                      Message
+                      {copy.form.message}
                     </label>
                     <textarea
-                      placeholder="Tell us more about your inquiry..."
+                      placeholder={copy.form.messagePlaceholder}
                       required
                       className="contact-input contact-textarea text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                     />
@@ -639,11 +768,11 @@
                       className="w-5 h-5 min-w-5 mt-0.5 cursor-pointer accent-[#00BCA1]"
                     />
                     <label htmlFor="agree" className="cursor-pointer">
-                      I agree to the{" "}
+                      {copy.form.agreementPrefix}
                       <a href="#" className="text-[#00BCA1] font-semibold no-underline hover:underline">
-                        privacy policy
+                        {copy.form.agreementLink}
                       </a>{" "}
-                      and terms. PenShield may contact me regarding my inquiry.
+                      {copy.form.agreementSuffix}
                     </label>
                   </div>
 
@@ -653,14 +782,14 @@
                     disabled={disabled}
                     className="text-responsive w-full mt-4 bg-[#00BCA1] hover:bg-[#009f88] disabled:opacity-60 disabled:cursor-not-allowed text-white border-none py-3.5 px-7 rounded-lg font-bold font-[inherit] cursor-pointer tracking-[0.01em] transition-all duration-200"
                   >
-                    Send Message
+                    {copy.form.submit}
                   </button>
                 </form>
               </div>
 
               {/* ── Info Column ── */}
               <div className="flex flex-col gap-8 lg:pl-8">
-                {INFO_ITEMS.map((item) => (
+                {infoItems.map((item) => (
                   <div key={item.title} className="info-card">
                     <div className="flex gap-4 items-start">
                       <div className="w-10 h-10 min-w-10 text-[#00BCA1] shrink-0">
@@ -696,7 +825,7 @@
                 {/* ── Social Links ── */}
                 <div className="border-t border-[rgba(0,188,161,0.14)] dark:border-[rgba(0,188,161,0.08)] pt-8 mt-4">
                   <p className="text-responsive text-[oklch(0.556_0_0)] dark:text-[oklch(0.4_0_0)] mb-5 font-semibold">
-                    Follow us
+                    {copy.followUs}
                   </p>
                   <div className="flex gap-3">
                     {SOCIALS.map((s) => (
