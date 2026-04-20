@@ -3,52 +3,33 @@
 import { useState } from "react";
 
 const CheckCircle = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <circle cx="8" cy="8" r="7.5" fill="#14b8a6" />
-    <path
-      d="M5 8L7 10L11 6"
-      stroke="white"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+  <div className="w-5 h-5 flex items-center justify-center rounded-full bg-teal-500 text-white text-xs">
+    ✓
+  </div>
 );
 
 const Circle = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <circle
-      cx="8"
-      cy="8"
-      r="7.5"
-      stroke="#d1d5db"
-      strokeWidth="1.2"
-      fill="white"
-    />
-  </svg>
+  <div className="w-5 h-5 rounded-full border border-gray-500"></div>
 );
 
 type Tool = {
   name: string;
   type: string;
-  active: boolean;
 };
 
 const tools: Tool[] = [
-  { name: "Subfinder", type: "Recon", active: true },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Nuclei", type: "Vuln Scan", active: false },
-  { name: "Nuclei", type: "Vuln Scan", active: false },
-  { name: "Nuclei", type: "Vuln Scan", active: false },
-  { name: "Nuclei", type: "Vuln Scan", active: false },
-  { name: "Nuclei", type: "Vuln Scan", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
-  { name: "Burp API", type: "Proxy", active: false },
+  { name: "Subfinder", type: "Recon" },
+  { name: "Burp API", type: "Proxy" },
+  { name: "Burp API", type: "Proxy" },
+  { name: "Burp API", type: "Proxy" },
+  { name: "Nuclei", type: "Vuln Scan" },
+  { name: "Nuclei", type: "Vuln Scan" },
+  { name: "Nuclei", type: "Vuln Scan" },
+  { name: "Nuclei", type: "Vuln Scan" },
+  { name: "Nuclei", type: "Vuln Scan" },
+  { name: "Burp API", type: "Proxy" },
+  { name: "Burp API", type: "Proxy" },
+  { name: "Burp API", type: "Proxy" },
 ];
 
 export default function ToolLibrary() {
@@ -61,33 +42,39 @@ export default function ToolLibrary() {
   };
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">Tool Library</h3>
-        <span className="text-xs bg-gray-800 text-white px-2.5 py-0.5 rounded-full font-medium">
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Tool Library
+        </h3>
+
+        <span className="text-xs bg-teal-500/20 text-teal-400 px-3 py-1 rounded-full font-medium">
           {selectedTools.length} ACTIVE
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      {/* Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tools.map((tool, idx) => {
           const isSelected = selectedTools.includes(idx);
+
           return (
             <button
               key={idx}
               onClick={() => toggleTool(idx)}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-colors ${
-                isSelected
-                  ? "border-teal-400 bg-white shadow-sm"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
+              className={`p-4 rounded-xl border transition-all flex items-center justify-between
+                ${
+                  isSelected
+                    ? "bg-teal-500/10 border-teal-400 shadow-md"
+                    : "bg-[#020617] border-gray-700 hover:border-gray-500 hover:scale-[1.02]"
+                }`}
             >
               <div>
-                <div className="text-sm font-semibold text-gray-800">
-                  {tool.name}
-                </div>
-                <div className="text-xs text-gray-400">{tool.type}</div>
+                <p className="font-semibold text-white">{tool.name}</p>
+                <p className="text-sm text-gray-400">{tool.type}</p>
               </div>
+
               {isSelected ? <CheckCircle /> : <Circle />}
             </button>
           );
