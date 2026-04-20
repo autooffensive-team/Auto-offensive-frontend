@@ -8,6 +8,7 @@ import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale } from "next-intl/server";
 import { OfflineProvider } from "@/components/providers/offline-provider";
+import { ReduxProvider } from "@/components/providers/redux-provider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -72,9 +73,11 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <OfflineProvider>
-              <LayoutWrapper>{children}</LayoutWrapper>
-            </OfflineProvider>
+            <ReduxProvider>
+              <OfflineProvider>
+                <LayoutWrapper>{children}</LayoutWrapper>
+              </OfflineProvider>
+            </ReduxProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

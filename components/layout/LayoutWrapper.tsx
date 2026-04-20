@@ -12,8 +12,12 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
 
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
   const isAuthPage =
-    pathname === "/login" || pathname === "/register";
+    normalizedPath === "/login" ||
+    normalizedPath === "/register" ||
+    normalizedPath.endsWith("/login") ||
+    normalizedPath.endsWith("/register");
 
   return (
     <>
