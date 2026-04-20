@@ -1,0 +1,239 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "search": "Search",
+    "language": "Language",
+    "documentation": "Documentation",
+    "gettingStarted": "Getting Started",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "tryForFree": "Try for Free",
+    "getStarted": "Get Started",
+    "learn": "Learn",
+    "reference": "Reference",
+    "execute": "Execute"
+  },
+  "nav": {
+    "features": "Features",
+    "tools": "Tools",
+    "resources": "Resources",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "loginRegister": "Login / Register"
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "tools": "Tools",
+    "pricing": "Pricing",
+    "integrations": "Integrations",
+    "resources": "Resources",
+    "documentation": "Documentation",
+    "apiReference": "API Reference",
+    "cliGuide": "CLI Guide",
+    "blog": "Blog",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "contactUs": "Contact Us",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "security": "Security",
+    "community": "Community",
+    "discord": "Discord",
+    "twitter": "Twitter",
+    "github": "GitHub",
+    "allRightsReserved": "All rights reserved.",
+    "builtWith": "Built with"
+  },
+  "hero": {
+    "title": "Next-Gen PaaS for Hackers",
+    "subtitle": "Automated Security Workflows and Pentesting Platform"
+  },
+  "tools": {
+    "title": "The Auto-Offensive ToolKit",
+    "subtitle": "Browse and launch industry-standard scanning engines from a single unified interface.",
+    "searchPlaceholder": "Search tools, tags...",
+    "noResults": "No tools found",
+    "tryDifferentSearch": "Try a different search or category"
+  },
+  "resource": {
+    "title": "Learn. Reference. Execute.",
+    "subtitle": "Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit.",
+    "documentationHub": "Documentation Hub",
+    "documentationCategories": "Documentation Categories",
+    "quickLinks": "Quick Links",
+    "featuredResources": "Featured Resources",
+    "quickStartGuide": "Quick Start Guide",
+    "quickStartDesc": "Get running in 5 minutes",
+    "apiAuthentication": "API Authentication",
+    "apiAuthDesc": "Generate API keys",
+    "exampleScripts": "Example Scripts",
+    "exampleScriptsDesc": "Copy-paste automation",
+    "videoTutorials": "Video Tutorials",
+    "videoTutorialsDesc": "Visual learning",
+    "newsletterTitle": "Get new resources in your inbox",
+    "newsletterSubtitle": "New guides, tutorials, and updates dropped every week.",
+    "subscribe": "Subscribe",
+    "emailPlaceholder": "your@email.com"
+  },
+  "features": {
+    "title": "Platform Capabilities",
+    "subtitle": "Everything you need to secure your infrastructure"
+  },
+  "homepage": {
+    "hero": {
+      "titleLine1": "Next Gen",
+      "titleLine2": "Platform As A Service",
+      "titleLine3": "for hacker",
+      "description": "Continuously scan your infrastructure for vulnerabilities - faster, smarter, and at scale. No manual setup. Just results.",
+      "primaryCta": "Start Scanning",
+      "secondaryCta": "Preview Report",
+      "scroll": "Scroll",
+      "stats": {
+        "completed": "Scans completed",
+        "uptime": "Uptime SLA",
+        "faster": "Faster than manual"
+      }
+    },
+    "aiBanner": {
+      "eyebrow": "Auto Offensive · AI-Powered Security",
+      "titleLine1": "AI amplifies your",
+      "titleLine2": "expertise,",
+      "titleLine3": "not replace it",
+      "description": "Auto Offensive doesn't replace skilled security professionals. Instead, we empower ethical hackers, penetration testers, and infosec practitioners with AI-driven workflows that handle the tedious work so you can focus on creative hacking, custom testing, and security research."
+    },
+    "video": {
+      "eyebrow": "Platform Walkthrough",
+      "playLabel": "Play video",
+      "title": "Discover Our Story",
+      "subtitle": "Watch a quick walkthrough of the platform, tools, and workflow experience."
+    },
+    "team": {
+      "eyebrow": "Our company",
+      "titleLine1": "In our company,",
+      "titleLine2": "we build",
+      "titleLine3": "what we use",
+      "paragraph1": "We launched as a team of passionate professionals and we've kept that mindset ever since. Our experts still drive product development today, focusing relentlessly on accuracy, speed, and control.",
+      "paragraph2": "Every new feature comes from real-world experience. We constantly improve our work with updated techniques, smarter processes, and validation that reflects how things actually operate.",
+      "cta": "Read our story",
+      "imagePlaceholder": "Team Photo Placeholder",
+      "teamSizeLabel": "Team size",
+      "teamSizeValue": "12+ Experts",
+      "established": "Est."
+    },
+    "audience": {
+      "eyebrow": "Auto Offensive is for",
+      "seeMore": "See more",
+      "cards": {
+        "consultants": {
+          "title": "Security",
+          "subtitle": "consultants",
+          "description": "Work faster, prove more, grow your practice."
+        },
+        "internalTeams": {
+          "title": "Internal security",
+          "subtitle": "teams",
+          "description": "Maintain visibility, reduce risk, earn trust."
+        },
+        "msps": {
+          "title": "Managed Security",
+          "subtitle": "Providers (MSPs)",
+          "description": "Deliver more value with less overhead."
+        }
+      }
+    },
+    "features": {
+      "sectionEyebrow": "Platform Capabilities",
+      "sectionTitleLine1": "What You Can Do",
+      "sectionTitleLine2": "with Auto Offensive",
+      "exploreCapability": "Explore capability"
+    }
+  },
+  "feature": {
+    "cli": {
+      "title": "Command Without Limits",
+      "subtitle": "Run 20+ professional security tools from your terminal with zero installation.",
+      "installCta": "Install the CLI",
+      "viewDocs": "View Docs",
+      "engineeringPrecision": "Engineering Precision",
+      "executionWorkflow": "Execution Workflow",
+      "readyUpgrade": "Ready to upgrade your workflow?"
+    },
+    "ai": {
+      "title": "AI-Assisted Reporting",
+      "subtitle": "Transform raw vulnerability data into boardroom-ready intelligence.",
+      "generateReport": "Generate Report",
+      "viewDemo": "View Demo",
+      "workflowTitle": "The Reporting Workflow",
+      "workflowSubtitle": "Three steps from raw data to comprehensive documentation",
+      "liveDashboard": "Live Result Dashboard",
+      "aiEdge": "The AI Edge",
+      "stopWriting": "Stop writing reports. Start securing."
+    },
+    "cicd": {
+      "title": "Repository Scanning",
+      "subtitle": "Integrate deep-code analysis directly into your SDLC.",
+      "connectRepo": "Connect Repository",
+      "viewDocs": "View Docs",
+      "analysisPipeline": "The Analysis Pipeline",
+      "ciCdIntegration": "CI/CD Integration Guide",
+      "readySecure": "Ready to secure your pipeline?"
+    },
+    "webui": {
+      "title": "Orchestrate Scans Without the CLI",
+      "subtitle": "Guardian AI bridges the gap between powerful open-source security tools and enterprise-grade usability.",
+      "launchScan": "Launch First Scan",
+      "watchDemo": "Watch Demo",
+      "engineeredForEnterprise": "Engineered for Enterprise ROI"
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "legal": "Legal"
+  },
+  "help": {
+    "title": "Help Center",
+    "support": "Support",
+    "searchPlaceholder": "Search for help...",
+    "frequentlyAsked": "Frequently Asked Questions",
+    "cantFind": "Can't find what you're looking for?",
+    "contactUs": "Contact Us",
+    "viewDocumentation": "View Documentation"
+  },
+  "docs": {
+    "title": "Documentation",
+    "searchPlaceholder": "Search documentation...",
+    "onThisPage": "On This Page",
+    "previous": "Previous",
+    "next": "Next",
+    "gettingStarted": "Getting Started",
+    "introduction": "Introduction",
+    "quickStart": "Quick Start",
+    "installation": "Installation"
+  },
+  "error": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or has been moved.",
+      "goHome": "Go Home",
+      "goBack": "Go Back"
+    },
+    "offline": {
+      "title": "You're Offline",
+      "description": "Please check your internet connection and try again.",
+      "tryAgain": "Try Again",
+      "goHome": "Go Home"
+    }
+  }
+}

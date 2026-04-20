@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
 
@@ -217,6 +218,13 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
 }
 
 export default function HomeHero() {
+  const t = useTranslations("homepage.hero");
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+  const titleLine3 = t("titleLine3");
+  const khmerTitleLine3Match = isKhmer
+    ? titleLine3.match(/^([\u1780-\u17FF\u200B-\u200D\s]+)(.*)$/u)
+    : null;
   const hexLeftRef  = useRef<SVGSVGElement>(null);
   const hexRightRef = useRef<SVGSVGElement>(null);
   const s1Ref       = useRef<HTMLDivElement>(null);
@@ -257,6 +265,7 @@ export default function HomeHero() {
   return (
     <>
       <style>{`
+        /* ── Star dots ── */
         .ao-s1, .ao-s2, .ao-s3 {
           position: absolute;
           top: 0; left: 0;
@@ -287,6 +296,7 @@ export default function HomeHero() {
           50%      { filter: blur(0.6px); opacity: 1;    }
         }
 
+        /* ── Planet arc container ── */
         .ao-planet {
           position: absolute;
           left: 0; right: 0;
@@ -300,6 +310,10 @@ export default function HomeHero() {
           0%   { opacity: 0; }
           100% { opacity: 1; }
         }
+
+        /* ════════════════════════════════════════════
+           LIGHT MODE sphere — original F7F5F0 palette
+           ════════════════════════════════════════════ */
         .ao-planet-sphere {
           opacity: 0;
           animation: planetReveal 0.9s ease-out 2.0s 1 forwards;
@@ -310,14 +324,164 @@ export default function HomeHero() {
           padding-top: 150%;
           border-radius: 50%;
           transform: translateX(-50%);
+          background: #F7F5F0;
+          overflow: hidden;
+        }
+
+        /* LEFT blob — deep blue */
+        .ao-planet-sphere::before {
+          content: '';
+          position: absolute;
+          border-radius: 50%;
+          width: 46%; height: 42%;
+          top: -8%; left: -6%;
+          background: #01509e;
+          opacity: 0.95;
+          filter: blur(80px);
+        }
+        /* RIGHT blob — teal */
+        .ao-planet-sphere::after {
+          content: '';
+          position: absolute;
+          border-radius: 50%;
+          width: 38%; height: 34%;
+          top: -5%; right: -4%;
+          background: #00d0b2;
+          opacity: 0.50;
+          filter: blur(70px);
+        }
+
+        .ao-planet-blob-white {
+          position: absolute;
+          border-radius: 50%;
+          width: 72%; height: 66%;
+          top: -55%; left: 50%;
+          transform: translateX(-50%);
+          background: #F7F5F0;
+          opacity: 1;
+          filter: blur(75px);
+        }
+        .ao-planet-blob-cyan {
+          position: absolute;
+          border-radius: 50%;
+          width: 42%; height: 38%;
+          bottom: -8%; left: -4%;
+          background: #0194c7;
+          opacity: 0.75;
+          filter: blur(72px);
+        }
+        .ao-planet-blob-cyan2 {
+          position: absolute;
+          border-radius: 50%;
+          width: 30%; height: 26%;
+          bottom: -6%; right: -2%;
+          background: #0194c7;
+          opacity: 0.50;
+          filter: blur(60px);
+        }
+        .ao-planet-blob-mid {
+          position: absolute;
+          border-radius: 50%;
+          width: 30%; height: 26%;
+          top: 22%; left: 35%;
+          background: #00d0b2;
+          opacity: 0.18;
+          filter: blur(55px);
+        }
+
+        .ao-planet-sphere-overlay {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
           background: radial-gradient(
-            ellipse at 50% 1.5%,
-            rgba(9,9,11,1) 0%,
-            rgba(9,9,11,0.95) 40%,
-            rgba(9,9,11,0.85) 70%,
-            rgba(9,9,11,0.7) 100%
+            ellipse at 50% 50%,
+            transparent 0%,
+            transparent 38%,
+            rgba(240,248,255,0.25) 55%,
+            rgba(220,235,245,0.55) 72%,
+            rgba(200,220,240,0.80) 88%,
+            rgba(185,210,235,0.92) 100%
+          );
+          pointer-events: none;
+        }
+        .ao-planet-sphere-top {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255,255,255,0.55) 0%,
+            transparent 48%
+          );
+          pointer-events: none;
+        }
+
+        /* ════════════════════════════════════════════
+           DARK MODE sphere overrides
+           bg: #09090B — deep space, vibrant teal/blue
+           ════════════════════════════════════════════ */
+        .dark .ao-planet-sphere {
+          background: #09090B;
+        }
+        /* LEFT blob — richer deep blue in dark */
+        .dark .ao-planet-sphere::before {
+          background: #0a3a7a;
+          opacity: 1;
+          filter: blur(70px);
+        }
+        /* RIGHT blob — vivid teal in dark */
+        .dark .ao-planet-sphere::after {
+          background: #00d0b2;
+          opacity: 0.70;
+          filter: blur(65px);
+        }
+        /* Centre blob — pure dark bg instead of off-white */
+        .dark .ao-planet-blob-white {
+          background: #09090B;
+          opacity: 1;
+          filter: blur(60px);
+        }
+        /* Bottom-left cyan — more vivid */
+        .dark .ao-planet-blob-cyan {
+          background: #00a8e8;
+          opacity: 0.85;
+          filter: blur(65px);
+        }
+        /* Bottom-right secondary cyan */
+        .dark .ao-planet-blob-cyan2 {
+          background: #00c4b4;
+          opacity: 0.65;
+          filter: blur(55px);
+        }
+        /* Mid teal softener — more visible in dark */
+        .dark .ao-planet-blob-mid {
+          background: #00d0b2;
+          opacity: 0.28;
+          filter: blur(50px);
+        }
+        /* Dark mode vignette — blend into #09090B at edges */
+        .dark .ao-planet-sphere-overlay {
+          background: radial-gradient(
+            ellipse at 50% 50%,
+            transparent 0%,
+            transparent 35%,
+            rgba(9,9,11,0.20) 52%,
+            rgba(9,9,11,0.55) 70%,
+            rgba(9,9,11,0.82) 86%,
+            rgba(9,9,11,0.95) 100%
           );
         }
+        /* Dark mode top wash — subtle teal luminance at crown */
+        .dark .ao-planet-sphere-top {
+          background: radial-gradient(
+            ellipse at 50% 0%,
+            rgba(0,208,178,0.18) 0%,
+            rgba(0,168,232,0.08) 30%,
+            transparent 55%
+          );
+        }
+
+        /* ── glow, rim, fade, sweep — same for both modes ── */
         .ao-planet-glow {
           position: absolute;
           top: -3%; left: 50%;
@@ -335,6 +499,15 @@ export default function HomeHero() {
           opacity: 0;
           animation: planetReveal 0.9s ease-out 1.0s 1 forwards;
         }
+        /* Dark mode glow — more intense teal/blue */
+        .dark .ao-planet-glow {
+          box-shadow:
+            0 0 0    2px rgba(0,208,178,0.6),
+            0 0 20px 8px rgba(0,168,232,0.5),
+            0 0 55px 22px rgba(0,208,178,0.28),
+            0 0 110px 45px rgba(1,80,158,0.18),
+            0 0 180px 80px rgba(0,208,178,0.1);
+        }
         .ao-planet-rim {
           position: absolute;
           top: -1%; left: 50%;
@@ -350,12 +523,24 @@ export default function HomeHero() {
           opacity: 0;
           animation: planetReveal 0.9s ease-out 2.0s 1 forwards;
         }
+        /* Dark mode rim — brighter teal */
+        .dark .ao-planet-rim {
+          border-color: rgba(0,208,178,0.9);
+          box-shadow:
+            0 0 20px 6px rgba(0,208,178,0.55),
+            0 0 50px 16px rgba(0,208,178,0.2),
+            inset 0 0 30px 8px rgba(0,208,178,0.15);
+        }
         .ao-planet-fade {
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 35%;
           background: linear-gradient(to bottom, transparent, rgba(238,247,245,0.92));
           z-index: 5;
+        }
+        /* Dark mode fade — blend into #09090B */
+        .dark .ao-planet-fade {
+          background: linear-gradient(to bottom, transparent, rgba(9,9,11,0.96));
         }
 
         .ao-planet-sweep {
@@ -398,6 +583,7 @@ export default function HomeHero() {
           100%    { opacity: 0; r: 0; }
         }
 
+        /* ── Hex grids ── */
         .hx {
           fill: transparent;
           stroke: #00D0B2;
@@ -527,8 +713,6 @@ export default function HomeHero() {
           0%, 100% { transform: translateX(-50%) translateY(0); }
           50%       { transform: translateX(-50%) translateY(5px); }
         }
-
-        /* ── KEY FIX: higher z-index so nothing covers it ── */
         .scroll-indicator {
           position: absolute;
           bottom: 28px;
@@ -537,19 +721,94 @@ export default function HomeHero() {
           animation: ao-bob 2.5s ease-in-out infinite;
           z-index: 20;
         }
+
+        /* ── Responsive description font sizes ── */
+        .hero-description {
+          font-size: 16px; /* mobile */
+        }
+        @media (min-width: 768px) {
+          .hero-description {
+            font-size: 18px; /* tablet */
+          }
+        }
+        @media (min-width: 1024px) {
+          .hero-description {
+            font-size: 20px; /* desktop */
+          }
+        }
+
+        /* Ripple Animation for Preview Button */
+        .ripple-button {
+          position: relative;
+          overflow: hidden;
+        }
+        .ripple-button:before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.25);
+          top: 100%;
+          width: 140%;
+          height: 180%;
+          background-color: rgba(0, 0, 0, 0.05);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:after {
+          content: "";
+          position: absolute;
+          left: 55%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.45);
+          top: 180%;
+          width: 160%;
+          height: 190%;
+          background-color: #39bda7;
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:hover {
+          border-color: #39bda7;
+        }
+        .ripple-button:hover svg {
+          color: black;
+          stroke: black;
+        }
+        .dark .ripple-button:hover svg {
+          color: white;
+          stroke: white;
+        }
+        .ripple-button:hover:before {
+          top: -35%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .ripple-button:hover:after {
+          top: -45%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+
       `}</style>
 
       <section
         className="
-          relative min-h-screen overflow-hidden
+          relative min-h-screen overflow-hidden mx-auto max-w-8xl
           flex flex-col items-center justify-center text-center
           px-[6%] py-25
-          bg-white dark:bg-[oklch(0.145_0_0)]
+          bg-white dark:bg-[#09090B]
           text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
-          font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif]
           transition-[background] duration-400
         "
-        style={{ background: "#ffffff" }}
+        style={{
+          background: "#fffff",
+          fontFamily: isKhmer
+            ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+            : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+        }}
       >
 
         {/* ── STAR DOTS ── */}
@@ -559,7 +818,14 @@ export default function HomeHero() {
 
         {/* ── PLANET ARC ── */}
         <div className="ao-planet" aria-hidden="true">
-          <div className="ao-planet-sphere" />
+          <div className="ao-planet-sphere">
+            <div className="ao-planet-blob-white" />
+            <div className="ao-planet-blob-cyan" />
+            <div className="ao-planet-blob-cyan2" />
+            <div className="ao-planet-blob-mid" />
+            <div className="ao-planet-sphere-overlay" />
+            <div className="ao-planet-sphere-top" />
+          </div>
           <div className="ao-planet-glow"   />
           <div className="ao-planet-rim"    />
           <div className="ao-planet-sweep" aria-hidden="true">
@@ -573,13 +839,13 @@ export default function HomeHero() {
                   x1="0" y1="100" x2="200" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
                   <stop offset="60%"  stopColor="#00D0B2" stopOpacity="0.55" />
-                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#F7F5F0" stopOpacity="0.95" />
                 </linearGradient>
                 <linearGradient id="cometGradR" gradientUnits="userSpaceOnUse"
                   x1="200" y1="100" x2="0" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
                   <stop offset="60%"  stopColor="#00D0B2" stopOpacity="0.55" />
-                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#F7F5F0" stopOpacity="0.95" />
                 </linearGradient>
                 <filter id="cometGlow" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation="1.5" result="blur" />
@@ -641,116 +907,126 @@ export default function HomeHero() {
         <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
 
         {/* ── CONTENT ── */}
-        <div className="relative z-10 flex flex-col items-center max-w-267 w-full">
+        <div className="relative z-10 flex flex-col items-center max-w-256.25 w-full">
 
           {/* Title */}
           <h1 className="
-            font-[var(--font-hackdaddy),var(--font-noto-khmer),monospace]
             text-[clamp(2.8rem,6vw,5rem)] font-bold
             leading-[1.08] tracking-[-0.02em]
             text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
             mb-[1.4rem] fade-up-2
           ">
-            <span className="text-[#01509e] accent-underline">Next Gen</span>
+            <span className="text-[#01509e] accent-underline">{t("titleLine1")}</span>
             <br />
-            Platform As A Service
+            {t("titleLine2")}
             <br />
-            <span className="text-primary
-             dark:text-[oklch(0.708_0_0)] font-light">
-              for hacker
+            <span className="text-[#00d0b2] dark:text-primary font-light">
+              {khmerTitleLine3Match ? (
+                <>
+                  <span className="font-khmer">{khmerTitleLine3Match[1]}</span>
+                  {khmerTitleLine3Match[2]}
+                </>
+              ) : (
+                titleLine3
+              )}
             </span>
           </h1>
 
-          {/* Subtitle */}
+          {/* Subtitle — responsive 16px / 18px / 20px */}
           <p className="
+            hero-description
             fade-up-3
-            text-[1.05rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]
-            max-w-130 mx-auto mb-[2.6rem]
+            text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]
+            max-w-125 mx-auto mb-[2.6rem]
             leading-[1.7] font-normal
           ">
-            Continuously scan your infrastructure for vulnerabilities — faster, smarter, and at scale. No manual setup. Just results.
+            {t("description")}
           </p>
 
           {/* Buttons */}
-          <div className="fade-up-4 flex items-center justify-center gap-3 flex-wrap">
+          <div className="fade-up-4 grid w-full max-w-136 grid-cols-2 gap-3 sm:flex sm:w-auto sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <button className="
-              bg-PRIMARY
-               text-white border-none
-              px-7.5 py-3.5 rounded-[10px]
-              text-[0.9rem] font-semibold font-[inherit]
-              flex items-center gap-2 cursor-pointer
-              hover:bg-[#00b89c]
-              transition-all duration-200
+              group relative inline-flex w-full min-w-0 items-center justify-center
+              overflow-hidden rounded-xl border-2 border-primary bg-primary
+              px-3 py-3 text-[14px] sm:text-[15px] font-black leading-none text-white
+              transition-transform duration-200 hover:-translate-y-px
+              before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
+              before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
+              before:transition-transform before:duration-200 before:content-['']
+              after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
+              after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
+              after:transition-transform after:duration-200 after:content-['']
+              hover:before:translate-y-0 hover:after:translate-y-0
+              sm:w-auto sm:px-7.5 sm:py-3.5
             ">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-              </svg>
-              Start Scanning
+              <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <span className="min-w-0 whitespace-nowrap text-center">{t("primaryCta")}</span>
+              </span>
             </button>
 
             <button className="
-              bg-white/90 dark:bg-[rgba(0,208,178,0.06)]
-              text-[oklch(0.145_0_0)] dark:text-[oklch(0.908_0_0)]
+              bg-white dark:bg-[rgba(0,208,178,0.06)]
+              text-black dark:text-white
               border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)]
-              px-6.5 py-3.4 rounded-[10px]
-              text-[0.9rem] font-medium font-[inherit]
+              w-full min-w-0 justify-center
+              px-4 py-3 rounded-xl
+              text-[0.82rem] leading-tight font-medium font-[inherit]
               flex items-center gap-2 cursor-pointer
               backdrop-blur-sm
-              hover:bg-white/90 dark:hover:bg-[rgba(0,208,178,0.12)]
-              hover:border-[rgba(0,208,178,0.55)] dark:hover:border-[rgba(0,208,178,0.45)]
               duration-200
+              ripple-button
+              sm:w-auto sm:px-6.5 sm:py-3.5 sm:text-[0.9rem]
             ">
-              <svg className="text-PRIMARY
-              " width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="text-black dark:text-white" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
-              View Sample Report
+              <span className="min-w-0 whitespace-nowrap text-center text-black dark:text-white">{t("secondaryCta")}</span>
             </button>
           </div>
 
           {/* Stats */}
           <div className="
             fade-up-5
-            flex justify-center gap-3
-            mt-[4rem] pt-[2rem]
+            flex justify-center gap-12
+            mt-16 pt-8
             border-t border-[rgba(0,208,178,0.14)] dark:border-[rgba(0,208,178,0.1)]
             w-full
           ">
             <div className="text-center">
-              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.985_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
-                12<em className="text-PRIMARY
-                 not-italic">K+</em>
+              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.556_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
+                12<em className="text-primary not-italic">K+</em>
               </div>
-              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-1">
-                Scans completed
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.985_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
-                <em className="text-PRIMARY
-                 not-italic">99</em>.9%
-              </div>
-              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-1">
-                Uptime SLA
+              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-0.75">
+                {t("stats.completed")}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.985_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
-                3<em className="text-PRIMARY
-                 not-italic">x</em>
+              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.556_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
+                <em className="text-primary not-italic">99</em>.9%
               </div>
-              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-1">
-                Faster than manual
+              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-0.75">
+                {t("stats.uptime")}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-[1.65rem] font-bold tracking-[-0.02em] text-[oklch(0.556_0_0)] dark:text-[oklch(0.985_0_0)] leading-none">
+                3<em className="text-primary not-italic">x</em>
+              </div>
+              <div className="text-[0.78rem] text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)] mt-0.75">
+                {t("stats.faster")}
               </div>
             </div>
           </div>
 
         </div>{/* end content */}
 
-        {/* ── SCROLL INDICATOR — lives in section, pinned via absolute ── */}
+        {/* ── SCROLL INDICATOR ── */}
         <div className="scroll-indicator flex flex-col items-center gap-1.5 pointer-events-none">
           <span className="text-[0.58rem] font-semibold tracking-[0.16em] uppercase text-[oklch(0.708_0_0)] dark:text-[oklch(0.556_0_0)]">
-            Scroll
+            {t("scroll")}
           </span>
           <div
             className="w-px h-7"

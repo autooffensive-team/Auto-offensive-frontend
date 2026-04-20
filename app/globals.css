@@ -8,16 +8,18 @@
   /* --- Fonts Configuration --- */
 
   --font-sans: var(--font-sans);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-display: var(--font-hackdaddy);
+  --font-khmer: var(--font-noto-khmer);
 
   /* --- Brand Colors (ពី Figma) --- */
   --color-primary: #00D0B2;
-  --color-secondary-start: #2CA3FF;
+  --color-secondary-start: #00509E;
   --color-secondary-mid: #1675B1;
   --color-secondary-end: #28CCE7;
 
   /* --- UI Status Colors --- */
-  --color-accent: #00ff41;    
+  --color-accent: #206393;    
   --color-danger: #ff4b4b;     
   --color-warning: #ffcc00;      
   --color-info: #2ca3ff;       
@@ -223,4 +225,30 @@
   --sidebar-border: oklch(1 0 0 / 10%);
 
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* --- Font Utility Classes --- */
+
+/* Khmer font for body text when using Khmer language */
+.font-khmer {
+  font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
+}
+
+/* Hackdaddy font for display/hero text */
+.display-font {
+  font-family: var(--font-hackdaddy), "Hackdaddy", monospace !important;
+}
+
+/* Apply Khmer font to body in kh locale */
+html[lang="kh"] body {
+  font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif;
+}
+
+/* Hackdaddy for big headings in kh locale */
+html[lang="kh"] h1,
+html[lang="kh"] h2,
+html[lang="kh"] .hero-title,
+html[lang="kh"] .big-text,
+html[lang="kh"] .display-text {
+  font-family: var(--font-hackdaddy), "Hackdaddy", monospace;
 }

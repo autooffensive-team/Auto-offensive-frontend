@@ -1,39 +1,13 @@
-import type { Metadata } from "next";
 import Home from "@/components/pages/homepage/home";
+import { generateMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = generateMetadata({
   title: "Auto-Offensive | Next-Gen PaaS for Hackers",
-  description: "Automated Security Workflows and Pentesting Platform",
-  keywords: [
-    "auto offensive",
-    "pentesting platform",
-    "security automation",
-    "cybersecurity tools",
-    "ethical hacking",
-  ],
-  openGraph: {
-    title: "Auto-Offensive | Next-Gen PaaS for Hackers",
-    description: "Automated Security Workflows and Pentesting Platform",
-    url: "https://yourdomain.com",
-    siteName: "Auto-Offensive",
-    images: [
-      {
-        url: "/public/Auto-Offensive.png",
-        width: 1200,
-        height: 630,
-        alt: "Auto-Offensive Platform",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Auto-Offensive",
-    description: "Automated Security Workflows Platform",
-    images: ["https://yourdomain.com/og-image.png"],
-  },
-};
+  description: "Automated Security Workflows and Pentesting Platform - Run 20+ professional security tools from your terminal with zero installation.",
+  image: "/og-image.png",
+  url: "/",
+});
 
-export default function RootPage() {
+export default function HomePage() {
   return <Home />;
 }

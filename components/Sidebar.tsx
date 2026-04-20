@@ -79,7 +79,7 @@ export default function Sidebar() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2"
+          className="w-full bg-linear-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2"
         >
           <Plus size={16} />
           New Scan

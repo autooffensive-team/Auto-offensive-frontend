@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "ទំព័រដើម",
+    "about": "អំពីយើងខ្ញុំ",
+    "contact": "ទំនាក់ទំនងយើង",
+    "login": "ចូលប្រើប្រាស់",
+    "register": "ចុះឈ្មោះថ្មី",
+    "logout": "ចេញចូល",
+    "search": "ស្វែងរក",
+    "language": "ភាសា",
+    "documentation": "ឯកសារឯកសារ",
+    "gettingStarted": "ចាប់ផ្តើមប្រើប្រាស់",
+    "learnMore": "ស្វែងយល់បន្ថែម",
+    "viewAll": "មើលទាំងអស់",
+    "tryForFree": "សាកល្បងដោយឥតគិតថ្លៃ",
+    "getStarted": "ចាប់ផ្តើមឥឡូវនេះ",
+    "learn": "រៀន",
+    "reference": "ឯកសារយោង",
+    "execute": "ប្រតិបត្តិការ"
+  },
+  "nav": {
+    "features": "មុខងារ",
+    "tools": "ឧបករណ៍",
+    "resources": "មាតិកា",
+    "pricing": "តម្លៃប្រាក់",
+    "documentation": "ឯកសារលម្អិត",
+    "loginRegister": "ចូល / ចុះឈ្មោះ"
+  },
+  "footer": {
+    "product": "ផលិតផល",
+    "features": "មុខងារ",
+    "tools": "ឧបករណ៍",
+    "pricing": "តម្លៃប្រាក់",
+    "integrations": "ការរួមបញ្ចូល",
+    "resources": "មាតិកា",
+    "documentation": "ឯកសារលម្អិត",
+    "apiReference": "ឯកសារយោង API",
+    "cliGuide": "មគ្គុទ្ឋសាន CLI",
+    "blog": "ប្លក",
+    "company": "ក្រុមហ៊ុន",
+    "aboutUs": "អំពីក្រុមហ៊ុនយើង",
+    "careers": "ឱកាសការងារ",
+    "contactUs": "ទំនាក់ទំនងយើង",
+    "legal": "ច្បាប់និងលក្ខណៈ",
+    "privacyPolicy": "គោលការណ៍ភាពឯកជន",
+    "termsOfService": "លក្ខខណ្ឌសេវាកម្ម",
+    "security": "សុវត្ថិភាព",
+    "community": "សហគមន៍",
+    "discord": "Discord",
+    "twitter": "Twitter",
+    "github": "GitHub",
+    "allRightsReserved": "រក្សាសិទ្ធិគ្រប់យ៉ាង",
+    "builtWith": "ត្រូវបានបង្កើតដោយ"
+  },
+  "homepage": {
+    "hero": {
+      "titleLine1": "Next Gen",
+      "titleLine2": "Platform As A Service",
+      "titleLine3": "សម្រាប់ Hacker",
+      "description": "អ្នកអាចធ្វើការ Scan infrastructure របស់អ្នកជាបន្តបន្ទាប់ ដើម្បីរក vulnerabilities - លឿនជាងមុន ឆ្លាតជាងមុន និងងាយស្រួលប្រើ ដោយមិនចាំបាច់ setup អ្វី។",
+      "primaryCta": "ចាប់ផ្តើមស្កេន",
+      "secondaryCta": "មើលរបាយការណ៍គំរូ",
+      "scroll": "រំកិលចុះក្រោម",
+      "stats": {
+        "completed": "ការស្កេនបានបញ្ចប់",
+        "uptime": "ស្ថិរភាពសេវាកម្ម",
+        "faster": "លឿនជាងធ្វើដោយដៃ"
+      }
+    },
+    "aiBanner": {
+      "eyebrow": "Auto Offensive · សុវត្ថិភាពដំណើរការដោយ AI",
+      "titleLine1": "AI ជួយបន្ថែម",
+      "titleLine2": "ជំនាញរបស់អ្នក",
+      "titleLine3": "មិនមែនជំនួសអ្នកទេ",
+      "description": "Auto Offensive មិនបានជំនួស skilled security professionals ទេ។ ផ្ទុយទៅវិញ យើង empower ethical hackers, penetration testers និង infosec practitioners ដោយប្រើ AI-driven workflows ដែលដោះស្រាយការងារ tedious ជំនួស ដូច្នេះអ្នកអាចផ្តោតលើ creative hacking, custom testing និង security research បានកាន់តែច្បាស់។"
+    },
+    "video": {
+      "eyebrow": "ទិដ្ឋភាពទូទៅនៃវេទិកា",
+      "playLabel": "បើកវីដេអូ",
+      "title": "ស្គាល់រឿងរ៉ាវរបស់យើង",
+      "subtitle": "មើលការណែនាំខ្លីៗអំពីវេទិកា ឧបករណ៍ និងបទពិសោធន៍នៃ workflow របស់យើង។"
+    },
+    "team": {
+      "eyebrow": "ក្រុមហ៊ុនរបស់យើង",
+      "titleLine1": "នៅក្រុមហ៊ុនរបស់យើង",
+      "titleLine2": "យើងបង្កើតអ្វី",
+      "titleLine3": "ដែលយើងប្រើផ្ទាល់",
+      "paragraph1": "យើងចាប់ផ្តើមពីក្រុមអ្នកជំនាញដែលស្រឡាញ់ការងារនេះពិតៗ ហើយយើងនៅតែរក្សាគំនិតនោះរហូតមកដល់ថ្ងៃនេះ។ ក្រុមរបស់យើងនៅតែជាអ្នកដឹកនាំក្នុងការអភិវឌ្ឍផលិតផល ដោយផ្តោតលើភាពត្រឹមត្រូវ ល្បឿន និងការគ្រប់គ្រង។",
+      "paragraph2": "មុខងារថ្មីៗទាំងអស់កើតចេញពីបទពិសោធន៍ពិត។ យើងតែងតែកែលម្អការងាររបស់យើងជាបន្តបន្ទាប់ ដោយប្រើបច្ចេកទេសថ្មីៗ ដំណើរការឆ្លាតជាងមុន និងការផ្ទៀងផ្ទាត់ដែលស្របនឹងការប្រើប្រាស់ពិត។",
+      "cta": "អានរឿងរ៉ាវរបស់យើង",
+      "imagePlaceholder": "កន្លែងដាក់រូបក្រុម",
+      "teamSizeLabel": "ទំហំក្រុម",
+      "teamSizeValue": "អ្នកជំនាញ 12+ នាក់",
+      "established": "បង្កើតឡើង"
+    },
+    "audience": {
+      "eyebrow": "Auto Offensive សមស្របសម្រាប់",
+      "seeMore": "មើលបន្ថែម",
+      "cards": {
+        "consultants": {
+          "title": "អ្នកប្រឹក្សា",
+          "subtitle": "សុវត្ថិភាព",
+          "description": "ធ្វើការលឿនជាងមុន បង្ហាញលទ្ធផលបានច្បាស់ និងពង្រីកសេវាកម្មរបស់អ្នក។"
+        },
+        "internalTeams": {
+          "title": "ក្រុមសុវត្ថិភាព",
+          "subtitle": "ក្នុងស្ថាប័ន",
+          "description": "រក្សាភាពមើលឃើញ កាត់បន្ថយហានិភ័យ និងបង្កើនទំនុកចិត្ត។"
+        },
+        "msps": {
+          "title": "អ្នកផ្តល់សេវាសុវត្ថិភាព",
+          "subtitle": "គ្រប់គ្រង (MSPs)",
+          "description": "ផ្តល់តម្លៃកាន់តែច្រើន ដោយប្រើធនធានតិចជាងមុន។"
+        }
+      }
+    },
+    "features": {
+      "sectionEyebrow": "សមត្ថភាពរបស់វេទិកា",
+      "sectionTitleLine1": "អ្វីដែលអ្នកអាចធ្វើបាន",
+      "sectionTitleLine2": "ជាមួយ Auto Offensive",
+      "exploreCapability": "មើលសមត្ថភាពបន្ថែម"
+    }
+  },
+  "error": {
+    "notFound": {
+      "title": "ទំព័ររកមិនឃើញ",
+      "description": "ទំព័រដែលអ្នកកំពុងរកមិនមានទេ ឬបានផ្លាស់ទីហើយ ។",
+      "goHome": "ទៅផ្ទាល់ខ្លួន",
+      "goBack": "ត្រលប់"
+    },
+    "offline": {
+      "title": "អ្នកកំពុងអស់អ៊ីនធឺណេត",
+      "description": "សូមពិនិត្យមេត្តាកម្មវិធីអ៊ីនធឺណេតរបស់អ្នក ហើយព្យាយាមម្តងទៀត ។",
+      "tryAgain": "ព្យាយាមម្តងទៀត",
+      "goHome": "ទៅផ្ទាល់ខ្លួន"
+    }
+  }
+}

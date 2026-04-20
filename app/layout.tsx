@@ -1,32 +1,34 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Khmer, Geist } from "next/font/google";
+import { Noto_Sans_Khmer, Geist, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getLocale } from "next-intl/server";
+import { OfflineProvider } from "@/components/providers/offline-provider";
 
-const geist = Geist({
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-jetbrains-mono",
+  display: "swap",
 });
 
-// Google Sans
 const googleSans = localFont({
   src: "./fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf",
   variable: "--font-google-sans",
   display: "swap",
 });
 
-// Hackdaddy
 const hackdaddy = localFont({
   src: "./fonts/Hackdaddy.otf",
   variable: "--font-hackdaddy",
   display: "swap",
 });
 
-// Khmer
 const notoKhmer = Noto_Sans_Khmer({
   subsets: ["khmer"],
   variable: "--font-noto-khmer",
@@ -35,26 +37,31 @@ const notoKhmer = Noto_Sans_Khmer({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://auto-offensive.com"),
   title: "Auto-Offensive | Next-Gen PaaS for Hackers",
   description: "Automated Security Workflows and Pentesting Platform",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className={cn(
-        "h-full antialiased font-sans",
-        geist.variable,
+        "h-full",
+        "antialiased",
         googleSans.variable,
         hackdaddy.variable,
         notoKhmer.variable,
+        jetbrainsMono.variable,
+        "font-sans",
+        geist.variable
       )}
     >
       <body>
@@ -64,9 +71,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <NextIntlClientProvider messages={messages}>
+            <OfflineProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </OfflineProvider>
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
