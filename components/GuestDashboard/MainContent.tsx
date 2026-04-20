@@ -1,9 +1,9 @@
 "use client";
 
-import ScanSection from "@/components/guestdashboard/ScanSection";
-import ToolLibrary from "@/components/guestdashboard/ToolLibrary";
-import FeatureCards from "@/components/guestdashboard/FeatureCards";
-import RecentScans from "@/components/guestdashboard/RecentScans";
+import ScanSection from "@/components/Guestdashboard/ScanSection";
+import ToolLibrary from "@/components/Guestdashboard/ToolLibrary";
+import FeatureCards from "@/components/Guestdashboard/FeatureCards";
+import RecentScans from "@/components/Guestdashboard/RecentScans";
 
 export default function MainContent() {
   return (
