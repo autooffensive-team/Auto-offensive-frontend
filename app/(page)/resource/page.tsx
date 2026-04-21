@@ -15,11 +15,13 @@ export default function ResourcePage() {
   const locale = useLocale();
   const isKhmer = locale === "kh";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+    ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
+  const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
 
   const docCategories = [
     {
@@ -99,12 +101,16 @@ export default function ResourcePage() {
             </span>
           </motion.div>
 
-          <motion.h1 {...fadeUp(0.1)} className="text-4xl sm:text-6xl font-black text-[#1A1A1A] dark:text-[#EDEDED] leading-tight mb-6">
+          <motion.h1
+            {...fadeUp(0.1)}
+            className="text-4xl sm:text-6xl font-black text-[#1A1A1A] dark:text-[#EDEDED] leading-tight mb-6"
+            style={{ fontFamily: displayFontFamily }}
+          >
             {t("hero.titleLine1")}<br />
             <span className="text-[#00BCA1]">{t("hero.titleLine2")}</span>
           </motion.h1>
 
-          <motion.p {...fadeUp(0.2)} className="text-[#5C5C5C] dark:text-[#9A9A9A] text-lg max-w-2xl mx-auto leading-relaxed">
+          <motion.p {...fadeUp(0.2)} className={`${descriptionTextClass} text-[#5C5C5C] dark:text-[#9A9A9A] max-w-2xl mx-auto leading-relaxed`}>
             {t("hero.subtitle")}
           </motion.p>
         </div>
@@ -113,10 +119,10 @@ export default function ResourcePage() {
       {/* ── Documentation Categories ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div {...fadeUp(0)} className="mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-3">
+          <h2 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-3`}>
             {t("categories.title")}
           </h2>
-          <p className="text-[#5C5C5C] dark:text-[#9A9A9A]">
+          <p className={`${descriptionTextClass} text-[#5C5C5C] dark:text-[#9A9A9A]`}>
             {t("categories.subtitle")}
           </p>
         </motion.div>
@@ -139,10 +145,10 @@ export default function ResourcePage() {
                     <Icon className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1">
+                    <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1`}>
                       {cat.title}
                     </h3>
-                    <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed">
+                    <p className={`${descriptionTextClass} text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed`}>
                       {cat.description}
                     </p>
                   </div>
@@ -187,7 +193,7 @@ export default function ResourcePage() {
       <section className="bg-white dark:bg-[#111113] border-y border-black/9 dark:border-white/9">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <motion.div {...fadeUp(0)} className="mb-8">
-            <h2 className="text-xl font-bold text-[#1A1A1A] dark:text-[#EDEDED]">
+            <h2 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED]`}>
               {t("quickLinks.title")}
             </h2>
           </motion.div>
@@ -206,10 +212,10 @@ export default function ResourcePage() {
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-[#1A1A1A] dark:text-[#EDEDED]">
+                    <div className={`${subtitleTextClass} font-semibold text-[#1A1A1A] dark:text-[#EDEDED]`}>
                       {link.title}
                     </div>
-                    <div className="text-xs text-[#9A9A9A]">
+                    <div className={`${descriptionTextClass} text-[#9A9A9A]`}>
                       {link.desc}
                     </div>
                   </div>
@@ -223,10 +229,10 @@ export default function ResourcePage() {
       {/* ── Featured Resources ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div {...fadeUp(0)} className="mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-3">
+          <h2 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-3`}>
             {t("featured.title")}
           </h2>
-          <p className="text-[#5C5C5C] dark:text-[#9A9A9A]">
+          <p className={`${descriptionTextClass} text-[#5C5C5C] dark:text-[#9A9A9A]`}>
             {t("featured.subtitle")}
           </p>
         </motion.div>
@@ -247,10 +253,10 @@ export default function ResourcePage() {
                 </span>
               </div>
 
-              <h3 className="font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-2 group-hover:text-[#00BCA1] transition-colors">
+              <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-2 group-hover:text-[#00BCA1] transition-colors`}>
                 {item.title}
               </h3>
-              <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed mb-4">
+              <p className={`${descriptionTextClass} text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed mb-4`}>
                 {item.desc}
               </p>
 
@@ -278,10 +284,10 @@ export default function ResourcePage() {
 
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              <h2 className={`${subtitleTextClass} font-bold text-white mb-2`}>
                 {t("newsletter.title")}
               </h2>
-              <p className="text-[#9A9A9A] text-sm">
+              <p className={`${descriptionTextClass} text-[#9A9A9A]`}>
                 {t("newsletter.subtitle")}
               </p>
             </div>
