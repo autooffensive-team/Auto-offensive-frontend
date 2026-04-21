@@ -1,12 +1,29 @@
 'use client';
 
 import { JSX, useState } from 'react';
+import { motion, cubicBezier } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
+
+const pageMotion = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: cubicBezier(0.25, 0.46, 0.45, 0.94) } },
+};
+
+const listMotion = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const cardMotion = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: cubicBezier(0.25, 0.46, 0.45, 0.94) } },
+};
 
 // ── Icons ──────────────────────────────────────────────────────────────
 const SearchIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-    <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.5"/>
-    <path d="M12 12L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M12 12L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 )
 
@@ -101,25 +118,6 @@ const icons: Record<string, () => JSX.Element> = {
   ),
 }
 
-const tools = [
-  { id: 'subfinder',   name: 'Subfinder',     category: 'Recon',   description: 'Passive subdomain discovery tool that iterates valid subdomains using multiple APIs and sources.',                      tags: ['subdomain', 'passive', 'dns'] },
-  { id: 'naabu',       name: 'Naabu',          category: 'Recon',   description: 'A fast port scanning tool focused on reliability and simplicity with nmap-like capabilities.',                          tags: ['port-scan', 'network'] },
-  { id: 'dnsx',        name: 'Dnsx',           category: 'Recon',   description: 'Fast and multi-purpose DNS toolkit allowing multiple DNS queries with user-defined resolvers.',                         tags: ['dns', 'resolver'] },
-  { id: 'assetfinder', name: 'AssetFinder',    category: 'Recon',   description: 'Find domains and subdomains related to a given domain using multiple open-source resources.',                          tags: ['subdomain', 'osint'] },
-  { id: 'nmap',        name: 'Nmap',           category: 'Recon',   description: 'The industry-standard for network discovery and security auditing with NSE script support.',                           tags: ['network', 'port-scan'] },
-  { id: 'nuclei',      name: 'Nuclei',         category: 'Vuln',    description: 'Fast and customizable vulnerability scanner based on simple YAML-based templates. Automate security checks at scale.', tags: ['scanner', 'templates', 'yaml'], badge: 'POPULAR' },
-  { id: 'wpscan',      name: 'WPScan',         category: 'Vuln',    description: 'Black Box WordPress security scanner that detects known vulnerabilities in core, plugins and themes.',                  tags: ['wordpress', 'cms'] },
-  { id: 'sqli',        name: 'SQLi Detector',  category: 'Vuln',    description: 'Detects and exploits SQL injection vulnerabilities through sophisticated payload testing and techniques.',              tags: ['sql', 'injection'] },
-  { id: 'strike3ifr',  name: '3ifR Strike',    category: 'Vuln',    description: 'Advanced info-gathering analysis equipped with state-of-the-art Red Team bypass techniques.',                          tags: ['redteam', 'bypass'] },
-  { id: 'urlfuzzer',   name: 'URL Fuzzer',     category: 'Fuzzing', description: 'Discover hidden files and directories in web servers using advanced wordlist-based fuzzing.',                          tags: ['fuzzing', 'directory'] },
-  { id: 'kitecrawler', name: 'Kitecrawler',    category: 'Fuzzing', description: 'Collects URLs for discovery and analysis for both REST API and dynamic web-based apps.',                               tags: ['crawler', 'api'] },
-  { id: 'httprobe',    name: 'Httprobe',       category: 'Fuzzing', description: 'Fast HTTP/HTTPS prober that takes a list of domains and probes for working http and https servers.',                   tags: ['http', 'probe'] },
-  { id: 'katana',      name: 'Katana',         category: 'Fuzzing', description: 'Next-generation crawling and spidering framework designed to navigate complexity with JS parsing.',                    tags: ['crawler', 'js'] },
-  { id: 'gobuster',    name: 'Gobuster',       category: 'Fuzzing', description: 'Fast tool to brute-force URIs including directories, files, and DNS subdomain enumeration.',                          tags: ['bruteforce', 'dns'] },
-]
-
-const categories = ['All', 'Recon', 'Vuln', 'Fuzzing']
-
 const categoryColors: Record<string, string> = {
   Recon:   'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800',
   Vuln:    'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800',
@@ -132,10 +130,49 @@ const categoryDot: Record<string, string> = {
   Fuzzing: 'bg-purple-500',
 }
 
+const categoryLabelKey: Record<string, 'recon' | 'vuln' | 'fuzzing'> = {
+  Recon: 'recon',
+  Vuln: 'vuln',
+  Fuzzing: 'fuzzing',
+}
+
 export default function ToolsPage() {
+  const t = useTranslations('toolsPage')
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+  const bodyFontFamily = isKhmer
+    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+  const displayFontFamily = isKhmer
+    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
+    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
-  const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+
+  const tools = [
+    { id: 'subfinder',   name: 'Subfinder',     category: 'Recon',   description: t('items.subfinder'),   tags: ['subdomain', 'passive', 'dns'] },
+    { id: 'naabu',       name: 'Naabu',         category: 'Recon',   description: t('items.naabu'),       tags: ['port-scan', 'network'] },
+    { id: 'dnsx',        name: 'Dnsx',          category: 'Recon',   description: t('items.dnsx'),        tags: ['dns', 'resolver'] },
+    { id: 'assetfinder', name: 'AssetFinder',   category: 'Recon',   description: t('items.assetfinder'), tags: ['subdomain', 'osint'] },
+    { id: 'nmap',        name: 'Nmap',          category: 'Recon',   description: t('items.nmap'),        tags: ['network', 'port-scan'] },
+    { id: 'nuclei',      name: 'Nuclei',        category: 'Vuln',    description: t('items.nuclei'),      tags: ['scanner', 'templates', 'yaml'], badge: t('popular') },
+    { id: 'wpscan',      name: 'WPScan',        category: 'Vuln',    description: t('items.wpscan'),      tags: ['wordpress', 'cms'] },
+    { id: 'sqli',        name: 'SQLi Detector', category: 'Vuln',    description: t('items.sqli'),        tags: ['sql', 'injection'] },
+    { id: 'strike3ifr',  name: '3ifR Strike',   category: 'Vuln',    description: t('items.strike3ifr'),  tags: ['redteam', 'bypass'] },
+    { id: 'urlfuzzer',   name: 'URL Fuzzer',    category: 'Fuzzing', description: t('items.urlfuzzer'),   tags: ['fuzzing', 'directory'] },
+    { id: 'kitecrawler', name: 'Kitecrawler',   category: 'Fuzzing', description: t('items.kitecrawler'), tags: ['crawler', 'api'] },
+    { id: 'httprobe',    name: 'Httprobe',      category: 'Fuzzing', description: t('items.httprobe'),    tags: ['http', 'probe'] },
+    { id: 'katana',      name: 'Katana',        category: 'Fuzzing', description: t('items.katana'),      tags: ['crawler', 'js'] },
+    { id: 'gobuster',    name: 'Gobuster',      category: 'Fuzzing', description: t('items.gobuster'),    tags: ['bruteforce', 'dns'] },
+  ]
+
+  const categories = [
+    { key: 'All', label: t('categories.all') },
+    { key: 'Recon', label: t('categories.recon') },
+    { key: 'Vuln', label: t('categories.vuln') },
+    { key: 'Fuzzing', label: t('categories.fuzzing') },
+  ]
 
   const filtered = tools.filter((t) => {
     const matchCat = activeCategory === 'All' || t.category === activeCategory
@@ -154,14 +191,20 @@ export default function ToolsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] dark:bg-[#09090B]" style={{ fontFamily: 'var(--font-google-sans), sans-serif' }}>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={pageMotion}
+      className="min-h-screen mt-17 bg-[#F7F5F0] dark:bg-[#09090B]"
+      style={{ fontFamily: bodyFontFamily }}
+    >
       <div className="bg-white dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-              <h1 className="text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">The Auto-Offensive ToolKit</h1>
-              <p className={`mt-2 max-w-xl text-[#5C5C5C] dark:text-[#9A9A9A] ${bodyCopy}`}>
-                Browse and launch industry-standard scanning engines from a single unified interface.
+              <h1 className="text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">{t('title')}</h1>
+              <p className="mt-2 text-[#5C5C5C] dark:text-[#9A9A9A] text-xl max-w-xl">
+                {t('subtitle')}
               </p>
             </div>
           </div>
@@ -172,7 +215,7 @@ export default function ToolsPage() {
               </div>
               <input
                 type="text"
-                placeholder="Search tools, tags..."
+                placeholder={t('searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-[#F7F5F0] dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-xl text-sm text-[#1A1A1A] dark:text-[#EDEDED] placeholder-[#9A9A9A] focus:border-[#00BCA1] focus:ring-1 focus:ring-[#00BCA1] transition"
@@ -181,18 +224,18 @@ export default function ToolsPage() {
             <div className="flex items-center gap-2 flex-wrap">
               {categories.map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  key={cat.key}
+                  onClick={() => setActiveCategory(cat.key)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
-                    activeCategory === cat
+                    activeCategory === cat.key
                       ? 'bg-[#00BCA1] text-white border-[#00BCA1] shadow-sm'
                       : 'bg-white dark:bg-[#111113] text-[#5C5C5C] dark:text-[#9A9A9A] border-black/9 dark:border-white/9 hover:border-[#00BCA1] hover:text-[#00BCA1]'
                   }`}
                 >
-                  {cat}
-                  {cat !== 'All' && (
-                    <span className={`ml-1.5 text-xs ${activeCategory === cat ? 'opacity-70' : 'text-[#9A9A9A]'}`}>
-                      ({tools.filter((t) => t.category === cat).length})
+                  {cat.label}
+                  {cat.key !== 'All' && (
+                    <span className={`ml-1.5 text-xs ${activeCategory === cat.key ? 'opacity-70' : 'text-[#9A9A9A]'}`}>
+                      ({tools.filter((t) => t.category === cat.key).length})
                     </span>
                   )}
                 </button>
@@ -208,18 +251,24 @@ export default function ToolsPage() {
               <circle cx="22" cy="22" r="14" stroke="#9A9A9A" strokeWidth="2"/>
               <path d="M32 32L44 44" stroke="#9A9A9A" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            <p className="text-lg font-medium text-[#1A1A1A] dark:text-[#EDEDED]">No tools found</p>
-            <p className={`mt-1 ${bodyCopy}`}>Try a different search or category</p>
+            <p className="text-lg font-medium text-[#1A1A1A] dark:text-[#EDEDED]">{t('noResults')}</p>
+            <p className="text-sm mt-1">{t('tryDifferent')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={listMotion}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
             {filtered.map((tool) => (
-              <div
+              <motion.div
                 key={tool.id}
-                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-lg hover:border-[#00BCA1]/40 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                variants={cardMotion}
+                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 hover:border-[#00BCA1]/40 transition-colors duration-200 cursor-pointer"
               >
                 <div className="flex items-start justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#111113] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1] group-hover:scale-105 transition-transform">
+                  <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#111113] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1]">
                     <Icon id={tool.id} />
                   </div>
                   <div className="flex items-center gap-2">
@@ -230,13 +279,13 @@ export default function ToolsPage() {
                     )}
                     <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 ${categoryColors[tool.category]}`}>
                       <span className={`inline-block w-1.5 h-1.5 rounded-full ${categoryDot[tool.category]}`} />
-                      {tool.category}
+                      {t(`categories.${categoryLabelKey[tool.category]}`)}
                     </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1.5">{tool.name}</h3>
-                  <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] ${bodyCopy}`}>{tool.description}</p>
+                  <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed">{tool.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-auto">
                   {tool.tags.map((tag) => (
@@ -250,17 +299,17 @@ export default function ToolsPage() {
                     href="#"
                     className="text-[#00BCA1] text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all"
                   >
-                    Try for Free
+                    {t('primaryCta')}
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </a>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

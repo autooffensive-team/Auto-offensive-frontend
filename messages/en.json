@@ -45,12 +45,13 @@
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "security": "Security",
-    "community": "Community",
+    "community": "FAQ ",
     "discord": "Discord",
     "twitter": "Twitter",
     "github": "GitHub",
     "allRightsReserved": "All rights reserved.",
-    "builtWith": "Built with"
+    "builtWith": "Built with",
+    "sponsoredBy": "Organized and sponsored by"
   },
   "hero": {
     "title": "Next-Gen PaaS for Hackers",
@@ -94,7 +95,7 @@
       "titleLine3": "for hacker",
       "description": "Continuously scan your infrastructure for vulnerabilities - faster, smarter, and at scale. No manual setup. Just results.",
       "primaryCta": "Start Scanning",
-      "secondaryCta": "Preview Report",
+      "secondaryCta": "View Sample Report",
       "scroll": "Scroll",
       "stats": {
         "completed": "Scans completed",
@@ -194,9 +195,879 @@
       "engineeredForEnterprise": "Engineered for Enterprise ROI"
     }
   },
+  "featuresPage": {
+    "common": {
+      "viewDocumentation": "View Documentation"
+    },
+    "hero": {
+      "badge": "Security Platform",
+      "titleLine1": "Platform",
+      "titleLine2": "Capabilities",
+      "subtitle": "Explore our suite of autonomous security tools and AI-driven analysis engines designed to protect your entire digital footprint.",
+      "primaryCta": "Get Started",
+      "secondaryCta": "View Docs"
+    },
+    "grid": {
+      "web": {
+        "title": "Web-Based Pentesting Automation",
+        "desc": "Orchestrate complex security workflows without touching a terminal. Launch industrial-grade tools like Subfinder for discovery, Nmap for port mapping, and Nuclei for vulnerability scanning through a unified, high-fidelity interface."
+      },
+      "ai": {
+        "title": "AI-Powered Security Analysis",
+        "desc": "Our neural engine digests raw scanner output to prioritize critical risks and explain complex vulnerabilities in plain, actionable language.",
+        "stats": {
+          "threats": "Threats Analyzed",
+          "accuracy": "Accuracy Rate"
+        }
+      },
+      "cards": {
+        "sast": {
+          "title": "Repository Scanning (SAST)",
+          "desc": "Seamless SonarQube integration for GitHub and GitLab. Find vulnerabilities in your source code at the speed of development, featuring AI-suggested remediation blocks.",
+          "badge": "GitHub · GitLab · SonarQube"
+        },
+        "cli": {
+          "title": "Managed CLI & API",
+          "desc": "A robust, cross-platform binary for remote tool execution. Integrate security testing directly into your Jenkins, GitLab, or GitHub CI/CD pipelines.",
+          "badge": "Jenkins · GitLab CI · GitHub Actions"
+        }
+      }
+    },
+    "report": {
+      "badge": "Advanced Reporting",
+      "titleLine1": "AI-Assisted",
+      "titleLine2": "Reporting",
+      "desc": "Generate professional, multi-tier reports with a single click. From high-level Executive summaries to granular Developer fix-lists, our AI tailors the narrative for every stakeholder.",
+      "cardTitle": "Report",
+      "criticalLabel": "Critical",
+      "tags": {
+        "executiveOverview": "Executive Overview",
+        "technicalDeepDive": "Technical Deep-dive",
+        "developerPatchNotes": "Developer Patch Notes"
+      }
+    },
+    "workflow": {
+      "title": "Integrated Attack Workflow",
+      "subtitle": "Seamless transition from identification to exploitation.",
+      "primaryCta": "Start Scanning",
+      "secondaryCta": "Read the Docs",
+      "steps": [
+        {
+          "title": "Enumerate",
+          "desc": "Discover subdomains, ports, and services automatically."
+        },
+        {
+          "title": "Identify",
+          "desc": "Map services to known CVE databases instantly."
+        },
+        {
+          "title": "Execute",
+          "desc": "Launch payloads via remote CLI nodes securely."
+        },
+        {
+          "title": "Document",
+          "desc": "Export evidence and mitigation paths effortlessly."
+        }
+      ]
+    }
+  },
+  "featurePages": {
+    "ai": {
+      "hero": {
+        "badge": "AI-Powered Reporting",
+        "titleLine1": "AI-Assisted",
+        "titleLine2": "Reporting.",
+        "subtitle": "Transform raw vulnerability data into boardroom-ready intelligence. Our AI automates analysis, narrative, and remediation strategies.",
+        "primaryCta": "Generate Report",
+        "secondaryCta": "View Demo",
+        "previewTitle": "Report Preview",
+        "previewBadge": "AI Generated",
+        "findingsLabel": "findings"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium"
+      },
+      "workflow": {
+        "title": "The Reporting Workflow",
+        "subtitle": "Three steps from raw data to comprehensive documentation",
+        "steps": [
+          {
+            "title": "Findings Aggregation",
+            "desc": "Pull data from active scans, manual entries, and exports into unified environment."
+          },
+          {
+            "title": "AI Synthesis",
+            "desc": "LLMs analyze and correlate vulnerabilities to generate contextual risk narratives."
+          },
+          {
+            "title": "Multi-Persona Output",
+            "desc": "Generate distinct versions for Executives, Engineers, and Developers."
+          }
+        ]
+      },
+      "dashboard": {
+        "severityTitle": "Severity Distribution",
+        "realTime": "Real Time",
+        "total": "total",
+        "meanTimeToFix": "Mean Time to Fix",
+        "meanTimeValue": "4.2 Days",
+        "exploitability": "Exploitability",
+        "exploitabilityValue": "High Risk",
+        "title": "Live Result Dashboard",
+        "desc": "Provide a living portal of security intelligence. Transform data into actionable insights through dynamic charts and trend analysis.",
+        "bullets": [
+          "Interactive severity breakdowns",
+          "Secure, shareable live links",
+          "Historical remediation tracking"
+        ]
+      },
+      "edge": {
+        "title": "The AI Edge",
+        "subtitle": "Intelligent features that set us apart",
+        "items": [
+          {
+            "title": "Automated Risk Explanation",
+            "desc": "AI cross-references findings with threat intelligence to explain why a vulnerability matters to your business."
+          },
+          {
+            "title": "Remediation Guidance",
+            "desc": "Personalized fix recommendations in your team's programming language."
+          },
+          {
+            "title": "Continuous Updates",
+            "desc": "Reports evolve as you fix vulnerabilities. Information is always current."
+          },
+          {
+            "title": "Compliance Mapping",
+            "desc": "Automatic mapping to SOC2, HIPAA, and ISO 27001 controls."
+          }
+        ]
+      },
+      "cta": {
+        "title": "Stop writing reports. Start securing.",
+        "subtitle": "Join security teams who have automated their reporting workflows.",
+        "primaryCta": "Try It Free",
+        "secondaryCta": "Schedule Demo"
+      }
+    },
+    "cli": {
+      "terminal": {
+        "copyValue": "auto-off scan --target example.com",
+        "lines": [
+          "$ auto-off scan --target example.com",
+          "[SYS] Initializing remote scan cluster...",
+          "[SYS] Dispatching Nmap 7.92 to Edge Node #412",
+          "[NET] Port 80/tcp   OPEN (http)",
+          "[NET] Port 443/tcp  OPEN (https)",
+          "[VULN] CVE-2024-XXXX detected on /admin",
+          "● Success: Scan completed in 2.3s"
+        ]
+      },
+      "hero": {
+        "badge": "Managed CLI",
+        "titleLine1": "Command Without",
+        "titleLine2": "Limits.",
+        "subtitle": "Run 20+ professional security tools from your terminal with zero installation. All processing happens on our secure cloud.",
+        "primaryCta": "Install the CLI",
+        "secondaryCta": "View Docs"
+      },
+      "cards": [
+        {
+          "title": "Remote Execution",
+          "desc": "Executing auto-off scan triggers high-performance remote API containers. We handle the heavy lifting on our hardened cloud infrastructure."
+        },
+        {
+          "title": "Cloud Sync & Auth",
+          "desc": "Authenticate using OAuth or API keys. Every command and scan history syncs to your secure dashboard automatically."
+        },
+        {
+          "title": "Instant Results",
+          "desc": "No more waiting. Get shareable URLs and direct download commands like ao get-report to pull JSON or PDF data."
+        }
+      ],
+      "specs": {
+        "title": "Engineering Precision",
+        "binaryTitle": "Hardened Binary",
+        "binaryDesc": "Built with Rust for memory safety. Uses gRPC protocol for real-time streaming. Every session is ephemeral and audit-logged.",
+        "items": [
+          { "label": "Supported OS", "value": "Linux, macOS, Windows" },
+          { "label": "Binary Size", "value": "<10.2 MB" },
+          { "label": "Encryption", "value": "TLS 1.3 + AES-256" },
+          { "label": "Auth Method", "value": "OAuth2 / PKCE / MFA" },
+          { "label": "Latency", "value": "<40ms (Global Edge)" }
+        ]
+      },
+      "workflow": {
+        "title": "Execution Workflow",
+        "steps": [
+          { "title": "Local Command", "desc": "Trigger tool via local CLI." },
+          { "title": "Backend Execution", "desc": "Container runs heavy logic." },
+          { "title": "Real-time Stream", "desc": "Live output piped to terminal." },
+          { "title": "Final Result", "desc": "Report sync & artifact save." }
+        ]
+      },
+      "cta": {
+        "title": "Ready to upgrade your workflow?",
+        "subtitle": "Lightweight, secure, and ready for production.",
+        "primaryCta": "Install Now",
+        "secondaryCta": "View Documentation"
+      }
+    },
+    "cicd": {
+      "hero": {
+        "badge": "CI/CD Integration",
+        "titleLine1": "Repository",
+        "titleLine2": "Scanning.",
+        "subtitle": "Integrate deep-code analysis directly into your SDLC. Detect vulnerabilities before they reach production.",
+        "primaryCta": "Connect Repository",
+        "secondaryCta": "View Docs",
+        "repoName": "auto-offensive/target-repo",
+        "active": "Active",
+        "scanTitle": "Security Scan",
+        "vulnerabilityFound": "1 vulnerability found",
+        "passed": "Passed",
+        "time1": "2m ago",
+        "time2": "Just now",
+        "time3": "5m ago"
+      },
+      "pipeline": {
+        "title": "The Analysis Pipeline",
+        "subtitle": "Four steps from code commit to security intelligence",
+        "steps": [
+          { "title": "Connect", "desc": "Native OAuth integration with GitHub, GitLab, and Bitbucket cloud or on-prem." },
+          { "title": "Clone & Hash", "desc": "Ephemeral cloning in sandbox containers. Every file is SHA-256 hashed for integrity tracking." },
+          { "title": "SonarScan", "desc": "Deep SAST analysis powered by SonarQube engines, identifying patterns of OWASP Top 10." },
+          { "title": "Signal", "desc": "Instant feedback via Slack, Jira, or inline PR comments with remediation steps." }
+        ]
+      },
+      "finding": {
+        "codeBadge": "SQL INJECTION",
+        "remediation": "REMEDIATION",
+        "title": "Critical Flaw",
+        "desc": "SQL Injection: User input concatenated directly into SQL query. An attacker could bypass authentication.",
+        "confidence": "Confidence",
+        "confidenceValue": "98% (High)",
+        "fixTime": "Fix Time",
+        "fixTimeValue": "5 Minutes",
+        "primaryCta": "Create Fix PR"
+      },
+      "integration": {
+        "title": "CI/CD Integration Guide",
+        "subtitle": "Deploy security scanning in seconds",
+        "tabs": {
+          "github": "GitHub Actions",
+          "gitlab": "GitLab CI"
+        },
+        "items": [
+          { "title": "Shift Left Security", "desc": "Block vulnerabilities before main branch" },
+          { "title": "Native Integration", "desc": "Pre-configured YAML, copy-paste deploy" },
+          { "title": "Full Audit Trail", "desc": "Compliance-ready scan history" }
+        ]
+      },
+      "cta": {
+        "title": "Ready to secure your pipeline?",
+        "subtitle": "Start scanning your repositories in minutes.",
+        "primaryCta": "Get Started Free",
+        "secondaryCta": "Schedule Demo"
+      }
+    },
+    "webui": {
+      "hero": {
+        "badge": "Auto-Offensive Suite",
+        "titleLine1": "Orchestrate Scans",
+        "titleLine2": "Without the CLI.",
+        "subtitle": "Guardian AI bridges the gap between powerful open-source security tools and enterprise-grade usability. Run Subfinder, Naabu, and Nuclei in a seamless, unified workflow.",
+        "primaryCta": "Launch First Scan",
+        "secondaryCta": "Watch Demo",
+        "terminal": {
+          "title": "guardian-ai terminal",
+          "status": "CONNECTED",
+          "lines": [
+            "$ guardian-ai scan start",
+            "[+] Initializing Subfinder...",
+            "[+] Found 142 subdomains",
+            "[+] Naabu: Port scanning active",
+            "[-] CVE-2023-XXXX detected on dev.api..."
+          ]
+        }
+      },
+      "live": {
+        "badge": "The Orchestration Engine",
+        "panelTitle": "live_output_stream.sh",
+        "panelStatus": "ACTIVE SCAN",
+        "configTitle": "Tool Configuration",
+        "configDesc": "Select your automated stack. No syntax flags required.",
+        "updateCta": "Update Live Scan",
+        "lines": [
+          "Loading configuration from cloud-vault...",
+          "Enumerating targets for api.guardian.ai",
+          "- dev.api.guardian.ai [Found]",
+          "- staging.api.guardian.ai [Found]",
+          "Starting fast port scan on 12 targets",
+          "- 10.0.4.12:443 [OPEN]",
+          "- 10.0.4.12:80 [OPEN]",
+          "- 10.0.4.15:22 [OPEN]",
+          "Template match: CVE-2023-XXXX on dev.api..."
+        ]
+      },
+      "howItWorks": {
+        "title": "How it Works",
+        "subtitle": "The transition from manual terminal inputs to autonomous orchestration is handled by our Guardian Kernel.",
+        "noteTitle": "TECHNICAL NOTE",
+        "noteBody": "\"Our backend translates your UI selections into optimized Go-binary commands, handling concurrency and resource management automatically.\"",
+        "steps": [
+          {
+            "title": "Target Input & Scope",
+            "desc": "Paste your root domains, IP ranges, or CIDR blocks. Guardian AI automatically validates ownership through integrated cloud connector APIs."
+          },
+          {
+            "title": "Tool Chain Selection",
+            "desc": "Choose from our curated library of top-tier offensive security tools. Enable 'Auto-Mode' to let our AI select the best tools based on the target's technology stack."
+          },
+          {
+            "title": "Autonomous Execution",
+            "desc": "The engine starts the sub-process chain. Data flows seamlessly from one tool to the next — Subfinder's output becomes Naabu's input automatically."
+          }
+        ]
+      },
+      "benefits": {
+        "title": "Engineered for Enterprise ROI",
+        "items": [
+          {
+            "title": "90% Faster Setup",
+            "desc": "Reduce scan configuration time from hours of scripting to seconds of toggling. Deploy complex reconnaissance pipelines instantly."
+          },
+          {
+            "title": "Democratized Security",
+            "desc": "Enable analysts of all skill levels to run professional-grade tests without deep CLI knowledge, freeing senior staff for high-level strategy."
+          },
+          {
+            "title": "Centralized Logic",
+            "desc": "Standardize your testing methodology across the entire organization. Ensure consistent tool flags and update versions globally with one click."
+          }
+        ]
+      },
+      "cta": {
+        "title": "Ready to automate your offensive posture?",
+        "subtitle": "Enterprise-grade reconnaissance pipelines in seconds, not hours.",
+        "primaryCta": "Start Your Free Scan",
+        "secondaryCta": "View Document"
+      }
+    }
+  },
+  "toolsPage": {
+    "title": "The Auto-Offensive ToolKit",
+    "subtitle": "Browse and launch industry-standard scanning engines from a single unified interface.",
+    "searchPlaceholder": "Search tools, tags...",
+    "noResults": "No tools found",
+    "tryDifferent": "Try a different search or category",
+    "primaryCta": "Try for Free",
+    "popular": "POPULAR",
+    "categories": {
+      "all": "All",
+      "recon": "Recon",
+      "vuln": "Vuln",
+      "fuzzing": "Fuzzing"
+    },
+    "items": {
+      "subfinder": "Passive subdomain discovery tool that iterates valid subdomains using multiple APIs and sources.",
+      "naabu": "A fast port scanning tool focused on reliability and simplicity with nmap-like capabilities.",
+      "dnsx": "Fast and multi-purpose DNS toolkit allowing multiple DNS queries with user-defined resolvers.",
+      "assetfinder": "Find domains and subdomains related to a given domain using multiple open-source resources.",
+      "nmap": "The industry-standard for network discovery and security auditing with NSE script support.",
+      "nuclei": "Fast and customizable vulnerability scanner based on simple YAML-based templates. Automate security checks at scale.",
+      "wpscan": "Black Box WordPress security scanner that detects known vulnerabilities in core, plugins and themes.",
+      "sqli": "Detects and exploits SQL injection vulnerabilities through sophisticated payload testing and techniques.",
+      "strike3ifr": "Advanced info-gathering analysis equipped with state-of-the-art Red Team bypass techniques.",
+      "urlfuzzer": "Discover hidden files and directories in web servers using advanced wordlist-based fuzzing.",
+      "kitecrawler": "Collects URLs for discovery and analysis for both REST API and dynamic web-based apps.",
+      "httprobe": "Fast HTTP/HTTPS prober that takes a list of domains and probes for working http and https servers.",
+      "katana": "Next-generation crawling and spidering framework designed to navigate complexity with JS parsing.",
+      "gobuster": "Fast tool to brute-force URIs including directories, files, and DNS subdomain enumeration."
+    }
+  },
+  "resourcePage": {
+    "hero": {
+      "badge": "Documentation Hub",
+      "titleLine1": "Learn. Reference.",
+      "titleLine2": "Execute.",
+      "subtitle": "Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills."
+    },
+    "categories": {
+      "title": "Documentation Categories",
+      "subtitle": "Explore our organized documentation by topic",
+      "viewAll": "View All Docs",
+      "cards": {
+        "tools": {
+          "title": "Tools Documentation",
+          "description": "Learn how to use each security tool in our toolkit. From subdomain enumeration to vulnerability scanning.",
+          "links": [
+            { "title": "Subfinder - Passive Recon", "tag": "Recon" },
+            { "title": "Nmap - Network Mapping", "tag": "Recon" },
+            { "title": "Nuclei - Vulnerability Scanner", "tag": "Vuln" },
+            { "title": "SQLMap - SQL Injection", "tag": "Vuln" },
+            { "title": "Gobuster - Directory Fuzzing", "tag": "Fuzzing" },
+            { "title": "Katana - Web Crawler", "tag": "Fuzzing" }
+          ]
+        },
+        "api": {
+          "title": "API Reference",
+          "description": "Integrate Auto-Offensive into your workflows with our comprehensive REST API documentation.",
+          "links": [
+            { "title": "Authentication", "tag": "Auth" },
+            { "title": "Scan Endpoints", "tag": "API" },
+            { "title": "Results Retrieval", "tag": "API" },
+            { "title": "Webhooks", "tag": "Integration" },
+            { "title": "Rate Limits", "tag": "Config" },
+            { "title": "Error Codes", "tag": "Reference" }
+          ]
+        },
+        "cli": {
+          "title": "CLI Guide",
+          "description": "Master the command-line interface for automated scanning and scripting workflows.",
+          "links": [
+            { "title": "Installation", "tag": "Setup" },
+            { "title": "Configuration", "tag": "Config" },
+            { "title": "Basic Commands", "tag": "Usage" },
+            { "title": "Advanced Flags", "tag": "Usage" },
+            { "title": "Scripting Examples", "tag": "Automation" },
+            { "title": "Troubleshooting", "tag": "Help" }
+          ]
+        },
+        "cicd": {
+          "title": "CI/CD Integration",
+          "description": "Embed security scanning into your continuous integration pipelines.",
+          "links": [
+            { "title": "GitHub Actions", "tag": "CI/CD" },
+            { "title": "GitLab CI", "tag": "CI/CD" },
+            { "title": "Jenkins Pipeline", "tag": "CI/CD" },
+            { "title": "Azure DevOps", "tag": "CI/CD" },
+            { "title": "SonarQube Integration", "tag": "SAST" },
+            { "title": "PR Comment Automation", "tag": "Automation" }
+          ]
+        }
+      }
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "items": [
+        { "title": "Quick Start Guide", "desc": "Get running in 5 minutes" },
+        { "title": "API Authentication", "desc": "Generate API keys" },
+        { "title": "Example Scripts", "desc": "Copy-paste automation" },
+        { "title": "Video Tutorials", "desc": "Visual learning" }
+      ]
+    },
+    "featured": {
+      "title": "Featured Resources",
+      "subtitle": "Popular guides and tutorials from our community",
+      "items": [
+        { "type": "Guide", "title": "Getting Started with Auto-Offensive", "desc": "Learn the basics of setting up your first scan and understanding the dashboard.", "tag": "Beginner", "cta": "Read" },
+        { "type": "Video", "title": "Complete CLI Tutorial", "desc": "A comprehensive video walkthrough of the command-line interface.", "tag": "Intermediate", "cta": "Watch" },
+        { "type": "API", "title": "Building Automated Workflows", "desc": "Create custom automation scripts using our REST API.", "tag": "Advanced", "cta": "Explore" }
+      ]
+    },
+    "newsletter": {
+      "title": "Get new resources in your inbox",
+      "subtitle": "New guides, tutorials, and updates dropped every week.",
+      "placeholder": "your@email.com",
+      "cta": "Subscribe"
+    },
+    "resourceSections": {
+      "title": "Resources",
+      "items": {
+        "dll": {
+          "title": "DLL Documents",
+          "description": "Official documentation library with specifications, white papers, and implementation guides.",
+          "items": ["API Specifications", "Architecture Guide", "Data Dictionary", "Compliance Matrix"],
+          "cta": "Explore"
+        },
+        "api": {
+          "title": "API Resources",
+          "description": "Complete API documentation including endpoints, examples, and error handling.",
+          "items": ["REST Endpoints", "Authentication", "Rate Limiting", "Error Codes"],
+          "cta": "Explore"
+        },
+        "integration": {
+          "title": "Integration Tools",
+          "description": "Pre-built tools and utilities for common integration scenarios.",
+          "items": ["SDKs", "Libraries", "CLI Tools", "Testing Tools"],
+          "cta": "Explore"
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Quick Start Paths",
+      "subtitle": "Get up and running with these essential pathways",
+      "items": {
+        "data": {
+          "title": "Data Requests",
+          "description": "Complete guide for requesting and managing clinical data with proper documentation and audit trails."
+        },
+        "marketplace": {
+          "title": "PLR Marketplace",
+          "description": "Explore our patient level research marketplace with curated datasets and integration examples."
+        },
+        "integration": {
+          "title": "EDSA Integration",
+          "description": "Step-by-step integration guide for the External Data Source API with code samples."
+        }
+      },
+      "learnMore": "Learn more"
+    },
+    "technical": {
+      "title": "Technical Deep Dives",
+      "subtitle": "Comprehensive guides for advanced implementations",
+      "items": {
+        "api": {
+          "title": "API Integration",
+          "description": "Complete API reference with authentication, rate limits, and advanced query patterns.",
+          "tags": ["REST", "GraphQL", "Webhooks"]
+        },
+        "sdk": {
+          "title": "SDK Reference",
+          "description": "Native SDKs for Python, JavaScript, Java with full documentation and examples.",
+          "tags": ["Python", "JavaScript", "Java"]
+        },
+        "security": {
+          "title": "Security Protocols",
+          "description": "Deep dive into encryption, compliance, and security best practices.",
+          "tags": ["HIPAA", "Encryption", "Audit Logs"]
+        },
+        "user": {
+          "title": "User Management",
+          "description": "Role-based access control, user provisioning, and team collaboration features.",
+          "tags": ["RBAC", "SSO", "Teams"]
+        }
+      }
+    },
+    "status": {
+      "title": "Platform Operational Status",
+      "subtitle": "Real-time status of all Clinical Precision services and infrastructure",
+      "service": "Service",
+      "status": "Status",
+      "uptime": "Uptime",
+      "lastIncident": "Last Incident",
+      "operational": "operational",
+      "degraded": "degraded",
+      "maintenance": "maintenance",
+      "statusNote": "Status Page: For detailed status information and incident history, visit our",
+      "dedicatedPage": "dedicated status page"
+    }
+  },
+  "helpCenterPage": {
+    "hero": {
+      "eyebrow": "Support",
+      "titleLine1": "Help",
+      "titleLine2": "Center",
+      "subtitle": "Find answers to common questions about Auto Offensive, our pentesting platform."
+    },
+    "searchPlaceholder": "Search for help...",
+    "faqTitle": "Frequently Asked Questions",
+    "noResults": "No matching FAQs found. Try a different search term.",
+    "contactPrompt": "Can't find what you're looking for?",
+    "contactCta": "Contact Us",
+    "viewDocs": "View Documentation",
+    "categories": {
+      "gettingStarted": "Getting Started",
+      "account": "Account & Security",
+      "scanning": "Scanning & Tools",
+      "team": "Team Collaboration",
+      "billing": "Billing & Plans",
+      "contact": "Contact Us"
+    },
+    "faq": {
+      "whatIs": {
+        "question": "What is Auto Offensive?",
+        "p1": "Auto Offensive is a next-generation penetration testing platform designed for security professionals, ethical hackers, and organizations.",
+        "p2": "Our platform provides automated security workflows, vulnerability scanning, and comprehensive reporting tools to identify and address security weaknesses in your systems."
+      },
+      "whoFor": {
+        "question": "Who can use Auto Offensive?",
+        "intro": "Auto Offensive is designed for:",
+        "items": [
+          "Security professionals and penetration testers",
+          "DevSecOps teams integrating security into CI/CD",
+          "Organizations conducting authorized security assessments",
+          "Security researchers and bug bounty hunters",
+          "Students learning ethical hacking and cybersecurity"
+        ]
+      },
+      "howStart": {
+        "question": "How do I get started?",
+        "steps": [
+          "Sign up — Create a free account with your email",
+          "Verify — Confirm your email address",
+          "Configure — Set up your first scan target",
+          "Scan — Run your first vulnerability assessment",
+          "Review — Analyze findings in your dashboard"
+        ],
+        "note": "New users get 3 free scans per day to test the platform."
+      },
+      "legalScanning": {
+        "question": "Is penetration testing legal?",
+        "p1": "Penetration testing is legal when you have explicit authorization to test target systems.",
+        "warning": "Important: Always obtain written permission before testing systems you don't own. Unauthorized access is illegal and may result in criminal charges.",
+        "p2": "For owned systems, internal security testing is generally permitted. Check your local laws and organizational policies."
+      },
+      "freeTier": {
+        "question": "What's included in the free tier?",
+        "intro": "Our free tier includes:",
+        "items": [
+          "3 scans per day",
+          "30-minute max scan duration",
+          "Single domain per scan",
+          "100 GB scan history storage",
+          "Access to all 14+ security tools",
+          "JSON, CSV, PDF export"
+        ],
+        "outro": "Perfect for learning, personal projects, and small-scale testing."
+      },
+      "toolsAvailable": {
+        "question": "What security tools are available?",
+        "intro": "Auto Offensive integrates 14+ industry-standard tools:",
+        "items": [
+          "Nmap — Network scanning",
+          "Nikto — Web vulnerability",
+          "SQLmap — SQL injection",
+          "Burp Suite — Web testing",
+          "OWASP ZAP — App scanning",
+          "Amass — Subdomain enum",
+          "Dirb — Directory brute",
+          "Gobuster — Fuzzing",
+          "Hydra — Password cracking",
+          "Metasploit — Exploitation",
+          "Nessus compatibility",
+          "OpenVAS integration"
+        ]
+      },
+      "apiAccess": {
+        "question": "Is there API access?",
+        "intro": "Yes! Auto Offensive provides a RESTful API for programmatic access:",
+        "items": [
+          "Start/stop scans programmatically",
+          "Retrieve scan results",
+          "Manage targets and schedules",
+          "Integrate with CI/CD pipelines"
+        ],
+        "outro": "API rate limits: 100 requests/minute (free tier), higher for enterprise."
+      },
+      "dataSecurity": {
+        "question": "How is my data secured?",
+        "intro": "We take security seriously:",
+        "items": [
+          "In Transit: TLS 256-bit encryption on all connections",
+          "At Rest: AES-256 encryption for sensitive data",
+          "Passwords: Bcrypt hashed with salt",
+          "Access: Role-based controls, MFA available",
+          "Monitoring: 24/7 intrusion detection, WAF, DDoS protection"
+        ],
+        "outro": "Each account is fully isolated at the database level."
+      },
+      "teamCollab": {
+        "question": "Can I collaborate with my team?",
+        "intro": "Yes! Our team collaboration features include:",
+        "items": [
+          "Shared project workspaces",
+          "Role-based access control (Admin, Editor, Viewer)",
+          "Real-time scan activity",
+          "Team activity logs",
+          "Collaborative report editing"
+        ],
+        "outro": "Enterprise plans include unlimited team members."
+      },
+      "exportData": {
+        "question": "Can I export my scan data?",
+        "intro": "Absolutely! You own your data. Export options include:",
+        "formats": [
+          "Machine readable",
+          "Spreadsheet friendly",
+          "Client reports"
+        ],
+        "outro": "Export from your dashboard at any time."
+      },
+      "upgradePlan": {
+        "question": "How do I upgrade my plan?",
+        "intro": "To upgrade to Pro or Enterprise:",
+        "steps": [
+          "Go to Settings → Billing",
+          "Select your plan (Pro or Enterprise)",
+          "Add your payment method",
+          "Confirm and start using premium features"
+        ],
+        "outro": "Enterprise plans include custom quotas, dedicated support, and SLA guarantees. Contact sales@auto-offensive.com"
+      },
+      "refundPolicy": {
+        "question": "What is your refund policy?",
+        "p1": "We offer a 14-day money-back guarantee for Pro plans.",
+        "p2": "If you're not satisfied, contact support@auto-offensive.com within 14 days of purchase for a full refund.",
+        "p3": "Enterprise contracts follow custom terms outlined in your agreement."
+      },
+      "reportBug": {
+        "question": "How do I report a bug or vulnerability?",
+        "intro": "We take security seriously. Report platform vulnerabilities responsibly:",
+        "response": "Response within 24 hours",
+        "include": "Please include:",
+        "items": [
+          "Description of the vulnerability",
+          "Steps to reproduce",
+          "Potential impact assessment"
+        ]
+      },
+      "getSupport": {
+        "question": "How can I get support?",
+        "intro": "We're here to help! Reach out through:",
+        "cards": [
+          { "title": "Email Support", "value": "support@auto-offensive.com", "meta": "24-48 hour response" },
+          { "title": "Documentation", "value": "docs.auto-offensive.com", "meta": "24/7 access" },
+          { "title": "Community", "value": "discord.gg/auto-offensive", "meta": "Live discussion" }
+        ]
+      }
+    }
+  },
+  "termsPage": {
+    "hero": {
+      "eyebrow": "Legal",
+      "titleLine1": "Terms of",
+      "titleLine2": "Service",
+      "subtitle": "By using Auto Offensive, you agree to use our platform responsibly. We built this tool for security professionals, not for causing harm.",
+      "ethicalTag": "Ethical Use Only",
+      "versionTag": "v2.0 · Apr 2026"
+    },
+    "sectionsLabel": "Sections",
+    "sections": {
+      "acceptance": {
+        "title": "Acceptable Use",
+        "intro": "Auto Offensive is provided for legitimate security testing, education, and authorized penetration testing. By using our platform, you agree to the following:",
+        "allowed": [
+          "Only test systems you own or have explicit written authorization to test",
+          "Use the platform for defensive security purposes only",
+          "Respect rate limits and fair usage policies",
+          "Report vulnerabilities responsibly through proper channels",
+          "Use findings to improve security, not for exploitation"
+        ],
+        "blocked": [
+          "Attack systems you don't own without authorization",
+          "Use automated tools for malicious scanning or DDoS",
+          "Share or publish vulnerabilities without responsible disclosure",
+          "Use the platform to harm, exploit, or steal from others"
+        ],
+        "notice": "Penetration Testing: If you're a security professional conducting authorized assessments, you may test client systems with documented permission."
+      },
+      "prohibited": {
+        "title": "Prohibited Activities",
+        "intro": "The following activities are strictly prohibited and may result in immediate account suspension:",
+        "items": [
+          "Testing or attacking government, military, or critical infrastructure without authorization",
+          "Attempting to gain unauthorized access to systems or data",
+          "Conducting any form of DDoS or resource exhaustion attacks",
+          "Distributing malware, ransomware, or malicious tools",
+          "Phishing, social engineering, or identity theft operations",
+          "Exploiting vulnerabilities for financial gain",
+          "Bypassing or attempting to bypass security controls",
+          "Scanning or attacking targets in restricted jurisdictions"
+        ],
+        "warning": "Warning: Violation of these terms may result in permanent account termination, IP blocking, and legal action. We cooperate with law enforcement when required."
+      },
+      "account": {
+        "title": "Account Responsibilities",
+        "intro": "You are responsible for maintaining the security of your account:",
+        "items": [
+          "Use strong, unique passwords and enable MFA when available",
+          "Keep your API keys and credentials secure",
+          "Report any suspicious activity immediately",
+          "Ensure your team members understand and comply with these terms",
+          "Do not share account credentials with unauthorized users"
+        ],
+        "rows": [
+          { "label": "Account age requirement", "value": "18+ or parental consent" },
+          { "label": "One account per person", "value": "Required" },
+          { "label": "Verified email", "value": "Required" }
+        ],
+        "notice": "Enterprise accounts: Organizations must designate authorized users and maintain audit logs of all testing activities."
+      },
+      "scans": {
+        "title": "Scan Limits & Fair Use",
+        "intro": "To ensure platform stability and fairness, we enforce the following limits:",
+        "rows": [
+          { "label": "Free tier daily scans", "value": "3 scans / day" },
+          { "label": "Max scan duration", "value": "30 minutes" },
+          { "label": "Concurrent scans", "value": "1 at a time" },
+          { "label": "Target scope", "value": "Single domain per scan" },
+          { "label": "Storage", "value": "100 GB scan history" },
+          { "label": "API rate limits", "value": "100 requests / minute" }
+        ],
+        "notice": "Enterprise tier: Higher limits available. Contact sales@auto-offensive.com for custom plans."
+      },
+      "intellectual": {
+        "title": "Intellectual Property",
+        "p1": "Auto Offensive platform: All software, tools, code, and content are the property of Auto Offensive. You may not copy, reverse engineer, or distribute our proprietary technology.",
+        "p2": "Your findings: You own all scan results, findings, and reports you generate. We provide export options in JSON, CSV, and PDF formats.",
+        "p3": "Open source tools: Many tools in our platform are open source. Their respective licenses apply independently.",
+        "items": [
+          "Export your findings anytime from the dashboard",
+          "Use reports for client deliverables and documentation",
+          "Share anonymized findings for community improvement",
+          "Resell or redistribute Auto Offensive scan data"
+        ]
+      },
+      "liability": {
+        "title": "Limitation of Liability",
+        "intro": "Auto Offensive is provided \"as is\" without warranties. We are not liable for:",
+        "items": [
+          "Any damages resulting from your use of the platform",
+          "Legal consequences of unauthorized testing",
+          "Loss of data due to service interruptions",
+          "Actions taken by third parties using your account",
+          "Indirect, incidental, or consequential damages"
+        ],
+        "notice": "User responsibility: You are solely responsible for ensuring your testing activities are legal and authorized in your jurisdiction."
+      },
+      "termination": {
+        "title": "Termination",
+        "intro": "We may suspend or terminate your account at any time for:",
+        "items": [
+          "Violation of these Terms of Service",
+          "Suspicious or illegal activity",
+          "Non-payment (for enterprise accounts)",
+          "Abuse of platform resources",
+          "Failure to respond to security inquiries"
+        ],
+        "outro": "You may delete your account at any time. Upon termination, we retain data per our Privacy Policy."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "intro": "We may update these terms periodically. Significant changes will be communicated via:",
+        "items": [
+          "Email notification to your registered address",
+          "Platform dashboard notice",
+          "Announcement on our website"
+        ],
+        "outro": "Continued use after changes constitutes acceptance of updated terms."
+      },
+      "contact": {
+        "title": "Contact",
+        "intro": "Questions about these terms? Reach out to our legal and compliance team.",
+        "cards": [
+          { "title": "Legal", "email": "legal@auto-offensive.com", "desc": "For legal inquiries" },
+          { "title": "Compliance", "email": "compliance@auto-offensive.com", "desc": "For compliance questions" }
+        ]
+      }
+    },
+    "footer": {
+      "version": "Terms of Service v2.0 · April 2026",
+      "subtitle": "Ethical Security Testing Platform"
+    }
+  },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated"
+    "lastUpdated": "Last updated",
+    "heroTitle": "Privacy",
+    "heroTitleHighlight": "Policy",
+    "heroDescription": "Your data stays yours. We built Auto-Offensive with privacy-first principles — no data selling, no hidden tracking, just secure security testing.",
+    "tagNoDataSelling": "No Data Selling",
+    "tagFreePlatform": "Free Platform"
   },
   "terms": {
     "title": "Terms of Service",
@@ -210,17 +1081,6 @@
     "cantFind": "Can't find what you're looking for?",
     "contactUs": "Contact Us",
     "viewDocumentation": "View Documentation"
-  },
-  "docs": {
-    "title": "Documentation",
-    "searchPlaceholder": "Search documentation...",
-    "onThisPage": "On This Page",
-    "previous": "Previous",
-    "next": "Next",
-    "gettingStarted": "Getting Started",
-    "introduction": "Introduction",
-    "quickStart": "Quick Start",
-    "installation": "Installation"
   },
   "error": {
     "notFound": {

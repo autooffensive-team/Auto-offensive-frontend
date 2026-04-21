@@ -28,14 +28,14 @@
   },
   "footer": {
     "product": "ផលិតផល",
-    "features": "មុខងារ",
+    "features": "លក្ខណៈពិសេស",
     "tools": "ឧបករណ៍",
     "pricing": "តម្លៃប្រាក់",
     "integrations": "ការរួមបញ្ចូល",
-    "resources": "មាតិកា",
+    "resources": "ធនធាននិងទំនាក់ទំនង",
     "documentation": "ឯកសារលម្អិត",
     "apiReference": "ឯកសារយោង API",
-    "cliGuide": "មគ្គុទ្ឋសាន CLI",
+    "cliGuide": "មគ្គុទ្ទេស CLI",
     "blog": "ប្លក",
     "company": "ក្រុមហ៊ុន",
     "aboutUs": "អំពីក្រុមហ៊ុនយើង",
@@ -50,7 +50,882 @@
     "twitter": "Twitter",
     "github": "GitHub",
     "allRightsReserved": "រក្សាសិទ្ធិគ្រប់យ៉ាង",
-    "builtWith": "ត្រូវបានបង្កើតដោយ"
+    "builtWith": "ត្រូវបានបង្កើតដោយ",
+    "sponsoredBy": "រៀបចំ និងឧបត្ថម្ភដោយ"
+  },
+  "featuresPage": {
+    "common": {
+      "viewDocumentation": "មើលឯកសារ"
+    },
+    "hero": {
+      "badge": "វេទិកាសុវត្ថិភាព",
+      "titleLine1": "សមត្ថភាព",
+      "titleLine2": "របស់វេទិកា",
+      "subtitle": "ស្វែងយល់ពីឈុតឧបករណ៍សុវត្ថិភាពស្វ័យប្រវត្តិ និងម៉ាស៊ីនវិភាគដែលដំណើរការដោយ AI របស់យើង ដែលត្រូវបានរចនាឡើងដើម្បីការពារប្រព័ន្ធឌីជីថលរបស់អ្នកទាំងមូល។",
+      "primaryCta": "ចាប់ផ្តើម",
+      "secondaryCta": "មើលឯកសារ"
+    },
+    "grid": {
+      "web": {
+        "title": "ស្វ័យប្រវត្តិកម្ម Pentesting តាម Web",
+        "desc": "គ្រប់គ្រងលំហូរការងារសុវត្ថិភាពស្មុគស្មាញដោយមិនចាំបាច់ប៉ះ terminal។ អ្នកអាចបើកដំណើរការឧបករណ៍កម្រិតឧស្សាហកម្មដូចជា Subfinder សម្រាប់ការស្វែងរក, Nmap សម្រាប់ផ្គូផ្គង ports និង Nuclei សម្រាប់ស្កេនភាពងាយរងគ្រោះ តាមរយៈចំណុចប្រទាក់តែមួយដែលមានគុណភាពខ្ពស់។"
+      },
+      "ai": {
+        "title": "ការវិភាគសុវត្ថិភាពដោយ AI",
+        "desc": "ម៉ាស៊ីនឆ្លាតវៃរបស់យើងវិភាគលទ្ធផល raw ពី scanner ដើម្បីកំណត់អាទិភាពហានិភ័យសំខាន់ៗ និងពន្យល់ពីភាពងាយរងគ្រោះស្មុគស្មាញជាភាសាសាមញ្ញដែលអាចអនុវត្តបាន។",
+        "stats": {
+          "threats": "ហានិភ័យដែលបានវិភាគ",
+          "accuracy": "អត្រាភាពត្រឹមត្រូវ"
+        }
+      },
+      "cards": {
+        "sast": {
+          "title": "ការស្កេន Repository (SAST)",
+          "desc": "រួមបញ្ចូលជាមួយ SonarQube យ៉ាងរលូនសម្រាប់ GitHub និង GitLab។ ស្វែងរកភាពងាយរងគ្រោះក្នុង source code របស់អ្នកឲ្យទាន់ល្បឿននៃការអភិវឌ្ឍ ហើយភ្ជាប់មកជាមួយសំណើដោះស្រាយពី AI ផងដែរ។",
+          "badge": "GitHub · GitLab · SonarQube"
+        },
+        "cli": {
+          "title": "CLI និង API ដែលគ្រប់គ្រងបាន",
+          "desc": "binary ឆ្លងវេទិកាដែលរឹងមាំសម្រាប់បញ្ជាអនុវត្តឧបករណ៍ពីចម្ងាយ។ អ្នកអាចរួមបញ្ចូលការធ្វើតេស្តសុវត្ថិភាពដោយផ្ទាល់ក្នុង Jenkins, GitLab ឬ GitHub CI/CD pipeline របស់អ្នក។",
+          "badge": "Jenkins · GitLab CI · GitHub Actions"
+        }
+      }
+    },
+    "report": {
+      "badge": "របាយការណ៍កម្រិតខ្ពស់",
+      "titleLine1": "របាយការណ៍",
+      "titleLine2": "ជំនួយដោយ AI",
+      "desc": "បង្កើតរបាយការណ៍ជាច្រើនកម្រិតប្រកបដោយវិជ្ជាជីវៈបានក្នុងការចុចតែម្តង។ ចាប់ពីសេចក្តីសង្ខេបសម្រាប់ថ្នាក់ដឹកនាំរហូតដល់បញ្ជីជួសជុលលម្អិតសម្រាប់អ្នកអភិវឌ្ឍ AI របស់យើងកែសម្រួលសាច់រឿងឲ្យសមនឹងអ្នកពាក់ព័ន្ធនីមួយៗ។",
+      "cardTitle": "របាយការណ៍",
+      "criticalLabel": "សំខាន់ខ្លាំង",
+      "tags": {
+        "executiveOverview": "ទិដ្ឋភាពទូទៅសម្រាប់ថ្នាក់ដឹកនាំ",
+        "technicalDeepDive": "ពិនិត្យបច្ចេកទេសជ្រាលជ្រៅ",
+        "developerPatchNotes": "កំណត់ត្រាជួសជុលសម្រាប់អ្នកអភិវឌ្ឍ"
+      }
+    },
+    "workflow": {
+      "title": "លំហូរការវាយប្រហាររួមបញ្ចូលគ្នា",
+      "subtitle": "ផ្លាស់ប្តូរយ៉ាងរលូនពីការកំណត់អត្តសញ្ញាណទៅការអនុវត្ត។",
+      "primaryCta": "ចាប់ផ្តើមស្កេន",
+      "secondaryCta": "អានឯកសារ",
+      "steps": [
+        {
+          "title": "ស្វែងរក",
+          "desc": "ស្វែងរក subdomains, ports និង services ដោយស្វ័យប្រវត្តិ។"
+        },
+        {
+          "title": "កំណត់អត្តសញ្ញាណ",
+          "desc": "ផ្គូផ្គង services ទៅកាន់មូលដ្ឋានទិន្នន័យ CVE ដែលស្គាល់បានភ្លាមៗ។"
+        },
+        {
+          "title": "អនុវត្ត",
+          "desc": "បើកដំណើរការ payloads តាមរយៈ remote CLI nodes ដោយសុវត្ថិភាព។"
+        },
+        {
+          "title": "ចងក្រងឯកសារ",
+          "desc": "នាំចេញភស្តុតាង និងផ្លូវដោះស្រាយបានយ៉ាងងាយស្រួល។"
+        }
+      ]
+    }
+  },
+  "featurePages": {
+    "ai": {
+      "hero": {
+        "badge": "របាយការណ៍ដោយ AI",
+        "titleLine1": "របាយការណ៍",
+        "titleLine2": "ជំនួយដោយ AI។",
+        "subtitle": "បម្លែងទិន្នន័យភាពងាយរងគ្រោះដើមទៅជាព័ត៌មានឆ្លាតវៃសម្រាប់ថ្នាក់ដឹកនាំ។ AI របស់យើងស្វ័យប្រវត្តិកម្មការវិភាគ ការរៀបរាប់ និងយុទ្ធសាស្ត្រកែសម្រួល។",
+        "primaryCta": "បង្កើតរបាយការណ៍",
+        "secondaryCta": "មើលដេម៉ូ",
+        "previewTitle": "មើលរបាយការណ៍ជាមុន",
+        "previewBadge": "បង្កើតដោយ AI",
+        "findingsLabel": "ការរកឃើញ"
+      },
+      "severity": {
+        "critical": "ធ្ងន់ធ្ងរ",
+        "high": "ខ្ពស់",
+        "medium": "មធ្យម"
+      },
+      "workflow": {
+        "title": "លំហូរការងាររបាយការណ៍",
+        "subtitle": "បីជំហានពីទិន្នន័យដើមទៅឯកសារគ្រប់ជ្រុងជ្រោយ",
+        "steps": [
+          {
+            "title": "ប្រមូលការរកឃើញ",
+            "desc": "ទាញទិន្នន័យពីស្កេនសកម្ម កំណត់ត្រាដោយដៃ និងឯកសារនាំចេញទៅកាន់បរិយាកាសរួម។"
+          },
+          {
+            "title": "សំយោគដោយ AI",
+            "desc": "LLMs វិភាគ និងភ្ជាប់ទំនាក់ទំនងភាពងាយរងគ្រោះដើម្បីបង្កើតការរៀបរាប់ហានិភ័យតាមបរិបទ។"
+          },
+          {
+            "title": "លទ្ធផលតាមតួនាទី",
+            "desc": "បង្កើតកំណែខុសៗគ្នាសម្រាប់ថ្នាក់ដឹកនាំ វិស្វករ និងអ្នកអភិវឌ្ឍ។"
+          }
+        ]
+      },
+      "dashboard": {
+        "severityTitle": "ការបែងចែកកម្រិតហានិភ័យ",
+        "realTime": "ពេលជាក់ស្តែង",
+        "total": "សរុប",
+        "meanTimeToFix": "ពេលមធ្យមក្នុងការជួសជុល",
+        "meanTimeValue": "4.2 ថ្ងៃ",
+        "exploitability": "សមត្ថភាពប្រើប្រាស់វាយប្រហារ",
+        "exploitabilityValue": "ហានិភ័យខ្ពស់",
+        "title": "ផ្ទាំងលទ្ធផលផ្ទាល់",
+        "desc": "ផ្តល់ផ្ទាំងព័ត៌មានសុវត្ថិភាពដែលរស់រវើក។ បម្លែងទិន្នន័យទៅជាចំណេះដឹងដែលអាចអនុវត្តបានតាមរយៈគំនូសតាង និងការវិភាគនិន្នាការ។",
+        "bullets": [
+          "ការបំបែកកម្រិតហានិភ័យអន្តរកម្ម",
+          "តំណភ្ជាប់បន្តផ្ទាល់ដែលអាចចែករំលែកបានដោយសុវត្ថិភាព",
+          "ការតាមដានប្រវត្តិការជួសជុល"
+        ]
+      },
+      "edge": {
+        "title": "អត្ថប្រយោជន៍ AI",
+        "subtitle": "មុខងារឆ្លាតវៃដែលធ្វើឲ្យយើងខុសប្លែក",
+        "items": [
+          {
+            "title": "ពន្យល់ហានិភ័យដោយស្វ័យប្រវត្តិ",
+            "desc": "AI ប្រៀបធៀបការរកឃើញជាមួយ threat intelligence ដើម្បីពន្យល់ថាហេតុអ្វីបានជាភាពងាយរងគ្រោះនេះសំខាន់ចំពោះអាជីវកម្មរបស់អ្នក។"
+          },
+          {
+            "title": "ការណែនាំសម្រាប់ជួសជុល",
+            "desc": "សំណើជួសជុលដែលប្ដូរតាមភាសាកម្មវិធីរបស់ក្រុមអ្នក។"
+          },
+          {
+            "title": "បច្ចុប្បន្នភាពបន្ត",
+            "desc": "របាយការណ៍នឹងអភិវឌ្ឍតាមការជួសជុលភាពងាយរងគ្រោះរបស់អ្នក។ ព័ត៌មានតែងតែទាន់សម័យ។"
+          },
+          {
+            "title": "ផ្គូផ្គងស្តង់ដារ",
+            "desc": "ផ្គូផ្គងដោយស្វ័យប្រវត្តិទៅកាន់ SOC2, HIPAA និង ISO 27001។"
+          }
+        ]
+      },
+      "cta": {
+        "title": "ឈប់សរសេររបាយការណ៍ ហើយចាប់ផ្តើមការពារ។",
+        "subtitle": "ចូលរួមជាមួយក្រុមសុវត្ថិភាពដែលបានស្វ័យប្រវត្តិកម្មលំហូរការងាររបាយការណ៍របស់ពួកគេ។",
+        "primaryCta": "សាកល្បងឥតគិតថ្លៃ",
+        "secondaryCta": "កក់ដេម៉ូ"
+      }
+    },
+    "cli": {
+      "terminal": {
+        "copyValue": "auto-off scan --target example.com",
+        "lines": [
+          "$ auto-off scan --target example.com",
+          "[SYS] កំពុងចាប់ផ្តើម cluster ស្កេនពីចម្ងាយ...",
+          "[SYS] កំពុងបញ្ជូន Nmap 7.92 ទៅ Edge Node #412",
+          "[NET] Port 80/tcp   បើក (http)",
+          "[NET] Port 443/tcp  បើក (https)",
+          "[VULN] រកឃើញ CVE-2024-XXXX នៅលើ /admin",
+          "● ជោគជ័យ: ស្កេនបានបញ្ចប់ក្នុង 2.3 វិនាទី"
+        ]
+      },
+      "hero": {
+        "badge": "CLI ដែលគ្រប់គ្រងបាន",
+        "titleLine1": "បញ្ជាដោយគ្មាន",
+        "titleLine2": "ដែនកំណត់។",
+        "subtitle": "ដំណើរការឧបករណ៍សុវត្ថិភាពជំនាញ 20+ ពី terminal របស់អ្នកដោយមិនចាំបាច់ដំឡើង។ ការដំណើរការទាំងអស់កើតឡើងនៅលើ cloud សុវត្ថិភាពរបស់យើង។",
+        "primaryCta": "ដំឡើង CLI",
+        "secondaryCta": "មើលឯកសារ"
+      },
+      "cards": [
+        {
+          "title": "អនុវត្តពីចម្ងាយ",
+          "desc": "ការរត់ auto-off scan នឹងបើក container API ពីចម្ងាយដែលមានប្រសិទ្ធភាពខ្ពស់។ យើងដោះស្រាយការងារធ្ងន់ទាំងអស់នៅលើ cloud infrastructure ដែលបានពង្រឹងសុវត្ថិភាព។"
+        },
+        {
+          "title": "Cloud Sync និង Auth",
+          "desc": "ផ្ទៀងផ្ទាត់ដោយ OAuth ឬ API keys។ រាល់ពាក្យបញ្ជា និងប្រវត្តិស្កេនទាំងអស់នឹង sync ទៅ dashboard សុវត្ថិភាពរបស់អ្នកដោយស្វ័យប្រវត្តិ។"
+        },
+        {
+          "title": "លទ្ធផលភ្លាមៗ",
+          "desc": "មិនចាំបាច់រង់ចាំទៀតទេ។ ទទួលបាន URLs ដែលអាចចែករំលែក និងពាក្យបញ្ជាទាញយកដោយផ្ទាល់ដូចជា ao get-report ដើម្បីយកទិន្នន័យ JSON ឬ PDF។"
+        }
+      ],
+      "specs": {
+        "title": "ភាពច្បាស់លាស់ផ្នែកវិស្វកម្ម",
+        "binaryTitle": "Binary ដែលបានពង្រឹងសុវត្ថិភាព",
+        "binaryDesc": "បង្កើតដោយ Rust សម្រាប់ memory safety។ ប្រើ gRPC សម្រាប់ការផ្សាយទិន្នន័យពេលជាក់ស្តែង។ session នីមួយៗមានអាយុកាលខ្លី និងត្រូវបានកត់ត្រាសវនកម្ម។",
+        "items": [
+          { "label": "OS ដែលគាំទ្រ", "value": "Linux, macOS, Windows" },
+          { "label": "ទំហំ Binary", "value": "<10.2 MB" },
+          { "label": "ការអ៊ិនគ្រីប", "value": "TLS 1.3 + AES-256" },
+          { "label": "វិធី Auth", "value": "OAuth2 / PKCE / MFA" },
+          { "label": "Latency", "value": "<40ms (Global Edge)" }
+        ]
+      },
+      "workflow": {
+        "title": "លំហូរការងារអនុវត្ត",
+        "steps": [
+          { "title": "បញ្ជាក្នុងមូលដ្ឋាន", "desc": "បើកឧបករណ៍តាម CLI ក្នុងមូលដ្ឋាន។" },
+          { "title": "អនុវត្តនៅ Backend", "desc": "Container ដំណើរការលោជិកធ្ងន់។" },
+          { "title": "ស្ទ្រីមពេលជាក់ស្តែង", "desc": "លទ្ធផលផ្ទាល់ត្រូវបានផ្ញើទៅ terminal។" },
+          { "title": "លទ្ធផលចុងក្រោយ", "desc": "របាយការណ៍ sync និងរក្សាទុក artifact។" }
+        ]
+      },
+      "cta": {
+        "title": "ត្រៀមធ្វើឲ្យលំហូរការងាររបស់អ្នកប្រសើរឡើងហើយឬនៅ?",
+        "subtitle": "ស្រាល សុវត្ថិភាព និងត្រៀមសម្រាប់ production។",
+        "primaryCta": "ដំឡើងឥឡូវនេះ",
+        "secondaryCta": "មើលឯកសារ"
+      }
+    },
+    "cicd": {
+      "hero": {
+        "badge": "ការរួមបញ្ចូល CI/CD",
+        "titleLine1": "ការស្កេន",
+        "titleLine2": "Repository។",
+        "subtitle": "រួមបញ្ចូលការវិភាគកូដជ្រាលជ្រៅទៅក្នុង SDLC របស់អ្នកដោយផ្ទាល់។ រកឃើញភាពងាយរងគ្រោះមុនពេលវាទៅដល់ production។",
+        "primaryCta": "ភ្ជាប់ Repository",
+        "secondaryCta": "មើលឯកសារ",
+        "repoName": "auto-offensive/target-repo",
+        "active": "សកម្ម",
+        "scanTitle": "ការស្កេនសុវត្ថិភាព",
+        "vulnerabilityFound": "រកឃើញភាពងាយរងគ្រោះ 1",
+        "passed": "បានឆ្លងកាត់",
+        "time1": "2 នាទីមុន",
+        "time2": "ឥឡូវនេះ",
+        "time3": "5 នាទីមុន"
+      },
+      "pipeline": {
+        "title": "លំហូរវិភាគ",
+        "subtitle": "បួនជំហានពី code commit ទៅព័ត៌មានសុវត្ថិភាព",
+        "steps": [
+          { "title": "ភ្ជាប់", "desc": "ការរួមបញ្ចូល OAuth ដើមជាមួយ GitHub, GitLab និង Bitbucket ទាំង cloud និង on-prem." },
+          { "title": "Clone និង Hash", "desc": "Clone បណ្ដោះអាសន្ននៅក្នុង sandbox containers។ រាល់ឯកសារត្រូវបាន hash ដោយ SHA-256 សម្រាប់តាមដានភាពត្រឹមត្រូវ។" },
+          { "title": "SonarScan", "desc": "វិភាគ SAST ជ្រាលជ្រៅដោយប្រើ SonarQube engines ដើម្បីរកលំនាំ OWASP Top 10។" },
+          { "title": "Signal", "desc": "ផ្តល់មតិយោបល់ភ្លាមៗតាម Slack, Jira ឬ inline PR comments ជាមួយជំហានជួសជុល។" }
+        ]
+      },
+      "finding": {
+        "codeBadge": "SQL INJECTION",
+        "remediation": "ការជួសជុល",
+        "title": "ចំណុចខ្សោយធ្ងន់ធ្ងរ",
+        "desc": "SQL Injection: ទិន្នន័យអ្នកប្រើត្រូវបានបញ្ចូលដោយផ្ទាល់ក្នុង SQL query។ អ្នកវាយប្រហារអាចឆ្លងកាត់ការផ្ទៀងផ្ទាត់បាន។",
+        "confidence": "កម្រិតជឿជាក់",
+        "confidenceValue": "98% (ខ្ពស់)",
+        "fixTime": "ពេលជួសជុល",
+        "fixTimeValue": "5 នាទី",
+        "primaryCta": "បង្កើត Fix PR"
+      },
+      "integration": {
+        "title": "មគ្គុទ្ទេស CI/CD Integration",
+        "subtitle": "ដាក់ប្រើការស្កេនសុវត្ថិភាពក្នុងរយៈពេលប៉ុន្មានវិនាទី",
+        "tabs": {
+          "github": "GitHub Actions",
+          "gitlab": "GitLab CI"
+        },
+        "items": [
+          { "title": "សុវត្ថិភាពតាំងពីដើម", "desc": "ទប់ស្កាត់ភាពងាយរងគ្រោះមុនចូល main branch" },
+          { "title": "រួមបញ្ចូលដើម", "desc": "YAML ត្រៀមរួច សម្រាប់ copy-paste ដាក់ប្រើ" },
+          { "title": "Audit Trail ពេញលេញ", "desc": "ប្រវត្តិស្កេនត្រៀមសម្រាប់ស្តង់ដារអនុលោម" }
+        ]
+      },
+      "cta": {
+        "title": "ត្រៀមការពារ pipeline របស់អ្នកហើយឬនៅ?",
+        "subtitle": "ចាប់ផ្តើមស្កេន repositories របស់អ្នកក្នុងរយៈពេលប៉ុន្មាននាទី។",
+        "primaryCta": "ចាប់ផ្តើមឥតគិតថ្លៃ",
+        "secondaryCta": "កក់ដេម៉ូ"
+      }
+    },
+    "webui": {
+      "hero": {
+        "badge": "ឈុត Auto-Offensive",
+        "titleLine1": "គ្រប់គ្រងការស្កេន",
+        "titleLine2": "ដោយមិនប្រើ CLI។",
+        "subtitle": "Guardian AI ភ្ជាប់ចន្លោះរវាងឧបករណ៍សុវត្ថិភាព open-source ដ៏មានអានុភាព និងភាពងាយប្រើកម្រិតសហគ្រាស។ ដំណើរការ Subfinder, Naabu និង Nuclei ក្នុងលំហូរការងារតែមួយដែលរលូន។",
+        "primaryCta": "បើកការស្កេនដំបូង",
+        "secondaryCta": "មើលដេម៉ូ",
+        "terminal": {
+          "title": "guardian-ai terminal",
+          "status": "បានភ្ជាប់",
+          "lines": [
+            "$ guardian-ai scan start",
+            "[+] កំពុងចាប់ផ្តើម Subfinder...",
+            "[+] រកឃើញ 142 subdomains",
+            "[+] Naabu: ការស្កេន ports កំពុងដំណើរការ",
+            "[-] រកឃើញ CVE-2023-XXXX នៅលើ dev.api..."
+          ]
+        }
+      },
+      "live": {
+        "badge": "ម៉ាស៊ីន Orchestration",
+        "panelTitle": "live_output_stream.sh",
+        "panelStatus": "ស្កេនសកម្ម",
+        "configTitle": "ការកំណត់រចនាសម្ព័ន្ធឧបករណ៍",
+        "configDesc": "ជ្រើសរើស stack ស្វ័យប្រវត្តិរបស់អ្នក។ មិនចាំបាច់ប្រើ syntax flags ទេ។",
+        "updateCta": "ធ្វើបច្ចុប្បន្នភាព Live Scan",
+        "lines": [
+          "កំពុងផ្ទុក configuration ពី cloud-vault...",
+          "កំពុងស្វែងរក targets សម្រាប់ api.guardian.ai",
+          "- dev.api.guardian.ai [រកឃើញ]",
+          "- staging.api.guardian.ai [រកឃើញ]",
+          "កំពុងចាប់ផ្តើម fast port scan លើ 12 targets",
+          "- 10.0.4.12:443 [បើក]",
+          "- 10.0.4.12:80 [បើក]",
+          "- 10.0.4.15:22 [បើក]",
+          "Template match: CVE-2023-XXXX on dev.api..."
+        ]
+      },
+      "howItWorks": {
+        "title": "របៀបដែលវាដំណើរការ",
+        "subtitle": "ការផ្លាស់ប្តូរពីការបញ្ចូលពាក្យបញ្ជាដោយដៃទៅ orchestration ដោយស្វ័យប្រវត្តិ ត្រូវបានគ្រប់គ្រងដោយ Guardian Kernel របស់យើង។",
+        "noteTitle": "កំណត់ចំណាំបច្ចេកទេស",
+        "noteBody": "\"Backend របស់យើងបម្លែងជម្រើស UI របស់អ្នកទៅជាពាក្យបញ្ជា Go-binary ដែលបានបង្កើនប្រសិទ្ធភាព ហើយគ្រប់គ្រង concurrency និង resource management ដោយស្វ័យប្រវត្តិ។\"",
+        "steps": [
+          {
+            "title": "បញ្ចូល Target និង Scope",
+            "desc": "បិទភ្ជាប់ root domains, IP ranges ឬ CIDR blocks របស់អ្នក។ Guardian AI នឹងផ្ទៀងផ្ទាត់ភាពជាម្ចាស់ដោយស្វ័យប្រវត្តិតាម cloud connector APIs។"
+          },
+          {
+            "title": "ជ្រើសរើស Tool Chain",
+            "desc": "ជ្រើសពីបណ្ណាល័យឧបករណ៍សុវត្ថិភាពកម្រិតខ្ពស់ដែលបានជ្រើសរើសរួច។ បើក 'Auto-Mode' ដើម្បីឲ្យ AI របស់យើងជ្រើសឧបករណ៍ល្អបំផុតតាម technology stack របស់ target។"
+          },
+          {
+            "title": "អនុវត្តដោយស្វ័យប្រវត្តិ",
+            "desc": "ម៉ាស៊ីននឹងចាប់ផ្តើម sub-process chain។ ទិន្នន័យនឹងហូរយ៉ាងរលូនពីឧបករណ៍មួយទៅមួយ ដូចជា output របស់ Subfinder ក្លាយជាទិន្នន័យបញ្ចូលរបស់ Naabu ដោយស្វ័យប្រវត្តិ។"
+          }
+        ]
+      },
+      "benefits": {
+        "title": "វិស្វកម្មសម្រាប់ផលចំណេញសហគ្រាស",
+        "items": [
+          {
+            "title": "រៀបចំលឿនជាងមុន 90%",
+            "desc": "កាត់បន្ថយពេលកំណត់ស្កេនពីម៉ោងជាច្រើននៃការសរសេរ script ទៅជាប៉ុន្មានវិនាទីនៃការបើកបិទ។ ដាក់ឲ្យដំណើរការ reconnaissance pipelines ស្មុគស្មាញបានភ្លាមៗ។"
+          },
+          {
+            "title": "ធ្វើឲ្យសុវត្ថិភាពអាចចូលដំណើរការបានសម្រាប់គ្រប់គ្នា",
+            "desc": "អនុញ្ញាតឲ្យអ្នកវិភាគគ្រប់កម្រិតអាចដំណើរការតេស្តកម្រិតវិជ្ជាជីវៈបានដោយមិនចាំបាច់មានចំណេះដឹង CLI ជ្រាលជ្រៅ។"
+          },
+          {
+            "title": "លោជិកកណ្ដាល",
+            "desc": "ធ្វើឲ្យវិធីសាស្ត្រធ្វើតេស្តរបស់អ្នកមានស្តង់ដារតែមួយនៅទូទាំងអង្គភាព។ ធានាថា tool flags និង versions ត្រូវបានធ្វើបច្ចុប្បន្នភាពស្របគ្នាដោយចុចតែម្តង។"
+          }
+        ]
+      },
+      "cta": {
+        "title": "ត្រៀមស្វ័យប្រវត្តិកម្ម offensive posture របស់អ្នកហើយឬនៅ?",
+        "subtitle": "reconnaissance pipelines កម្រិតសហគ្រាសក្នុងរយៈពេលប៉ុន្មានវិនាទី មិនមែនប៉ុន្មានម៉ោង។",
+        "primaryCta": "ចាប់ផ្តើមស្កេនឥតគិតថ្លៃ",
+        "secondaryCta": "មើលឯកសារ"
+      }
+    }
+  },  
+  "toolsPage": {
+    "title": "The Auto-Offensive ToolKit",
+    "subtitle": "ស្វែងរក និងប្រើប្រាស់ tools ស្កេន Security ជាច្រើន នៅកន្លែងតែមួយ",
+    "searchPlaceholder": "ស្វែងរកឧបករណ៍ និងស្លាក...",
+    "noResults": "រកមិនឃើញឧបករណ៍ទេ",
+    "tryDifferent": "សាកល្បងស្វែងរក ឬជ្រើសប្រភេទផ្សេងទៀត",
+    "primaryCta": "សាកល្បងឥតគិតថ្លៃ",
+    "popular": "ពេញនិយម",
+    "categories": {
+      "all": "ទាំងអស់",
+      "recon": "ស្វែងរកព័ត៌មាន",
+      "vuln": "ភាពងាយរងគ្រោះ",
+      "fuzzing": "Fuzzing"
+    },
+    "items": {
+      "subfinder": "Tool សម្រាប់ស្វែងរក subdomain បែប passive ដោយប្រើ APIs និងប្រភពជាច្រើន។",
+      "naabu": "Tool ស្កេន port លឿន មានភាពទុកចិត្ត និងងាយប្រើ ដូច nmap។",
+      "dnsx": "DNS tool លឿន អាច query DNS ច្រើន និងកំណត់ resolver ផ្ទាល់ខ្លួនបាន។",
+      "assetfinder": "ស្វែងរក domain និង subdomain ដែលពាក់ព័ន្ធ ដោយប្រើប្រភព open-source។",
+      "nmap": "Tool ស្តង់ដារសម្រាប់ network discovery និង security auditing (support NSE scripts)",
+      "nuclei": "Scanner សម្រាប់រក vulnerability លឿន និងអាច customize ដោយប្រើ YAML templates",
+      "wpscan": "Scanner សម្រាប់ WordPress ដែលរកឃើញ vulnerability ក្នុង core, plugins និង themes",
+      "sqli": "រក និង test SQL Injection ដោយប្រើ payload និង techniques កម្រិតខ្ពស់",
+      "strike3ifr": "Tool វិភាគ info-gathering កម្រិតខ្ពស់ ជាមួយ Red Team bypass techniques",
+      "urlfuzzer": "រក files និង directories លាក់ដោយប្រើ wordlist fuzzing",
+      "kitecrawler": "ប្រមូល URLs សម្រាប់ analysis (REST API និង dynamic web apps)",
+      "httprobe": "Tool សម្រាប់ test HTTP/HTTPS domains ដើម្បីរក services ដែលដំណើរការ",
+      "katana": "Framework crawling ជំនាន់ថ្មី សម្រាប់ web apps ដែលមាន JS complexity",
+      "gobuster": "Tool លឿនសម្រាប់ brute-force directories, files និង DNS subdomains"
+    }
+  },
+"resourcePage": {
+    "hero": {
+      "badge": "មជ្ឈមណ្ឌលឯកសារ",
+      "titleLine1": "រៀន។ ឯកសារយោង។",
+      "titleLine2": "អនុវត្ត។",
+      "subtitle": "មគ្គុទ្ទេសក៍ ឯកសារយោង API និងការបង្រៀនដ៏ទូលំទូលាយ ដើម្បីជួយអ្នកឲ្យស្ទាត់ជំនាញលើ Auto-Offensive toolkit និងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។"
+    },
+    "categories": {
+      "title": "ប្រភេទឯកសារ",
+      "subtitle": "ស្វែងយល់ពីឯកសារដែលបានរៀបចំតាមប្រធានបទ",
+      "viewAll": "មើលឯកសារទាំងអស់",
+      "cards": {
+        "tools": {
+          "title": "ឯកសារឧបករណ៍",
+          "description": "រៀនពីរបៀបប្រើឧបករណ៍សុវត្ថិភាពនីមួយៗក្នុង toolkit របស់យើង ចាប់ពី subdomain enumeration ដល់ vulnerability scanning។",
+          "links": [
+            { "title": "Subfinder - Passive Recon", "tag": "Recon" },
+            { "title": "Nmap - Network Mapping", "tag": "Recon" },
+            { "title": "Nuclei - Vulnerability Scanner", "tag": "Vuln" },
+            { "title": "SQLMap - SQL Injection", "tag": "Vuln" },
+            { "title": "Gobuster - Directory Fuzzing", "tag": "Fuzzing" },
+            { "title": "Katana - Web Crawler", "tag": "Fuzzing" }
+          ]
+        },
+        "api": {
+          "title": "ឯកសារយោង API",
+          "description": "រួមបញ្ចូល Auto-Offensive ទៅក្នុង workflow របស់អ្នកជាមួយឯកសារ REST API ដ៏ទូលំទូលាយ។",
+          "links": [
+            { "title": "Authentication", "tag": "Auth" },
+            { "title": "Scan Endpoints", "tag": "API" },
+            { "title": "Results Retrieval", "tag": "API" },
+            { "title": "Webhooks", "tag": "Integration" },
+            { "title": "Rate Limits", "tag": "Config" },
+            { "title": "Error Codes", "tag": "Reference" }
+          ]
+        },
+        "cli": {
+          "title": "មគ្គុទ្ទេស CLI",
+          "description": "ស្ទាត់ជំនាញលើ command-line interface សម្រាប់ automated scanning និង scripting workflows។",
+          "links": [
+            { "title": "Installation", "tag": "Setup" },
+            { "title": "Configuration", "tag": "Config" },
+            { "title": "Basic Commands", "tag": "Usage" },
+            { "title": "Advanced Flags", "tag": "Usage" },
+            { "title": "Scripting Examples", "tag": "Automation" },
+            { "title": "Troubleshooting", "tag": "Help" }
+          ]
+        },
+        "cicd": {
+          "title": "ការរួមបញ្ចូល CI/CD",
+          "description": "បញ្ចូលការស្កេនសុវត្ថិភាពទៅក្នុង continuous integration pipelines របស់អ្នក។",
+          "links": [
+            { "title": "GitHub Actions", "tag": "CI/CD" },
+            { "title": "GitLab CI", "tag": "CI/CD" },
+            { "title": "Jenkins Pipeline", "tag": "CI/CD" },
+            { "title": "Azure DevOps", "tag": "CI/CD" },
+            { "title": "SonarQube Integration", "tag": "SAST" },
+            { "title": "PR Comment Automation", "tag": "Automation" }
+          ]
+        }
+      }
+    },
+    "quickLinks": {
+      "title": "តំណភ្ជាប់រហ័ស",
+      "items": [
+        { "title": "មគ្គុទ្ទេសចាប់ផ្តើមរហ័ស", "desc": "ចាប់ផ្តើមបានក្នុង 5 នាទី" },
+        { "title": "API Authentication", "desc": "បង្កើត API keys" },
+        { "title": "Example Scripts", "desc": "ស្វ័យប្រវត្តិកម្មបែប copy-paste" },
+        { "title": "វីដេអូបង្រៀន", "desc": "រៀនតាមរូបភាព" }
+      ]
+    },
+    "featured": {
+      "title": "ធនធានពិសេស",
+      "subtitle": "មគ្គុទ្ទេសក៍ និងការបង្រៀនពេញនិយមពីសហគមន៍របស់យើង",
+      "items": [
+        { "type": "Guide", "title": "ការចាប់ផ្តើមជាមួយ Auto-Offensive", "desc": "រៀនមូលដ្ឋាននៃការកំណត់ស្កេនដំបូង និងការយល់អំពី dashboard។", "tag": "Beginner", "cta": "អាន" },
+        { "type": "Video", "title": "មេរៀន CLI ពេញលេញ", "desc": "វីដេអូណែនាំពេញលេញអំពី command-line interface។", "tag": "Intermediate", "cta": "មើល" },
+        { "type": "API", "title": "ការបង្កើត Automated Workflows", "desc": "បង្កើត automation scripts ផ្ទាល់ខ្លួនដោយប្រើ REST API របស់យើង។", "tag": "Advanced", "cta": "ស្វែងយល់" }
+      ]
+    },
+    "newsletter": {
+      "title": "ទទួលធនធានថ្មីៗក្នុងប្រអប់សំបុត្ររបស់អ្នក",
+      "subtitle": "មគ្គុទ្ទេសក៍ ការបង្រៀន និងព័ត៌មានថ្មីៗរៀងរាល់សប្ដាហ៍។",
+      "placeholder": "your@email.com",
+      "cta": "ជាវ"
+    },
+    "resourceSections": {
+      "title": "ធនធាន",
+      "items": {
+        "dll": {
+          "title": "ឯកសារ DLL",
+          "description": "បណ្ណាល័យឯកសារផ្�Official ជាមួយ specifications, white papers, និង execution guides ។",
+          "items": ["ពិសេស API", "Architecture Guide", "Data Dictionary", "Compliance Matrix"],
+          "cta": "ស្វែងយល់"
+        },
+        "api": {
+          "title": "ធនធាន API",
+          "description": "ឯកសារ API ពេញលេញ រួមមាន endpoints, ឧទាហរណ៍, និង error handling ។",
+          "items": ["REST Endpoints", "Authentication", "Rate Limiting", "Error Codes"],
+          "cta": "ស្វែងយល់"
+        },
+        "integration": {
+          "title": "ឧបករណ៍រួមបញ្ចូល",
+          "description": "ឧបករណ៍ និង utilities សម្រាប់ករណី រួមបញ្ចូល ទូទៅ ។",
+          "items": ["SDKs", "Libraries", "CLI Tools", "Testing Tools"],
+          "cta": "ស្វែងយល់"
+        }
+      }
+    },
+    "quickStart": {
+      "title": "ផ្លូវចាប់ផ្តើម រហ័ស",
+      "subtitle": "ចាប់ផ្តើម ហើយ ដំណើរការ ជាមួយ pathways ចាំបាច់",
+      "items": {
+        "data": {
+          "title": "ការស្នើរទិន្នន័យ",
+          "description": "មគ្គុទ្ទេស ពេញ លេញ ស្នើ ហើយ គ្រប់គ្រង ទិន្នន័យ clinical ជាមួយ documentation និង audit trails ។"
+        },
+        "marketplace": {
+          "title": "PLR Marketplace",
+          "description": "ស្វែងយល់ ផ្ទាល់ ខ្លួន នៅ ទីផ្សារ research ដែល មាន datasets និង ឧទាហរណ៍ រួមបញ្ចូល ។"
+        },
+        "integration": {
+          "title": "EDSA Integration",
+          "description": "មគ្គុទ្ទេស ជំហាន ដោយ ជំហាន ស្វែងរក API Source ខាងក្រៅ ជាមួយ code samples ។"
+        }
+      },
+      "learnMore": "ស្វែងយល់បន្ថែម"
+    },
+    "technical": {
+      "title": "ការចូលជ្រៅ បច្ចេកទេស",
+      "subtitle": "មគ្គុទ្ទេស ទូទំនាយ សម្រាប់ implementations កម្រិត ខ្ពស់",
+      "items": {
+        "api": {
+          "title": "API Integration",
+          "description": "ឯកសារ API ពេញលេញ ជាមួយ authentication, rate limits, និង patterns កម្រិត ខ្ពស់ ។",
+          "tags": ["REST", "GraphQL", "Webhooks"]
+        },
+        "sdk": {
+          "title": "SDK Reference",
+          "description": "Native SDKs សម្រាប់ Python, JavaScript, Java ជាមួយ documentation និង ឧទាហរណ៍ ពេញ ។",
+          "tags": ["Python", "JavaScript", "Java"]
+        },
+        "security": {
+          "title": "Security Protocols",
+          "description": "ចូល ជ្រៅ ទៅ ក្នុង encryption, compliance, និង មគ្គុទ្ទេស សុវត្ថិភាព ។",
+          "tags": ["HIPAA", "Encryption", "Audit Logs"]
+        },
+        "user": {
+          "title": "User Management",
+          "description": "Role-based access control, user provisioning, និង មុខងារ សហការ ក្រុម ។",
+          "tags": ["RBAC", "SSO", "Teams"]
+        }
+      }
+    },
+    "status": {
+      "title": "ស្ថានភាព ប្រតិបត្តិ របស់ វេទិកា",
+      "subtitle": "ស្ថានភាព ពេល ជាក់ ស្តែ ង នៃ សេវា និង infrastructure ទាំងអស់ របស់ Clinical Precision",
+      "service": "សេវា",
+      "status": "ស្ថានភាព",
+      "uptime": "Uptime",
+      "lastIncident": "ចុងក្រោយ Incident",
+      "operational": " ដំណើរការ",
+      "degraded": " ធ្មេច",
+      "maintenance": " ថែទាំ",
+      "statusNote": "Status Page: សម្រាប់ ព័ត៌ មាន លម្អិត និង ប្រវត្តិ ហេតុ ចូល ទៅ កាន់",
+      "dedicatedPage": "status page ផ្តាច់ ពី"
+    }
+  },
+  "helpCenterPage": {
+    "hero": {
+      "eyebrow": "ជំនួយ",
+      "titleLine1": "មជ្ឈមណ្ឌល",
+      "titleLine2": "ជំនួយ",
+      "subtitle": "ស្វែងរកចម្លើយសម្រាប់សំណួរដែលគេសួរញឹកញាប់អំពី Auto Offensive និងវេទិកា pentesting របស់យើង។"
+    },
+    "searchPlaceholder": "ស្វែងរកជំនួយ...",
+    "faqTitle": "សំណួរដែលគេសួរញឹកញាប់",
+    "noResults": "រកមិនឃើញ FAQ ដែលត្រូវគ្នាទេ។ សូមសាកល្បងពាក្យស្វែងរកផ្សេង។",
+    "contactPrompt": "រកមិនឃើញអ្វីដែលអ្នកកំពុងស្វែងរកមែនទេ?",
+    "contactCta": "ទាក់ទងយើង",
+    "viewDocs": "មើលឯកសារ",
+    "categories": {
+      "gettingStarted": "ការចាប់ផ្តើម",
+      "account": "គណនី និងសុវត្ថិភាព",
+      "scanning": "ការស្កេន និងឧបករណ៍",
+      "team": "កិច្ចសហការក្រុម",
+      "billing": "ការទូទាត់ និងគម្រោង",
+      "contact": "ទាក់ទងយើង"
+    },
+    "faq": {
+      "whatIs": {
+        "question": "តើ Auto Offensive ជាអ្វី?",
+        "p1": "Auto Offensive គឺជាវេទិកា penetration testing ជំនាន់ថ្មី ដែលរចនាឡើងសម្រាប់អ្នកជំនាញសុវត្ថិភាព ethical hackers និងអង្គភាពផ្សេងៗ។",
+        "p2": "វេទិការបស់យើងផ្តល់នូវ security workflows ស្វ័យប្រវត្តិ vulnerability scanning និងឧបករណ៍របាយការណ៍ដ៏ទូលំទូលាយ ដើម្បីស្វែងរក និងដោះស្រាយចំណុចខ្សោយសុវត្ថិភាពក្នុងប្រព័ន្ធរបស់អ្នក។"
+      },
+      "whoFor": {
+        "question": "តើនរណាអាចប្រើ Auto Offensive?",
+        "intro": "Auto Offensive ត្រូវបានរចនាសម្រាប់៖",
+        "items": [
+          "អ្នកជំនាញសុវត្ថិភាព និង penetration testers",
+          "ក្រុម DevSecOps ដែលរួមបញ្ចូលសុវត្ថិភាពទៅក្នុង CI/CD",
+          "អង្គភាពដែលធ្វើការវាយតម្លៃសុវត្ថិភាពដោយមានការអនុញ្ញាត",
+          "អ្នកស្រាវជ្រាវសុវត្ថិភាព និង bug bounty hunters",
+          "សិស្សនិស្សិតដែលកំពុងសិក្សា ethical hacking និង cybersecurity"
+        ]
+      },
+      "howStart": {
+        "question": "តើខ្ញុំចាប់ផ្តើមដូចម្តេច?",
+        "steps": [
+          "ចុះឈ្មោះ — បង្កើតគណនីឥតគិតថ្លៃដោយប្រើអ៊ីមែល",
+          "ផ្ទៀងផ្ទាត់ — បញ្ជាក់អាសយដ្ឋានអ៊ីមែលរបស់អ្នក",
+          "កំណត់រចនា — រៀបចំ scan target ដំបូងរបស់អ្នក",
+          "ស្កេន — ដំណើរការ vulnerability assessment ដំបូងរបស់អ្នក",
+          "ពិនិត្យមើល — វិភាគលទ្ធផលក្នុង dashboard"
+        ],
+        "note": "អ្នកប្រើថ្មីទទួលបាន 3 scans ឥតគិតថ្លៃក្នុងមួយថ្ងៃ ដើម្បីសាកល្បងវេទិកា។"
+      },
+      "legalScanning": {
+        "question": "តើ penetration testing ស្របច្បាប់ទេ?",
+        "p1": "Penetration testing ស្របច្បាប់ នៅពេលអ្នកមានការអនុញ្ញាតច្បាស់លាស់សម្រាប់ធ្វើតេស្តលើប្រព័ន្ធគោលដៅ។",
+        "warning": "សំខាន់៖ តែងតែទទួលបានការអនុញ្ញាតជាលាយលក្ខណ៍អក្សរ មុនធ្វើតេស្តប្រព័ន្ធដែលអ្នកមិនមែនជាម្ចាស់។ ការចូលប្រើដោយគ្មានការអនុញ្ញាតគឺខុសច្បាប់។",
+        "p2": "សម្រាប់ប្រព័ន្ធផ្ទាល់ខ្លួន ការធ្វើតេស្តសុវត្ថិភាពខាងក្នុងជាទូទៅត្រូវបានអនុញ្ញាត។ សូមពិនិត្យច្បាប់មូលដ្ឋាន និងគោលការណ៍អង្គភាពរបស់អ្នក។"
+      },
+      "freeTier": {
+        "question": "តើមានអ្វីខ្លះក្នុងគម្រោងឥតគិតថ្លៃ?",
+        "intro": "គម្រោងឥតគិតថ្លៃរួមមាន៖",
+        "items": [
+          "3 scans ក្នុងមួយថ្ងៃ",
+          "រយៈពេលស្កេនអតិបរមា 30 នាទី",
+          "domain តែមួយសម្រាប់មួយ scan",
+          "ការផ្ទុក scan history 100 GB",
+          "ចូលប្រើឧបករណ៍សុវត្ថិភាព 14+",
+          "នាំចេញជា JSON, CSV, PDF"
+        ],
+        "outro": "សមស្របសម្រាប់ការសិក្សា គម្រោងផ្ទាល់ខ្លួន និងការធ្វើតេស្តទំហំតូច។"
+      },
+      "toolsAvailable": {
+        "question": "តើមានឧបករណ៍សុវត្ថិភាពអ្វីខ្លះ?",
+        "intro": "Auto Offensive រួមបញ្ចូលឧបករណ៍ស្តង់ដារឧស្សាហកម្ម 14+៖",
+        "items": [
+          "Nmap — ស្កេនបណ្តាញ",
+          "Nikto — Web vulnerability",
+          "SQLmap — SQL injection",
+          "Burp Suite — Web testing",
+          "OWASP ZAP — App scanning",
+          "Amass — Subdomain enum",
+          "Dirb — Directory brute",
+          "Gobuster — Fuzzing",
+          "Hydra — Password cracking",
+          "Metasploit — Exploitation",
+          "Nessus compatibility",
+          "OpenVAS integration"
+        ]
+      },
+      "apiAccess": {
+        "question": "តើមាន API access ទេ?",
+        "intro": "មាន! Auto Offensive ផ្តល់ RESTful API សម្រាប់ការចូលប្រើតាមកម្មវិធី៖",
+        "items": [
+          "ចាប់ផ្តើម/បញ្ឈប់ scans តាមកម្មវិធី",
+          "ទាញយកលទ្ធផល scan",
+          "គ្រប់គ្រង targets និង schedules",
+          "រួមបញ្ចូលជាមួយ CI/CD pipelines"
+        ],
+        "outro": "API rate limits: 100 requests/minute (free tier) និងខ្ពស់ជាងនេះសម្រាប់ enterprise។"
+      },
+      "dataSecurity": {
+        "question": "តើទិន្នន័យរបស់ខ្ញុំត្រូវបានការពារដូចម្តេច?",
+        "intro": "យើងយកចិត្តទុកដាក់ចំពោះសុវត្ថិភាពយ៉ាងខ្លាំង៖",
+        "items": [
+          "ក្នុងពេលបញ្ជូន៖ TLS 256-bit encryption",
+          "នៅពេលផ្ទុក៖ AES-256 encryption",
+          "ពាក្យសម្ងាត់៖ Bcrypt hashed ជាមួយ salt",
+          "ការចូលប្រើ៖ Role-based controls និង MFA",
+          "ការត្រួតពិនិត្យ៖ 24/7 intrusion detection, WAF, DDoS protection"
+        ],
+        "outro": "គណនីនីមួយៗត្រូវបានបំបែកដោយពេញលេញនៅកម្រិត database។"
+      },
+      "teamCollab": {
+        "question": "តើខ្ញុំអាចសហការជាមួយក្រុមបានទេ?",
+        "intro": "បាន! មុខងារសហការក្រុមរបស់យើងរួមមាន៖",
+        "items": [
+          "Shared project workspaces",
+          "Role-based access control",
+          "សកម្មភាពស្កេនពេលជាក់ស្តែង",
+          "Team activity logs",
+          "Collaborative report editing"
+        ],
+        "outro": "គម្រោង Enterprise រួមមានសមាជិកក្រុមគ្មានដែនកំណត់។"
+      },
+      "exportData": {
+        "question": "តើខ្ញុំអាចនាំចេញទិន្នន័យស្កេនរបស់ខ្ញុំបានទេ?",
+        "intro": "បាន! អ្នកជាម្ចាស់ទិន្នន័យរបស់អ្នក។ ជម្រើសនាំចេញរួមមាន៖",
+        "formats": [
+          "អាចអានដោយម៉ាស៊ីន",
+          "សមស្របសម្រាប់ spreadsheet",
+          "របាយការណ៍សម្រាប់អតិថិជន"
+        ],
+        "outro": "អ្នកអាចនាំចេញពី dashboard បានគ្រប់ពេល។"
+      },
+      "upgradePlan": {
+        "question": "តើខ្ញុំអាប់ក្រេដគម្រោងដូចម្តេច?",
+        "intro": "ដើម្បីអាប់ក្រេដទៅ Pro ឬ Enterprise៖",
+        "steps": [
+          "ទៅកាន់ Settings → Billing",
+          "ជ្រើសគម្រោងរបស់អ្នក",
+          "បន្ថែមវិធីបង់ប្រាក់",
+          "បញ្ជាក់ ហើយចាប់ផ្តើមប្រើមុខងារ premium"
+        ],
+        "outro": "គម្រោង Enterprise រួមមាន quotas ផ្ទាល់ខ្លួន dedicated support និង SLA guarantees។ ទាក់ទង sales@auto-offensive.com"
+      },
+      "refundPolicy": {
+        "question": "តើគោលការណ៍បង្វិលប្រាក់របស់អ្នកជាអ្វី?",
+        "p1": "យើងផ្តល់ 14-day money-back guarantee សម្រាប់គម្រោង Pro។",
+        "p2": "ប្រសិនបើអ្នកមិនពេញចិត្ត សូមទាក់ទង support@auto-offensive.com ក្នុងរយៈពេល 14 ថ្ងៃ ដើម្បីទទួលបានការបង្វិលប្រាក់ពេញលេញ។",
+        "p3": "កិច្ចសន្យា Enterprise អនុវត្តតាមលក្ខខណ្ឌផ្ទាល់ខ្លួនក្នុងកិច្ចព្រមព្រៀងរបស់អ្នក។"
+      },
+      "reportBug": {
+        "question": "តើខ្ញុំរាយការណ៍ bug ឬ vulnerability ដូចម្តេច?",
+        "intro": "យើងយកចិត្តទុកដាក់ចំពោះសុវត្ថិភាព។ សូមរាយការណ៍ platform vulnerabilities ដោយទំនួលខុសត្រូវ៖",
+        "response": "ឆ្លើយតបក្នុងរយៈពេល 24 ម៉ោង",
+        "include": "សូមបញ្ចូល៖",
+        "items": [
+          "ការពិពណ៌នាអំពី vulnerability",
+          "ជំហានសម្រាប់បង្កើតឡើងវិញ",
+          "ការវាយតម្លៃផលប៉ះពាល់"
+        ]
+      },
+      "getSupport": {
+        "question": "តើខ្ញុំអាចទទួលបានជំនួយដូចម្តេច?",
+        "intro": "យើងនៅទីនេះដើម្បីជួយ! សូមទាក់ទងតាមរយៈ៖",
+        "cards": [
+          { "title": "Email Support", "value": "support@auto-offensive.com", "meta": "ឆ្លើយតបក្នុង 24-48 ម៉ោង" },
+          { "title": "Documentation", "value": "docs.auto-offensive.com", "meta": "អាចចូលប្រើ 24/7" },
+          { "title": "Community", "value": "discord.gg/auto-offensive", "meta": "ការពិភាក្សាផ្ទាល់" }
+        ]
+      }
+    }
+  },
+  "termsPage": {
+    "hero": {
+      "eyebrow": "ច្បាប់",
+      "titleLine1": "លក្ខខណ្ឌ",
+      "titleLine2": "សេវាកម្ម",
+      "subtitle": "ដោយការប្រើ Auto Offensive អ្នកយល់ព្រមប្រើវេទិការបស់យើងដោយទំនួលខុសត្រូវ។ យើងបង្កើតឧបករណ៍នេះសម្រាប់អ្នកជំនាញសុវត្ថិភាព មិនមែនសម្រាប់បង្កគ្រោះថ្នាក់ទេ។",
+      "ethicalTag": "ប្រើប្រាស់តែបែបសីលធម៌",
+      "versionTag": "v2.0 · មេសា 2026"
+    },
+    "sectionsLabel": "ផ្នែក",
+    "sections": {
+      "acceptance": {
+        "title": "ការប្រើប្រាស់ដែលអាចទទួលយកបាន",
+        "intro": "Auto Offensive ត្រូវបានផ្តល់សម្រាប់ការធ្វើតេស្តសុវត្ថិភាពស្របច្បាប់ ការអប់រំ និង penetration testing ដែលមានការអនុញ្ញាត។",
+        "allowed": [
+          "ធ្វើតេស្តតែលើប្រព័ន្ធដែលអ្នកជាម្ចាស់ ឬមានការអនុញ្ញាតជាលាយលក្ខណ៍អក្សរ",
+          "ប្រើវេទិកាសម្រាប់គោលបំណងការពារសុវត្ថិភាពប៉ុណ្ណោះ",
+          "គោរព rate limits និង fair usage policies",
+          "រាយការណ៍ vulnerabilities ដោយទំនួលខុសត្រូវ",
+          "ប្រើ findings ដើម្បីពង្រឹងសុវត្ថិភាព មិនមែនសម្រាប់ exploitation"
+        ],
+        "blocked": [
+          "វាយប្រហារប្រព័ន្ធដែលអ្នកមិនមែនជាម្ចាស់ដោយគ្មានការអនុញ្ញាត",
+          "ប្រើ automated tools សម្រាប់ malicious scanning ឬ DDoS",
+          "ចែករំលែក vulnerabilities ដោយគ្មាន responsible disclosure",
+          "ប្រើវេទិកាដើម្បីបង្កគ្រោះថ្នាក់ exploit ឬលួចពីអ្នកដទៃ"
+        ],
+        "notice": "Penetration Testing: ប្រសិនបើអ្នកជាអ្នកជំនាញសុវត្ថិភាពដែលធ្វើ authorized assessments អ្នកអាចធ្វើតេស្តប្រព័ន្ធអតិថិជនដោយមានការអនុញ្ញាត។"
+      },
+      "prohibited": {
+        "title": "សកម្មភាពហាមឃាត់",
+        "intro": "សកម្មភាពខាងក្រោមត្រូវបានហាមឃាត់យ៉ាងតឹងរ៉ឹង ហើយអាចនាំឲ្យផ្អាកគណនីភ្លាមៗ៖",
+        "items": [
+          "ធ្វើតេស្ត ឬវាយប្រហាររដ្ឋាភិបាល យោធា ឬ critical infrastructure ដោយគ្មានការអនុញ្ញាត",
+          "ព្យាយាមចូលប្រើប្រព័ន្ធ ឬទិន្នន័យដោយគ្មានសិទ្ធិ",
+          "ធ្វើ DDoS ឬ resource exhaustion attacks",
+          "ចែកចាយ malware ransomware ឬឧបករណ៍អាក្រក់",
+          "Phishing social engineering ឬ identity theft",
+          "ប្រើ vulnerabilities ដើម្បីរកចំណេញហិរញ្ញវត្ថុ",
+          "Bypass ឬព្យាយាម bypass security controls",
+          "ស្កេន ឬវាយប្រហារគោលដៅក្នុង restricted jurisdictions"
+        ],
+        "warning": "ការរំលោភលើលក្ខខណ្ឌទាំងនេះ អាចនាំឲ្យបិទគណនីជាអចិន្ត្រៃយ៍ បិទ IP និងចាត់វិធានការតាមច្បាប់។"
+      },
+      "account": {
+        "title": "ទំនួលខុសត្រូវគណនី",
+        "intro": "អ្នកទទួលខុសត្រូវក្នុងការថែរក្សាសុវត្ថិភាពគណនីរបស់អ្នក៖",
+        "items": [
+          "ប្រើពាក្យសម្ងាត់ខ្លាំង និងបើក MFA នៅពេលមាន",
+          "រក្សា API keys និង credentials ឲ្យមានសុវត្ថិភាព",
+          "រាយការណ៍សកម្មភាពគួរឱ្យសង្ស័យភ្លាមៗ",
+          "ធានាថាសមាជិកក្រុមយល់ និងគោរពលក្ខខណ្ឌទាំងនេះ",
+          "កុំចែករំលែក account credentials ជាមួយអ្នកមិនមានសិទ្ធិ"
+        ],
+        "rows": [
+          { "label": "អាយុអប្បបរមាគណនី", "value": "18+ ឬមានការយល់ព្រមពីមាតាបិតា" },
+          { "label": "គណនីម្នាក់មួយ", "value": "ត្រូវការ" },
+          { "label": "អ៊ីមែលផ្ទៀងផ្ទាត់", "value": "ត្រូវការ" }
+        ],
+        "notice": "គណនី Enterprise: អង្គភាពត្រូវកំណត់អ្នកប្រើដែលមានសិទ្ធិ និងរក្សា audit logs សម្រាប់សកម្មភាពធ្វើតេស្តទាំងអស់។"
+      },
+      "scans": {
+        "title": "ដែនកំណត់ Scan និង Fair Use",
+        "intro": "ដើម្បីធានាស្ថេរភាពវេទិកា និងភាពយុត្តិធម៌ យើងអនុវត្តដែនកំណត់ខាងក្រោម៖",
+        "rows": [
+          { "label": "Free tier daily scans", "value": "3 scans / day" },
+          { "label": "Max scan duration", "value": "30 minutes" },
+          { "label": "Concurrent scans", "value": "1 at a time" },
+          { "label": "Target scope", "value": "Single domain per scan" },
+          { "label": "Storage", "value": "100 GB scan history" },
+          { "label": "API rate limits", "value": "100 requests / minute" }
+        ],
+        "notice": "Enterprise tier: ដែនកំណត់ខ្ពស់ជាងនេះអាចរកបាន។ ទាក់ទង sales@auto-offensive.com"
+      },
+      "intellectual": {
+        "title": "កម្មសិទ្ធិបញ្ញា",
+        "p1": "Auto Offensive platform: software tools code និង content ទាំងអស់ជាកម្មសិទ្ធិរបស់ Auto Offensive។",
+        "p2": "Your findings: អ្នកជាម្ចាស់ scan results findings និង reports ទាំងអស់ដែលអ្នកបង្កើត។",
+        "p3": "Open source tools: ឧបករណ៍ជាច្រើននៅក្នុងវេទិការបស់យើងគឺ open source ហើយអាជ្ញាបណ្ណរបស់ពួកវាអនុវត្តដោយឡែក។",
+        "items": [
+          "នាំចេញ findings របស់អ្នកបានគ្រប់ពេលពី dashboard",
+          "ប្រើ reports សម្រាប់ client deliverables និង documentation",
+          "ចែករំលែក anonymized findings សម្រាប់ការកែលម្អសហគមន៍",
+          "លក់បន្ត ឬចែកចាយឡើងវិញទិន្នន័យស្កេនរបស់ Auto Offensive"
+        ]
+      },
+      "liability": {
+        "title": "កម្រិតទំនួលខុសត្រូវ",
+        "intro": "Auto Offensive ត្រូវបានផ្តល់ \"as is\" ដោយគ្មានការធានា។ យើងមិនទទួលខុសត្រូវចំពោះ៖",
+        "items": [
+          "ការខូចខាតណាមួយដែលកើតចេញពីការប្រើវេទិកា",
+          "ផលវិបាកតាមច្បាប់ពីការធ្វើតេស្តដោយគ្មានការអនុញ្ញាត",
+          "ការបាត់បង់ទិន្នន័យដោយសារការផ្អាកសេវា",
+          "សកម្មភាពរបស់ភាគីទីបីដែលប្រើគណនីរបស់អ្នក",
+          "ការខូចខាតបែបប្រយោល ឬផលវិបាកបន្ត"
+        ],
+        "notice": "ទំនួលខុសត្រូវអ្នកប្រើ៖ អ្នកជាអ្នកទទួលខុសត្រូវតែម្នាក់ឯងក្នុងការធានាថាសកម្មភាពធ្វើតេស្តរបស់អ្នកស្របច្បាប់ និងមានការអនុញ្ញាត។"
+      },
+      "termination": {
+        "title": "ការបញ្ចប់",
+        "intro": "យើងអាចផ្អាក ឬបញ្ចប់គណនីរបស់អ្នកគ្រប់ពេលដោយសារ៖",
+        "items": [
+          "ការរំលោភលើ Terms of Service",
+          "សកម្មភាពគួរឱ្យសង្ស័យ ឬខុសច្បាប់",
+          "មិនបង់ប្រាក់ (សម្រាប់ enterprise accounts)",
+          "ការប្រើធនធានវេទិកាខុសបំណង",
+          "មិនឆ្លើយតបសំណួរសុវត្ថិភាព"
+        ],
+        "outro": "អ្នកអាចលុបគណនីបានគ្រប់ពេល។ បន្ទាប់ពីបញ្ចប់ យើងរក្សាទុកទិន្នន័យតាម Privacy Policy។"
+      },
+      "changes": {
+        "title": "ការផ្លាស់ប្តូរលក្ខខណ្ឌ",
+        "intro": "យើងអាចធ្វើបច្ចុប្បន្នភាពលក្ខខណ្ឌទាំងនេះជាប្រចាំ។ ការផ្លាស់ប្តូរសំខាន់ៗនឹងត្រូវបានជូនដំណឹងតាមរយៈ៖",
+        "items": [
+          "Email notification ទៅកាន់អាសយដ្ឋានដែលបានចុះឈ្មោះ",
+          "Platform dashboard notice",
+          "សេចក្តីប្រកាសលើគេហទំព័រ"
+        ],
+        "outro": "ការបន្តប្រើប្រាស់បន្ទាប់ពីការផ្លាស់ប្តូរ មានន័យថាអ្នកយល់ព្រមលើលក្ខខណ្ឌថ្មី។"
+      },
+      "contact": {
+        "title": "ទំនាក់ទំនង",
+        "intro": "មានសំណួរអំពីលក្ខខណ្ឌទាំងនេះមែនទេ? សូមទាក់ទងក្រុមច្បាប់ និងអនុលោមរបស់យើង។",
+        "cards": [
+          { "title": "ច្បាប់", "email": "legal@auto-offensive.com", "desc": "សម្រាប់សំណួរផ្នែកច្បាប់" },
+          { "title": "អនុលោម", "email": "compliance@auto-offensive.com", "desc": "សម្រាប់សំណួរផ្នែកអនុលោម" }
+        ]
+      }
+    },
+    "footer": {
+      "version": "Terms of Service v2.0 · មេសា 2026",
+      "subtitle": "វេទិកាសាកល្បងសុវត្ថិភាពបែបសីលធម៌"
+    }
+  },
+  "privacy": {
+    "title": "គោលការណ៍ភាពឯកជន",
+    "lastUpdated": "ធ្វើបច្ចុប្បន្នភាពចុងក្រោយ",
+    "heroTitle": "គោលការណ៍",
+    "heroTitleHighlight": "ភាពឯកជន",
+    "heroDescription": "ទិន្នន័យរបស់អ្នកនៅតែជារបស់អ្នក។ យើងបានបង្កើត Auto-Offensive ដោយមានគោលការណ៍ភាពឯកជនជាមុនសិទ្ធិ — គ្មានការលក់ទិន្នន័យ គ្មានការតាមដានលាក់កំបាំង គ្រាន់តែការធ្វើតេស្តសុវត្ថិភាពដោយសុវត្ថិភាព។",
+    "tagNoDataSelling": "គ្មានការលក់ទិន្នន័យ",
+    "tagFreePlatform": "វេទិកាឥតគិតថ្លៃ"
   },
   "homepage": {
     "hero": {
@@ -72,7 +947,7 @@
       "titleLine1": "AI ជួយបន្ថែម",
       "titleLine2": "ជំនាញរបស់អ្នក",
       "titleLine3": "មិនមែនជំនួសអ្នកទេ",
-      "description": "Auto Offensive មិនបានជំនួស skilled security professionals ទេ។ ផ្ទុយទៅវិញ យើង empower ethical hackers, penetration testers និង infosec practitioners ដោយប្រើ AI-driven workflows ដែលដោះស្រាយការងារ tedious ជំនួស ដូច្នេះអ្នកអាចផ្តោតលើ creative hacking, custom testing និង security research បានកាន់តែច្បាស់។"
+      "description": "Auto Offensive មិនបានជំនួសអ្នកជំនាញសុវត្ថិភាពទេ។ ផ្ទុយទៅវិញ វាជួយ ethical hackers, penetration testers និងអ្នកធ្វើការផ្នែក infosec ដោយប្រើ workflow ដែលមាន AI ជួយកាន់ការងារដែលចំណាយពេលច្រើន ដូច្នេះអ្នកអាចផ្តោតលើការធ្វើតេស្តបែបច្នៃប្រឌិត ការសាកល្បងតាមតម្រូវការ និងការស្រាវជ្រាវសុវត្ថិភាពបានកាន់តែច្បាស់។"
     },
     "video": {
       "eyebrow": "ទិដ្ឋភាពទូទៅនៃវេទិកា",
@@ -85,8 +960,8 @@
       "titleLine1": "នៅក្រុមហ៊ុនរបស់យើង",
       "titleLine2": "យើងបង្កើតអ្វី",
       "titleLine3": "ដែលយើងប្រើផ្ទាល់",
-      "paragraph1": "យើងចាប់ផ្តើមពីក្រុមអ្នកជំនាញដែលស្រឡាញ់ការងារនេះពិតៗ ហើយយើងនៅតែរក្សាគំនិតនោះរហូតមកដល់ថ្ងៃនេះ។ ក្រុមរបស់យើងនៅតែជាអ្នកដឹកនាំក្នុងការអភិវឌ្ឍផលិតផល ដោយផ្តោតលើភាពត្រឹមត្រូវ ល្បឿន និងការគ្រប់គ្រង។",
-      "paragraph2": "មុខងារថ្មីៗទាំងអស់កើតចេញពីបទពិសោធន៍ពិត។ យើងតែងតែកែលម្អការងាររបស់យើងជាបន្តបន្ទាប់ ដោយប្រើបច្ចេកទេសថ្មីៗ ដំណើរការឆ្លាតជាងមុន និងការផ្ទៀងផ្ទាត់ដែលស្របនឹងការប្រើប្រាស់ពិត។",
+      "paragraph1": "យើងចាប់ផ្តើមពីក្រុមអ្នកជំនាញដែលស្រឡាញ់ការងារនេះពិតៗ ហើយយើងនៅតែរក្សាគំនិតនោះដដែលរហូតមកដល់ថ្ងៃនេះ។ ក្រុមរបស់យើងនៅតែជាអ្នកជំរុញការអភិវឌ្ឍផលិតផល ដោយផ្តោតលើភាពត្រឹមត្រូវ ល្បឿន និងការគ្រប់គ្រង។",
+      "paragraph2": "មុខងារថ្មីៗទាំងអស់កើតចេញពីបទពិសោធន៍ការងារពិត។ យើងកែលម្អការងារជាបន្តបន្ទាប់ដោយប្រើបច្ចេកទេសថ្មីៗ ដំណើរការឆ្លាតជាងមុន និងការផ្ទៀងផ្ទាត់ដែលស្របតាមការប្រើប្រាស់ជាក់ស្តែង។",
       "cta": "អានរឿងរ៉ាវរបស់យើង",
       "imagePlaceholder": "កន្លែងដាក់រូបក្រុម",
       "teamSizeLabel": "ទំហំក្រុម",
@@ -108,9 +983,9 @@
           "description": "រក្សាភាពមើលឃើញ កាត់បន្ថយហានិភ័យ និងបង្កើនទំនុកចិត្ត។"
         },
         "msps": {
-          "title": "អ្នកផ្តល់សេវាសុវត្ថិភាព",
-          "subtitle": "គ្រប់គ្រង (MSPs)",
-          "description": "ផ្តល់តម្លៃកាន់តែច្រើន ដោយប្រើធនធានតិចជាងមុន។"
+          "title": "អ្នកផ្តល់សេវា",
+          "subtitle": "សុវត្ថិភាពគ្រប់គ្រង",
+          "description": "ផ្តល់តម្លៃបានច្រើនជាងមុន ដោយចំណាយធនធានតិចជាងមុន។"
         }
       }
     },
