@@ -79,7 +79,7 @@ export default function StatusTable() {
   const t = useTranslations("resourcePage")
 
   return (
-    <section className="py-12 md:py-16 bg-white dark:bg-black dark:to-white">
+    <section className="py-12 md:py-16 bg-[#F7F5F0] dark:bg-[#09090B]">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8 md:mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">

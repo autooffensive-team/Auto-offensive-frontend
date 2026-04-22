@@ -3,6 +3,7 @@
 import { FileText, Link2, Code2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import { TbPoint } from 'react-icons/tb'
 
 export default function ResourceSections() {
   const t = useTranslations("resourcePage")
@@ -26,7 +27,8 @@ export default function ResourceSections() {
       description: t('resourceSections.items.dll.description'),
       icon: FileText,
       items: t.raw('resourceSections.items.dll.items') as string[],
-      color: 'bg-primary/5',
+      color: 'bg-white dark:bg-[#111113]',
+      iconBg: 'bg-primary/5',
       iconColor: 'text-primary',
       cta: t('resourceSections.items.dll.cta')
     },
@@ -35,8 +37,9 @@ export default function ResourceSections() {
       description: t('resourceSections.items.api.description'),
       icon: Code2,
       items: t.raw('resourceSections.items.api.items') as string[],
-      color: 'bg-secondary/5',
-      iconColor: 'text-secondary',
+      color: 'bg-white dark:bg-[#111113]',
+      iconBg: 'bg-primary/5',
+      iconColor: 'text-primary',
       cta: t('resourceSections.items.api.cta')
     },
     {
@@ -44,14 +47,15 @@ export default function ResourceSections() {
       description: t('resourceSections.items.integration.description'),
       icon: Link2,
       items: t.raw('resourceSections.items.integration.items') as string[],
-      color: 'bg-accent/5',
-      iconColor: 'text-accent',
+      color: 'bg-white dark:bg-[#111113]',
+      iconBg: 'bg-primary/5',
+      iconColor: 'text-primary',
       cta: t('resourceSections.items.integration.cta')
     }
   ]
 
   return (
-    <section className="py-12 md:py-16 bg-white dark:bg-black dark:to-white">
+    <section className="py-12 md:py-16 bg-[#F7F5F0] dark:bg-[#09090B]">
       <div className="max-w-7xl mx-auto px-4">
         <motion.div 
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
@@ -66,9 +70,9 @@ export default function ResourceSections() {
               <motion.div 
                 key={idx} 
                 variants={itemVariants}
-                className={`p-6 md:p-7 rounded-xl border border-border transition-colors ${resource.color}`}
+                className={`flex h-full flex-col rounded-xl border border-border p-6 md:p-7 transition-[border-color,box-shadow] duration-200 hover:border-[#00BCA1]/60 hover:shadow-[0_0_0_1px_rgba(0,188,161,0.18),0_0_16px_rgba(0,188,161,0.10)] ${resource.color}`}
               >
-                <div className={`w-12 h-12 ${resource.color} rounded-lg flex items-center justify-center mb-3 border border-border`}>
+                <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-lg border border-border ${resource.iconBg}`}>
                   <Icon className={resource.iconColor} size={24} />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-2">
@@ -77,17 +81,17 @@ export default function ResourceSections() {
                 <p className="resource-page-copy text-foreground/70 mb-4">
                   {resource.description}
                 </p>
-                <div className="space-y-1.5">
+                <div className="mb-5 space-y-1.5 flex-1">
                   {resource.items.map((item, iIdx) => (
                     <div key={iIdx} className="resource-page-meta flex items-center gap-2 text-foreground/80">
-                      <span className={`w-1.5 h-1.5 rounded-full ${resource.iconColor}`}></span>
+                      <TbPoint className={resource.iconColor} size={18} />
                       {item}
                     </div>
                   ))}
                 </div>
                 <button className="
                   resource-page-button
-                  group relative mt-5 inline-flex w-full items-center justify-center gap-2
+                  group relative mt-auto inline-flex w-full items-center justify-center gap-2
                   overflow-hidden rounded-xl border-2 border-primary/35 bg-primary/6
                   py-2.5 font-semibold text-primary
                   transition-colors duration-200 hover:border-primary/55 hover:bg-primary/10
