@@ -136,6 +136,21 @@ const categoryLabelKey: Record<string, 'recon' | 'vuln' | 'fuzzing'> = {
   Fuzzing: 'fuzzing',
 }
 
+// ── Category stat counts bar ──────────────────────────────────────────
+function CategoryStatBar({ tools }: { tools: { category: string }[] }) {
+  const counts = { Recon: 0, Vuln: 0, Fuzzing: 0 }
+  tools.forEach((t) => { if (t.category in counts) counts[t.category as keyof typeof counts]++ })
+  const total = tools.length
+
+  return (
+    <div className="flex gap-1 h-1 rounded-full overflow-hidden w-full max-w-xs">
+      <div className="bg-blue-400 rounded-full transition-all duration-500" style={{ width: `${(counts.Recon / total) * 100}%` }} />
+      <div className="bg-red-400 rounded-full transition-all duration-500" style={{ width: `${(counts.Vuln / total) * 100}%` }} />
+      <div className="bg-purple-400 rounded-full transition-all duration-500" style={{ width: `${(counts.Fuzzing / total) * 100}%` }} />
+    </div>
+  )
+}
+
 export default function ToolsPage() {
   const t = useTranslations('toolsPage')
   const locale = useLocale();
@@ -197,18 +212,48 @@ export default function ToolsPage() {
       className="min-h-screen mt-17 bg-[#F7F5F0] dark:bg-[#09090B]"
       style={{ fontFamily: bodyFontFamily }}
     >
+      {/* ── Hero Header ─────────────────────────────────────────── */}
       <div className="bg-white dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-            <div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">{t('title')}</h1>
-              <p className={`mt-2 text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl ${descriptionTextClass}`}>
-                {t('subtitle')}
-              </p>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+
+          {/* Title row */}
+          <div className="flex flex-col gap-2 mb-6">
+            <h1 className="text-4xl sm:text-6xl font-bold text-[#1A1A1A] dark:text-[#EDEDED]">
+              {t('title')}
+            </h1>
+            <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-2xl ${descriptionTextClass}`}>
+              {t('subtitle')}
+            </p>
           </div>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1 max-w-md">
+
+          {/* Stats row */}
+          <div className="flex items-center gap-5 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-blue-400" />
+                <span className="text-xs text-[#9A9A9A]">
+                  {t('categories.recon')} ({tools.filter(t => t.category === 'Recon').length})
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-red-400" />
+                <span className="text-xs text-[#9A9A9A]">
+                  {t('categories.vuln')} ({tools.filter(t => t.category === 'Vuln').length})
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-purple-400" />
+                <span className="text-xs text-[#9A9A9A]">
+                  {t('categories.fuzzing')} ({tools.filter(t => t.category === 'Fuzzing').length})
+                </span>
+              </div>
+            </div>
+            <CategoryStatBar tools={tools} />
+          </div>
+
+          {/* Search + filters */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="relative flex-1 max-w-sm">
               <div className="absolute inset-y-0 left-3 flex items-center text-[#9A9A9A] pointer-events-none">
                 <SearchIcon />
               </div>
@@ -220,6 +265,10 @@ export default function ToolsPage() {
                 className="w-full pl-10 pr-4 py-2.5 bg-[#F7F5F0] dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-xl text-sm text-[#1A1A1A] dark:text-[#EDEDED] placeholder-[#9A9A9A] focus:border-[#00BCA1] focus:ring-1 focus:ring-[#00BCA1] transition"
               />
             </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-6 bg-black/9 dark:bg-white/9" />
+
             <div className="flex items-center gap-2 flex-wrap">
               {categories.map((cat) => (
                 <button
@@ -243,15 +292,38 @@ export default function ToolsPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Content ─────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {/* Results count */}
+        {filtered.length > 0 && (
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-sm text-[#9A9A9A]">
+              {filtered.length} {filtered.length === 1 ? 'tool' : 'tools'}
+              {search && <span> for <span className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">"{search}"</span></span>}
+            </p>
+          </div>
+        )}
+
         {filtered.length === 0 ? (
           <div className="text-center py-24 text-[#9A9A9A]">
-            <svg className="mx-auto mb-4" width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <circle cx="22" cy="22" r="14" stroke="#9A9A9A" strokeWidth="2"/>
-              <path d="M32 32L44 44" stroke="#9A9A9A" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
+            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 flex items-center justify-center mx-auto mb-4">
+              <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+                <circle cx="22" cy="22" r="14" stroke="#9A9A9A" strokeWidth="2"/>
+                <path d="M32 32L44 44" stroke="#9A9A9A" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
             <p className="text-lg font-medium text-[#1A1A1A] dark:text-[#EDEDED]">{t('noResults')}</p>
             <p className="text-sm mt-1">{t('tryDifferent')}</p>
+            {search && (
+              <button
+                onClick={() => { setSearch(''); setActiveCategory('All'); }}
+                className="mt-4 text-sm text-[#00BCA1] font-medium hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
           <motion.div
@@ -264,36 +336,59 @@ export default function ToolsPage() {
               <motion.div
                 key={tool.id}
                 variants={cardMotion}
-                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 hover:border-[#00BCA1]/40 transition-colors duration-200 cursor-pointer"
+                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-[#00BCA1]/40 hover:shadow-[0_4px_24px_0_rgba(0,188,161,0.07)] transition-all duration-200 cursor-pointer"
               >
-                <div className="flex items-start justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#111113] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1]">
-                    <Icon id={tool.id} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {tool.badge && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">
-                        {tool.badge}
+                {/* Card top accent line */}
+                <div className={`h-0.5 w-full ${
+                  tool.category === 'Recon' ? 'bg-blue-400/60' :
+                  tool.category === 'Vuln' ? 'bg-red-400/60' :
+                  'bg-purple-400/60'
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-200`} />
+
+                <div className="p-6 flex flex-col gap-4 flex-1">
+                  {/* Icon + badges row */}
+                  <div className="flex items-start justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1] shrink-0">
+                      <Icon id={tool.id} />
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {tool.badge && (
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">
+                          {tool.badge}
+                        </span>
+                      )}
+                      <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 ${categoryColors[tool.category]}`}>
+                        <span className={`inline-block w-1.5 h-1.5 rounded-full ${categoryDot[tool.category]}`} />
+                        {t(`categories.${categoryLabelKey[tool.category]}`)}
                       </span>
-                    )}
-                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 ${categoryColors[tool.category]}`}>
-                      <span className={`inline-block w-1.5 h-1.5 rounded-full ${categoryDot[tool.category]}`} />
-                      {t(`categories.${categoryLabelKey[tool.category]}`)}
-                    </span>
+                    </div>
+                  </div>
+
+                  {/* Name + description */}
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>
+                      {tool.name}
+                    </h3>
+                    <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>
+                      {tool.description}
+                    </p>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {tool.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <div>
-                  <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1.5`}>{tool.name}</h3>
-                  <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mt-auto">
-                  {tool.tags.map((tag) => (
-                    <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#111113] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="pt-3 border-t border-black/9 dark:border-white/9">
+
+                {/* Card footer */}
+                <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10] flex items-center justify-between">
                   <a
                     href="#"
                     className="text-[#00BCA1] text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all"

@@ -1,68 +1,115 @@
+'use client'
+
 import { FileText, Link2, Code2 } from 'lucide-react'
-
-const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
-
-const resources = [
-  {
-    title: 'DLL Documents',
-    description: 'Official documentation library with specifications, white papers, and implementation guides.',
-    icon: FileText,
-    items: ['API Specifications', 'Architecture Guide', 'Data Dictionary', 'Compliance Matrix'],
-    color: 'bg-primary/5',
-    iconColor: 'text-primary'
-  },
-  {
-    title: 'API Resources',
-    description: 'Complete API documentation including endpoints, examples, and error handling.',
-    icon: Code2,
-    items: ['REST Endpoints', 'Authentication', 'Rate Limiting', 'Error Codes'],
-    color: 'bg-secondary/5',
-    iconColor: 'text-secondary'
-  },
-  {
-    title: 'Integration Tools',
-    description: 'Pre-built tools and utilities for common integration scenarios.',
-    icon: Link2,
-    items: ['SDKs', 'Libraries', 'CLI Tools', 'Testing Tools'],
-    color: 'bg-accent/5',
-    iconColor: 'text-accent'
-  }
-]
+import { motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 
 export default function ResourceSections() {
+  const t = useTranslations("resourcePage")
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  }
+
+  const resourcesData = [
+    {
+      title: t('resourceSections.items.dll.title'),
+      description: t('resourceSections.items.dll.description'),
+      icon: FileText,
+      items: t.raw('resourceSections.items.dll.items') as string[],
+      color: 'bg-primary/5',
+      iconColor: 'text-primary',
+      cta: t('resourceSections.items.dll.cta')
+    },
+    {
+      title: t('resourceSections.items.api.title'),
+      description: t('resourceSections.items.api.description'),
+      icon: Code2,
+      items: t.raw('resourceSections.items.api.items') as string[],
+      color: 'bg-secondary/5',
+      iconColor: 'text-secondary',
+      cta: t('resourceSections.items.api.cta')
+    },
+    {
+      title: t('resourceSections.items.integration.title'),
+      description: t('resourceSections.items.integration.description'),
+      icon: Link2,
+      items: t.raw('resourceSections.items.integration.items') as string[],
+      color: 'bg-accent/5',
+      iconColor: 'text-accent',
+      cta: t('resourceSections.items.integration.cta')
+    }
+  ]
+
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-black dark:to-white">
+    <section className="py-12 md:py-16 bg-white dark:bg-black dark:to-white">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {resources.map((resource, idx) => {
+        <motion.div 
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {resourcesData.map((resource, idx) => {
             const Icon = resource.icon
             return (
-              <div key={idx} className={`p-8 rounded-xl border border-border hover:shadow-lg transition ${resource.color}`}>
-                <div className={`w-12 h-12 ${resource.color} rounded-lg flex items-center justify-center mb-4 border border-border`}>
+              <motion.div 
+                key={idx} 
+                variants={itemVariants}
+                className={`p-6 md:p-7 rounded-xl border border-border transition-colors ${resource.color}`}
+              >
+                <div className={`w-12 h-12 ${resource.color} rounded-lg flex items-center justify-center mb-3 border border-border`}>
                   <Icon className={resource.iconColor} size={24} />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   {resource.title}
                 </h3>
-                <p className={`text-foreground/70 mb-6 ${bodyCopy}`}>
+                <p className="resource-page-copy text-foreground/70 mb-4">
                   {resource.description}
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {resource.items.map((item, iIdx) => (
-                    <div key={iIdx} className="flex items-center gap-2 text-foreground/80">
+                    <div key={iIdx} className="resource-page-meta flex items-center gap-2 text-foreground/80">
                       <span className={`w-1.5 h-1.5 rounded-full ${resource.iconColor}`}></span>
                       {item}
                     </div>
                   ))}
                 </div>
-                <button className="mt-6 text-primary font-semibold hover:text-primary/80 transition flex items-center gap-2 w-full justify-center py-2 border border-border rounded-lg hover:bg-primary/5">
-                  Explore
-                  <span>→</span>
+                <button className="
+                  resource-page-button
+                  group relative mt-5 inline-flex w-full items-center justify-center gap-2
+                  overflow-hidden rounded-xl border-2 border-primary/35 bg-primary/6
+                  py-2.5 font-semibold text-primary
+                  transition-colors duration-200 hover:border-primary/55 hover:bg-primary/10
+                  before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
+                  before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,208,178,0.10)_25%,transparent_0,transparent_50%,rgba(0,208,178,0.10)_0,rgba(0,208,178,0.10)_75%,transparent_0)]
+                  before:transition-transform before:duration-200 before:content-['']
+                  after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
+                  after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,208,178,0.16)_0,rgba(0,208,178,0.16)_50%,transparent_0,transparent_75%,rgba(0,208,178,0.12)_0)]
+                  after:transition-transform after:duration-200 after:content-['']
+                  hover:before:translate-y-0 hover:after:translate-y-0
+                ">
+                  <span className="relative z-10 inline-flex items-center gap-2">
+                    {resource.cta}
+                    <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                      →
+                    </motion.span>
+                  </span>
                 </button>
-              </div>
+              </motion.div>
             )
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

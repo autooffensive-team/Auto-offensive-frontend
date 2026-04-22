@@ -1,8 +1,7 @@
 'use client'
 
 import { CheckCircle2, AlertCircle, Clock } from 'lucide-react'
-
-const bodyCopy = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.75]";
+import { useTranslations } from 'next-intl'
 
 interface StatusItem {
   service: string
@@ -77,15 +76,17 @@ const getStatusBadge = (status: string) => {
 }
 
 export default function StatusTable() {
+  const t = useTranslations("resourcePage")
+
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-black dark:to-white">
+    <section className="py-12 md:py-16 bg-white dark:bg-black dark:to-white">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="mb-12">
+        <div className="mb-8 md:mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Platform Operational Status
+            {t('status.title')}
           </h2>
-          <p className={`text-foreground/60 ${bodyCopy}`}>
-            Real-time status of all Clinical Precision services and infrastructure
+          <p className="resource-page-copy text-foreground/60">
+            {t('status.subtitle')}
           </p>
         </div>
 
@@ -93,30 +94,30 @@ export default function StatusTable() {
           <table className="w-full">
             <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Service</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Uptime</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Last Incident</th>
+                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.service')}</th>
+                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.status')}</th>
+                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.uptime')}</th>
+                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.lastIncident')}</th>
               </tr>
             </thead>
             <tbody>
               {statusData.map((item, idx) => (
-                <tr key={idx} className="border-b border-border hover:bg-muted/50 transition">
-                  <td className="px-6 py-4 text-foreground font-medium">
+                <tr key={idx} className="border-b border-border">
+                  <td className="resource-page-meta px-5 py-3.5 text-foreground font-medium">
                     {item.service}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(item.status)}
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusBadge(item.status)}`}>
-                        {item.status}
+                      <span className={`resource-page-meta px-3 py-1 rounded-full font-medium capitalize ${getStatusBadge(item.status)}`}>
+                        {t(`status.${item.status}`)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-foreground/80">
+                  <td className="resource-page-meta px-5 py-3.5 text-foreground/80">
                     {item.uptime}
                   </td>
-                  <td className="px-6 py-4 text-foreground/70">
+                  <td className="resource-page-meta px-5 py-3.5 text-foreground/70">
                     {item.lastIncident}
                   </td>
                 </tr>
@@ -125,12 +126,9 @@ export default function StatusTable() {
           </table>
         </div>
 
-        <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
-          <p className={`text-foreground/80 ${bodyCopy}`}>
-            <span className="font-semibold text-foreground">Status Page:</span> For detailed status information and incident history, visit our{' '}
-            <a href="#" className="text-primary hover:underline font-semibold">
-              dedicated status page
-            </a>
+        <div className="mt-6 p-5 bg-primary/5 border border-primary/20 rounded-xl">
+          <p className="resource-page-meta text-foreground/80">
+            <span className="font-semibold text-foreground">{t('status.statusNote')}</span> {t('status.dedicatedPage')}
           </p>
         </div>
       </div>

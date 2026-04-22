@@ -251,3 +251,48 @@ html[lang="kh"] .big-text,
 html[lang="kh"] .display-text {
   font-family: var(--font-hackdaddy), "Hackdaddy", monospace;
 }
+
+/* Keep resource page typography fully Khmer in kh locale */
+html[lang="kh"] .resource-page,
+html[lang="kh"] .resource-page * {
+  font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
+}
+
+html[lang="kh"] .resource-page h1,
+html[lang="kh"] .resource-page h2,
+html[lang="kh"] .resource-page h3,
+html[lang="kh"] .resource-page h4,
+html[lang="kh"] .resource-page h5,
+html[lang="kh"] .resource-page h6 {
+  font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
+  letter-spacing: normal;
+}
+
+.resource-page-copy {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.resource-page-meta {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.resource-page-button {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .resource-page-copy,
+  .resource-page-meta {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .resource-page-copy,
+  .resource-page-meta {
+    font-size: 20px;
+  }
+}
