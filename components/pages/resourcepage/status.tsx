@@ -91,33 +91,33 @@ export default function StatusTable() {
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full">
+          <table className="w-full min-w-160">
             <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.service')}</th>
-                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.status')}</th>
-                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.uptime')}</th>
-                <th className="resource-page-meta px-5 py-3.5 text-left font-semibold text-foreground">{t('status.lastIncident')}</th>
+                <th className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-left font-semibold text-foreground">{t('status.service')}</th>
+                <th className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-left font-semibold text-foreground">{t('status.status')}</th>
+                <th className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-left font-semibold text-foreground">{t('status.uptime')}</th>
+                <th className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-left font-semibold text-foreground">{t('status.lastIncident')}</th>
               </tr>
             </thead>
             <tbody>
               {statusData.map((item, idx) => (
                 <tr key={idx} className="border-b border-border">
-                  <td className="resource-page-meta px-5 py-3.5 text-foreground font-medium">
+                  <td className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-foreground font-medium">
                     {item.service}
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(item.status)}
-                      <span className={`resource-page-meta px-3 py-1 rounded-full font-medium capitalize ${getStatusBadge(item.status)}`}>
+                      <span className={`resource-page-meta whitespace-nowrap px-3 py-1 rounded-full font-medium capitalize ${getStatusBadge(item.status)}`}>
                         {t(`status.${item.status}`)}
                       </span>
                     </div>
                   </td>
-                  <td className="resource-page-meta px-5 py-3.5 text-foreground/80">
+                  <td className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-foreground/80">
                     {item.uptime}
                   </td>
-                  <td className="resource-page-meta px-5 py-3.5 text-foreground/70">
+                  <td className="resource-page-meta whitespace-nowrap px-5 py-3.5 text-foreground/70">
                     {item.lastIncident}
                   </td>
                 </tr>
