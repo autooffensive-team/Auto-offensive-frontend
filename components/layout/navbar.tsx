@@ -154,7 +154,6 @@ function LanguageToggle() {
 
   const handleLocaleChange = () => {
     startTransition(() => {
-      // eslint-disable-next-line react-hooks/immutability
       window.document.cookie = `locale=${nextLocale};path=/;max-age=31536000;SameSite=Lax`;
       router.refresh();
     });

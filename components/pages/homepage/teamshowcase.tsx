@@ -1,53 +1,51 @@
 "use client";
 
 import { useRef } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import AnimatedCta from "./animated-cta";
 
 export default function TeamShowcase() {
   const t = useTranslations("homepage.team");
-  const locale = useLocale();
-  const isKhmer = locale === "kh";
-  const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
-  const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
   const imageRef = useRef<HTMLDivElement>(null);
 
   return (
     <section
-      className="overflow-hidden bg-[#F7F5F0] px-6 pb-20 pt-10 transition-colors duration-300 dark:bg-[#09090B] md:px-10"
-      style={{ fontFamily: bodyFontFamily }}
+      className="bg-[#F7F5F0] pb-20 px-10 overflow-hidden"
+      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
     >
-      <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-12 lg:grid-cols-[1.2fr_1.6fr] lg:gap-20">
-        <div className="relative z-10">
-          <p className="mb-6 text-xs font-bold uppercase tracking-[3px] text-[#00BCA1]">
-            {t("eyebrow")}
+      <div className="max-w-300 mx-auto grid grid-cols-[1fr_1.6fr] gap-16 items-center">
+
+        {/* ── Left: Text Content ── */}
+        <div>
+          {/* Label */}
+          <p className="text-xs font-semibold tracking-[3px] uppercase text-[#00BCA1] mb-4">
+            Our company
           </p>
 
-          <h3
-            className="mb-2 font-bold uppercase leading-[1.1] text-[#01509e] dark:text-white"
+          {/* Heading */}
+          <h2
+            className="font-bold leading-[1.18] text-[#01509e] mb-2"
             style={{
-              fontFamily: displayFontFamily,
-              fontSize: "clamp(32px, 4.5vw, 56px)",
+              fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif",
+              fontSize: "clamp(28px, 3.5vw, 44px)",
             }}
           >
             <span className="block whitespace-nowrap">{t("titleLine1")}</span>
             <span className="block whitespace-nowrap text-[#00BCA1]">{t("titleLine2")}</span>
             <span className="block whitespace-nowrap">{t("titleLine3")}</span>
-          </h3>
+          </h2>
 
           <div
             className="my-8 h-1.5 w-24 rounded-full"
             style={{ background: "linear-gradient(90deg, #00BCA1, #01509e)" }}
           />
 
-          <div className="mb-10 space-y-6 text-base leading-relaxed text-[#4a4a4a] dark:text-gray-400 md:text-[18px] lg:text-[20px]">
-            <p>{t("paragraph1")}</p>
-            <p>{t("paragraph2")}</p>
-          </div>
+          {/* Paragraphs */}
+            <p className="text-[15px] leading-[1.8] text-[#4a4a4a] mb-4.5">
+              We launched as a team of passionate professionals — and we&apos;ve kept
+              that mindset ever since. Our experts still drive product development
+              today, focusing relentlessly on accuracy, speed, and control.
+            </p>
 
           <AnimatedCta
             as="a"
@@ -109,9 +107,15 @@ export default function TeamShowcase() {
             </div>
           </div>
 
-          <div className="absolute -right-4 bottom-10 z-20 rounded-2xl bg-[#01509e] px-6 py-3 shadow-xl dark:bg-[#00BCA1]">
-            <p className="m-0 text-[10px] font-bold uppercase text-white/70 dark:text-black/70">{t("established")}</p>
-            <p className="m-0 text-xl font-black text-white dark:text-[#09090B]">2026</p>
+          {/* Floating year badge — bottom-right */}
+          <div
+            className="absolute bottom-12 -right-4 z-2 bg-[#01509e] rounded-xl px-4.5 py-2.5"
+            style={{ boxShadow: "0 8px 24px rgba(1,80,158,0.25)" }}
+          >
+            <p className="text-[11px] text-white/70 font-medium m-0 mb-0.5">
+              Est.
+            </p>
+            <p className="text-xl font-bold text-white m-0">2026</p>
           </div>
         </div>
       </div>

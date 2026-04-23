@@ -25,7 +25,6 @@ import {
   Moon,
   Sun,
   Menu,
-  ArrowUp,
 } from "lucide-react";
 
 import { useTheme } from "@/components/theme-provider";
@@ -367,7 +366,7 @@ export default function UserDashboardShell({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-[22rem] overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -474,7 +473,7 @@ export default function UserDashboardShell({
           </div>
         </header>
 
-        <main className="mx-auto max-w-[1600px] px-4 py-6 md:px-8 md:py-8">
+        <main className="mx-auto max-w-400 px-4 py-6 md:px-8 md:py-8">
           {children}
         </main>
       </div>

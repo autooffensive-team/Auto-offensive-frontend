@@ -301,7 +301,7 @@ export default function ToolsPage() {
           <div className="flex items-center justify-between mb-6">
             <p className="text-sm text-[#9A9A9A]">
               {filtered.length} {filtered.length === 1 ? 'tool' : 'tools'}
-              {search && <span> for <span className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">"{search}"</span></span>}
+              {search && <span> for <span className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">&quot;{search}&quot;</span></span>}
             </p>
           </div>
         )}

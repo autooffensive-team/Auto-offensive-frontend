@@ -141,7 +141,6 @@ export default function PlatformCapabilities() {
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
-  const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
 
   const heroRef = useRef(null);
   const gridRef = useRef(null);

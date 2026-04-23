@@ -13,7 +13,6 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
 
-  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
   const isAuthPage =
     pathname === "/login" || pathname === "/register";
   const isDashboardPage = pathname.startsWith("/userdashboard") || pathname.startsWith("/guestdashboard");

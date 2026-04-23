@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, UserRound, Mail, Lock, Rocket } from "lucide-react";
+import { EyeOff, UserRound, Mail, Lock, Rocket } from "lucide-react";
 import Link from "next/link";
 
 export default function RegisterForm() {
