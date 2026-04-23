@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { Search } from 'lucide-react';
 
 interface TocItem {
@@ -20,29 +21,52 @@ export const ToolRightSidebar: React.FC<ToolRightSidebarProps> = ({
   onNavigate,
   activeSection,
 }) => {
+  const locale = useLocale();
+  const isKhmer = locale === 'kh';
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const tocItems: TocItem[] = [
-    { label: 'Tool Overview', href: '#overview' },
-    { label: 'All tools at a glance', href: '#overview', isSub: true },
-    { label: 'subfinder', href: '#subfinder' },
-    { label: 'Parameters', href: '#subfinder', isSub: true },
-    { label: 'Usage examples', href: '#subfinder', isSub: true },
-    { label: 'httpx', href: '#httpx' },
-    { label: 'Parameters', href: '#httpx', isSub: true },
-    { label: 'Usage examples', href: '#httpx', isSub: true },
-    { label: 'naabu', href: '#naabu' },
-    { label: 'Parameters', href: '#naabu', isSub: true },
-    { label: 'Usage examples', href: '#naabu', isSub: true },
-    { label: 'nuclei', href: '#nuclei' },
-    { label: 'Parameters', href: '#nuclei', isSub: true },
-    { label: 'Template categories', href: '#nuclei', isSub: true },
-    { label: 'Versions & Status', href: '#versions' },
-    { label: 'Rate Limits', href: '#limits' },
-    { label: 'Output Formats', href: '#output' },
-    { label: 'Error Reference', href: '#errors' },
-  ];
+  const tocItems: TocItem[] = isKhmer
+    ? [
+        { label: 'ទិដ្ឋភាពទូទៅនៃ Tool', href: '#overview' },
+        { label: 'Tool ទាំងអស់មើលឃើញភ្លាម', href: '#overview', isSub: true },
+        { label: 'subfinder', href: '#subfinder' },
+        { label: 'Parameters', href: '#subfinder', isSub: true },
+        { label: 'Usage examples', href: '#subfinder', isSub: true },
+        { label: 'httpx', href: '#httpx' },
+        { label: 'Parameters', href: '#httpx', isSub: true },
+        { label: 'Usage examples', href: '#httpx', isSub: true },
+        { label: 'naabu', href: '#naabu' },
+        { label: 'Parameters', href: '#naabu', isSub: true },
+        { label: 'Usage examples', href: '#naabu', isSub: true },
+        { label: 'nuclei', href: '#nuclei' },
+        { label: 'Parameters', href: '#nuclei', isSub: true },
+        { label: 'Template categories', href: '#nuclei', isSub: true },
+        { label: 'Versions & Status', href: '#versions' },
+        { label: 'Rate Limits', href: '#limits' },
+        { label: 'Output Formats', href: '#output' },
+        { label: 'Error Reference', href: '#errors' },
+      ]
+    : [
+        { label: 'Tool Overview', href: '#overview' },
+        { label: 'All tools at a glance', href: '#overview', isSub: true },
+        { label: 'subfinder', href: '#subfinder' },
+        { label: 'Parameters', href: '#subfinder', isSub: true },
+        { label: 'Usage examples', href: '#subfinder', isSub: true },
+        { label: 'httpx', href: '#httpx' },
+        { label: 'Parameters', href: '#httpx', isSub: true },
+        { label: 'Usage examples', href: '#httpx', isSub: true },
+        { label: 'naabu', href: '#naabu' },
+        { label: 'Parameters', href: '#naabu', isSub: true },
+        { label: 'Usage examples', href: '#naabu', isSub: true },
+        { label: 'nuclei', href: '#nuclei' },
+        { label: 'Parameters', href: '#nuclei', isSub: true },
+        { label: 'Template categories', href: '#nuclei', isSub: true },
+        { label: 'Versions & Status', href: '#versions' },
+        { label: 'Rate Limits', href: '#limits' },
+        { label: 'Output Formats', href: '#output' },
+        { label: 'Error Reference', href: '#errors' },
+      ];
 
   const filteredItems = tocItems.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -98,7 +122,7 @@ export const ToolRightSidebar: React.FC<ToolRightSidebarProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search content..."
+              placeholder={isKhmer ? "ស្វែងរកមាតិកា..." : "Search content..."}
               className={`w-full bg-transparent outline-none text-[18px] ${
                 isDark ? 'text-[#E5E7EB] placeholder:text-[#8F96A3]' : 'text-[#4A4540] placeholder:text-[#9A9287]'
               }`}
@@ -117,7 +141,7 @@ export const ToolRightSidebar: React.FC<ToolRightSidebarProps> = ({
         </div>
 
         <div className={`text-[10px] font-semibold uppercase tracking-widest ${labelColor} mb-2.5`}>
-          On this page
+          {isKhmer ? "នៅលើទំព័រនេះ" : "On this page"}
         </div>
 
         <div className="flex flex-col gap-px">

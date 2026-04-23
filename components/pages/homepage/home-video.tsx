@@ -117,7 +117,7 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
                   </span>
                 </button>
 
-                <div className="absolute bottom-0 left-0 z-30 max-w-[78%] p-6 sm:p-8 md:p-10">
+                <div className="absolute bottom-0 left-0 z-30 hidden max-w-[78%] p-6 sm:block sm:p-8 md:p-10">
                   <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/72">
                     {eyebrow}
                   </p>

@@ -56,7 +56,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Powerful, connected scanners for mapping exposed network assets and web apps, including cloud and APIs. Get a global view of open ports, running services, operating systems, and screenshots - plus ML-driven insights from subdomains, outdated technologies, reverse DNS, WAFs, and hidden files.",
     link: "#",
-    image: "./home-image/4.png",
+    image: "/home-image/4.webp",
     imageAlt: "Attack Surface Mapping",
     reverse: false,
     imageW: "520px",
@@ -76,7 +76,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Proprietary web app and API scanner with benchmark-proven detection accuracy - outperforming both commercial and open-source tools. Network scanner combines 4 detection engines, ranked #1 in remote detection accuracy across 128 environments against Qualys, Nessus, and OpenVAS.",
     link: "#",
-    image: "./home-image/1.png",
+    image: "/home-image/1.webp",
     imageAlt: "Vulnerability Scanning",
     reverse: true,
     imageW: "480px",
@@ -96,7 +96,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Automatic exploitation of new, critical CVEs with Sniper Auto Exploiter for validating risk and extracting evidence. Purpose-built to safely confirm exploitability of SQL injection, XSS, and more - with evidence-rich results including screenshots, network maps, exploit paths, and traffic logs.",
     link: "#",
-    image: "./home-image/3.png",
+    image: "/home-image/3.webp",
     imageAlt: "Vulnerability Exploitation",
     reverse: false,
     imageW: "500px",
@@ -116,7 +116,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Built-in pentest report generator for creating editable DOCX reports 90% faster. Extensive library of customizable findings with vulnerability descriptions, risk ratings, evidence, and remediation steps. Export as PDF, HTML, CSV, XLSX, or via REST API - with branded templates per client.",
     link: "#",
-    image: "./home-image/2.png",
+    image: "/home-image/2.webp",
     imageAlt: "Pentest Reporting",
     reverse: true,
     imageW: "460px",
@@ -136,7 +136,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Persistent coverage with scheduled scans that automate recurring tests across assets. Real-time alerts for critical issues via email, Slack, or Webhooks. Hands-off monitoring with Pentest Robots that trigger repeatable scan sequences - plus instant REST API access to all scanning capabilities.",
     link: "#",
-    image: "./home-image/5.png",
+    image: "/home-image/5.webp",
     imageAlt: "Continuous Monitoring",
     reverse: false,
     imageW: "540px",
@@ -156,7 +156,7 @@ const EN_CARDS = [
     hlLine: 1,
     desc: "Embed offensive security directly into your CI/CD workflow. Auto Offensive triggers scans on every build, blocks deployments on critical findings, and feeds results into your existing DevSecOps toolchain - so vulnerabilities are caught before they ever reach production.",
     link: "#",
-    image: "./home-image/6.png",
+    image: "/home-image/6.webp",
     imageAlt: "CI/CD Integration",
     reverse: true,
     imageW: "500px",
@@ -186,11 +186,11 @@ const CARDS = [
   {
     num: "01",
     tag: "Recon",
-    title: ["ការស្វែងរកផ្ទៃ", "វាយប្រហារ"],
+    title: ["ការធ្វើ Mapping នៃ", "Attack Surface"],
     hlLine: 1,
-    desc: "ប្រើម៉ាស៊ីនស្កេនដែលភ្ជាប់គ្នាដើម្បីស្វែងរក asset ដែលបើកចំហរ ទាំងបណ្តាញ Web App, Cloud និង API។ អ្នកអាចឃើញ ports ដែលបើក សេវាកម្មដែលកំពុងដំណើរការ ប្រព័ន្ធប្រតិបត្តិការ screenshots និងព័ត៌មានជ្រៅបន្ថែមពី subdomain, បច្ចេកវិទ្យាចាស់, reverse DNS, WAF និងឯកសារលាក់។",
+    desc: "Powerful scanning tools ដែលភ្ជាប់គ្នា សម្រាប់ mapping exposed assets នៅលើ network, Web App, Cloud និង API។ ទទួលបាន global view នៃ open ports, running services, operating systems, screenshots — រួមជាមួយ ML-driven insights ពី subdomains, outdated technologies, reverse DNS, WAFs និង hidden files។",
     link: "#",
-    image: "./home-image/4.png",
+    image: "/home-image/4.webp",
     imageAlt: "ការស្វែងរកផ្ទៃវាយប្រហារ",
     reverse: false,
     imageW: "520px",
@@ -206,11 +206,11 @@ const CARDS = [
   {
     num: "02",
     tag: "Scanning",
-    title: ["ការស្កេនចំណុចខ្សោយ", "បានគ្រប់ជ្រុងជ្រោយ"],
+    title: ["ការ scan vulnerability", "បានគ្រប់ជ្រុងជ្រោយ"],
     hlLine: 1,
-    desc: "Web App និង API scanner របស់យើងផ្តល់ភាពត្រឹមត្រូវខ្ពស់ក្នុងការរកឃើញបញ្ហា ហើយធ្វើការបានល្អទាំងលើ commercial tools និង open-source tools។ ផ្នែក network scanner រួមបញ្ចូល detection engines ចំនួន 4 ដើម្បីជួយឱ្យការស្វែងរកពីចម្ងាយមានភាពច្បាស់ និងទុកចិត្តបាន។",
+    desc: "Proprietary Web App និង API scanner ដែលមាន benchmark-proven detection accuracy — outperforming ទាំង commercial និង open-source tools។ Network scanner រួមបញ្ចូល detection engines ចំនួន 4 ហើយត្រូវបាន ranked #1 ក្នុង remote detection accuracy នៅក្នុង 128 environments ប្រៀបធៀបជាមួយ Qualys, Nessus និង OpenVAS។",
     link: "#",
-    image: "./home-image/1.png",
+    image: "/home-image/1.webp",
     imageAlt: "ការស្កេនចំណុចខ្សោយ",
     reverse: true,
     imageW: "480px",
@@ -226,11 +226,11 @@ const CARDS = [
   {
     num: "03",
     tag: "Exploitation",
-    title: ["ការផ្ទៀងផ្ទាត់", "ការវាយប្រហារ"],
+    title: ["ការរកឃើញចំណុចខ្សោយ ", "និងវាយប្រហារ"],
     hlLine: 1,
-    desc: "ប្រព័ន្ធអាចធ្វើការសាកល្បងវាយប្រហារដោយស្វ័យប្រវត្តិលើ CVE សំខាន់ៗ ដើម្បីផ្ទៀងផ្ទាត់កម្រិតហានិភ័យ និងប្រមូលភស្តុតាង។ វាជួយបញ្ជាក់ដោយសុវត្ថិភាពថា SQL injection, XSS និងបញ្ហាផ្សេងៗអាច exploit បានឬអត់ ជាមួយលទ្ធផលដែលមាន screenshot, network map, exploit path និង traffic log។",
+    desc: "ប្រព័ន្ធអាចធ្វើការសាកល្បងវាយប្រហារដោយស្វ័យប្រវត្តិលើ CVE សំខាន់ៗ ដើម្បីផ្ទៀងផ្ទាត់កម្រិតហានិភ័យ និងប្រមូលភស្តុតាង។ វាជួយបញ្ជាក់ safely confirm ថា SQL injection, XSS និងបញ្ហាផ្សេងៗអាច exploit បានឬអត់ ជាមួយលទ្ធផលដែលមាន screenshot, network map, exploit path និង traffic log។",
     link: "#",
-    image: "./home-image/3.png",
+    image: "/home-image/3.webp",
     imageAlt: "ការផ្ទៀងផ្ទាត់ការវាយប្រហារ",
     reverse: false,
     imageW: "500px",
@@ -246,11 +246,11 @@ const CARDS = [
   {
     num: "04",
     tag: "Reporting",
-    title: ["របាយការណ៍ Pentest", "និងការនាំចេញទិន្នន័យ"],
+    title: ["របាយការណ៍ Pentest", "និងទាញយកទិន្នន័យ"],
     hlLine: 1,
-    desc: "បង្កើតរបាយការណ៍ Pentest ដែលអាចកែសម្រួលបានលឿនជាងមុនជាមួយ report generator ក្នុងប្រព័ន្ធ។ មានបណ្ណាល័យ findings ដែលអាចប្ដូរតាមតម្រូវការ រួមទាំងពិពណ៌នាបញ្ហា កម្រិតហានិភ័យ ភស្តុតាង និងជំហានដោះស្រាយ។ អាច export ជា PDF, HTML, CSV, XLSX ឬតាម REST API បានផងដែរ។",
+    desc: "Built-in pentest report generator ដែលអាចបង្កើត DOCX reports ដែលអាចកែសម្រួលបាន លឿនជាងមុនរហូតដល់ 90%។ មាន extensive library findings ធំទូលាយ ដែលអាច customize បាន រួមមាន vulnerability descriptions, risk ratings, evidence និង remediation steps។អាច export ជា PDF, HTML, CSV, XLSX ឬតាម REST API បាន — ជាមួយ templates ដែលអាចដាក់ branding តាម client នីមួយៗ។",
     link: "#",
-    image: "./home-image/2.png",
+    image: "/home-image/2.webp",
     imageAlt: "របាយការណ៍ Pentest",
     reverse: true,
     imageW: "460px",
@@ -266,11 +266,11 @@ const CARDS = [
   {
     num: "05",
     tag: "Monitoring",
-    title: ["ការតាមដានចំណុចខ្សោយ", "ជាបន្តបន្ទាប់"],
+    title: ["ការតាមដាន Vulnerabilities", "ជាបន្តបន្ទាប់"],
     hlLine: 1,
-    desc: "កំណត់ពេលស្កេនជាប្រចាំដើម្បីគ្របដណ្តប់លើ asset ទាំងអស់ដោយស្វ័យប្រវត្តិ។ ប្រសិនបើមានបញ្ហាសំខាន់ អ្នកអាចទទួលការជូនដំណឹងភ្លាមៗតាម email, Slack ឬ Webhook។ វាសមស្របសម្រាប់ការតាមដានដោយមិនចាំបាច់ធ្វើដៃជាញឹកញាប់ ហើយអាចចូលប្រើសមត្ថភាពស្កេនតាម REST API បានភ្លាមៗ។",
+    desc: "កំណត់ពេលស្កេនជាប្រចាំដើម្បីគ្របដណ្តប់លើ asset ទាំងអស់ដោយស្វ័យប្រវត្តិ។  Real-time alerts សម្រាប់បញ្ហាសំខាន់ៗតាម email, Slack ឬ Webhooks។ Hands-off monitoring ដោយ Pentest Robots ដែល trigger repeatable scan sequences — បូករួមជាមួយការចូលប្រើ REST API ភ្លាមៗសម្រាប់សមត្ថភាពស្កេនទាំងអស់។",
     link: "#",
-    image: "./home-image/5.png",
+    image: "/home-image/5.webp",
     imageAlt: "ការតាមដានជាបន្តបន្ទាប់",
     reverse: false,
     imageW: "540px",
@@ -286,11 +286,11 @@ const CARDS = [
   {
     num: "06",
     tag: "CI/CD Integration",
-    title: ["បញ្ចូលសុវត្ថិភាព", "ទៅក្នុងគ្រប់ Pipeline"],
+    title: ["បញ្ចូល Security", "ទៅក្នុងគ្រប់ Pipeline"],
     hlLine: 1,
     desc: "បញ្ចូលការត្រួតពិនិត្យសុវត្ថិភាពចូលទៅក្នុង workflow CI/CD របស់អ្នកដោយផ្ទាល់។ Auto Offensive អាចបើកការស្កេនរាល់ពេល build ទប់ស្កាត់ deployment នៅពេលមានបញ្ហាសំខាន់ និងបញ្ជូនលទ្ធផលទៅ DevSecOps toolchain ដែលអ្នកកំពុងប្រើ ដើម្បីរកឃើញបញ្ហាមុនពេលឡើង production។",
     link: "#",
-    image: "./home-image/6.png",
+    image: "/home-image/6.webp",
     imageAlt: "ការភ្ជាប់ CI/CD",
     reverse: true,
     imageW: "500px",
@@ -338,10 +338,23 @@ function useTheme() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
 
-    // Helper: check both the media query AND a .dark class on <html>
+    // Helper: respect the explicit theme class first, then fall back to system preference.
     const check = () => {
-      const hasDarkClass = document.documentElement.classList.contains("dark");
-      setIsDark(mq.matches || hasDarkClass);
+      const root = document.documentElement;
+      const hasDarkClass = root.classList.contains("dark");
+      const hasLightClass = root.classList.contains("light");
+
+      if (hasDarkClass) {
+        setIsDark(true);
+        return;
+      }
+
+      if (hasLightClass) {
+        setIsDark(false);
+        return;
+      }
+
+      setIsDark(mq.matches);
     };
 
     check();
@@ -458,7 +471,7 @@ function DualSpine({
 
 // ─── Center Logo ──────────────────────────────────────────────────────────────
 
-function CenterLogo({ visible }: { visible: boolean }) {
+function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) {
   return (
     <div
       className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-200 pointer-events-none"
@@ -483,7 +496,7 @@ function CenterLogo({ visible }: { visible: boolean }) {
         </div>
       </div>
       <Image
-        src="/Auto-Offensive.png"
+        src={isDark ? "/Auto-Offensive-dm.webp" : "/Auto-Offensive.webp"}
         alt="Logo"
         className="relative z-10 object-contain"
         style={{ filter: "drop-shadow(0 0 10px rgba(0,188,161,0.18))" }}
@@ -606,7 +619,6 @@ function CardRow({
   const contentPaddingX = isMobile ? "20px" : isTablet ? "32px" : undefined;
   const contentPaddingY = isCompact ? (isMobile ? "40px" : "48px") : undefined;
   const imageWidth = isCompact ? "min(100%, 420px)" : card.imageW;
-  const imageHeight = isCompact ? "auto" : card.imageH;
   const bodyFontSize = isMobile ? "16px" : isTablet ? "18px" : FONT_SIZES.sm.desktop;
   const labelFontSize = isMobile ? "9px" : isTablet ? "10px" : FONT_SIZES.xs.desktop;
 
@@ -631,37 +643,38 @@ function CardRow({
           transition: "transform 0.85s 0.2s cubic-bezier(.16,1,.3,1), opacity 0.85s 0.2s",
         }}
       >
-        {/* Number */}
-        <p
-          className="uppercase mb-5"
-          style={{
-            fontFamily: labelFontFamily,
-            color: colors.accent1,
-            fontSize: labelFontSize,
-            letterSpacing: "0.2em",
-            opacity: 0.6,
-          }}
-        >
-          {card.num}
-        </p>
+        <div className="mb-6 flex items-center gap-3 whitespace-nowrap">
+          <span
+            className="inline-flex items-center justify-center rounded-xl border px-3 py-2"
+            style={{
+              fontFamily: labelFontFamily,
+              color: colors.accent1,
+              borderColor: "rgba(1,80,158,0.18)",
+              backgroundColor: "rgba(1,80,158,0.04)",
+              fontSize: labelFontSize,
+              letterSpacing: "0.2em",
+              opacity: 0.7,
+              textTransform: "uppercase",
+            }}
+          >
+            {card.num}
+          </span>
 
-        {/* Tag */}
-        <span
-          className="inline-flex items-center gap-1.5 mb-6"
-          style={{
-            fontFamily: labelFontFamily,
-            color: colors.accent1,
-            backgroundColor: `rgba(1,80,158,0.07)`,
-            border: `1px solid rgba(1,80,158,0.18)`,
-            borderRadius: 1,
-            padding: "6px 12px",
-            fontSize: labelFontSize,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-          }}
-        >
-          {card.tag}
-        </span>
+          <span
+            className="inline-flex items-center justify-center rounded-xl border px-3 py-2"
+            style={{
+              fontFamily: labelFontFamily,
+              color: colors.accent1,
+              backgroundColor: `rgba(1,80,158,0.07)`,
+              border: `1px solid rgba(1,80,158,0.18)`,
+              fontSize: labelFontSize,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            {card.tag}
+          </span>
+        </div>
 
         {/* Title */}
         <h3
@@ -742,7 +755,10 @@ function CardRow({
       }}
     >
       <div
+        className="relative"
         style={{
+          width: imageWidth,
+          aspectRatio: `${parseFloat(card.imageW) / parseFloat(card.imageH)}`,
           transform: isVisible
             ? `translateX(${card.imageOffsetX}) translateY(${card.imageOffsetY}) scale(1)`
             : reverse
@@ -752,15 +768,13 @@ function CardRow({
           transition: "transform 0.9s 0.15s cubic-bezier(.16,1,.3,1), opacity 0.9s 0.15s",
         }}
       >
-        <img
+        <Image
           src={card.image}
           alt={card.imageAlt}
+          fill
+          sizes={isCompact ? "min(100vw, 420px)" : card.imageW}
           style={{
-            width: imageWidth,
-            height: imageHeight,
-            maxWidth: "100%",
             objectFit: "contain",
-            display: "block",
           }}
         />
       </div>
@@ -844,10 +858,12 @@ export default function Features() {
   const [logoVisible, setLogoVisible] = useState(false);
 
   const colors = useTheme();
+  const isDark = colors === CONFIG.DARK;
   const mode = useResponsiveMode();
   const isDesktop = mode === "desktop";
   const sectionPaddingX = mode === "mobile" ? "20px" : mode === "tablet" ? "32px" : "52px";
   const sectionHeaderLabelSize = mode === "mobile" ? "9px" : mode === "tablet" ? "10px" : FONT_SIZES.xs.desktop;
+  const sectionTitleLine2 = t("sectionTitleLine2");
 
   const firstCardRef = useRef<HTMLDivElement | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -1006,13 +1022,30 @@ export default function Features() {
       {/* FIX: Pass scrollPct so the bar actually fills */}
       <ProgressBar widthPct={scrollPct} />
       {isDesktop ? <DualSpine fillPct={spineFill} clipPath={spineClip} colors={colors} /> : null}
-      {isDesktop ? <CenterLogo visible={logoVisible} /> : null}
+      {isDesktop ? <CenterLogo visible={logoVisible} isDark={isDark} /> : null}
 
       <section
         ref={featureSectionRef}
-        className={`relative pt-12 pb-1.5 ${MAX_WIDTH_CLASSES[CONFIG.MAX_WIDTH as keyof typeof MAX_WIDTH_CLASSES]} ${getAlignmentClass(CONFIG.SECTION_ALIGNMENT)}`}
+        className={`relative -mt-12 pb-1.5 pt-24 md:-mt-20 md:pt-32 ${MAX_WIDTH_CLASSES[CONFIG.MAX_WIDTH as keyof typeof MAX_WIDTH_CLASSES]} ${getAlignmentClass(CONFIG.SECTION_ALIGNMENT)}`}
         id="features"
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 -top-16 h-24 md:-top-24 md:h-32"
+          style={{
+            background: `linear-gradient(to bottom, transparent 0%, ${colors.bg} 78%)`,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-[12%] -top-8 h-16 rounded-full blur-3xl md:-top-12 md:h-24"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(1,80,158,0.12) 24%, rgba(0,208,178,0.16) 52%, rgba(1,80,158,0.1) 78%, transparent 100%)",
+            opacity: isDesktop ? 0.95 : 0.7,
+          }}
+        />
+
         {/* Section Header */}
         <div
           className="flex items-center justify-between py-12 border-b"
@@ -1045,7 +1078,15 @@ export default function Features() {
             >
               {t("sectionTitleLine1")}
               <br />
-              {t("sectionTitleLine2")}
+              {sectionTitleLine2.includes("Auto Offensive") ? (
+                <>
+                  with{" "}
+                  <span style={{ color: CONFIG.LIGHT.accent2 }}>Auto</span>{" "}
+                  <span style={{ color: CONFIG.LIGHT.accent1 }}>Offensive</span>
+                </>
+              ) : (
+                sectionTitleLine2
+              )}
             </h2>
           </div>
         </div>

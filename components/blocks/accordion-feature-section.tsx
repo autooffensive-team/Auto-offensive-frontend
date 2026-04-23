@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 import {
   Accordion,
@@ -75,7 +76,7 @@ const Feature197 = ({ features = defaultFeatures }: Feature197Props) => {
                       setActiveImage(tab.image);
                       setActiveTabId(tab.id);
                     }}
-                    className="cursor-pointer py-5 !no-underline transition"
+                    className="cursor-pointer py-5 no-underline transition"
                   >
                     <h6
                       className={`text-xl font-semibold ${tab.id === activeTabId ? "text-foreground" : "text-muted-foreground"}`}
@@ -88,7 +89,7 @@ const Feature197 = ({ features = defaultFeatures }: Feature197Props) => {
                       {tab.description}
                     </p>
                     <div className="mt-4 md:hidden">
-                      <img
+                      <Image
                         src={tab.image}
                         alt={tab.title}
                         className="h-full max-h-80 w-full rounded-md object-cover"
@@ -100,10 +101,10 @@ const Feature197 = ({ features = defaultFeatures }: Feature197Props) => {
             </Accordion>
           </div>
           <div className="relative m-auto hidden w-1/2 overflow-hidden rounded-xl bg-muted md:block">
-            <img
+            <Image
               src={activeImage}
               alt="Feature preview"
-              className="aspect-[4/3] rounded-md object-cover pl-4"
+              className="aspect-4/3 rounded-md object-cover pl-4"
             />
           </div>
         </div>

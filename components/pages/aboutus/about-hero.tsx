@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useLocale } from "next-intl";
+import { ChevronDown } from "lucide-react";
 
 const GradientBackground = () => (
   <>
@@ -118,12 +119,11 @@ export default function AboutHero() {
     ? {
         eyebrow: "Auto Offensive",
         titleTop: "ស្គាល់ពី",
-        titleAccent: "វេទិកាសុវត្ថិភាព",
+        titleAccent: "វេទិកា Security",
         titleBottom: "ជំនាន់ថ្មីរបស់យើង",
         subtitle:
-          "Auto-Offensive គឺជា PaaS សម្រាប់ស្កេនសុវត្ថិភាពលើវេបសាយ បណ្ដាញ និងកូដដោយស្វ័យប្រវត្តិ ដំណើរការដោយ AI ហើយមិនចាំបាច់ដំឡើង CLI ទេ។",
-        primaryButton: "រឿងរ៉ាវរបស់យើង",
-        secondaryButton: "ស្គាល់ក្រុមការងារ",
+          "Auto-Offensive គឺជា PaaS ដែលប្រើ AI ដើម្បី automate ការស្កេនសុវត្ថិភាពលើ web, network និង code — ដោយមិនចាំបាច់ដំឡើង CLI ឬ setup អ្វីឡើយ។",
+        ctaButton: "↓ ស្វែងយល់រឿងរ៉ាវរបស់យើង",
         stats: ["ទម្រង់របាយការណ៍", "ស្កេនលឿនជាងមុន", "ត្រៀមសម្រាប់ API", "MCP + SonarQube"],
         scroll: "រំកិល",
       }
@@ -134,8 +134,7 @@ export default function AboutHero() {
         titleBottom: "Security Platform",
         subtitle:
           "Auto-Offensive is a PaaS that automates web, network and code security scanning powered by AI, with zero CLI setup required.",
-        primaryButton: "Our Story",
-        secondaryButton: "Meet the Team",
+        ctaButton: "↓ Discover Our Story",
         stats: ["Report Formats", "Faster Scanning", "API Ready", "MCP + SonarQube"],
         scroll: "Scroll",
       };
@@ -146,6 +145,7 @@ export default function AboutHero() {
   const titleFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
     : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+  const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";
 
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const hl0Ref = useRef<HTMLSpanElement>(null);
@@ -228,6 +228,79 @@ export default function AboutHero() {
           left: 50%;
           transform: translateX(-50%);
           animation: ao-bob 2.5s ease-in-out infinite;
+        }
+        .ripple-button {
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+        }
+        .ripple-button:before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.25);
+          top: 100%;
+          width: 140%;
+          height: 180%;
+          background-color: rgba(0, 208, 178, 0.12);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:after {
+          content: "";
+          position: absolute;
+          left: 55%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.45);
+          top: 180%;
+          width: 160%;
+          height: 190%;
+          background-color: rgba(0, 208, 178, 0.42);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:hover {
+          border-color: #39bda7;
+          box-shadow:
+            0 0 0 1px rgba(0, 208, 178, 0.14),
+            0 10px 24px rgba(0, 208, 178, 0.14);
+        }
+        .ripple-button:hover svg {
+          color: black;
+          stroke: black;
+        }
+        .dark .ripple-button:hover svg {
+          color: white;
+          stroke: white;
+        }
+        .ripple-button:hover:before {
+          top: -35%;
+          background-color: rgba(0, 208, 178, 0.88);
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .ripple-button:hover:after {
+          top: -45%;
+          background-color: #00d0b2;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .dark .ripple-button {
+          box-shadow: none;
+        }
+        .dark .ripple-button:before {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        .dark .ripple-button:after {
+          background-color: #39bda7;
+        }
+        .dark .ripple-button:hover {
+          border-color: #39bda7;
+        }
+        .dark .ripple-button:hover:before,
+        .dark .ripple-button:hover:after {
+          background-color: #39bda7;
         }
         .ao-content {
           width: 100%;
@@ -358,7 +431,7 @@ export default function AboutHero() {
             </span>
             <span className="block overflow-hidden">
               <span ref={hl2Ref} className="ao-hli block">
-                <span className="font-light text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]">{content.titleBottom}</span>
+                <span className="font-light text-[#01509e] dark:text-[#01509e]">{content.titleBottom}</span>
               </span>
             </span>
           </h1>
@@ -371,12 +444,13 @@ export default function AboutHero() {
           </p>
 
           <div ref={hbtnsRef} className="ao-btns mb-[3.2rem] flex flex-wrap items-center justify-center gap-2.5 md:mb-[3.8rem]">
-            <button className="rounded-[8px] border-none bg-primary px-6 py-3.5 text-[0.96rem] font-bold text-white transition-colors duration-200 hover:bg-[#006C52] md:text-[1rem]">
-              {content.primaryButton}
-            </button>
-            <button className="rounded-[8px] border border-[color-mix(in_srgb,#00D0B2_18%,transparent)] bg-transparent px-5.5 py-3.5 text-[0.96rem] font-medium text-[oklch(0.145_0_0)] transition-[border-color] duration-200 hover:border-primary dark:text-[oklch(0.985_0_0)] md:text-[1rem]">
-              {content.secondaryButton}
-            </button>
+            <a
+              href="#team-footer-section"
+              className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.45)] bg-[rgba(255,255,255,0.95)] px-6 py-3.5 text-[14px] font-bold leading-none text-black transition-all duration-200 hover:-translate-y-px dark:border-[rgba(0,208,178,0.2)] dark:bg-[rgba(0,208,178,0.06)] dark:text-white md:px-7 md:py-3.5 md:text-[15px]"
+            >
+              <ChevronDown size={18} strokeWidth={2.6} aria-hidden="true" />
+              <span className="whitespace-nowrap">{ctaText}</span>
+            </a>
           </div>
 
           <div ref={hstatsRef} className="ao-stats ao-stats-grid overflow-hidden rounded-[14px] border border-[color-mix(in_srgb,#00D0B2_15%,transparent)]">

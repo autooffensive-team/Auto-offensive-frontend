@@ -736,6 +736,62 @@ export default function HomeHero() {
             font-size: 20px; /* desktop */
           }
         }
+
+        /* Ripple Animation for Preview Button */
+        .ripple-button {
+          position: relative;
+          overflow: hidden;
+        }
+        .ripple-button:before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.25);
+          top: 100%;
+          width: 140%;
+          height: 180%;
+          background-color: rgba(0, 0, 0, 0.05);
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:after {
+          content: "";
+          position: absolute;
+          left: 55%;
+          transform: translateX(-50%) scaleY(1) scaleX(1.45);
+          top: 180%;
+          width: 160%;
+          height: 190%;
+          background-color: #39bda7;
+          border-radius: 50%;
+          display: block;
+          transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+          z-index: -1;
+        }
+        .ripple-button:hover {
+          border-color: #39bda7;
+        }
+        .ripple-button:hover svg {
+          color: black;
+          stroke: black;
+        }
+        .dark .ripple-button:hover svg {
+          color: white;
+          stroke: white;
+        }
+        .ripple-button:hover:before {
+          top: -35%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+        .ripple-button:hover:after {
+          top: -45%;
+          background-color: #39bda7;
+          transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+
       `}</style>
 
       <section
@@ -888,37 +944,46 @@ export default function HomeHero() {
           </p>
 
           {/* Buttons */}
-          <div className="fade-up-4 flex items-center justify-center gap-3 flex-wrap">
+          <div className="fade-up-4 grid w-full max-w-136 grid-cols-2 gap-3 sm:flex sm:w-auto sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <button className="
-              bg-primary text-white border-none
-              px-7.5 py-3.5 rounded-[10px]
-              text-[0.9rem] font-semibold font-[inherit]
-              flex items-center gap-2 cursor-pointer
-              hover:bg-[#00b89c]
-              transition-all duration-200
+              group relative inline-flex w-full min-w-0 items-center justify-center
+              overflow-hidden rounded-xl border-2 border-primary bg-primary
+              px-3 py-3 text-[14px] sm:text-[15px] font-black leading-none text-white
+              transition-transform duration-200 hover:-translate-y-px
+              before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
+              before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
+              before:transition-transform before:duration-200 before:content-['']
+              after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
+              after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
+              after:transition-transform after:duration-200 after:content-['']
+              hover:before:translate-y-0 hover:after:translate-y-0
+              sm:w-auto sm:px-7.5 sm:py-3.5
             ">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-              </svg>
-              {t("primaryCta")}
+              <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <span className="min-w-0 whitespace-nowrap text-center">{t("primaryCta")}</span>
+              </span>
             </button>
 
             <button className="
               bg-white dark:bg-[rgba(0,208,178,0.06)]
-              text-[oklch(0.145_0_0)] dark:text-[oklch(0.908_0_0)]
+              text-black dark:text-white
               border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)]
-              px-6.5 py-3.5 rounded-[10px]
-              text-[0.9rem] font-medium font-[inherit]
+              w-full min-w-0 justify-center
+              px-4 py-3 rounded-xl
+              text-[0.82rem] leading-tight font-medium font-[inherit]
               flex items-center gap-2 cursor-pointer
               backdrop-blur-sm
-              hover:bg-white/90 dark:hover:bg-[rgba(0,208,178,0.12)]
-              hover:border-[rgba(0,208,178,0.55)] dark:hover:border-[rgba(0,208,178,0.45)]
               duration-200
+              ripple-button
+              sm:w-auto sm:px-6.5 sm:py-3.5 sm:text-[0.9rem]
             ">
-              <svg className="text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="text-black dark:text-white" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
-              {t("secondaryCta")}
+              <span className="min-w-0 whitespace-nowrap text-center text-black dark:text-white">{t("secondaryCta")}</span>
             </button>
           </div>
 

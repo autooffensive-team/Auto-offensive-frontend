@@ -141,11 +141,10 @@ export default function ToolsPage() {
   const locale = useLocale();
   const isKhmer = locale === "kh";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+    ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
-  const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
+  const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
 
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
@@ -202,8 +201,8 @@ export default function ToolsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-              <h1 className="text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">{t('title')}</h1>
-              <p className="mt-2 text-[#5C5C5C] dark:text-[#9A9A9A] text-xl max-w-xl">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] mt-1 text-center">{t('title')}</h1>
+              <p className={`mt-2 text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl ${descriptionTextClass}`}>
                 {t('subtitle')}
               </p>
             </div>
@@ -265,12 +264,10 @@ export default function ToolsPage() {
               <motion.div
                 key={tool.id}
                 variants={cardMotion}
-                whileHover={{ y: -5, scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-lg hover:border-[#00BCA1]/40 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 hover:border-[#00BCA1]/40 transition-colors duration-200 cursor-pointer"
               >
                 <div className="flex items-start justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#111113] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1] group-hover:scale-105 transition-transform">
+                  <div className="w-11 h-11 rounded-xl bg-[#F7F5F0] dark:bg-[#111113] border border-[#00BCA1]/20 flex items-center justify-center text-[#00BCA1]">
                     <Icon id={tool.id} />
                   </div>
                   <div className="flex items-center gap-2">
@@ -286,8 +283,8 @@ export default function ToolsPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1.5">{tool.name}</h3>
-                  <p className="text-[#5C5C5C] dark:text-[#9A9A9A] text-sm leading-relaxed">{tool.description}</p>
+                  <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] mb-1.5`}>{tool.name}</h3>
+                  <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-auto">
                   {tool.tags.map((tag) => (

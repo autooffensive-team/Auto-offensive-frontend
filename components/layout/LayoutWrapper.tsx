@@ -14,14 +14,15 @@ export default function LayoutWrapper({
 
   const isAuthPage =
     pathname === "/login" || pathname === "/register";
+  const isDashboardPage = pathname.startsWith("/userdashboard") || pathname.startsWith("/guestdashboard");
 
   return (
     <>
-      {!isAuthPage && <Header />}
+      {!isAuthPage && !isDashboardPage && <Header />}
 
       <main
         className={cn(
-          !isAuthPage && "-mt-14",
+          !isAuthPage && !isDashboardPage && "-mt-14",
           isAuthPage &&
             "min-h-screen flex items-center justify-center"
         )}
@@ -29,7 +30,7 @@ export default function LayoutWrapper({
         {children}
       </main>
 
-      {!isAuthPage && <Footer />}
+      {!isAuthPage && !isDashboardPage && <Footer />}
     </>
   );
 }

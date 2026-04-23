@@ -37,7 +37,7 @@ export default function AiBanner() {
               style={{ fontFamily: displayFontFamily }}
             >
               <span className="block">{t("titleLine1")}</span>
-              <span className="block font-extrabold text-primary dark:text-[#00BCA1]">{t("titleLine2")}</span>
+              <span className="block font-extrabold text-[#01509e] dark:text-[#4fa3e5]">{t("titleLine2")}</span>
               <span className="block font-extrabold text-primary dark:text-[#00BCA1]">{t("titleLine3")}</span>
             </h2>
 
@@ -57,7 +57,7 @@ export default function AiBanner() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden justify-center max-[900px]:flex">
             <div className="w-72 max-[767px]:w-60">
               <Image
-                src="/fox.png"
+                src="/fox.webp"
                 alt="Auto Offensive mascot"
                 width={960}
                 height={960}
@@ -75,7 +75,7 @@ export default function AiBanner() {
           }}
         >
           <Image
-            src="/fox.png"
+            src="/fox.webp"
             alt="Auto Offensive mascot"
             width={960}
             height={960}

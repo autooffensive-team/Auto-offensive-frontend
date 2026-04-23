@@ -136,11 +136,13 @@ export default function PlatformCapabilities() {
   const locale = useLocale();
   const isKhmer = locale === "kh";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+    ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
+  const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
 
   const heroRef = useRef(null);
   const gridRef = useRef(null);
@@ -237,7 +239,7 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={2}
-              className="text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mx-auto"
+              className={`${descriptionTextClass} text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mx-auto`}
             >
               {t("hero.subtitle")}
             </motion.p>
@@ -299,10 +301,10 @@ export default function PlatformCapabilities() {
                   text-emerald-600 dark:text-emerald-400">Module 01</span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mb-3 leading-snug">
+              <h2 className={`${subtitleTextClass} font-extrabold text-slate-900 dark:text-white mb-3 leading-snug`}>
                 {t("grid.web.title")}
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+              <p className={`${descriptionTextClass} text-slate-500 dark:text-slate-400 leading-relaxed mb-5`}>
                 {t("grid.web.desc")}
               </p>
 
@@ -341,10 +343,10 @@ export default function PlatformCapabilities() {
                 <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-5">
                   <Brain className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-3 leading-snug">
+                <h2 className={`${subtitleTextClass} font-extrabold text-white mb-3 leading-snug`}>
                   {t("grid.ai.title")}
                 </h2>
-                <p className="text-sm text-white/70 leading-relaxed mb-6">
+                <p className={`${descriptionTextClass} text-white/70 leading-relaxed mb-6`}>
                   {t("grid.ai.desc")}
                 </p>
 
@@ -389,10 +391,10 @@ export default function PlatformCapabilities() {
                   ${card.iconBg} ${card.iconColor}`}>
                   {card.icon}
                 </div>
-                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-3 leading-snug">
+                <h2 className={`${subtitleTextClass} font-extrabold text-slate-900 dark:text-white mb-3 leading-snug`}>
                   {card.title}
                 </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                <p className={`${descriptionTextClass} text-slate-500 dark:text-slate-400 leading-relaxed mb-4`}>
                   {card.desc}
                 </p>
                 <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-5">
@@ -435,7 +437,7 @@ export default function PlatformCapabilities() {
                   initial="hidden"
                   animate={reportInView ? "visible" : "hidden"}
                   custom={2}
-                  className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-4 leading-tight"
+                  className={`${subtitleTextClass} font-black text-slate-900 dark:text-white mb-4 leading-tight`}
                 >
                   {t("report.titleLine1")}<br />{t("report.titleLine2")}
                 </motion.h2>
@@ -444,7 +446,7 @@ export default function PlatformCapabilities() {
                   initial="hidden"
                   animate={reportInView ? "visible" : "hidden"}
                   custom={3}
-                  className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed mb-6 max-w-md"
+                  className={`${descriptionTextClass} text-slate-500 dark:text-slate-400 leading-relaxed mb-6 max-w-md`}
                 >
                   {t("report.desc")}
                 </motion.p>
@@ -579,10 +581,10 @@ export default function PlatformCapabilities() {
             animate={workflowInView ? "visible" : "hidden"}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-black text-primary dark:text-emerald-400 mb-3">
+            <h2 className={`${subtitleTextClass} font-black text-primary dark:text-emerald-400 mb-3`}>
               {t("workflow.title")}
             </h2>
-            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
+            <p className={`${descriptionTextClass} text-slate-500 dark:text-slate-400`}>
               {t("workflow.subtitle")}
             </p>
           </motion.div>
@@ -616,10 +618,10 @@ export default function PlatformCapabilities() {
                       0{step.step}
                     </span>
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2 text-left">
+                  <h3 className={`${subtitleTextClass} font-extrabold text-slate-900 dark:text-white mb-2 text-left`}>
                     {t(`workflow.steps.${i}.title`)}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed text-left">
+                  <p className={`${descriptionTextClass} text-slate-500 dark:text-slate-400 leading-relaxed text-left`}>
                     {t(`workflow.steps.${i}.desc`)}
                   </p>
                 </motion.div>

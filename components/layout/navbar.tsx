@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/theme-provider';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -44,47 +44,42 @@ type ResourceItem = {
   icon: string;
 };
 
-type ResourceLinkCardProps = ResourceItem & {
-  useNavigationMenuLink?: boolean;
-  compact?: boolean;
-};
-
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '#', icon: '/icons/subfinder.png'    },
-  { title: 'Naabu',        href: '#', icon: '/icons/naabu.png'        },
-  { title: 'Nmap',         href: '#', icon: '/icons/nmap.png'         },
-  { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.png'       },
-  { title: 'URL Fuzzer',   href: '#', icon: '/icons/urlfuzzer.png'    },
-  { title: 'WPScan',       href: '#', icon: '/icons/wpscan.png'       },
-  { title: 'SQLi',         href: '#', icon: '/icons/sqli.png'         },
-  { title: 'XSS Strike',   href: '#', icon: '/icons/xssstrike.png'    },
-  { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.png'   },
-  { title: 'Httpx',        href: '#', icon: '/icons/httpx.png'        },
-  { title: 'Katana',       href: '#', icon: '/icons/katana.png'       },
-  { title: 'GoBuster',       href: '#', icon: '/icons/gobuster.png'       },
-  { title: 'Amass',        href: '#', icon: '/icons/amass.png'        },
-  { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.png'  },
+  { title: 'Subfinder',    href: '#', icon: '/icons/subfinder.webp'    },
+  { title: 'Naabu',        href: '#', icon: '/icons/nabuu.webp'        },
+  { title: 'Nmap',         href: '#', icon: '/icons/nmap.webp'         },
+  { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.webp'       },
+  { title: 'URL Fuzzer',   href: '#', icon: '/icons/url.webp'    },
+  { title: 'WPScan',       href: '#', icon: '/icons/wpscan.webp'       },
+  { title: 'SQLi',         href: '#', icon: '/icons/sqli.webp'         },
+  { title: 'XSS Strike',   href: '#', icon: '/icons/xss.webp'    },
+  { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.webp'   },
+  { title: 'Httpx',        href: '#', icon: '/icons/httpx.webp'        },
+  { title: 'Katana',       href: '#', icon: '/icons/katana.webp'       },
+  { title: 'Gobuster',       href: '#', icon: '/icons/gobuster.webp'       },
+  { title: 'Amass',        href: '#', icon: '/icons/amass.webp'        },
+  { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.webp'  },
 ];
 
 const featureLinks: FeatureItem[] = [
-  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.png'       },
-  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.png'  },
-  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli', icon: '/icons/feature-cli.png'        },
-  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui', icon: '/icons/feature-automation.png' },
+  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.webp'       },
+  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.webp'  },
+  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli', icon: '/icons/feature-cli.webp'        },
+  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui', icon: '/icons/feature-automation.webp' },
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'CLI Documents',   description: 'Guides for using tools via command line',      href: '/resource/cli', icon: '/icons/res-cli.png'   },
-  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api', icon: '/icons/res-api.png'   },
-  { title: 'Tools Documents', description: 'Instructions for using security tools',        href: '/resource/tool', icon: '/icons/res-tools.png' },
-  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',        href: '/resource/ci-cd', icon: '/icons/res-cicd.png'  },
+  { title: 'CLI Documents',   description: 'Guides for using tools via command line',        href: '/resource/cli',   icon: '/icons/res-cli.webp'   },
+  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api',   icon: '/icons/res-api.webp'   },
+  { title: 'Tools Documents', description: 'Instructions for using security tools',          href: '/resource/tool',  icon: '/icons/res-tools.webp' },
+  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',          href: '/resource/ci-cd', icon: '/icons/res-cicd.webp'  },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
-  { title: 'About Us',    href: '/about-us', icon: '/icons/about_us_icon.png'   },
-  { title: 'Contact Us',  href: '/contact-us',          icon: '/icons/contact_us_icon.png' },
-  { title: 'FAQ',         href: '/help-center',          icon: '/icons/faq_icon.png'     },
+  { title: 'About Us',    href: '/about-us', icon: '/icons/about_us_icon.webp'   },
+  { title: 'Contact Us',  href: '/contact-us',          icon: '/icons/contact_us_icon.webp' },
+  { title: 'FAQ',         href: '/help-center',          icon: '/icons/faq.webp'     },
 ];
 
 // ── Logo ─────────────────────────────────────────────────────────────────────
@@ -215,16 +210,15 @@ function ToolItem({ title, href, icon }: ToolItem) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
-      <div className="shrink-0 w-10 h-10 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+      <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 shadow-sm">
         <Image
           src={icon}
           alt={title}
-          width={94}
-          height={94}
-          style={{ width: 'auto', height: 'auto' }}
-          className="object-contain"
+          width={36}
+          height={36}
+          className="h-9 w-9 object-contain"
         />
       </div>
       <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
@@ -239,19 +233,18 @@ function FeatureItem({ title, description, href, icon }: FeatureItem) {
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-md p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-start gap-3 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
-      <div className="shrink-0 w-10 h-10  rounded-md  bg-[#FDF6ED] flex items-center justify-center overflow-hidden shadow-sm">
-          <Image
+      <div className="mt-0.5 flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-background/80 shadow-sm">
+        <Image
           src={icon}
           alt={title}
-          width={58}
-          height={58}
-          style={{ width: 'auto', height: 'auto' }}
-          className="object-contain"
+          width={32}
+          height={32}
+          className="h-8 w-8 object-contain"
         />
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-foreground">
           {title} <span className="text-muted-foreground font-normal">:</span>
         </p>
@@ -262,71 +255,68 @@ function FeatureItem({ title, description, href, icon }: FeatureItem) {
 }
 
 // ── Resource Doc Item ─────────────────────────────────────────────────────────
-function ResourceLinkCard({
+function ResourceDocItem({
   title,
   description,
   href,
   icon,
-  useNavigationMenuLink = false,
-  compact = false,
-}: ResourceLinkCardProps) {
+  asMenuLink = false,
+}: ResourceItem & { asMenuLink?: boolean }) {
   const content = (
     <Link
       href={href}
-      className={cn(
-        'rounded-md transition-colors group hover:bg-gray-100 dark:hover:bg-gray-800',
-        compact ? 'flex items-center gap-2.5 px-2 py-2' : 'flex items-start gap-3 p-2',
-      )}
+      className="flex items-start gap-3 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
-      <div
-        className={cn(
-          'shrink-0 border border-border bg-[#FDF6ED] flex items-center justify-center overflow-hidden shadow-sm',
-          compact ? 'w-10 h-10 rounded-md' : 'w-10 h-10 rounded-md',
-        )}
-      >
+      <div className="shrink-0 w-9 h-9 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
         <Image
           src={icon}
           alt={title}
-          width={compact ? 52 : 68}
-          height={compact ? 52 : 68}
+          width={24}
+          height={24}
           style={{ width: 'auto', height: 'auto' }}
           className="object-contain"
         />
       </div>
       <div>
         <p className="text-sm font-semibold text-foreground">
-          {title}
-          {!compact && <span className="text-muted-foreground font-normal"> :</span>}
+          {title} <span className="text-muted-foreground font-normal">:</span>
         </p>
-        {description && !compact && (
+        {description && (
           <p className="text-xs text-muted-foreground leading-snug">{description}</p>
         )}
       </div>
     </Link>
   );
 
-  if (useNavigationMenuLink) {
-    return <NavigationMenuLink asChild>{content}</NavigationMenuLink>;
-  }
-
-  return content;
-}
-
-function ResourceDocItem(props: ResourceItem) {
-  return <ResourceLinkCard {...props} useNavigationMenuLink />;
+  return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
 
 // ── Resource Misc Item ────────────────────────────────────────────────────────
-function ResourceMiscItem(props: ResourceItem) {
-  return <ResourceLinkCard {...props} compact useNavigationMenuLink />;
-}
+function ResourceMiscItem({
+  title,
+  href,
+  icon,
+  asMenuLink = false,
+}: ResourceItem & { asMenuLink?: boolean }) {
+  const content = (
+    <Link
+      href={href}
+      className="flex items-center gap-2.5 rounded-md px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+    >
+      <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+        <Image
+          src={icon}
+          alt={title}
+          width={22}
+          height={22}
+          className="object-contain"
+        />
+      </div>
+      <span className="text-sm font-medium text-foreground">{title}</span>
+    </Link>
+  );
 
-function MobileResourceDocItem(props: ResourceItem) {
-  return <ResourceLinkCard {...props} />;
-}
-
-function MobileResourceMiscItem(props: ResourceItem) {
-  return <ResourceLinkCard {...props} compact />;
+  return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
 
 // ── Scroll hook ───────────────────────────────────────────────────────────────
@@ -404,7 +394,7 @@ export function Header() {
 
               {/* ── Tools ── */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[state=active]:bg-transparent data-[state=open]:bg-transparent text-primary font-semibold text-[16px]">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
                 <Link href="/tools">  {t('tools')}</Link>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background">
@@ -422,7 +412,7 @@ export function Header() {
 
               {/* ── Features ── */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[state=active]:bg-transparent data-[state=open]:bg-transparent text-[16px]">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
                 <Link href="/feature">  {t('features')}</Link>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background">
@@ -440,8 +430,8 @@ export function Header() {
 
               {/* ── Resources ── */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[state=active]:bg-transparent data-[state=open]:bg-transparent text-[16px]">
-                  <Link href="/resource-page">  {t('resources')}</Link>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
+                  <Link href="/resource">  {t('resources')}</Link>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background">
                   <div className="w-120 rounded-xl border border-border bg-popover shadow-xl p-3">
@@ -450,7 +440,7 @@ export function Header() {
                       <ul className="space-y-0.5 border-r border-border pr-2">
                         {resourceDocLinks.map((item, i) => (
                           <li key={i}>
-                            <ResourceDocItem {...item} />
+                            <ResourceDocItem {...item} asMenuLink />
                           </li>
                         ))}
                       </ul>
@@ -458,7 +448,7 @@ export function Header() {
                       <ul className="space-y-0.5 pl-2">
                         {resourceMiscLinks.map((item, i) => (
                           <li key={i}>
-                            <ResourceMiscItem {...item} />
+                            <ResourceMiscItem {...item} asMenuLink />
                           </li>
                         ))}
                       </ul>
@@ -488,9 +478,7 @@ export function Header() {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 md:hidden">
-          <LanguageToggle />
-          <ThemeToggle />
+        <div className="flex items-center md:hidden">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -504,8 +492,19 @@ export function Header() {
       </nav>
 
       {/* Mobile Menu */}
-      <MobileMenu open={open} className="flex flex-col justify-between gap-2 overflow-y-auto bg-white dark:bg-[#0A0A0A]">
+      <MobileMenu open={open} className="flex flex-col justify-between gap-2 overflow-y-auto">
         <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background/70 p-3 backdrop-blur-md">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
+              <p className="text-sm text-foreground">Language and theme</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+          </div>
+
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"><Link href="/tools">Tools</Link></p>
           <div className="grid grid-cols-2 gap-0.5">
             {toolLinks.map((link, i) => (
@@ -520,19 +519,19 @@ export function Header() {
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2"><Link href="/resource-page">Resources</Link></p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2"><Link href="/resource">Resources</Link></p>
           <div className="grid grid-cols-1 gap-0.5">
             {resourceDocLinks.map((link, i) => (
-              <MobileResourceDocItem key={i} {...link} />
+              <ResourceDocItem key={i} {...link} />
             ))}
             {resourceMiscLinks.map((link, i) => (
-              <MobileResourceMiscItem key={i} {...link} />
+              <ResourceMiscItem key={i} {...link} />
             ))}
           </div>
         </div>
 
         <div className="flex flex-col gap-2 pt-2 border-t border-border">
-          <button className="w-full py-2 rounded-md border border-primary text-[16px] text-primary font-semibold bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
+          <button className="w-full py-2 rounded-md border border-primary text-primary text-sm font-semibold bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
             {t('loginRegister')}
           </button>
         </div>

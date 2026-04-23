@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
+import { useLocale } from "next-intl";
 
 const sansFontStyle = {
   fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
@@ -122,6 +123,8 @@ export function RightSidebar({
   activeId,
   onNavigate,
 }: RightSidebarProps) {
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -183,7 +186,7 @@ export function RightSidebar({
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search content..."
+            placeholder={isKhmer ? "ស្វែងរកមាតិកា..." : "Search content..."}
             className="w-full bg-transparent outline-none text-[18px] text-[#4A4540] dark:text-[#E5E7EB] placeholder:text-[#9A9287] dark:placeholder:text-[#8F96A3]"
             style={sansFontStyle}
           />
@@ -194,7 +197,7 @@ export function RightSidebar({
       </div>
 
       <div className="text-[10px] font-semibold tracking-widest uppercase text-[#B5B0A8] dark:text-[#9CA3AF] mb-2.5">
-        On this page
+        {isKhmer ? "នៅលើទំព័រនេះ" : "On this page"}
       </div>
 
       <nav className="flex flex-col gap-px">

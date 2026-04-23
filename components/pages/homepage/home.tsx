@@ -1,9 +1,11 @@
 import HomeHero from "@/components/pages/homepage/home-hero";
 import Features from "@/components/pages/homepage/feature";
 import AIBanner from "@/components/pages/homepage/ai-banner";
-import ThreeCards, {  } from "@/components/pages/homepage/threecards";
+import ThreeCards from "@/components/pages/homepage/threecards";
+import { Architecture } from "@/components/pages/homepage/archtecture";
 import TeamShowcase from "./teamshowcase";
 import HomeVideo from "./home-video";
+
 
 
 export default function Home() {
@@ -13,8 +15,10 @@ export default function Home() {
       <Features />
       <HomeVideo />
       <AIBanner />
-       <TeamShowcase />
+      <Architecture /> 
       <ThreeCards />
+      <TeamShowcase />
+     
       
     </main>
   );

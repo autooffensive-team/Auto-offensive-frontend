@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import { Search } from "lucide-react";
-
-const sansFontStyle = {
-  fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
-} as const;
 
 export interface SidebarItem {
   id: string;
@@ -33,6 +30,13 @@ export function LeftSidebar({
   activeId,
   onNavigate,
 }: LeftSidebarProps) {
+  const locale = useLocale();
+  const sansFontStyle = {
+    fontFamily:
+      locale === "kh"
+        ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+        : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+  } as const;
   return (
     <aside className="hidden lg:block w-72 shrink-0 sticky top-22 self-start h-[calc(100vh-5.5rem)] overflow-y-auto py-5.5 border-r border-[#E2DDD5] dark:border-white/10 bg-[#F7F5F0] dark:bg-[#09090B]">
       <div className="px-5">
@@ -80,6 +84,13 @@ export function RightSidebar({
   activeId,
   onNavigate,
 }: RightSidebarProps) {
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+  const sansFontStyle = {
+    fontFamily: isKhmer
+      ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
+      : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+  } as const;
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -120,7 +131,7 @@ export function RightSidebar({
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search content..."
+            placeholder={isKhmer ? "ស្វែងរកមាតិកា..." : "Search content..."}
             className="w-full bg-transparent outline-none text-[18px] text-[#4A4540] dark:text-[#E5E7EB] placeholder:text-[#9A9287] dark:placeholder:text-[#8F96A3]"
             style={sansFontStyle}
           />
@@ -131,7 +142,7 @@ export function RightSidebar({
       </div>
 
       <div className="text-[10px] font-semibold tracking-widest uppercase text-[#B5B0A8] dark:text-[#9CA3AF] mb-2.5">
-        On this page
+        {isKhmer ? "នៅលើទំព័រនេះ" : "On this page"}
       </div>
 
       <nav className="flex flex-col gap-px">

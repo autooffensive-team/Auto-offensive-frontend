@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import AnimatedCta from "./animated-cta";
 
 export default function TeamShowcase() {
   const t = useTranslations("homepage.team");
@@ -48,12 +49,25 @@ export default function TeamShowcase() {
             <p>{t("paragraph2")}</p>
           </div>
 
-          <a
+          <AnimatedCta
+            as="a"
             href="about-us"
-            className="inline-block rounded-xl border-2 border-[#01509e] px-8 py-3.5 text-base font-bold tracking-wide text-[#01509e] transition-all duration-300 hover:bg-[#01509e] hover:text-white dark:border-[#00BCA1] dark:text-[#00BCA1] dark:hover:bg-[#00BCA1] dark:hover:text-[#09090B]"
+            className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
+            iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+            icon={
+              <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path
+                  d="M6 1L11 6L6 11M11 6H1"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            }
           >
-            {t("cta")} →
-          </a>
+            {t("cta")}
+          </AnimatedCta>
         </div>
 
         <div className="relative group">

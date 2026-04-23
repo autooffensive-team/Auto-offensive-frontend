@@ -143,7 +143,7 @@ const accordionItems: AccordionItem[] = [
     title: "What We Collect",
     content: (
       <>
-        <BodyP>We only collect what's needed to run the platform and keep your account secure.</BodyP>
+        <BodyP>We only collect what&apos;s needed to run the platform and keep your account secure.</BodyP>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
           <ItemCard label="Account" val="Email, username, bcrypt-hashed password, encrypted API tokens" />
           <ItemCard label="Scan Data" val="Targets, findings, logs, metadata — isolated to your account" />
@@ -177,7 +177,7 @@ const accordionItems: AccordionItem[] = [
             { text: <><Em>Lawful Basis:</Em> Performance of contract (service delivery) and legitimate interests (security)</> },
             { text: <><Em>Right to Access:</Em> Get a copy of all personal data we hold within 30 days</> },
             { text: <><Em>Right to Rectification:</Em> Correct inaccurate personal data instantly</> },
-            { text: <><Em>Right to Erasure:</Em> Request deletion ("right to be forgotten") with no delay</> },
+            { text: <><Em>Right to Erasure:</Em> Request deletion (&quot;right to be forgotten&quot;) with no delay</> },
             { text: <><Em>Data Portability:</Em> Receive your data in machine-readable format (JSON/CSV)</> },
             { text: <><Em>Right to Object:</Em> Opt out of processing for marketing or legitimate interests</> },
             { text: <><Em>International Transfers:</Em> Protected by Standard Contractual Clauses (SCCs)</> },
@@ -240,7 +240,7 @@ const accordionItems: AccordionItem[] = [
         <DataRow label="Storage" val="100 GB scan history" />
         <DataRow label="Tools available" val="All 14+ tools" last />
         <Notice>
-          Accounts that abuse free resources (e.g. mass automated scanning of targets you don't own) may be suspended. Legitimate learning and testing is always welcome.
+          Accounts that abuse free resources (e.g. mass automated scanning of targets you don&apos;t own) may be suspended. Legitimate learning and testing is always welcome.
         </Notice>
       </>
     ),
@@ -258,7 +258,7 @@ const accordionItems: AccordionItem[] = [
           ))}
         </div>
         <BodyP>
-          All providers are contractually required to protect your data and use it only for the specified purpose. We may disclose data to authorities when required by law — and we'll notify you when legally permitted to do so.
+          All providers are contractually required to protect your data and use it only for the specified purpose. We may disclose data to authorities when required by law — and we&apos;ll notify you when legally permitted to do so.
         </BodyP>
       </>
     ),

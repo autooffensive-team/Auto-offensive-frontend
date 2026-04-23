@@ -19,9 +19,9 @@
     "execute": "ប្រតិបត្តិការ"
   },
   "nav": {
-    "features": "លក្ខណៈពិសេស",
+    "features": "មុខងារ",
     "tools": "ឧបករណ៍",
-    "resources": "ធនធាននិងទំនាក់ទំនង",
+    "resources": "មាតិកា",
     "pricing": "តម្លៃប្រាក់",
     "documentation": "ឯកសារលម្អិត",
     "loginRegister": "ចូល / ចុះឈ្មោះ"
@@ -60,71 +60,71 @@
     "hero": {
       "badge": "វេទិកាសុវត្ថិភាព",
       "titleLine1": "សមត្ថភាព",
-      "titleLine2": "របស់វេទិកា",
-      "subtitle": "ស្វែងយល់ពីឈុតឧបករណ៍សុវត្ថិភាពស្វ័យប្រវត្តិ និងម៉ាស៊ីនវិភាគដែលដំណើរការដោយ AI របស់យើង ដែលត្រូវបានរចនាឡើងដើម្បីការពារប្រព័ន្ធឌីជីថលរបស់អ្នកទាំងមូល។",
+      "titleLine2": "Platform",
+      "subtitle": "ស្វែងយល់អំពី Tools សុវត្ថិភាព និង AI analysis ដែលដំណើរការដោយស្វ័យប្រវត្តិ ដើម្បីការពារទិន្នន័យ និងប្រព័ន្ធឌីជីថលរបស់អ្នកទាំងមូល",
       "primaryCta": "ចាប់ផ្តើម",
       "secondaryCta": "មើលឯកសារ"
     },
     "grid": {
       "web": {
-        "title": "ស្វ័យប្រវត្តិកម្ម Pentesting តាម Web",
-        "desc": "គ្រប់គ្រងលំហូរការងារសុវត្ថិភាពស្មុគស្មាញដោយមិនចាំបាច់ប៉ះ terminal។ អ្នកអាចបើកដំណើរការឧបករណ៍កម្រិតឧស្សាហកម្មដូចជា Subfinder សម្រាប់ការស្វែងរក, Nmap សម្រាប់ផ្គូផ្គង ports និង Nuclei សម្រាប់ស្កេនភាពងាយរងគ្រោះ តាមរយៈចំណុចប្រទាក់តែមួយដែលមានគុណភាពខ្ពស់។"
+        "title": "Pentesting Automation តាម Web",
+        "desc": "គ្រប់គ្រង workflow សុវត្ថិភាពស្មុគស្មាញ ដោយមិនចាំបាច់ប្រើ terminal។ ប្រើ tools កម្រិតអាជីពដូចជា Subfinder (ស្វែងរក), Nmap (ស្កេន port) និង Nuclei (ស្កេន vulnerability) តាមរយៈ interface តែមួយដែលងាយប្រើ"
       },
       "ai": {
-        "title": "ការវិភាគសុវត្ថិភាពដោយ AI",
-        "desc": "ម៉ាស៊ីនឆ្លាតវៃរបស់យើងវិភាគលទ្ធផល raw ពី scanner ដើម្បីកំណត់អាទិភាពហានិភ័យសំខាន់ៗ និងពន្យល់ពីភាពងាយរងគ្រោះស្មុគស្មាញជាភាសាសាមញ្ញដែលអាចអនុវត្តបាន។",
+        "title": "AI សម្រាប់វិភាគសុវត្ថិភាព",
+        "desc": "AI របស់យើងវិភាគលទ្ធផលស្កេន ដើម្បីកំណត់ហានិភ័យសំខាន់ និងពន្យល់ vulnerability ឲ្យងាយយល់ និងអាចអនុវត្តបាន",
         "stats": {
-          "threats": "ហានិភ័យដែលបានវិភាគ",
-          "accuracy": "អត្រាភាពត្រឹមត្រូវ"
+          "threats": "បានវិភាគការគំរាមកំហែង",
+          "accuracy": "ភាពត្រឹមត្រូវ"
         }
       },
       "cards": {
         "sast": {
-          "title": "ការស្កេន Repository (SAST)",
-          "desc": "រួមបញ្ចូលជាមួយ SonarQube យ៉ាងរលូនសម្រាប់ GitHub និង GitLab។ ស្វែងរកភាពងាយរងគ្រោះក្នុង source code របស់អ្នកឲ្យទាន់ល្បឿននៃការអភិវឌ្ឍ ហើយភ្ជាប់មកជាមួយសំណើដោះស្រាយពី AI ផងដែរ។",
+          "title": "ស្កេនកូដ (SAST)",
+          "desc": "ភ្ជាប់ជាមួយ SonarQube, GitHub និង GitLab យ៉ាងងាយស្រួល។ រក vulnerability ក្នុងកូដរបស់អ្នកបានលឿន ជាមួយការណែនាំ fix ពី AI",
           "badge": "GitHub · GitLab · SonarQube"
         },
         "cli": {
-          "title": "CLI និង API ដែលគ្រប់គ្រងបាន",
-          "desc": "binary ឆ្លងវេទិកាដែលរឹងមាំសម្រាប់បញ្ជាអនុវត្តឧបករណ៍ពីចម្ងាយ។ អ្នកអាចរួមបញ្ចូលការធ្វើតេស្តសុវត្ថិភាពដោយផ្ទាល់ក្នុង Jenkins, GitLab ឬ GitHub CI/CD pipeline របស់អ្នក។",
+          "title": "CLI & API ដែលគ្រប់គ្រងដោយប្រព័ន្ធ",
+          "desc": "CLI ដែលអាចដំណើរការបានលើគ្រប់ platform និង execute tools ពីចម្ងាយ។ ភ្ជាប់ security testing ទៅក្នុង CI/CD ដូចជា Jenkins, GitLab និង GitHub បានដោយផ្ទាល់",
           "badge": "Jenkins · GitLab CI · GitHub Actions"
         }
       }
     },
     "report": {
-      "badge": "របាយការណ៍កម្រិតខ្ពស់",
-      "titleLine1": "របាយការណ៍",
-      "titleLine2": "ជំនួយដោយ AI",
-      "desc": "បង្កើតរបាយការណ៍ជាច្រើនកម្រិតប្រកបដោយវិជ្ជាជីវៈបានក្នុងការចុចតែម្តង។ ចាប់ពីសេចក្តីសង្ខេបសម្រាប់ថ្នាក់ដឹកនាំរហូតដល់បញ្ជីជួសជុលលម្អិតសម្រាប់អ្នកអភិវឌ្ឍ AI របស់យើងកែសម្រួលសាច់រឿងឲ្យសមនឹងអ្នកពាក់ព័ន្ធនីមួយៗ។",
+      "badge": "Reporting កម្រិតខ្ពស់",
+      "titleLine1": "Reporting",
+      "titleLine2": "ជាមួយ AI",
+      "desc": "បង្កើត report កម្រិតអាជីពបានតែចុចមួយ។ ចាប់ពីសង្ខេបសម្រាប់អ្នកគ្រប់គ្រង ដល់លម្អិតសម្រាប់ Developer",
       "cardTitle": "របាយការណ៍",
       "criticalLabel": "សំខាន់ខ្លាំង",
       "tags": {
-        "executiveOverview": "ទិដ្ឋភាពទូទៅសម្រាប់ថ្នាក់ដឹកនាំ",
-        "technicalDeepDive": "ពិនិត្យបច្ចេកទេសជ្រាលជ្រៅ",
-        "developerPatchNotes": "កំណត់ត្រាជួសជុលសម្រាប់អ្នកអភិវឌ្ឍ"
+        "executiveOverview": "សង្ខេបសម្រាប់អ្នកគ្រប់គ្រង",
+        "technicalDeepDive": "វិភាគបច្ចេកទេសលម្អិត",
+        "developerPatchNotes": "ការណែនាំកែសម្រាប់ Developer"
       }
     },
     "workflow": {
-      "title": "លំហូរការវាយប្រហាររួមបញ្ចូលគ្នា",
-      "subtitle": "ផ្លាស់ប្តូរយ៉ាងរលូនពីការកំណត់អត្តសញ្ញាណទៅការអនុវត្ត។",
+      "title": "Workflow វាយប្រហារដែលភ្ជាប់គ្នា",
+      "subtitle": "ដំណើរការពេញលេញពីការស្វែងរក ទៅការវាយប្រហារ",
       "primaryCta": "ចាប់ផ្តើមស្កេន",
       "secondaryCta": "អានឯកសារ",
       "steps": [
         {
           "title": "ស្វែងរក",
-          "desc": "ស្វែងរក subdomains, ports និង services ដោយស្វ័យប្រវត្តិ។"
+          "desc": "ស្វែងរក subdomain, ports និង services ដោយស្វ័យប្រវត្តិ"
         },
         {
           "title": "កំណត់អត្តសញ្ញាណ",
-          "desc": "ផ្គូផ្គង services ទៅកាន់មូលដ្ឋានទិន្នន័យ CVE ដែលស្គាល់បានភ្លាមៗ។"
+          "desc": "ផ្គូផ្គង service ជាមួយ CVE database ភ្លាមៗ"
         },
         {
           "title": "អនុវត្ត",
-          "desc": "បើកដំណើរការ payloads តាមរយៈ remote CLI nodes ដោយសុវត្ថិភាព។"
+          "desc": "បញ្ចេញ payload តាម CLI ពីចម្ងាយដោយសុវត្ថិភាព"
         },
         {
           "title": "ចងក្រងឯកសារ",
-          "desc": "នាំចេញភស្តុតាង និងផ្លូវដោះស្រាយបានយ៉ាងងាយស្រួល។"
+          "desc": "Export ភស្តុតាង និងវិធីដោះស្រាយបានងាយស្រួល"
         }
       ]
     }
@@ -414,10 +414,10 @@
         "secondaryCta": "មើលឯកសារ"
       }
     }
-  },
+  },  
   "toolsPage": {
-    "title": "ឈុតឧបករណ៍ Auto-Offensive",
-    "subtitle": "ស្វែងរក និងដំណើរការម៉ាស៊ីនស្កេនស្តង់ដារឧស្សាហកម្មពីចំណុចប្រទាក់តែមួយ។",
+    "title": "The Auto-Offensive ToolKit",
+    "subtitle": "ស្វែងរក និងប្រើប្រាស់ tools ស្កេន Security ជាច្រើន នៅកន្លែងតែមួយ",
     "searchPlaceholder": "ស្វែងរកឧបករណ៍ និងស្លាក...",
     "noResults": "រកមិនឃើញឧបករណ៍ទេ",
     "tryDifferent": "សាកល្បងស្វែងរក ឬជ្រើសប្រភេទផ្សេងទៀត",
@@ -430,37 +430,37 @@
       "fuzzing": "Fuzzing"
     },
     "items": {
-      "subfinder": "ឧបករណ៍ស្វែងរក subdomain បែប passive ដែលប្រើ APIs និងប្រភពជាច្រើនដើម្បីរក subdomain ត្រឹមត្រូវ។",
-      "naabu": "ឧបករណ៍ស្កេន port លឿន ដែលផ្តោតលើភាពទុកចិត្តបាន និងភាពសាមញ្ញ ជាមួយសមត្ថភាពស្រដៀង nmap។",
-      "dnsx": "ឧបករណ៍ DNS លឿន និងពហុមុខងារ ដែលអនុញ្ញាតឲ្យធ្វើ DNS queries ជាច្រើនដោយកំណត់ resolvers ផ្ទាល់ខ្លួន។",
-      "assetfinder": "ស្វែងរក domains និង subdomains ដែលពាក់ព័ន្ធជាមួយ domain គោលដៅ ដោយប្រើប្រភព open-source ជាច្រើន។",
-      "nmap": "ស្តង់ដារឧស្សាហកម្មសម្រាប់ network discovery និង security auditing ជាមួយការគាំទ្រ NSE scripts។",
-      "nuclei": "ឧបករណ៍ស្កេនភាពងាយរងគ្រោះដែលលឿន និងអាចប្ដូរតាមតម្រូវការ ដោយផ្អែកលើ templates YAML សាមញ្ញ។",
-      "wpscan": "WordPress security scanner បែប black box ដែលរកឃើញភាពងាយរងគ្រោះក្នុង core, plugins និង themes។",
-      "sqli": "រកឃើញ និងសាកល្បង SQL injection ដោយប្រើ payload និងបច្ចេកទេសកម្រិតខ្ពស់។",
-      "strike3ifr": "ការវិភាគ info-gathering កម្រិតខ្ពស់ ដែលបំពាក់ដោយបច្ចេកទេស Red Team bypass ទំនើប។",
-      "urlfuzzer": "ស្វែងរកឯកសារ និង directories លាក់នៅលើ web servers ដោយប្រើ wordlist-based fuzzing។",
-      "kitecrawler": "ប្រមូល URLs សម្រាប់ការស្វែងរក និងវិភាគ ទាំង REST API និង dynamic web apps។",
-      "httprobe": "HTTP/HTTPS prober លឿន ដែលទទួល domain list ហើយសាកល្បងសេវា http និង https ដែលដំណើរការ។",
-      "katana": "framework សម្រាប់ crawling និង spidering ជំនាន់ថ្មី ដែលរចនាឡើងសម្រាប់គេហទំព័រស្មុគស្មាញជាមួយ JS parsing។",
-      "gobuster": "ឧបករណ៍លឿនសម្រាប់ brute-force URIs រួមមាន directories, files និង DNS subdomains។"
+      "subfinder": "Tool សម្រាប់ស្វែងរក subdomain បែប passive ដោយប្រើ APIs និងប្រភពជាច្រើន។",
+      "naabu": "Tool ស្កេន port លឿន មានភាពទុកចិត្ត និងងាយប្រើ ដូច nmap។",
+      "dnsx": "DNS tool លឿន អាច query DNS ច្រើន និងកំណត់ resolver ផ្ទាល់ខ្លួនបាន។",
+      "assetfinder": "ស្វែងរក domain និង subdomain ដែលពាក់ព័ន្ធ ដោយប្រើប្រភព open-source។",
+      "nmap": "Tool ស្តង់ដារសម្រាប់ network discovery និង security auditing (support NSE scripts)",
+      "nuclei": "Scanner សម្រាប់រក vulnerability លឿន និងអាច customize ដោយប្រើ YAML templates",
+      "wpscan": "Scanner សម្រាប់ WordPress ដែលរកឃើញ vulnerability ក្នុង core, plugins និង themes",
+      "sqli": "រក និង test SQL Injection ដោយប្រើ payload និង techniques កម្រិតខ្ពស់",
+      "strike3ifr": "Tool វិភាគ info-gathering កម្រិតខ្ពស់ ជាមួយ Red Team bypass techniques",
+      "urlfuzzer": "រក files និង directories លាក់ដោយប្រើ wordlist fuzzing",
+      "kitecrawler": "ប្រមូល URLs សម្រាប់ analysis (REST API និង dynamic web apps)",
+      "httprobe": "Tool សម្រាប់ test HTTP/HTTPS domains ដើម្បីរក services ដែលដំណើរការ",
+      "katana": "Framework crawling ជំនាន់ថ្មី សម្រាប់ web apps ដែលមាន JS complexity",
+      "gobuster": "Tool លឿនសម្រាប់ brute-force directories, files និង DNS subdomains"
     }
   },
 "resourcePage": {
     "hero": {
       "badge": "មជ្ឈមណ្ឌលឯកសារ",
-      "titleLine1": "រៀន។ ឯកសារយោង។",
-      "titleLine2": "អនុវត្ត។",
-      "subtitle": "មគ្គុទ្ទេសក៍ ឯកសារយោង API និងការបង្រៀនដ៏ទូលំទូលាយ ដើម្បីជួយអ្នកឲ្យស្ទាត់ជំនាញលើ Auto-Offensive toolkit និងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។"
+      "titleLine1": "រៀន · មើលឯកសារ ·",
+      "titleLine2": "អនុវត្ត",
+      "subtitle": "មគ្គុទ្ទេសក៍ ឯកសារ API និង tutorial ដើម្បីជួយអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព"
     },
     "categories": {
       "title": "ប្រភេទឯកសារ",
-      "subtitle": "ស្វែងយល់ពីឯកសារដែលបានរៀបចំតាមប្រធានបទ",
-      "viewAll": "មើលឯកសារទាំងអស់",
+      "subtitle": "ស្វែងរកឯកសារតាមប្រធានបទ",
+      "viewAll": "មើលទាំងអស់",
       "cards": {
         "tools": {
-          "title": "ឯកសារឧបករណ៍",
-          "description": "រៀនពីរបៀបប្រើឧបករណ៍សុវត្ថិភាពនីមួយៗក្នុង toolkit របស់យើង ចាប់ពី subdomain enumeration ដល់ vulnerability scanning។",
+          "title": "ឯកសារ Tools",
+          "description": "រៀនពីរបៀបប្រើ tools សុវត្ថិភាពនីមួយៗ ចាប់ពី Recon ដល់ Vulnerability scanning",
           "links": [
             { "title": "Subfinder - Passive Recon", "tag": "Recon" },
             { "title": "Nmap - Network Mapping", "tag": "Recon" },
@@ -471,8 +471,8 @@
           ]
         },
         "api": {
-          "title": "ឯកសារយោង API",
-          "description": "រួមបញ្ចូល Auto-Offensive ទៅក្នុង workflow របស់អ្នកជាមួយឯកសារ REST API ដ៏ទូលំទូលាយ។",
+          "title": "ឯកសារ API",
+          "description": "ភ្ជាប់ Auto-Offensive ទៅក្នុង workflow របស់អ្នកដោយប្រើ REST API",
           "links": [
             { "title": "Authentication", "tag": "Auth" },
             { "title": "Scan Endpoints", "tag": "API" },
@@ -484,7 +484,7 @@
         },
         "cli": {
           "title": "មគ្គុទ្ទេស CLI",
-          "description": "ស្ទាត់ជំនាញលើ command-line interface សម្រាប់ automated scanning និង scripting workflows។",
+          "description": "រៀនប្រើ CLI សម្រាប់ automated scanning និង scripting",
           "links": [
             { "title": "Installation", "tag": "Setup" },
             { "title": "Configuration", "tag": "Config" },
@@ -495,8 +495,8 @@
           ]
         },
         "cicd": {
-          "title": "ការរួមបញ្ចូល CI/CD",
-          "description": "បញ្ចូលការស្កេនសុវត្ថិភាពទៅក្នុង continuous integration pipelines របស់អ្នក។",
+          "title": "ការភ្ជាប់ CI/CD",
+          "description": "បញ្ចូល security scanning ទៅក្នុង CI/CD pipeline",
           "links": [
             { "title": "GitHub Actions", "tag": "CI/CD" },
             { "title": "GitLab CI", "tag": "CI/CD" },
@@ -509,26 +509,26 @@
       }
     },
     "quickLinks": {
-      "title": "តំណភ្ជាប់រហ័ស",
+      "title": "ចូលប្រើរហ័ស",
       "items": [
-        { "title": "មគ្គុទ្ទេសចាប់ផ្តើមរហ័ស", "desc": "ចាប់ផ្តើមបានក្នុង 5 នាទី" },
-        { "title": "API Authentication", "desc": "បង្កើត API keys" },
-        { "title": "Example Scripts", "desc": "ស្វ័យប្រវត្តិកម្មបែប copy-paste" },
-        { "title": "វីដេអូបង្រៀន", "desc": "រៀនតាមរូបភាព" }
+        { "title": "ចាប់ផ្តើមរហ័ស", "desc": "5 នាទី" },
+        { "title": "បង្កើត API Key", "desc": "API Authentication" },
+        { "title": "Script ឧទាហរណ៍", "desc": "copy-paste" },
+        { "title": "វីដេអូបង្រៀន", "desc": "Video Tutorials" }
       ]
     },
     "featured": {
-      "title": "ធនធានពិសេស",
-      "subtitle": "មគ្គុទ្ទេសក៍ និងការបង្រៀនពេញនិយមពីសហគមន៍របស់យើង",
+      "title": "ធនធានពេញនិយម",
+      "subtitle": "មគ្គុទ្ទេសក៍ និង tutorial ពេញនិយមពីសហគមន៍",
       "items": [
-        { "type": "Guide", "title": "ការចាប់ផ្តើមជាមួយ Auto-Offensive", "desc": "រៀនមូលដ្ឋាននៃការកំណត់ស្កេនដំបូង និងការយល់អំពី dashboard។", "tag": "Beginner", "cta": "អាន" },
-        { "type": "Video", "title": "មេរៀន CLI ពេញលេញ", "desc": "វីដេអូណែនាំពេញលេញអំពី command-line interface។", "tag": "Intermediate", "cta": "មើល" },
-        { "type": "API", "title": "ការបង្កើត Automated Workflows", "desc": "បង្កើត automation scripts ផ្ទាល់ខ្លួនដោយប្រើ REST API របស់យើង។", "tag": "Advanced", "cta": "ស្វែងយល់" }
+        { "type": "មគ្គុទ្ទេស", "title": "ចាប់ផ្តើមប្រើ Auto-Offensive", "desc": "រៀនមូលដ្ឋាននៃការកំណត់ scan ដំបូង និងការប្រើ dashboard។", "tag": "អ្នកចាប់ផ្តើម", "cta": "អាន" },
+        { "type": "វីដេអូ", "title": "មេរៀន CLI ពេញលេញ", "desc": "វីដេអូបង្ហាញអំពីការប្រើ CLI ចាប់ពីដំបូងដល់ចប់។", "tag": "កម្រិតមធ្យម", "cta": "មើល" },
+        { "type": "API", "title": "បង្កើត Automation Workflows", "desc": "បង្កើត automation workflows ដោយប្រើ REST API របស់យើង។", "tag": "កម្រិតខ្ពស់", "cta": "ស្វែងយល់" }
       ]
     },
     "newsletter": {
-      "title": "ទទួលធនធានថ្មីៗក្នុងប្រអប់សំបុត្ររបស់អ្នក",
-      "subtitle": "មគ្គុទ្ទេសក៍ ការបង្រៀន និងព័ត៌មានថ្មីៗរៀងរាល់សប្ដាហ៍។",
+      "title": "ទទួលបានមាតិកាថ្មីៗតាម Email",
+      "subtitle": "មគ្គុទ្ទេស និង update ថ្មីៗរៀងរាល់សប្តាហ៍",
       "placeholder": "your@email.com",
       "cta": "ជាវ"
     },
