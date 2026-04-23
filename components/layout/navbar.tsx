@@ -20,7 +20,6 @@ import {
 import {
   SunIcon,
   MoonIcon,
-  ChevronDownIcon,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -140,33 +139,27 @@ type Lang = 'en' | 'kh';
 
 function LanguageToggle() {
   const [mounted, setMounted] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
+  const khmerLabel = '\u1781\u17d2\u1798\u17c2\u179a';
+  const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
+  const currentLabel = currentLocale === 'en' ? 'EN' : 'KH';
+  const nextLabel = currentLocale === 'en' ? khmerLabel : 'EN';
 
   React.useEffect(() => setMounted(true), []);
 
-  React.useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleLocaleChange = (newLocale: Lang) => {
-    // eslint-disable-next-line react-hooks/immutability
-    window.document.cookie = `locale=${newLocale};path=/;max-age=31536000;SameSite=Lax`;
-    router.refresh();
-    setOpen(false);
+  const handleLocaleChange = () => {
+    startTransition(() => {
+      // eslint-disable-next-line react-hooks/immutability
+      window.document.cookie = `locale=${nextLocale};path=/;max-age=31536000;SameSite=Lax`;
+      router.refresh();
+    });
   };
 
-  const options: { value: Lang; label: string; flagSrc: string }[] = [
-    { value: 'en', label: 'English',  flagSrc: '/flags/en.png' },
-    { value: 'kh', label: 'ខ្មែរ',     flagSrc: '/flags/kh.png' },
+  const options: { value: Lang; label?: string; flagSrc: string }[] = [
+    { value: 'en', flagSrc: '/flags/en.png' },
+    { value: 'kh', flagSrc: '/flags/kh.png' },
   ];
 
   if (!mounted) return <div className="w-14 h-7" />;
@@ -174,34 +167,28 @@ function LanguageToggle() {
   const current = options.find(o => o.value === currentLocale) || options[0];
 
   return (
-    <div ref={ref} className="relative shrink-0">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-transparent text-sm font-medium cursor-pointer hover:bg-primary/10 transition-colors"
-      >
-        <Image src={current.flagSrc} alt={current.value} width={20} height={14} style={{ width: 'auto', height: 'auto' }} className="object-cover" />
-        <span>{current.value.toUpperCase()}</span>
-        <ChevronDownIcon className={cn('size-3.5 transition-transform', open && 'rotate-180')} />
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-1 w-36 bg-popover shadow-lg z-50 overflow-hidden">
-          {options.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => handleLocaleChange(opt.value)}
-              className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-primary/10 transition-colors cursor-pointer',
-                currentLocale === opt.value && 'bg-primary/10 font-semibold',
-              )}
-            >
-              <Image src={opt.flagSrc} alt={opt.value} width={20} height={14} style={{ width: 'auto', height: 'auto' }} className="object-cover" />
-              <span>{opt.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={handleLocaleChange}
+      disabled={isPending}
+      aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
+      className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-zinc-200/80 bg-white/80 px-2.5 text-zinc-900 shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-100 dark:hover:bg-zinc-900"
+    >
+      <Image
+        src={current.flagSrc}
+        alt={current.value}
+        width={18}
+        height={12}
+        className="rounded-[2px] object-cover"
+      />
+      <span className="text-xs font-semibold tracking-[0.14em]">
+        {currentLabel}
+      </span>
+      <span className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs">⇄</span>
+        {isPending ? '...' : nextLabel}
+      </span>
+    </button>
   );
 }
 
