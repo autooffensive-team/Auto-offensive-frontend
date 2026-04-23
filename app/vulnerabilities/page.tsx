@@ -21,7 +21,7 @@ export default function VulnerabilitiesPage() {
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto">
-        <div className="px-8 py-8 space-y-8 max-w-[1400px] mx-auto">
+        <div className="px-8 py-8 space-y-8 max-w-350 mx-auto">
           <PageHeader />
           <StatsRow />
           <FindingsTable />

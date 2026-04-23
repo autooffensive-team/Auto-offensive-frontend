@@ -2,7 +2,7 @@ export default function HeaderSection() {
   return (
     <div className="flex justify-between items-start">
       <div>
-        <h1 className="text-5xl font-bold mb-2">Tool Chain Builder</h1>
+        <h1 className="display-font text-5xl font-bold mb-2">Tool Chain Builder</h1>
         <p className="text-[20px] text-gray-400">
           Configure your autonomous offensive pipeline
         </p>

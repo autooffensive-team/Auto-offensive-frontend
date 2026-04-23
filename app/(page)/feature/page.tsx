@@ -353,7 +353,7 @@ export default function PlatformCapabilities() {
               animate={gridInView ? "visible" : "hidden"}
               custom={1}
               className="lg:col-span-2 rounded-xl p-8 sm:p-10 relative overflow-hidden
-                bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900/60 dark:to-slate-900/40
+                bg-linear-to-br from-emerald-50 to-teal-50 dark:from-slate-900/60 dark:to-slate-900/40
                 border border-emerald-200/50 dark:border-slate-800/50
                 hover:border-emerald-300/50 dark:hover:border-slate-700/50 transition-all duration-300
                 hover:shadow-lg dark:hover:shadow-black/20 group"
@@ -632,7 +632,7 @@ export default function PlatformCapabilities() {
         <div className="relative">
           {/* Connecting line */}
           <div className="hidden lg:block absolute top-12 left-[5%] right-[5%] h-0.5
-            bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent z-0" />
+            bg-linear-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent z-0" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {workflowSteps.map((step, i) => (

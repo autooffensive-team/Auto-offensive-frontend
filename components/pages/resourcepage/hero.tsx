@@ -100,7 +100,7 @@ export default function Hero() {
             </motion.span>
             <motion.h1
               variants={itemVariants}
-              className="text-4xl md:text-5xl font-bold text-foreground mb-3 leading-tight text-balance"
+              className="display-font text-4xl md:text-5xl font-bold text-foreground mb-3 leading-tight text-balance"
             >
               {t('hero.titleLine1')} <span className='text-primary'>{t('hero.titleLine2')}</span>
             </motion.h1>

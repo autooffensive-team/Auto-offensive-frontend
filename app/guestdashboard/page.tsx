@@ -8,14 +8,14 @@ import RecentScans from "@/components/GuestDashboard/RecentScans";
 
 function MainContent() {
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 text-gray-900 dark:bg-gradient-to-br dark:from-[#0b1220] dark:to-[#0d1117] dark:text-white transition-colors">
+    <div className="flex-1 flex flex-col bg-gray-50 text-gray-900 dark:bg-Linear-to-br dark:from-[#0b1220] dark:to-[#0d1117] dark:text-white transition-colors">
       <main className="flex-1 overflow-y-auto py-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           {/* HEADER */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
             {/* TITLE */}
             <div className="max-w-2xl">
-              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-3 mt-6 text-gray-900 dark:text-white">
+              <h1 className="display-font text-4xl lg:text-5xl font-bold tracking-tight mb-3 mt-6 text-gray-900 dark:text-white">
                 BASIC SCAN
               </h1>
 

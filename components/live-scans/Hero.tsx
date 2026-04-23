@@ -1,7 +1,7 @@
 export default function Hero() {
   return (
     <section className="mb-10">
-      <h1 className="text-5xl font-bold text-gray-600 dark:text-gray-400 mb-4 mt-8">
+      <h1 className="display-font text-5xl font-bold text-gray-600 dark:text-gray-400 mb-4 mt-8">
         Scan Orchestration
       </h1>
 

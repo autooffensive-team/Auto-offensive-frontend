@@ -7,7 +7,7 @@
   /* --- Fonts Configuration --- */
 
   --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
+  --font-heading: var(--font-google-sans);
   --font-display: var(--font-hackdaddy);
   --font-khmer: var(--font-noto-khmer);
 
@@ -144,7 +144,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-hackdaddy), var(--font-noto-khmer), sans-serif;
+    font-family: var(--font-google-sans), var(--font-noto-khmer), sans-serif;
   }
   * {
     @apply border-border outline-ring/50;
@@ -238,18 +238,16 @@
   font-family: var(--font-hackdaddy), "Hackdaddy", monospace !important;
 }
 
+.hero-title,
+.hero-display,
+.display-text,
+.ph-h1 {
+  font-family: var(--font-hackdaddy), "Hackdaddy", monospace !important;
+}
+
 /* Apply Khmer font to body in kh locale */
 html[lang="kh"] body {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif;
-}
-
-/* Hackdaddy for big headings in kh locale */
-html[lang="kh"] h1,
-html[lang="kh"] h2,
-html[lang="kh"] .hero-title,
-html[lang="kh"] .big-text,
-html[lang="kh"] .display-text {
-  font-family: var(--font-hackdaddy), "Hackdaddy", monospace;
 }
 
 /* Keep resource page typography fully Khmer in kh locale */

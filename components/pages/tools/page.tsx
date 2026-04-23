@@ -161,7 +161,7 @@ export default function ToolsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-              <h1 className="text-7xl font-bold text-primary mt-1 text-center">The Auto-Offensive ToolKit</h1>
+              <h1 className="display-font text-7xl font-bold text-primary mt-1 text-center">The Auto-Offensive ToolKit</h1>
               <p className="mt-2 text-gray-500 text-xl max-w-xl ">
                 Browse and launch industry-standard scanning engines from a single unified interface.
               </p>

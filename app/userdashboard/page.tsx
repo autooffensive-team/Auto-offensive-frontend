@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   Activity,
-  ArrowUpRight,
   Clock3,
   Cpu,
   Database,
@@ -184,7 +183,6 @@ const lastScans = [
 ];
 
 export default function UserDashboardPage() {
-  const totalAssets = scannedAssetMetrics.reduce((sum, item) => sum + item.value, 0);
   const totalFindings = vulnerabilityData.reduce((sum, item) => sum + item.count, 0);
   const highestSeverity = Math.max(...vulnerabilityData.map((item) => item.count));
 
@@ -199,7 +197,7 @@ export default function UserDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              <h2 className="max-w-5xl text-3xl font-semibold leading-tight text-slate-950 dark:text-white md:text-5xl">
+              <h2 className="display-font max-w-5xl text-3xl font-semibold leading-tight text-slate-950 dark:text-white md:text-5xl">
                 Scanned asset visibility, vulnerability posture, and live scan status.
               </h2>
               <p className="max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300 md:text-base">
@@ -476,36 +474,6 @@ function SeverityBar({
           className={`h-full rounded-full ${color}`}
         />
       </div>
-    </div>
-  );
-}
-
-function SummaryMiniCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
-    </div>
-  );
-}
-
-function QuickStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-slate-300">{label}</span>
-      <span className="font-semibold text-white">{value}</span>
     </div>
   );
 }

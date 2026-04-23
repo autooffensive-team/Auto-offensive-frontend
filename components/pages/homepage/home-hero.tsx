@@ -911,7 +911,7 @@ export default function HomeHero() {
 
           {/* Title */}
           <h1 className="
-            text-[clamp(2.8rem,6vw,5rem)] font-bold
+            display-font text-[clamp(2.8rem,6vw,5rem)] font-bold
             leading-[1.08] tracking-[-0.02em]
             text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
             mb-[1.4rem] fade-up-2
