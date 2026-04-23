@@ -808,13 +808,13 @@ export default function ResourceComponent() {
             <p className="resource-page-copy mt-3 text-[#52525B] dark:text-[#A1A1AA]">{sectionLabels.systemStatusSubtitle}</p>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-[#CBEDE6] bg-white shadow-[0_18px_50px_rgba(1,80,158,0.08)] dark:border-white/10 dark:bg-[#111827]">
-            <div className="border-b border-[#D9F4EF] bg-[linear-gradient(90deg,rgba(0,208,178,0.12),rgba(1,80,158,0.08))] px-4 py-3 text-[13px] font-medium text-[#01509E] md:hidden">
+          <div className="overflow-hidden rounded-2xl border border-[#CBEDE6] bg-[#F7F5F0] shadow-[0_18px_50px_rgba(1,80,158,0.08)] dark:border-white/10 dark:bg-[#09090B]">
+            <div className="border-b border-[#D9F4EF] bg-[#F7F5F0] px-4 py-3 text-[13px] font-medium text-[#01509E] dark:bg-[#09090B] md:hidden">
               {sectionLabels.mobileTableHint}
             </div>
             <div className="w-full overflow-x-auto">
               <table className="w-full min-w-190">
-                <thead className="bg-[linear-gradient(90deg,#e6faf6_0%,#eaf2ff_100%)] dark:bg-[#162033]">
+                <thead className="bg-[#F2EFE7] dark:bg-[#111113]">
                   <tr>
                     <th className="resource-page-meta px-6 py-4 text-left font-bold uppercase tracking-[0.18em] text-[#18181B] dark:text-white">
                       {sectionLabels.component}
@@ -832,7 +832,7 @@ export default function ResourceComponent() {
                 </thead>
                 <tbody>
                   {statusRows.map((row, index) => (
-                    <tr key={row.service} className={index % 2 === 0 ? 'bg-[#F7FFFD] dark:bg-[#13131A]' : 'bg-[#FBFDFF] dark:bg-[#0F1014]'}>
+                    <tr key={row.service} className={index % 2 === 0 ? 'bg-[#F7F5F0] dark:bg-[#09090B]' : 'bg-[#F2EFE7] dark:bg-[#111113]'}>
                       <td className="resource-page-meta whitespace-nowrap px-6 py-5 font-bold text-[#18181B] dark:text-white">{row.service}</td>
                       <td className="resource-page-meta whitespace-nowrap px-6 py-5 text-[#52525B] dark:text-[#A1A1AA]">{row.version}</td>
                       <td className="px-6 py-5">
