@@ -159,20 +159,15 @@ export default function TeamAndFooter() {
 
   const copy = isKhmer
     ? {
-        eyebrow: "Auto-Offensive",
         heroLine1: "ក្រុមមនុស្សនៅពីក្រោយ",
         heroLine2Lead: "វេទិកា",
         heroLine2Accent: "",
         heroBody:
           "អ្នកស្រាវជ្រាវសុវត្ថិភាព វិស្វករ និងអ្នកបង្កើត ដែលរួមគ្នាក្នុងបេសកកម្មតែមួយ គឺធ្វើឱ្យ offensive security ងាយប្រើសម្រាប់គ្រប់គ្នា។",
-        section01: "ផ្នែក 01",
         mentorsLead: "ទីប្រឹក្សា",
         mentorsAccent: "របស់យើង",
-        mentorsBody: "ដឹកនាំផ្លូវដោយបទពិសោធន៍ និងការណែនាំ",
-        section02: "ផ្នែក 02",
         teamLead: "ក្រុម",
         teamAccent: "ស្នូល",
-        teamBody: "អ្នកជំនាញដែលកំពុងសាងសង់វេទិកានេះ",
         footerPath: ["Scan", "Analyse", "Report"],
         footerLead: "ត្រៀមប្រើស្វ័យប្រវត្តិកម្មសម្រាប់",
         footerAccent: "ការធ្វើតេស្តសុវត្ថិភាពរបស់អ្នកឬនៅ?",
@@ -182,20 +177,15 @@ export default function TeamAndFooter() {
         copyright: "© 2026 Auto-Offensive · រក្សាសិទ្ធិគ្រប់យ៉ាង",
       }
     : {
-        eyebrow: "Auto-Offensive",
         heroLine1: "The People Behind",
         heroLine2Lead: "the",
         heroLine2Accent: "Platform",
         heroBody:
           "Security researchers, engineers and builders united by one mission: make offensive security accessible to everyone.",
-        section01: "Section 01",
         mentorsLead: "Our",
         mentorsAccent: "Mentors",
-        mentorsBody: "Leading the way with expertise and guidance",
-        section02: "Section 02",
         teamLead: "Core",
         teamAccent: "Team",
-        teamBody: "Dedicated professionals building the platform",
         footerPath: ["Scan", "Analyse", "Report"],
         footerLead: "Ready to automate your",
         footerAccent: "security testing",
@@ -250,7 +240,6 @@ export default function TeamAndFooter() {
         .tf-card:hover { border-color: rgba(0,208,178,.22) !important; }
         .tf-card--mentor:hover { border-color: rgba(255,59,59,0.4) !important; }
         .tf-intro::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 560px; height: 260px; background: radial-gradient(ellipse, rgba(0,208,178,.04) 0%, transparent 70%); pointer-events: none; }
-        .tf-eyebrow::before, .tf-eyebrow::after { content: ''; width: 22px; height: 1px; background: #00D0B2; opacity: .4; }
         .tf-photo-outer::before { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 2px solid transparent; border-top-color: #00D0B2; border-right-color: rgba(0,207,255,.6); animation: tf-spin 6s linear infinite; }
         .tf-photo-outer::after { content: ''; position: absolute; inset: -20px; border-radius: 50%; border: 1.5px solid rgba(0,208,178,.12); }
         .tf-status-dot { position: absolute; bottom: 8px; right: 8px; width: 14px; height: 14px; border-radius: 50%; background: #00D0B2; border: 2.5px solid #F7F5F0; box-shadow: 0 0 8px rgba(0,208,178,.4); animation: tf-blink 2.4s ease-in-out infinite; }
@@ -293,7 +282,6 @@ export default function TeamAndFooter() {
         .tf-grid-3 { grid-template-columns: repeat(3, 340px); justify-content: center; }
         @media (max-width: 1120px) { .tf-grid-3 { grid-template-columns: repeat(2, 340px); } }
         @media (max-width: 740px) { .tf-grid-2, .tf-grid-3 { grid-template-columns: 340px; } }
-        .tf-group-label::before { content: ''; width: 18px; height: 1px; background: #00D0B2; opacity: .35; }
         .tf-gradient-wrapper { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; will-change: transform; }
         .tf-gradient-bg { width: 100%; height: 120%; will-change: transform; }
         .tf-body-text { font-size: 16px; }
@@ -327,9 +315,6 @@ export default function TeamAndFooter() {
         <div className="relative z-10 w-full h-px bg-linear-to-r from-transparent via-[rgba(0,208,177,0.45)] to-transparent" />
 
         <div className="relative z-10 tf-intro px-[6%] pt-23 pb-10 text-center overflow-hidden">
-          <div className="inline-flex items-center gap-3 text-[0.68rem] font-semibold tracking-[0.16em] uppercase text-[rgba(0,208,178,0.55)] mb-4 tf-eyebrow">
-            {copy.eyebrow}
-          </div>
           <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: titleFont }}>
             {copy.heroLine1}<br />
             {isKhmer ? (
@@ -343,13 +328,9 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-6 pb-3">
           <div className="mb-4">
-            <div className="tf-group-label flex items-center gap-3 text-[0.62rem] font-semibold tracking-[0.16em] uppercase text-[rgba(0,208,178,0.5)] mb-[0.7rem]">
-              {copy.section01}
-            </div>
             <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
               {copy.mentorsLead} <em className="text-primary not-italic">{copy.mentorsAccent}</em>
             </h2>
-            <p className="tf-body-text text-[#4a6e65] dark:text-[#9cb8b1] leading-[1.7]">{copy.mentorsBody}</p>
           </div>
 
           <div className="tf-section-path">
@@ -383,13 +364,9 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-2 pb-3">
           <div className="mb-4">
-            <div className="tf-group-label flex items-center gap-3 text-[0.62rem] font-semibold tracking-[0.16em] uppercase text-[rgba(0,208,178,0.5)] mb-[0.7rem]">
-              {copy.section02}
-            </div>
             <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
               {copy.teamLead} <em className="text-primary not-italic">{copy.teamAccent}</em>
             </h2>
-            <p className="tf-body-text text-[#4a6e65] dark:text-[#9cb8b1] leading-[1.7]">{copy.teamBody}</p>
           </div>
 
           <div className="tf-section-path">

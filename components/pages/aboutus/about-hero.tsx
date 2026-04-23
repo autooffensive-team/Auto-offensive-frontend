@@ -117,7 +117,6 @@ export default function AboutHero() {
   const isKhmer = locale === "kh";
   const content = isKhmer
     ? {
-        eyebrow: "Auto Offensive",
         titleTop: "ស្គាល់ពី",
         titleAccent: "វេទិកា Security",
         titleBottom: "ជំនាន់ថ្មីរបស់យើង",
@@ -128,7 +127,6 @@ export default function AboutHero() {
         scroll: "រំកិល",
       }
     : {
-        eyebrow: "Auto Offensive",
         titleTop: "Meet Our",
         titleAccent: "Next-Gen",
         titleBottom: "Security Platform",
@@ -147,7 +145,6 @@ export default function AboutHero() {
     : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
   const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";
 
-  const eyebrowRef = useRef<HTMLDivElement>(null);
   const hl0Ref = useRef<HTMLSpanElement>(null);
   const hl1Ref = useRef<HTMLSpanElement>(null);
   const hl2Ref = useRef<HTMLSpanElement>(null);
@@ -159,7 +156,6 @@ export default function AboutHero() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      eyebrowRef.current?.classList.add("in");
       [hl0Ref, hl1Ref, hl2Ref].forEach((ref, n) =>
         setTimeout(() => ref.current?.classList.add("in"), 180 + n * 110)
       );
@@ -190,8 +186,6 @@ export default function AboutHero() {
   return (
     <>
       <style>{`
-        .ao-eyebrow { opacity: 0; transform: translateY(10px); }
-        .ao-eyebrow.in { opacity: 1; transform: translateY(0); transition: opacity .55s, transform .55s cubic-bezier(.16,1,.3,1); }
         .ao-hli { transform: translateY(112%); }
         .ao-hli.in { transform: translateY(0); transition: transform .7s cubic-bezier(.16,1,.3,1); }
         .ao-sub { opacity: 0; transform: translateY(8px); }
@@ -408,15 +402,6 @@ export default function AboutHero() {
         </div>
 
         <div className="ao-content relative z-10 flex flex-col items-center">
-          <div
-            ref={eyebrowRef}
-            className="ao-eyebrow mb-[1.8rem] inline-flex items-center gap-2.5 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-primary"
-          >
-            <span className="h-[1.5px] w-5.5 rounded-sm bg-primary opacity-55" />
-            {content.eyebrow}
-            <span className="h-[1.5px] w-5.5 rounded-sm bg-primary opacity-55" />
-          </div>
-
           <h1
             className="mb-[1.4rem] max-w-225 text-[clamp(2.6rem,6vw,5.25rem)] leading-[1.08] tracking-[-0.04em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]"
             style={{ fontFamily: titleFont }}
