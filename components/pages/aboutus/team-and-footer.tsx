@@ -12,13 +12,13 @@ const SOCIAL_LINKS = {
 const MENTORS = [
   {
     name: "Kim Chansokpheng",
+    nameKh: "គឹម ចាន់សុផេង",
     role: "Cybersecurity Professional",
     roleKh: "អ្នកជំនាញសន្តិសុខសាយប័រ",
     badge: "Mentor",
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
     slogan: "Defending the digital frontier,\none exploit at a time.",
-    sloganKh: "ការពារពិភពឌីជីថល\nមួយចំណុចខ្សោយម្តង។",
     img: "/images/teacher_Sokpheng.jpg",
     social: {
       github: "https://github.com/sokpheng001",
@@ -28,13 +28,13 @@ const MENTORS = [
   },
   {
     name: "Sreng Chipor",
+    nameKh: "ស្រេង ជីប៉",
     role: "Exploit Specialist",
     roleKh: "អ្នកជំនាញផ្នែក Exploit",
     badge: "Mentor",
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
-    slogan: "Breaking systems so\nyou don't have to.",
-    sloganKh: "សាកល្បងបំបែកប្រព័ន្ធ\nជំនួសអ្នក។",
+    slogan: "Your future self is always\n watching you.",
     img: "./images/teacher_chipor.png",
     social: {
       github: "https://github.com/jiporCK",
@@ -45,15 +45,15 @@ const MENTORS = [
 ];
 
 const TEAM = [
-  { name: "Chheng Panharoth", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", sloganKh: "កសាងម៉ាស៊ីនស្នូល\nនៅពីក្រោយប្រព័ន្ធ។", img: "./images/panharoth.jpg", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/" } },
-  { name: "Pech Rathanakmony", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", sloganKh: "ការរចនាទាំងអស់\nមានគោលបំណង។", img: "./images/rathanakmony.jpg", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/" } },
-  { name: "So Bohty", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Ship fast,\nship secure.", sloganKh: "ធ្វើឱ្យលឿន\nនិងមានសុវត្ថិភាព។", img: "./images/bohty.jpg", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/" } },
-  { name: "Rin Bunvarn", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every threat\nhas a signature.", sloganKh: "គ្រប់ការគំរាមកំហែង\nសុទ្ធតែមានស្នាមសម្គាល់។", img: "./images/bunvarn (2).JPG", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/" } },
-  { name: "Ey Channim", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Teaching machines\nto hunt.", sloganKh: "បង្រៀនម៉ាស៊ីន\nឱ្យចេះស្វែងរក។", img: "./images/channim.JPG", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/" } },
-  { name: "Mom Reaksmey", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Security that\nfeels effortless.", sloganKh: "សុវត្ថិភាពដែល\nប្រើងាយស្រួល។", img: "./images/reaksmey.jpg", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/" } },
-  { name: "Hor Ratha", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every endpoint\na fortress.", sloganKh: "គ្រប់ endpoint\nដូចជាបន្ទាយ។", img: "./images/ratha.jpg", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/" } },
-  { name: "Ben Loemheng", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Quality is\nnot optional.", sloganKh: "គុណភាពគឺ\nមិនអាចខ្វះបាន។", img: "./images/loemheng.jpg", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/" } },
-  { name: "Dina Pisethi", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Find the crack\nbefore they do.", sloganKh: "រកចំណុចខ្សោយ\nមុនអ្នកដទៃ។", img: "./images/pisethi.jpg", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/" } },
+  { name: "Chheng Panharoth", nameKh: "ឆេង បញ្ញារតន៍", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "./images/panharoth.jpg", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/" } },
+  { name: "Pech Rathanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "./images/rathanakmony.jpg", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/" } },
+  { name: "So Bohty", nameKh: "គ្រី សុបុត្រទី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Ship fast,\nship secure.", img: "./images/bohty.jpg", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/" } },
+  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every threat\nhas a signature.", img: "./images/bunvarn (2).JPG", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/" } },
+  { name: "Ey Channim", nameKh: "អ៊ី ចាន់និម", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Teaching machines\nto hunt.", img: "./images/channim.JPG", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/" } },
+  { name: "Mom Reaksmey", nameKh: "មុំ រស្មី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Security that\nfeels effortless.", img: "./images/reaksmey.jpg", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/" } },
+  { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every endpoint\na fortress.", img: "./images/ratha.jpg", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/" } },
+  { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Quality is\nnot optional.", img: "./images/loemheng.jpg", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/" } },
+  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Find the crack\nbefore they do.", img: "./images/pisethi.jpg", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/" } },
 ];
 
 function IconGithub() {
@@ -100,9 +100,9 @@ function CardTraces() {
 type Member = (typeof MENTORS)[0] & { isMentor?: boolean; social?: Record<string, string> };
 
 function CardInner({ member: m, index, isKhmer }: { member: Member; index: number; isKhmer: boolean }) {
-  const role = isKhmer ? m.roleKh : m.role;
-  const badge = isKhmer ? m.badgeKh : m.badge;
-  const slogan = (isKhmer ? m.sloganKh : m.slogan).split("\n");
+  const displayName = isKhmer && m.nameKh ? m.nameKh : m.name;
+  const badge = m.badge;
+  const slogan = m.slogan.split("\n");
 
   return (
     <>
@@ -114,13 +114,13 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
       <div className="tf-node-badge">{String(index + 1).padStart(2, "0")}</div>
       <div className="relative z-2 flex justify-center pt-3 mb-5">
         <div className="tf-photo-outer relative w-50 h-50 bg-[rgba(0,208,178,0.05)] rounded-full flex items-center justify-center">
-          <img src={m.img} alt={m.name} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
+          <img src={m.img} alt={displayName} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
           <span className="tf-status-dot" />
         </div>
       </div>
       <div className="relative z-2">
-        <div className="text-[1.18rem] font-bold text-[#0a1f1a] dark:text-white tracking-[-0.01em] mb-1">{m.name}</div>
-        <div className="text-[0.78rem] font-semibold text-primary tracking-widest uppercase mb-3">{role}</div>
+        <div className="text-[1.18rem] font-bold text-[#0a1f1a] dark:text-white tracking-[-0.01em] mb-1">{displayName}</div>
+        <div className="text-[0.78rem] font-semibold text-primary tracking-widest uppercase mb-3">{m.role}</div>
         <div className="w-7 h-px bg-linear-to-r from-primary to-[#00cfff] mx-auto mb-3 rounded-sm opacity-45" />
         <div className="text-[0.84rem] text-[#8aada6] leading-[1.9] tracking-[0.03em] mb-4 min-h-9 italic">
           <em className="text-[rgba(0,208,178,0.55)] not-italic">&gt;</em>

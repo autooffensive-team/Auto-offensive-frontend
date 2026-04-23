@@ -179,7 +179,7 @@ function LanguageToggle() {
         alt={current.value}
         width={18}
         height={12}
-        className="rounded-[2px] object-cover"
+        className="rounded-xs object-cover"
       />
       <span className="text-xs font-semibold tracking-[0.14em]">
         {currentLabel}
@@ -306,6 +306,7 @@ function ResourceMiscItem({
   return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
 
+
 // ── Scroll hook ───────────────────────────────────────────────────────────────
 function useScroll(threshold: number) {
   const [scrolled, setScrolled] = React.useState(false);
@@ -352,6 +353,8 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
 // ── Header ────────────────────────────────────────────────────────────────────
 export function Header() {
   const t = useTranslations('nav');
+  const locale = useLocale();
+  const isKhmer = locale === 'kh';
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
 
@@ -492,21 +495,48 @@ export function Header() {
             </div>
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
+            <Link
+              href="/tools"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-2 gap-0.5">
             {toolLinks.map((link, i) => (
               <ToolItem key={i} {...link} />
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2">Features</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Features</p>
+            <Link
+              href="/feature"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-1 gap-1">
             {featureLinks.map((link, i) => (
               <FeatureItem key={i} {...link} />
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2">Resources</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
+            <Link
+              href="/resource"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-1 gap-0.5">
             {resourceDocLinks.map((link, i) => (
               <ResourceDocItem key={i} {...link} />
@@ -518,11 +548,16 @@ export function Header() {
         </div>
 
         <div className="flex flex-col gap-2 pt-2 border-t border-border">
-          <button className="w-full py-2 rounded-md border border-primary text-primary text-sm font-semibold bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
+          <Link
+            href="/register"
+            onClick={() => setOpen(false)}
+            className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+          >
             {t('loginRegister')}
-          </button>
+          </Link>
         </div>
       </MobileMenu>
     </header>
   );
 }
+
