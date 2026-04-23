@@ -39,7 +39,7 @@ const MENTORS = [
     social: {
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
-      linkedin: "https://linkedin.com/in/srengchipor",
+      linkedin: "https://www.linkedin.com/in/sreng-chipor-a31346239/",
     },
   },
 ];
