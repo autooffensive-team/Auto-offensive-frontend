@@ -23,7 +23,7 @@ type QuickCard = {
   what: string
   why: string
   how: string
-  icon: ComponentType<{ className?: string; size?: number }>
+  icon: ComponentType<{ className?: string; size?: number; strokeWidth?: number }>
 }
 
 type MiniCard = {
@@ -31,7 +31,7 @@ type MiniCard = {
   description: string
   version: string
   level: number
-  icon: ComponentType<{ className?: string; size?: number }>
+  icon: ComponentType<{ className?: string; size?: number; strokeWidth?: number }>
 }
 
 type FeatureCard = {
@@ -42,12 +42,11 @@ type FeatureCard = {
   meta?: string
   badge?: string
   tags?: string[]
-  icon: ComponentType<{ className?: string; size?: number }>
+  icon: ComponentType<{ className?: string; size?: number; strokeWidth?: number }>
   /** which side the image sits on: 'left' = image left / content right, 'right' = content left / image right */
   imageSide: 'left' | 'right'
   /** src for the illustration/screenshot — drop in your own image path */
   imageSrc: string
-  darkImageSrc?: string
   imageAlt: string
 }
 
@@ -86,6 +85,10 @@ export default function ResourceComponent() {
   const displayFontFamily = isKhmer
     ? 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
+
+  const featureTitleFontFamily = isKhmer
+    ? 'var(--font-noto-khmer), var(--font-hackdaddy), sans-serif'
+    : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
 
   const sectionLabels = isKhmer
     ? {
@@ -422,48 +425,32 @@ export default function ResourceComponent() {
   }
 
   // ─── Helper: one pentest-tools-style feature row ──────────────────────────
-  function resolveFeatureImageSources(card: FeatureCard) {
-    if (card.darkImageSrc) {
-      return { lightSrc: card.imageSrc, darkSrc: card.darkImageSrc }
+  function resolveFeatureImageSrc(card: FeatureCard) {
+    const assetMap: Record<string, string> = {
+      '/images/cli-illustration.png': '/document/dark_icon_cli.webp',
+      '/images/api-illustration.png': '/document/dark_icon_api.webp',
+      '/images/tools-illustration.png': '/document/dark_icon_tools.webp',
+      '/images/cicd-illustration.png': '/document/dark_icon_cicd.webp',
     }
 
-    const assetMap: Record<string, { lightSrc: string; darkSrc: string }> = {
-      '/images/cli-illustration.png': {
-        lightSrc: '/document/dark_icon_cli.webp',
-        darkSrc: '/document/dark_icon_cli.webp',
-      },
-      '/images/api-illustration.png': {
-        lightSrc: '/document/dark_icon_api.webp',
-        darkSrc: '/document/dark_icon_api.webp',
-      },
-      '/images/tools-illustration.png': {
-        lightSrc: '/document/dark_icon_tools.webp',
-        darkSrc: '/document/dark_icon_tools.webp',
-      },
-      '/images/cicd-illustration.png': {
-        lightSrc: '/document/dark_icon_cicd.webp',
-        darkSrc: '/document/dark_icon_cicd.webp',
-      },
-    }
-
-    return assetMap[card.imageSrc] ?? { lightSrc: card.imageSrc, darkSrc: card.imageSrc }
+    return assetMap[card.imageSrc] ?? card.imageSrc
   }
 
   function FeatureRow({ card, index }: { card: FeatureCard; index: number }) {
     const Icon = card.icon
     const isImageLeft = card.imageSide === 'left'
     const cardNumber = String(index + 1).padStart(2, '0')
-    const { lightSrc, darkSrc } = resolveFeatureImageSources(card)
+    const imageSrc = resolveFeatureImageSrc(card)
 
     const contentBlock = (
-      <div className="flex flex-1 flex-col justify-center gap-5 bg-[#F7F5F0] px-8 py-10 dark:bg-[#09090B] md:px-12 md:py-14">
+      <div className="order-2 flex flex-1 flex-col justify-center gap-5 bg-[#F7F5F0] px-6 py-8 dark:bg-[#09090B] md:order-0 md:px-12 md:py-14">
         {/* number + badge row */}
         <div className="flex items-center gap-3">
           <span className="text-xs font-semibold tracking-widest text-[#9CA3AF]">
             {cardNumber} / 04
           </span>
           {card.badge && (
-            <span className="rounded-lg bg-[#F97316] px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
+            <span className="rounded-lg bg-[#f91616] px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white">
               {card.badge}
             </span>
           )}
@@ -476,7 +463,7 @@ export default function ResourceComponent() {
           </div>
           <h3
             className="text-2xl font-bold text-[#0F172A] dark:text-white"
-            style={{ fontFamily: displayFontFamily }}
+            style={{ fontFamily: featureTitleFontFamily }}
           >
             {card.title}
           </h3>
@@ -502,7 +489,7 @@ export default function ResourceComponent() {
         )}
 
         {/* CTA + meta */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
           <AnimatedCta
             as="a"
             href={card.href ?? '#'}
@@ -521,7 +508,7 @@ export default function ResourceComponent() {
 
     // Image placeholder — swap the inner div for your <Image /> component
     const imageBlock = (
-      <div className="flex flex-1 items-center justify-center bg-[#F7F5F0] p-8 dark:bg-[#09090B] md:p-10">
+      <div className="order-1 flex flex-1 items-center justify-center bg-[#F7F5F0] p-6 dark:bg-[#09090B] md:order-0 md:p-10">
         {/*
           ── Replace the div below with your actual image, e.g.:
           <Image
@@ -532,19 +519,12 @@ export default function ResourceComponent() {
             className="h-full w-full object-contain p-8"
           />
         */}
-        <div className="relative aspect-[4/3] w-full max-w-[460px]">
+        <div className="relative aspect-4/3 w-full max-w-115">
           <Image
-            src={lightSrc}
+            src={imageSrc}
             alt={card.imageAlt}
             fill
-            className="object-contain dark:hidden"
-            sizes="(max-width: 768px) 100vw, 40vw"
-          />
-          <Image
-            src={darkSrc}
-            alt={card.imageAlt}
-            fill
-            className="hidden object-contain dark:block"
+            className="object-contain"
             sizes="(max-width: 768px) 100vw, 40vw"
           />
         </div>
@@ -561,26 +541,23 @@ export default function ResourceComponent() {
         // imageSide='left'  → image left, content right → partial border on RIGHT side (top+right+bottom only)
         // imageSide='right' → content left, image right → partial border on LEFT  side (top+left+bottom only)
         className={[
-          'relative flex min-h-[380px] overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]',
+          'relative flex min-h-95 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]',
           // C-shape achieved via mx offset + border on 3 sides
           isImageLeft
-            ? 'ml-6 rounded-r-[28px] border-y border-r border-[#737373]/60'
-            : 'mr-6 rounded-l-[28px] border-y border-l border-[#737373]/60',
+            ? 'ml-4 rounded-r-[28px] border-y border-r border-[#737373]/60 md:ml-6'
+            : 'mr-4 rounded-l-[28px] border-y border-l border-[#737373]/60 md:ml-0 md:mr-6 md:rounded-r-none md:rounded-l-[28px] md:border-r-0 md:border-l',
           // Mobile: stack vertically
           'flex-col md:flex-row',
         ].join(' ')}
       >
         {isImageLeft ? (
           <>
-            {/* Divider line between image and content */}
             {imageBlock}
-            <div className="hidden w-px self-stretch bg-[#737373]/30 md:block" />
             {contentBlock}
           </>
         ) : (
           <>
             {contentBlock}
-            <div className="hidden w-px self-stretch bg-[#737373]/30 md:block" />
             {imageBlock}
           </>
         )}
@@ -689,7 +666,7 @@ export default function ResourceComponent() {
 
       {/* ── Technical Deep Dives ──────────────────────────────────────────── */}
       <section className="bg-[#F7F5F0] px-4 pb-14 dark:bg-[#09090B] md:pb-18">
-        <div className="mx-auto max-w-7xl bg-[#EAF1EC] px-5 py-10 dark:bg-[#101713] md:px-6 md:py-12">
+        <div className="mx-auto max-w-7xl rounded-xl bg-[#EAF1EC] px-5 py-10 dark:bg-[#101713] md:px-6 md:py-12">
           <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-[clamp(2rem,3vw,2.25rem)] font-bold text-[#18181B] dark:text-white">{sectionLabels.technical}</h2>
