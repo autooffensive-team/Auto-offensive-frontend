@@ -529,7 +529,7 @@ export default function PlatformCapabilities() {
                 custom={4}
                 className={`${primaryButtonClass} w-fit bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
               >
-                <FileText className="w-5 h-5 transition-transform duration-300 group-hover:translate-y-[-1px]" />
+                <FileText className="w-5 h-5 transition-transform duration-300 group-hover:-translate-y-px" />
                 <span>{t("common.viewDocumentation")}</span>
               </motion.button>
             </div>
