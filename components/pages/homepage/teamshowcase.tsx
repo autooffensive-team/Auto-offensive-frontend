@@ -23,10 +23,6 @@ export default function TeamShowcase() {
     >
       <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-12 lg:grid-cols-[1.2fr_1.6fr] lg:gap-20">
         <div className="relative z-10">
-          <p className="mb-6 text-xs font-bold uppercase tracking-[3px] text-[#00BCA1]">
-            {t("eyebrow")}
-          </p>
-
           <h3
             className="mb-2 font-bold uppercase leading-[1.1] text-[#01509e] dark:text-white"
             style={{

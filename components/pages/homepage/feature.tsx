@@ -862,8 +862,6 @@ export default function Features() {
   const mode = useResponsiveMode();
   const isDesktop = mode === "desktop";
   const sectionPaddingX = mode === "mobile" ? "20px" : mode === "tablet" ? "32px" : "52px";
-  const sectionHeaderLabelSize = mode === "mobile" ? "9px" : mode === "tablet" ? "10px" : FONT_SIZES.xs.desktop;
-  const sectionTitleLine2 = t("sectionTitleLine2");
 
   const firstCardRef = useRef<HTMLDivElement | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
@@ -1055,40 +1053,17 @@ export default function Features() {
             borderColor: colors.border,
           }}
         >
-          <div>
-            <p
-              className="uppercase mb-2.5"
-              style={{
-                fontFamily: labelFontFamily,
-                color: colors.accent2,
-                fontSize: sectionHeaderLabelSize,
-                letterSpacing: "0.2em",
-              }}
-            >
-              {t("sectionEyebrow")}
-            </p>
-            <h2
-              className="font-bold leading-[1.1]"
-              style={{
-                fontFamily: displayFontFamily,
-                fontSize: getResponsiveFontSize("4xl"),
-                letterSpacing: "-0.02em",
-                color: colors.text,
-              }}
-            >
-              {t("sectionTitleLine1")}
-              <br />
-              {sectionTitleLine2.includes("Auto Offensive") ? (
-                <>
-                  with{" "}
-                  <span style={{ color: CONFIG.LIGHT.accent2 }}>Auto</span>{" "}
-                  <span style={{ color: CONFIG.LIGHT.accent1 }}>Offensive</span>
-                </>
-              ) : (
-                sectionTitleLine2
-              )}
-            </h2>
-          </div>
+          <h2
+            className="font-bold leading-[1.1]"
+            style={{
+              fontFamily: displayFontFamily,
+              fontSize: getResponsiveFontSize("4xl"),
+              letterSpacing: "-0.02em",
+              color: colors.text,
+            }}
+          >
+            {t("sectionTitleLine1")}
+          </h2>
         </div>
 
         {/* Card Rows */}
