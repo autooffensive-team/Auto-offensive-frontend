@@ -208,6 +208,7 @@
       "secondaryCta": "View Docs"
     },
     "grid": {
+      "sectionSubtitle": "Enterprise-grade tools designed for security professionals",
       "web": {
         "title": "Web-Based Pentesting Automation",
         "desc": "Orchestrate complex security workflows without touching a terminal. Launch industrial-grade tools like Subfinder for discovery, Nmap for port mapping, and Nuclei for vulnerability scanning through a unified, high-fidelity interface."

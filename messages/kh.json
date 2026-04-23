@@ -66,6 +66,7 @@
       "secondaryCta": "មើលឯកសារ"
     },
     "grid": {
+      "sectionSubtitle": "ឧបករណ៍កម្រិតសហគ្រាសដែលរចនាឡើងសម្រាប់អ្នកឯកទេសផ្នែកសុវត្ថិភាព",
       "web": {
         "title": "Pentesting Automation តាម Web",
         "desc": "គ្រប់គ្រង workflow សុវត្ថិភាពស្មុគស្មាញ ដោយមិនចាំបាច់ប្រើ terminal។ ប្រើ tools កម្រិតអាជីពដូចជា Subfinder (ស្វែងរក), Nmap (ស្កេន port) និង Nuclei (ស្កេន vulnerability) តាមរយៈ interface តែមួយដែលងាយប្រើ"
