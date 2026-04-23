@@ -269,12 +269,12 @@ html[lang="kh"] .resource-page h6 {
 }
 
 .resource-page-copy {
-  font-size: 16px;
+  font-size: 16px !important;
   line-height: 1.75;
 }
 
 .resource-page-meta {
-  font-size: 16px;
+  font-size: 16px !important;
   line-height: 1.6;
 }
 
@@ -286,13 +286,13 @@ html[lang="kh"] .resource-page h6 {
 @media (min-width: 768px) {
   .resource-page-copy,
   .resource-page-meta {
-    font-size: 18px;
+    font-size: 18px !important;
   }
 }
 
 @media (min-width: 1024px) {
   .resource-page-copy,
   .resource-page-meta {
-    font-size: 20px;
+    font-size: 20px !important;
   }
 }

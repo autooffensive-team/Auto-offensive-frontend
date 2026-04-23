@@ -3,6 +3,7 @@
 import { Database, BarChart3, Zap} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import AnimatedCta from '../homepage/animated-cta'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -92,28 +93,25 @@ export default function QuickStartPaths() {
                 <p className="resource-page-copy mb-4 flex-1 text-foreground/70">
                   {path.description}
                 </p>
-                <a
+                <AnimatedCta
+                  as="a"
                   href={path.link}
-                  className="
-                    resource-page-button
-                    group relative mt-auto inline-flex w-full items-center justify-center gap-2
-                    overflow-hidden rounded-xl border-2 border-primary/35 bg-primary/6
-                    py-2.5 font-semibold text-primary
-                    transition-colors duration-200 hover:border-primary/55 hover:bg-primary/10
-                    before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
-                    before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,208,178,0.10)_25%,transparent_0,transparent_50%,rgba(0,208,178,0.10)_0,rgba(0,208,178,0.10)_75%,transparent_0)]
-                    before:transition-transform before:duration-200 before:content-['']
-                    after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
-                    after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,208,178,0.16)_0,rgba(0,208,178,0.16)_50%,transparent_0,transparent_75%,rgba(0,208,178,0.12)_0)]
-                    after:transition-transform after:duration-200 after:content-['']
-                    hover:before:translate-y-0 hover:after:translate-y-0
-                  "
+                  className="resource-page-button mt-auto mx-auto w-auto min-w-[168px] self-center rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] text-[15px] font-bold text-white hover:bg-[#00a892] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
+                  iconClassName="bg-white text-[#00BCA1] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(0,188,161,0.16)] dark:bg-white dark:text-[#00BCA1]"
+                  icon={
+                    <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path
+                        d="M6 1L11 6L6 11M11 6H1"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  }
                 >
-                  <span className="relative z-10 inline-flex items-center gap-2">
-                    {t('quickStart.learnMore')}
-                    <span>→</span>
-                  </span>
-                </a>
+                  {t('quickStart.learnMore')}
+                </AnimatedCta>
               </motion.div>
             )
           })}

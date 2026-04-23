@@ -118,7 +118,7 @@ export default function Hero() {
                 resource-page-button
                 group relative inline-flex items-center justify-center gap-2
                 overflow-hidden rounded-xl border-2 border-primary bg-primary
-                min-h-[48px] px-3 py-2.5 text-center text-[13px] font-semibold leading-tight text-primary-foreground
+                min-h-12 px-3 py-2.5 text-center text-[13px] font-semibold leading-tight text-primary-foreground
                 transition-colors duration-200
                 before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
                 before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
@@ -139,7 +139,7 @@ export default function Hero() {
                 inline-flex items-center justify-center gap-2
                 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)]
                 bg-white dark:bg-[rgba(0,208,178,0.06)]
-                min-h-[48px] px-3 py-2.5 text-center text-[13px] font-semibold leading-tight text-black dark:text-white
+                min-h-12 px-3 py-2.5 text-center text-[13px] font-semibold leading-tight text-black dark:text-white
                 backdrop-blur-sm transition-colors duration-200
                 md:min-h-0 md:px-6 md:py-3 md:text-[15px]
               ">
