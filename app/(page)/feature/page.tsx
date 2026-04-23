@@ -110,9 +110,9 @@ export default function PlatformCapabilities() {
     : "var(--font-google-sans), sans-serif";
   const sectionDescriptionClass = "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.7]";
   const primaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "group inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
   const secondaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-lg border px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "group inline-flex items-center justify-center gap-2 rounded-lg border px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
   const docsButtonClass =
     "group relative inline-flex h-[2.55em] w-fit items-center justify-start overflow-hidden rounded-xl border border-[#E2DDD5] bg-white px-[0.95em] pr-[2.2em] text-[13px] font-semibold text-[#01509E] transition-[transform,background-color,color,border-color] duration-300 hover:-translate-y-px hover:border-[#01509E] hover:bg-[#01509E] hover:text-white dark:border-white/10 dark:bg-[#111113] dark:text-[#7AAEF7] dark:hover:border-[#00BCA1] dark:hover:bg-[#00BCA1] dark:hover:text-[#09090B] sm:h-[2.8em] sm:px-[1.2em] sm:pr-[3.3em]";
   const docsButtonIconClass =
@@ -206,9 +206,7 @@ export default function PlatformCapabilities() {
             >
               {t("hero.subtitle")}
               <br />
-              <span className="text-sm opacity-90">
-                ឧបករណ៍ថេរលម្អិត ដែលរចនាឡើងសម្រាប់អ្នកឯកទេសផ្នែកសុវត្ថិភាព
-              </span>
+              
             </motion.p>
 
             <motion.div
@@ -216,18 +214,20 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={3}
-              className="flex flex-row flex-nowrap items-center justify-center gap-2 sm:gap-4 w-full"
+              className="flex w-full flex-row flex-nowrap items-center justify-center gap-2 sm:gap-4"
             >
               <button
-                className={`${primaryButtonClass} flex-1 sm:flex-none whitespace-nowrap bg-[#00BCA1] text-white hover:bg-[#0AAE98]`}
+                className={`${primaryButtonClass} min-w-0 flex-1 whitespace-nowrap px-3 py-2.5 sm:flex-none sm:px-3.5 sm:py-2.5 bg-[#00BCA1] text-white hover:bg-[#0AAE98]`}
               >
-                <span>{t("hero.primaryCta")}</span>
+                <span className="sm:hidden">Start Scanning</span>
+                <span className="hidden sm:inline">{t("hero.primaryCta")}</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
               <button
-                className={`${secondaryButtonClass} flex-1 sm:flex-none whitespace-nowrap bg-[#F7F5F0] text-slate-900 border-[#E2DDD5] hover:bg-[#EFE9DE] hover:border-[#CFC7BA] dark:bg-[#09090B] dark:text-slate-100 dark:border-white/10 dark:hover:bg-[#151A18] dark:hover:border-white/20`}
+                className={`${secondaryButtonClass} min-w-0 flex-1 whitespace-nowrap px-3 py-2.5 sm:flex-none sm:px-3.5 sm:py-2.5 bg-[#F7F5F0] text-slate-900 border-[#E2DDD5] hover:bg-[#EFE9DE] hover:border-[#CFC7BA] dark:bg-[#09090B] dark:text-slate-100 dark:border-white/10 dark:hover:bg-[#151A18] dark:hover:border-white/20`}
               >
-                <span>{t("hero.secondaryCta")}</span>
+                <span className="sm:hidden">Read the Docs</span>
+                <span className="hidden sm:inline">{t("hero.secondaryCta")}</span>
                 <ExternalLink className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" />
               </button>
             </motion.div>
