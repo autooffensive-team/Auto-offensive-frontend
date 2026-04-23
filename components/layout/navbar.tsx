@@ -8,7 +8,7 @@ import { useTheme } from '@/components/theme-provider';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,7 +20,6 @@ import {
 import {
   SunIcon,
   MoonIcon,
-  ChevronDownIcon,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -28,6 +27,7 @@ type ToolItem = {
   title: string;
   href: string;
   icon: string; 
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 type FeatureItem = {
@@ -35,6 +35,7 @@ type FeatureItem = {
   description: string;
   href: string;
   icon: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 type ResourceItem = {
@@ -42,6 +43,7 @@ type ResourceItem = {
   description?: string;
   href: string;
   icon: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -140,33 +142,27 @@ type Lang = 'en' | 'kh';
 
 function LanguageToggle() {
   const [mounted, setMounted] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
+  const khmerLabel = '\u1781\u17d2\u1798\u17c2\u179a';
+  const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
+  const currentLabel = currentLocale === 'en' ? 'EN' : 'KH';
+  const nextLabel = currentLocale === 'en' ? khmerLabel : 'EN';
 
   React.useEffect(() => setMounted(true), []);
 
-  React.useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleLocaleChange = (newLocale: Lang) => {
-    // eslint-disable-next-line react-hooks/immutability
-    window.document.cookie = `locale=${newLocale};path=/;max-age=31536000;SameSite=Lax`;
-    router.refresh();
-    setOpen(false);
+  const handleLocaleChange = () => {
+    startTransition(() => {
+      // eslint-disable-next-line react-hooks/immutability
+      window.document.cookie = `locale=${nextLocale};path=/;max-age=31536000;SameSite=Lax`;
+      router.refresh();
+    });
   };
 
-  const options: { value: Lang; label: string; flagSrc: string }[] = [
-    { value: 'en', label: 'English',  flagSrc: '/flags/en.png' },
-    { value: 'kh', label: 'ខ្មែរ',     flagSrc: '/flags/kh.png' },
+  const options: { value: Lang; label?: string; flagSrc: string }[] = [
+    { value: 'en', flagSrc: '/flags/en.png' },
+    { value: 'kh', flagSrc: '/flags/kh.png' },
   ];
 
   if (!mounted) return <div className="w-14 h-7" />;
@@ -174,42 +170,37 @@ function LanguageToggle() {
   const current = options.find(o => o.value === currentLocale) || options[0];
 
   return (
-    <div ref={ref} className="relative shrink-0">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-transparent text-sm font-medium cursor-pointer hover:bg-primary/10 transition-colors"
-      >
-        <Image src={current.flagSrc} alt={current.value} width={20} height={14} style={{ width: 'auto', height: 'auto' }} className="object-cover" />
-        <span>{current.value.toUpperCase()}</span>
-        <ChevronDownIcon className={cn('size-3.5 transition-transform', open && 'rotate-180')} />
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-1 w-36 bg-popover shadow-lg z-50 overflow-hidden">
-          {options.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => handleLocaleChange(opt.value)}
-              className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-primary/10 transition-colors cursor-pointer',
-                currentLocale === opt.value && 'bg-primary/10 font-semibold',
-              )}
-            >
-              <Image src={opt.flagSrc} alt={opt.value} width={20} height={14} style={{ width: 'auto', height: 'auto' }} className="object-cover" />
-              <span>{opt.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={handleLocaleChange}
+      disabled={isPending}
+      aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
+      className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-zinc-200/80 bg-white/80 px-2.5 text-zinc-900 shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-100 dark:hover:bg-zinc-900"
+    >
+      <Image
+        src={current.flagSrc}
+        alt={current.value}
+        width={18}
+        height={12}
+        className="rounded-xs object-cover"
+      />
+      <span className="text-xs font-semibold tracking-[0.14em]">
+        {currentLabel}
+      </span>
+      <span className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs">⇄</span>
+        {isPending ? '...' : nextLabel}
+      </span>
+    </button>
   );
 }
 
 // ── Tool List Item (image icon, 2-col grid) ───────────────────────────────────
-function ToolItem({ title, href, icon }: ToolItem) {
+function ToolItem({ title, href, icon, onClick }: ToolItem) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
       <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 shadow-sm">
@@ -229,10 +220,11 @@ function ToolItem({ title, href, icon }: ToolItem) {
 }
 
 // ── Feature List Item (image icon + description) ──────────────────────────────
-function FeatureItem({ title, description, href, icon }: FeatureItem) {
+function FeatureItem({ title, description, href, icon, onClick }: FeatureItem) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="flex items-start gap-3 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
       <div className="mt-0.5 flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-background/80 shadow-sm">
@@ -260,11 +252,13 @@ function ResourceDocItem({
   description,
   href,
   icon,
+  onClick,
   asMenuLink = false,
 }: ResourceItem & { asMenuLink?: boolean }) {
   const content = (
     <Link
       href={href}
+      onClick={onClick}
       className="flex items-start gap-3 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
       <div className="shrink-0 w-9 h-9 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
@@ -296,11 +290,13 @@ function ResourceMiscItem({
   title,
   href,
   icon,
+  onClick,
   asMenuLink = false,
 }: ResourceItem & { asMenuLink?: boolean }) {
   const content = (
     <Link
       href={href}
+      onClick={onClick}
       className="flex items-center gap-2.5 rounded-md px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
     >
       <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
@@ -318,6 +314,7 @@ function ResourceMiscItem({
 
   return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
+
 
 // ── Scroll hook ───────────────────────────────────────────────────────────────
 function useScroll(threshold: number) {
@@ -365,6 +362,9 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
 // ── Header ────────────────────────────────────────────────────────────────────
 export function Header() {
   const t = useTranslations('nav');
+  const locale = useLocale();
+  const pathname = usePathname();
+  const isKhmer = locale === 'kh';
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
 
@@ -372,6 +372,10 @@ export function Header() {
     document.body.style.overflow = open ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [open]);
+
+  React.useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <header
@@ -505,37 +509,69 @@ export function Header() {
             </div>
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"><Link href="/tools">Tools</Link></p>
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
+            <Link
+              href="/tools"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-2 gap-0.5">
             {toolLinks.map((link, i) => (
-              <ToolItem key={i} {...link} />
+              <ToolItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2"><Link href="/feature">Features</Link></p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Features</p>
+            <Link
+              href="/feature"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-1 gap-1">
             {featureLinks.map((link, i) => (
-              <FeatureItem key={i} {...link} />
+              <FeatureItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2"><Link href="/resource">Resources</Link></p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
+            <Link
+              href="/resource"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary"
+            >
+              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
+            </Link>
+          </div>
           <div className="grid grid-cols-1 gap-0.5">
             {resourceDocLinks.map((link, i) => (
-              <ResourceDocItem key={i} {...link} />
+              <ResourceDocItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
             {resourceMiscLinks.map((link, i) => (
-              <ResourceMiscItem key={i} {...link} />
+              <ResourceMiscItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
           </div>
         </div>
 
         <div className="flex flex-col gap-2 pt-2 border-t border-border">
-          <button className="w-full py-2 rounded-md border border-primary text-primary text-sm font-semibold bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
+          <Link
+            href="/register"
+            onClick={() => setOpen(false)}
+            className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+          >
             {t('loginRegister')}
-          </button>
+          </Link>
         </div>
       </MobileMenu>
     </header>
   );
 }
+

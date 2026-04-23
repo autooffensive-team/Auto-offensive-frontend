@@ -25,10 +25,12 @@ import {
   Moon,
   Sun,
   Menu,
+  ArrowUp,
 } from "lucide-react";
 
 import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
+import GoToTop from "@/components/ui/go-to-top";
 
 const mainNavItems = [
   { label: "Overview", path: "/userdashboard", icon: LayoutDashboard },
@@ -490,6 +492,8 @@ export default function UserDashboardLayout({
           {children}
         </main>
       </div>
+
+      <GoToTop />
     </div>
   );
 }

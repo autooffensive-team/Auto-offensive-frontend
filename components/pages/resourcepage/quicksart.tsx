@@ -3,27 +3,7 @@
 import { Database, BarChart3, Zap} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-
-const paths = [
-  {
-    icon: Database,
-    title: 'Data Requests',
-    description: 'Complete guide for requesting and managing clinical data with proper documentation and audit trails.',
-    link: '#'
-  },
-  {
-    icon: BarChart3,
-    title: 'PLR Marketplace',
-    description: 'Explore our patient level research marketplace with curated datasets and integration examples.',
-    link: '#'
-  },
-  {
-    icon: Zap,
-    title: 'EDSA Integration',
-    description: 'Step-by-step integration guide for the External Data Source API with code samples.',
-    link: '#'
-  }
-]
+import AnimatedCta from '../homepage/animated-cta'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -53,27 +33,30 @@ export default function QuickStartPaths() {
       icon: Database,
       title: t('quickStart.items.data.title'),
       description: t('quickStart.items.data.description'),
-      link: '#'
+      link: '#',
+      iconColor: 'text-primary'
     },
     {
       icon: BarChart3,
       title: t('quickStart.items.marketplace.title'),
       description: t('quickStart.items.marketplace.description'),
-      link: '#'
+      link: '#',
+      iconColor: 'text-primary'
     },
     {
       icon: Zap,
       title: t('quickStart.items.integration.title'),
       description: t('quickStart.items.integration.description'),
-      link: '#'
+      link: '#',
+      iconColor: 'text-primary'
     }
   ]
 
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-black dark:to-white">
+    <section className="py-12 md:py-16 bg-[#F7F5F0] dark:bg-[#09090B]">
       <div className="max-w-7xl mx-auto px-4">
         <motion.div 
-          className="mb-12"
+          className="mb-8 md:mb-10"
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -82,12 +65,12 @@ export default function QuickStartPaths() {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance">
             {t('quickStart.title')}
           </h2>
-          <p className="text-lg text-foreground/60">
+          <p className="resource-page-copy text-foreground/60">
             {t('quickStart.subtitle')}
           </p>
         </motion.div>
         <motion.div
-          className="grid md:grid-cols-3 gap-6 lg:gap-8"
+          className="grid md:grid-cols-3 gap-5 lg:gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -98,23 +81,37 @@ export default function QuickStartPaths() {
             return (
               <motion.div 
                 key={idx} 
-                className="p-6 md:p-8 border border-border rounded-xl hover:border-primary/50 hover:shadow-lg transition"
+                className="flex h-full flex-col rounded-xl border border-border bg-white dark:bg-[#111113] p-6 md:p-7 transition-[border-color,box-shadow] duration-200 hover:border-[#00BCA1]/60 hover:shadow-[0_0_0_1px_rgba(0,188,161,0.18),0_0_16px_rgba(0,188,161,0.10)]"
                 variants={itemVariants}
-                whileHover={{ y: -5 }}
               >
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="text-primary" size={24} />
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-primary/5">
+                  <Icon className={path.iconColor} size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
+                <h3 className="mb-2 text-2xl font-bold text-foreground">
                   {path.title}
                 </h3>
-                <p className="text-foreground/70 mb-4 leading-relaxed">
+                <p className="resource-page-copy mb-4 flex-1 text-foreground/70">
                   {path.description}
                 </p>
-                <a href={path.link} className="text-primary font-semibold hover:text-primary/80 transition flex items-center gap-2">
+                <AnimatedCta
+                  as="a"
+                  href={path.link}
+                  className="resource-page-button mt-auto mx-auto w-auto min-w-42 self-center rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] text-[15px] font-bold text-white hover:bg-[#00a892] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
+                  iconClassName="bg-white text-[#00BCA1] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(0,188,161,0.16)] dark:bg-white dark:text-[#00BCA1]"
+                  icon={
+                    <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path
+                        d="M6 1L11 6L6 11M11 6H1"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  }
+                >
                   {t('quickStart.learnMore')}
-                  <span>→</span>
-                </a>
+                </AnimatedCta>
               </motion.div>
             )
           })}

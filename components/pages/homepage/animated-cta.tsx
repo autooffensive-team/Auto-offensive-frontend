@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import Link from "next/link";
 
 type BaseProps = {
   children: ReactNode;
@@ -29,6 +30,9 @@ const labelClasses = "relative z-10";
 const iconClasses =
   "absolute right-[0.25em] top-1/2 z-0 flex h-[1.75em] w-[1.75em] -translate-y-1/2 items-center justify-center overflow-hidden rounded-[0.55em] transition-[width,transform,background-color,color,box-shadow] duration-300 group-hover:w-[calc(100%-0.45em)] group-active:scale-95 sm:right-[0.3em] sm:h-[2.2em] sm:w-[2.2em] sm:rounded-[0.7em] sm:group-hover:w-[calc(100%-0.6em)]";
 
+const isExternalHref = (href: string) =>
+  /^(?:[a-z][a-z\d+\-.]*:|\/\/)/i.test(href);
+
 export default function AnimatedCta(props: ButtonProps | LinkProps) {
   const {
     children,
@@ -51,6 +55,14 @@ export default function AnimatedCta(props: ButtonProps | LinkProps) {
   const classes = `${baseClasses} ${className}`.trim();
 
   if (props.as === "a") {
+    if (!isExternalHref(props.href)) {
+      return (
+        <Link href={props.href} className={classes} style={style}>
+          {content}
+        </Link>
+      );
+    }
+
     return (
       <a href={props.href} className={classes} style={style}>
         {content}

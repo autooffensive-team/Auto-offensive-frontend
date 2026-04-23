@@ -451,12 +451,12 @@
       "badge": "មជ្ឈមណ្ឌលឯកសារ",
       "titleLine1": "រៀន · មើលឯកសារ ·",
       "titleLine2": "អនុវត្ត",
-      "subtitle": "មគ្គុទ្ទេសក៍ ឯកសារ API និង tutorial ដើម្បីជួយអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព"
+      "subtitle": "មគ្គុទ្ទេសក៍, ឯកសារ API និង tutorials ដើម្បីជួយអ្នកប្រើ Auto-Offensive និងអភិវឌ្ឍជំនាញសុវត្ថិភាពរបស់អ្នក"
     },
     "categories": {
       "title": "ប្រភេទឯកសារ",
       "subtitle": "ស្វែងរកឯកសារតាមប្រធានបទ",
-      "viewAll": "មើលទាំងអស់",
+      "viewAll": "មើលឯកសារទាំងអស់",
       "cards": {
         "tools": {
           "title": "ឯកសារ Tools",
@@ -537,81 +537,81 @@
       "items": {
         "dll": {
           "title": "ឯកសារ DLL",
-          "description": "បណ្ណាល័យឯកសារផ្�Official ជាមួយ specifications, white papers, និង execution guides ។",
+          "description": "បណ្ណាល័យឯកសារផ្លូវការ រួមមាន specifications, white papers និង implementation guides",
           "items": ["ពិសេស API", "Architecture Guide", "Data Dictionary", "Compliance Matrix"],
           "cta": "ស្វែងយល់"
         },
         "api": {
           "title": "ធនធាន API",
-          "description": "ឯកសារ API ពេញលេញ រួមមាន endpoints, ឧទាហរណ៍, និង error handling ។",
+          "description": "ឯកសារ API ពេញលេញ រួមមាន endpoints, ឧទាហរណ៍ និងការដោះស្រាយ error",
           "items": ["REST Endpoints", "Authentication", "Rate Limiting", "Error Codes"],
           "cta": "ស្វែងយល់"
         },
         "integration": {
-          "title": "ឧបករណ៍រួមបញ្ចូល",
-          "description": "ឧបករណ៍ និង utilities សម្រាប់ករណី រួមបញ្ចូល ទូទៅ ។",
+          "title": "Tools សម្រាប់ Integration",
+          "description": "tools និង utilities សម្រាប់ការភ្ជាប់ប្រព័ន្ធក្នុងករណីទូទៅ",
           "items": ["SDKs", "Libraries", "CLI Tools", "Testing Tools"],
           "cta": "ស្វែងយល់"
         }
       }
     },
     "quickStart": {
-      "title": "ផ្លូវចាប់ផ្តើម រហ័ស",
-      "subtitle": "ចាប់ផ្តើម ហើយ ដំណើរការ ជាមួយ pathways ចាំបាច់",
+      "title": "ផ្លូវចាប់ផ្តើមរហ័ស",
+      "subtitle": "ចាប់ផ្តើមប្រើប្រាស់បានលឿន ជាមួយជំហានសំខាន់ៗទាំងនេះ",
       "items": {
         "data": {
-          "title": "ការស្នើរទិន្នន័យ",
-          "description": "មគ្គុទ្ទេស ពេញ លេញ ស្នើ ហើយ គ្រប់គ្រង ទិន្នន័យ clinical ជាមួយ documentation និង audit trails ។"
+          "title": "ការស្នើសុំទិន្នន័យ",
+          "description": "មគ្គុទ្ទេសពេញលេញសម្រាប់ស្នើ និងគ្រប់គ្រងទិន្នន័យ clinical ជាមួយ documentation និង audit trail"
         },
         "marketplace": {
           "title": "PLR Marketplace",
-          "description": "ស្វែងយល់ ផ្ទាល់ ខ្លួន នៅ ទីផ្សារ research ដែល មាន datasets និង ឧទាហរណ៍ រួមបញ្ចូល ។"
+          "description": "ស្វែងរក datasets និងឧទាហរណ៍ integration សម្រាប់ការស្រាវជ្រាវ"
         },
         "integration": {
-          "title": "EDSA Integration",
-          "description": "មគ្គុទ្ទេស ជំហាន ដោយ ជំហាន ស្វែងរក API Source ខាងក្រៅ ជាមួយ code samples ។"
+          "title": "ការភ្ជាប់ EDSA",
+          "description": "មគ្គុទ្ទេសជំហានៗ សម្រាប់ភ្ជាប់ External Data Source API ជាមួយ code samples"
         }
       },
       "learnMore": "ស្វែងយល់បន្ថែម"
     },
     "technical": {
-      "title": "ការចូលជ្រៅ បច្ចេកទេស",
-      "subtitle": "មគ្គុទ្ទេស ទូទំនាយ សម្រាប់ implementations កម្រិត ខ្ពស់",
+      "title": "ការពន្យល់បច្ចេកទេសលម្អិត",
+      "subtitle": "មគ្គុទ្ទេសសម្រាប់ការអនុវត្តកម្រិតខ្ពស់",
       "items": {
         "api": {
-          "title": "API Integration",
-          "description": "ឯកសារ API ពេញលេញ ជាមួយ authentication, rate limits, និង patterns កម្រិត ខ្ពស់ ។",
+          "title": "ការភ្ជាប់ API",
+          "description": "ឯកសារ API ពេញលេញ ជាមួយ authentication, rate limit និង query patterns កម្រិតខ្ពស់",
           "tags": ["REST", "GraphQL", "Webhooks"]
         },
         "sdk": {
-          "title": "SDK Reference",
-          "description": "Native SDKs សម្រាប់ Python, JavaScript, Java ជាមួយ documentation និង ឧទាហរណ៍ ពេញ ។",
+          "title": "ឯកសារ SDK",
+          "description": "SDK សម្រាប់ Python, JavaScript និង Java ជាមួយឯកសារ និងឧទាហរណ៍ពេញលេញ",
           "tags": ["Python", "JavaScript", "Java"]
         },
         "security": {
-          "title": "Security Protocols",
-          "description": "ចូល ជ្រៅ ទៅ ក្នុង encryption, compliance, និង មគ្គុទ្ទេស សុវត្ថិភាព ។",
+          "title": "ស្តង់ដារសុវត្ថិភាព",
+          "description": "ពន្យល់អំពី encryption, compliance និង best practices សុវត្ថិភាព",
           "tags": ["HIPAA", "Encryption", "Audit Logs"]
         },
         "user": {
-          "title": "User Management",
-          "description": "Role-based access control, user provisioning, និង មុខងារ សហការ ក្រុម ។",
+          "title": "ការគ្រប់គ្រងអ្នកប្រើប្រាស់",
+          "description": "Role-based access control, ការបង្កើតអ្នកប្រើ និងការសហការក្រុម",
           "tags": ["RBAC", "SSO", "Teams"]
         }
       }
     },
     "status": {
-      "title": "ស្ថានភាព ប្រតិបត្តិ របស់ វេទិកា",
-      "subtitle": "ស្ថានភាព ពេល ជាក់ ស្តែ ង នៃ សេវា និង infrastructure ទាំងអស់ របស់ Clinical Precision",
+      "title": "ស្ថានភាពប្រព័ន្ធ",
+      "subtitle": "ស្ថានភាពពេលវេលាជាក់ស្តែង នៃសេវា និង infrastructure ទាំងអស់",
       "service": "សេវា",
       "status": "ស្ថានភាព",
       "uptime": "Uptime",
       "lastIncident": "ចុងក្រោយ Incident",
-      "operational": " ដំណើរការ",
-      "degraded": " ធ្មេច",
-      "maintenance": " ថែទាំ",
-      "statusNote": "Status Page: សម្រាប់ ព័ត៌ មាន លម្អិត និង ប្រវត្តិ ហេតុ ចូល ទៅ កាន់",
-      "dedicatedPage": "status page ផ្តាច់ ពី"
+      "operational": "ដំណើរការធម្មតា",
+      "degraded": "ដំណើរការខ្សោយ",
+      "maintenance": "កំពុងថែទាំ",
+      "statusNote": "សម្រាប់ព័ត៌មានលម្អិត និងប្រវត្តិ incident សូមចូលទៅកាន់",
+      "dedicatedPage": "Status Page"
     }
   },
   "helpCenterPage": {
