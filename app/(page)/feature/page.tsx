@@ -690,7 +690,7 @@ export default function PlatformCapabilities() {
           initial="hidden"
           animate={workflowInView ? "visible" : "hidden"}
           custom={4}
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="mt-12 flex flex-row flex-wrap items-center justify-center gap-4"
         >
           <button
             className={`${primaryButtonClass} bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
