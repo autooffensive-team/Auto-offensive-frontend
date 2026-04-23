@@ -10,56 +10,35 @@ export default function ScanBox() {
   const scanOptions = ["Basic", "Medium", "Advance"];
 
   const handleStartScan = () => {
-    if (scanType === "Medium") {
-      router.push("/medium-scan"); // ✅ route here
-    } else if (scanType === "Basic") {
-      router.push("/basic-scan"); // optional
-    } else if (scanType === "Advance") {
-      router.push("/advance-scan"); // optional
-    }
+    if (scanType === "Medium") router.push("/medium-scan");
+    else if (scanType === "Basic") router.push("/basic-scan");
+    else router.push("/advance-scan");
   };
 
   return (
-    <div
-      className="
-        border-2 border-blue-400 
-        rounded-2xl p-8 
-        bg-gray-100 dark:bg-gray-800 
-        text-black dark:text-white 
-        shadow-lg transition-colors
-      "
-    >
-      <h2 className="text-2xl font-semibold text-center mb-6">
+    <div className="bg-[#0f172a] border border-gray-700 rounded-2xl p-8 shadow-md">
+      {/* Title */}
+      <h2 className="text-2xl font-semibold text-center mb-8 text-white tracking-wide">
         Initiate Autonomous Scan
       </h2>
 
       {/* Input + Button */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         <input
           placeholder="Enter Target (Domain, URL, or IP)"
-          className="
-            flex-1 
-            bg-gray-200 dark:bg-gray-700 
-            rounded-lg px-4 py-3 
-            outline-none 
-            text-black dark:text-white
-          "
+          className="flex-1 bg-[#020617] border border-gray-700 rounded-xl px-5 py-3 text-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         />
 
         <button
-          onClick={handleStartScan} // ✅ click triggers routing
-          className="
-            bg-gradient-to-r from-blue-500 to-teal-500 
-            text-white px-6 py-3 rounded-lg 
-            font-semibold hover:opacity-90 transition
-          "
+          onClick={handleStartScan}
+          className="bg-gradient-to-r from-blue-500 to-teal-500 px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-transform"
         >
           ▶ Start Scan ({scanType})
         </button>
       </div>
 
-      {/* Scan Type Buttons */}
-      <div className="flex justify-center gap-4 mt-6 flex-wrap">
+      {/* Scan Type */}
+      <div className="flex justify-center gap-3 mt-8 flex-wrap">
         {scanOptions.map((type) => {
           const isActive = scanType === type;
 
@@ -67,14 +46,12 @@ export default function ScanBox() {
             <button
               key={type}
               onClick={() => setScanType(type)}
-              className={`
-                px-4 py-2 rounded-full text-sm font-medium transition
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all
                 ${
                   isActive
-                    ? "bg-yellow-400 text-black shadow"
-                    : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-600"
-                }
-              `}
+                    ? "bg-yellow-400 text-black shadow-md scale-105"
+                    : "bg-[#020617] border border-gray-700 text-gray-400 hover:bg-gray-800"
+                }`}
             >
               {type} Scan
             </button>

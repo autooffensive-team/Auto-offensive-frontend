@@ -15,24 +15,17 @@ export default function VulnerabilitiesPage() {
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
 
   return (
-    <div className="flex min-h-screen bg-white dark:bg-gray-900" style={{ fontFamily: bodyFontFamily }}>
+    <div className="flex min-h-screen bg-white text-gray-900 dark:bg-[#0d1117] dark:text-white transition-colors">
       {/* Sidebar */}
-      <aside className="w-64 hidden md:block border-r border-gray-200 dark:border-gray-800">
-        <Sidebar />
-      </aside>
+      <Sidebar />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Content */}
-        <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      {/* Main */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="px-8 py-8 space-y-8 max-w-[1400px] mx-auto">
           <PageHeader />
           <StatsRow />
           <FindingsTable />
-
-          {/* Fix spacing ABOVE and BELOW banner */}
-          <div className="pt-6 pb-16">
-            <GuestBanner />
-          </div>
+          <GuestBanner />
         </div>
       </main>
     </div>

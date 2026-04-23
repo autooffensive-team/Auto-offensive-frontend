@@ -23,34 +23,37 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen shrink-0 transition-colors">
-      {/* Guest Mode */}
-      <div className="px-3 pt-4 mb-4">
-        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-            <User size={16} className="text-gray-500" />
+    <aside
+      className="w-64 h-[calc(100vh-64px)] sticky top-16 
+      bg-white dark:bg-[#0f172a] 
+      border-r border-gray-200 dark:border-gray-800 
+      flex flex-col text-gray-700 dark:text-gray-300"
+    >
+      {/* Header */}
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+            <User size={16} className="text-gray-500 dark:text-gray-400" />
           </div>
 
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <div>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">
               Guest Mode
-            </span>
-            <span className="text-[10px] text-gray-400 uppercase">
-              Limited Access
-            </span>
+            </p>
+            <p className="text-xs text-gray-500 uppercase">Limited Access</p>
           </div>
         </div>
       </div>
 
-      {/* Unlock Button */}
-      <div className="px-3 mb-5">
-        <button className="w-full bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-lg py-2 transition">
+      {/* Unlock */}
+      <div className="px-4 py-4">
+        <button className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-semibold rounded-xl py-2.5 hover:opacity-90 transition">
           Unlock Full Suite
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 space-y-1">
+      <nav className="flex-1 px-3 space-y-2">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.path);
           const Icon = item.icon;
@@ -59,13 +62,14 @@ export default function Sidebar() {
             <motion.button
               key={item.label}
               onClick={() => router.push(item.path)}
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition ${
-                isActive
-                  ? "bg-teal-50 dark:bg-teal-900 text-teal-600"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all
+                ${
+                  isActive
+                    ? "bg-gray-900 text-teal-400 dark:bg-black"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                }`}
             >
               <Icon size={18} />
               <span className="text-sm">{item.label}</span>
@@ -75,11 +79,11 @@ export default function Sidebar() {
       </nav>
 
       {/* New Scan */}
-      <div className="px-3 mb-4">
+      <div className="px-4 mb-4">
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-linear-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2"
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold rounded-xl py-2.5 flex items-center justify-center gap-2 shadow-md"
         >
           <Plus size={16} />
           New Scan
@@ -87,7 +91,7 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom */}
-      <div className="px-2 pb-5 space-y-1">
+      <div className="px-3 pb-5 border-t border-gray-200 dark:border-gray-800 pt-3 space-y-2">
         {[
           { label: "Settings", icon: Settings },
           { label: "Support", icon: LifeBuoy },
@@ -97,9 +101,12 @@ export default function Sidebar() {
           return (
             <motion.button
               key={item.label}
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl 
+              text-gray-600 dark:text-gray-400 
+              hover:bg-gray-100 dark:hover:bg-gray-800 
+              hover:text-black dark:hover:text-white transition"
             >
               <Icon size={18} />
               <span className="text-sm">{item.label}</span>
