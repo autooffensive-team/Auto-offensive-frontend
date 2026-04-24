@@ -102,42 +102,44 @@ function Logo() {
 
 // ── Theme Toggle ─────────────────────────────────────────────────────────────
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="w-14 h-7" />;
-  const isDark = theme === 'dark';
+  if (!mounted) return <div className="size-10 shrink-0 rounded-full" />;
+  const isDark = (theme === 'system' ? resolvedTheme : theme) === 'dark';
   return (
     <button
+      type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label="Toggle theme"
-      className={cn(
-        'relative inline-flex items-center w-14 h-7 rounded-full border-2 transition-colors duration-300 cursor-pointer shrink-0',
-        isDark
-          ? 'bg-gray-700 border-gray-600'
-          : 'bg-gray-200 border-gray-300',
-      )}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      aria-pressed={isDark}
+      className="group relative grid size-10 shrink-0 place-items-center rounded-full border border-zinc-300/80 bg-transparent text-zinc-700 transition-all duration-300 dark:border-white/10 dark:bg-transparent dark:text-zinc-100"
     >
-      {/* Sun icon — left */}
-      <span className="absolute left-1 flex items-center justify-center w-5 h-5">
-        <SunIcon className={cn('size-3.5 transition-opacity', isDark ? 'opacity-40' : 'opacity-100 text-amber-500')} />
-      </span>
-      {/* Moon icon — right */}
-      <span className="absolute right-1 flex items-center justify-center w-5 h-5">
-        <MoonIcon className={cn('size-3.5 transition-opacity', isDark ? 'opacity-100 text-blue-300' : 'opacity-40')} />
-      </span>
-      {/* Thumb */}
       <span
         className={cn(
-          'absolute top-0.5 w-5 h-5 rounded-full shadow transition-transform duration-300',
-          isDark ? 'translate-x-7 bg-blue-400' : 'translate-x-0.5 bg-amber-400',
+          'col-start-1 row-start-1 p-1.5 leading-none transition-transform duration-500',
+          isDark
+            ? 'scale-100 rotate-0 text-zinc-400 delay-200'
+            : 'scale-0 rotate-360 text-zinc-400 delay-0',
         )}
-      />
+      >
+        <MoonIcon className="size-5" />
+      </span>
+      <span
+        className={cn(
+          'col-start-1 row-start-1 p-1.5 leading-none transition-transform duration-500',
+          isDark
+            ? 'scale-0 -rotate-360 text-amber-500 delay-0'
+            : 'scale-100 rotate-360 text-amber-500 delay-200',
+        )}
+      >
+        <SunIcon className="size-5" />
+      </span>
+      <span className="sr-only">Toggle theme</span>
     </button>
   );
 }
 
-// ── Language Toggle ───────────────────────────────────────────────────────────
 type Lang = 'en' | 'kh';
 
 function LanguageToggle() {
@@ -145,10 +147,8 @@ function LanguageToggle() {
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
-  const khmerLabel = '\u1781\u17d2\u1798\u17c2\u179a';
   const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
-  const currentLabel = currentLocale === 'en' ? 'EN' : 'KH';
-  const nextLabel = currentLocale === 'en' ? khmerLabel : 'EN';
+  const isEnglish = currentLocale === 'en';
 
   React.useEffect(() => setMounted(true), []);
 
@@ -160,12 +160,12 @@ function LanguageToggle() {
     });
   };
 
-  const options: { value: Lang; label?: string; flagSrc: string }[] = [
-    { value: 'en', flagSrc: '/flags/en.png' },
-    { value: 'kh', flagSrc: '/flags/kh.png' },
+  const options: { value: Lang; flagSrc: string; code: string }[] = [
+    { value: 'en', flagSrc: '/flags/en.png', code: 'EN' },
+    { value: 'kh', flagSrc: '/flags/kh.png', code: 'KH' },
   ];
 
-  if (!mounted) return <div className="w-14 h-7" />;
+  if (!mounted) return <div className="h-10 w-23 shrink-0 rounded-full" />;
 
   const current = options.find(o => o.value === currentLocale) || options[0];
 
@@ -175,21 +175,31 @@ function LanguageToggle() {
       onClick={handleLocaleChange}
       disabled={isPending}
       aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
-      className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-zinc-200/80 bg-white/80 px-2.5 text-zinc-900 shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-100 dark:hover:bg-zinc-900"
+      aria-pressed={!isEnglish}
+      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-zinc-300/80 bg-white/90 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:border-white/15 dark:bg-zinc-950/80 dark:text-white"
     >
-      <Image
-        src={current.flagSrc}
-        alt={current.value}
-        width={18}
-        height={12}
-        className="rounded-xs object-cover"
-      />
-      <span className="text-xs font-semibold tracking-[0.14em]">
-        {currentLabel}
+      <span
+        className={cn(
+          'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-zinc-300/80 bg-white transition-all duration-300 ease-out dark:border-white/15 dark:bg-zinc-900',
+          isEnglish ? 'left-1.25' : 'left-[calc(100%-2rem)]',
+        )}
+      >
+        <Image
+          src={current.flagSrc}
+          alt={current.value}
+          width={28}
+          height={28}
+          className="h-full w-full object-cover"
+        />
       </span>
-      <span className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-        <span className="text-xs">⇄</span>
-        {isPending ? '...' : nextLabel}
+      <span
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2 text-lg font-semibold leading-none tracking-[0.02em] transition-all duration-300 ease-out',
+          isEnglish ? 'right-3 text-left' : 'left-3 text-left',
+          isPending && 'opacity-70',
+        )}
+      >
+        {current.code}
       </span>
     </button>
   );
