@@ -217,14 +217,24 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
   });
 }
 
+function FocusWord({ children }: { children: string }) {
+  return (
+    <span className="focus-word">
+      <span className="focus-word-corner focus-word-corner-tl" aria-hidden="true" />
+      <span className="focus-word-corner focus-word-corner-tr" aria-hidden="true" />
+      <span className="focus-word-corner focus-word-corner-bl" aria-hidden="true" />
+      <span className="focus-word-corner focus-word-corner-br" aria-hidden="true" />
+      <span className="focus-word-text">{children}</span>
+    </span>
+  );
+}
+
 export default function HomeHero() {
   const t = useTranslations("homepage.hero");
   const locale = useLocale();
   const isKhmer = locale === "kh";
   const titleLine3 = t("titleLine3");
-  const khmerTitleLine3Match = isKhmer
-    ? titleLine3.match(/^([\u1780-\u17FF\u200B-\u200D\s]+)(.*)$/u)
-    : null;
+  const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
   const hexLeftRef  = useRef<SVGSVGElement>(null);
   const hexRightRef = useRef<SVGSVGElement>(null);
   const s1Ref       = useRef<HTMLDivElement>(null);
@@ -709,6 +719,93 @@ export default function HomeHero() {
           opacity: 0.35;
         }
 
+        .focus-word {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin-inline: 0.06em;
+          padding: 0.04em 0.34em;
+          color: inherit;
+          isolation: isolate;
+        }
+        .focus-word::before {
+          content: "";
+          position: absolute;
+          inset: 0.2em 0.24em;
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at center, rgba(99, 70, 255, 0.11) 0%, rgba(99, 70, 255, 0.035) 46%, transparent 70%);
+          filter: blur(5px);
+          opacity: 0.56;
+          animation: focusGlow 2.6s ease-in-out infinite;
+          z-index: -1;
+        }
+        .focus-word-text {
+          position: relative;
+          z-index: 1;
+        }
+        .focus-word-corner {
+          position: absolute;
+          width: 0.22em;
+          height: 0.22em;
+          border-color: #6346ff;
+          filter: drop-shadow(0 0 2px rgba(99, 70, 255, 0.45));
+          animation: focusCornerPulse 2.6s ease-in-out infinite;
+        }
+        .focus-word-corner-tl {
+          top: 0.05em;
+          left: 0.06em;
+          border-top: 0.055em solid currentColor;
+          border-left: 0.055em solid currentColor;
+          color: #6346ff;
+          border-top-color: currentColor;
+          border-left-color: currentColor;
+          border-right: 0;
+          border-bottom: 0;
+        }
+        .focus-word-corner-tr {
+          top: 0.05em;
+          right: 0.06em;
+          border-top: 0.055em solid currentColor;
+          border-right: 0.055em solid currentColor;
+          color: #6346ff;
+          border-top-color: currentColor;
+          border-right-color: currentColor;
+          border-left: 0;
+          border-bottom: 0;
+        }
+        .focus-word-corner-bl {
+          bottom: 0.05em;
+          left: 0.06em;
+          border-bottom: 0.055em solid currentColor;
+          border-left: 0.055em solid currentColor;
+          color: #6346ff;
+          border-bottom-color: currentColor;
+          border-left-color: currentColor;
+          border-top: 0;
+          border-right: 0;
+        }
+        .focus-word-corner-br {
+          bottom: 0.05em;
+          right: 0.06em;
+          border-bottom: 0.055em solid currentColor;
+          border-right: 0.055em solid currentColor;
+          color: #6346ff;
+          border-bottom-color: currentColor;
+          border-right-color: currentColor;
+          border-top: 0;
+          border-left: 0;
+        }
+        @keyframes focusGlow {
+          0%, 100% { opacity: 0.3; transform: scale(0.99); }
+          50% { opacity: 0.56; transform: scale(1.01); }
+        }
+        @keyframes focusCornerPulse {
+          0%, 100% { opacity: 0.58; transform: scale(0.99); }
+          50% { opacity: 0.78; transform: scale(1.02); }
+        }
+
         @keyframes ao-bob {
           0%, 100% { transform: translateX(-50%) translateY(0); }
           50%       { transform: translateX(-50%) translateY(5px); }
@@ -921,10 +1018,15 @@ export default function HomeHero() {
             {t("titleLine2")}
             <br />
             <span className="text-[#00d0b2] dark:text-primary font-light">
-              {khmerTitleLine3Match ? (
+              {titleLine3FocusMatch ? (
                 <>
-                  <span className="font-khmer">{khmerTitleLine3Match[1]}</span>
-                  {khmerTitleLine3Match[2]}
+                  {isKhmer ? (
+                    <span className="font-khmer">{titleLine3FocusMatch[1]}</span>
+                  ) : (
+                    titleLine3FocusMatch[1]
+                  )}
+                  <FocusWord>{titleLine3FocusMatch[2]}</FocusWord>
+                  {titleLine3FocusMatch[3]}
                 </>
               ) : (
                 titleLine3

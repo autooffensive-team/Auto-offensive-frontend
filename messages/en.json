@@ -117,8 +117,7 @@
       "subtitle": "Watch a quick walkthrough of the platform, tools, and workflow experience."
     },
     "team": {
-      "eyebrow": "Our company",
-      "titleLine1": "In our company,",
+      "titleLine1": "In our team,",
       "titleLine2": "we build",
       "titleLine3": "what we use",
       "paragraph1": "We launched as a team of passionate professionals and we've kept that mindset ever since. Our experts still drive product development today, focusing relentlessly on accuracy, speed, and control.",
@@ -153,7 +152,7 @@
     "features": {
       "sectionEyebrow": "Platform Capabilities",
       "sectionTitleLine1": "What You Can Do",
-      "sectionTitleLine2": "with Auto Offensive",
+      "sectionTitleLine2": "with Reffensive",
       "exploreCapability": "Explore capability"
     }
   },

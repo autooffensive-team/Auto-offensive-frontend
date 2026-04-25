@@ -64,6 +64,10 @@ const toolLinks: ToolItem[] = [
   { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.webp'  },
 ];
 
+const navbarToolLinks = toolLinks.filter(({ title }) =>
+  ['Nmap', 'Naabu', 'Subfinder', 'Katana', 'Httpx', 'Gobuster'].includes(title)
+);
+
 const featureLinks: FeatureItem[] = [
   { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.webp'       },
   { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.webp'  },
@@ -412,14 +416,25 @@ export function Header() {
                 <Link href="/tools">  {t('tools')}</Link>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background">
-                  <div className="w-120 rounded-xl border border-border bg-popover shadow-xl p-3">
+                  <div className="w-104 rounded-xl border border-border bg-popover p-3">
                     <ul className="grid grid-cols-2 gap-0.5">
-                      {toolLinks.map((item, i) => (
+                      {navbarToolLinks.map((item, i) => (
                         <li key={i}>
                           <ToolItem {...item} />
                         </li>
                       ))}
                     </ul>
+                    <div className="mt-2 border-t border-border pt-2">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/tools"
+                          className="flex items-center justify-between rounded-lg px-2.5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <span>See more</span>
+                          <span aria-hidden="true">→</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -521,19 +536,20 @@ export function Header() {
 
           <div className="mt-1 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
-            <Link
-              href="/tools"
-              onClick={() => setOpen(false)}
-              className="text-xs font-medium text-primary"
-            >
-              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
-            </Link>
           </div>
           <div className="grid grid-cols-2 gap-0.5">
-            {toolLinks.map((link, i) => (
+            {navbarToolLinks.map((link, i) => (
               <ToolItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
           </div>
+          <Link
+            href="/tools"
+            onClick={() => setOpen(false)}
+            className="mt-1 flex items-center justify-between rounded-lg border border-border/70 px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <span>See more</span>
+            <span aria-hidden="true">-&gt;</span>
+          </Link>
 
           <div className="mt-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Features</p>

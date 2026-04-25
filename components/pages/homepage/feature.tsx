@@ -154,7 +154,7 @@ const EN_CARDS = [
     tag: "CI/CD Integration",
     title: ["Security Baked", "Into Every Pipeline"],
     hlLine: 1,
-    desc: "Embed offensive security directly into your CI/CD workflow. Auto Offensive triggers scans on every build, blocks deployments on critical findings, and feeds results into your existing DevSecOps toolchain - so vulnerabilities are caught before they ever reach production.",
+    desc: "Embed offensive security directly into your CI/CD workflow. Reffensive triggers scans on every build, blocks deployments on critical findings, and feeds results into your existing DevSecOps toolchain - so vulnerabilities are caught before they ever reach production.",
     link: "#",
     image: "/home-image/6.webp",
     imageAlt: "CI/CD Integration",
@@ -288,7 +288,7 @@ const CARDS = [
     tag: "CI/CD Integration",
     title: ["បញ្ចូល Security", "ទៅក្នុងគ្រប់ Pipeline"],
     hlLine: 1,
-    desc: "បញ្ចូលការត្រួតពិនិត្យសុវត្ថិភាពចូលទៅក្នុង workflow CI/CD របស់អ្នកដោយផ្ទាល់។ Auto Offensive អាចបើកការស្កេនរាល់ពេល build ទប់ស្កាត់ deployment នៅពេលមានបញ្ហាសំខាន់ និងបញ្ជូនលទ្ធផលទៅ DevSecOps toolchain ដែលអ្នកកំពុងប្រើ ដើម្បីរកឃើញបញ្ហាមុនពេលឡើង production។",
+    desc: "បញ្ចូលការត្រួតពិនិត្យសុវត្ថិភាពចូលទៅក្នុង workflow CI/CD របស់អ្នកដោយផ្ទាល់។ Reffensive អាចបើកការស្កេនរាល់ពេល build ទប់ស្កាត់ deployment នៅពេលមានបញ្ហាសំខាន់ និងបញ្ជូនលទ្ធផលទៅ DevSecOps toolchain ដែលអ្នកកំពុងប្រើ ដើម្បីរកឃើញបញ្ហាមុនពេលឡើង production។",
     link: "#",
     image: "/home-image/6.webp",
     imageAlt: "ការភ្ជាប់ CI/CD",
@@ -1062,7 +1062,10 @@ export default function Features() {
               color: colors.text,
             }}
           >
-            {t("sectionTitleLine1")}
+            <span className="block">{t("sectionTitleLine1")}</span>
+            <span className="block" style={{ color: colors.accent2 }}>
+              {t("sectionTitleLine2")}
+            </span>
           </h2>
         </div>
 

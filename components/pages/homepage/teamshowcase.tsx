@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import AnimatedCta from "./animated-cta";
+import ourTeamImage from "@/public/images/Our-team-image.webp";
 
 export default function TeamShowcase() {
   const t = useTranslations("homepage.team");
@@ -49,7 +51,7 @@ export default function TeamShowcase() {
             as="a"
             href="about-us"
             className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
-            iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+            iconClassName="bg-white text-[#01509e] dark:bg-white dark:text-[#00BCA1]"
             icon={
               <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path
@@ -66,49 +68,144 @@ export default function TeamShowcase() {
           </AnimatedCta>
         </div>
 
-        <div className="relative group">
+        {/* Premium Image Card with Elegant Border */}
+        <div className="relative group mx-auto w-full max-w-135">
+          {/* Enhanced Glow Background */}
           <div
-            className="absolute z-0 rounded-[2.5rem]"
+            className="absolute left-1/2 top-1/2 z-0 h-[92%] w-[86%] -translate-x-1/2 -translate-y-1/2 rounded-3xl opacity-100"
             style={{
-              inset: "-20px",
-              background: "linear-gradient(135deg, rgba(0,188,161,0.2) 0%, rgba(1,80,158,0.15) 100%)",
+              background:
+                "radial-gradient(ellipse at top, rgba(0,188,161,0.32), transparent 40%), radial-gradient(ellipse at bottom right, rgba(1,80,158,0.28), transparent 55%)",
+              filter: "blur(28px)",
             }}
           />
 
+          {/* Decorative Corner Plus Icons */}
+          <svg
+            className="absolute -top-4.25 -left-4.25 z-20 size-9 text-[#01509e]/60 dark:text-[#00BCA1]/60"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+
+          <svg
+            className="absolute -top-4.25 -right-4.25 z-20 size-9 text-[#01509e]/60 dark:text-[#00BCA1]/60"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+
+          <svg
+            className="absolute -bottom-4.25 -left-4.25 z-20 size-9 text-[#01509e]/60 dark:text-[#00BCA1]/60"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+
+          <svg
+            className="absolute -bottom-4.25 -right-4.25 z-20 size-9 text-[#01509e]/60 dark:text-[#00BCA1]/60"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+
+          {/* Top and Bottom Border Lines */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-[#01509e]/40 to-transparent dark:via-[#00BCA1]/40" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-[#01509e]/40 to-transparent dark:via-[#00BCA1]/40" />
+
+          {/* Left and Right Border Lines */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-[#01509e]/40 to-transparent dark:via-[#00BCA1]/40" />
+          <div className="absolute right-0 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-[#01509e]/40 to-transparent dark:via-[#00BCA1]/40" />
+
+          {/* Center Dashed Vertical Line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 border-l border-dashed border-[#01509e]/20 dark:border-[#00BCA1]/20 pointer-events-none" />
+
+          {/* Main Card Container */}
           <div
             ref={imageRef}
-            className="relative z-10 overflow-hidden rounded-[24px] border border-white/10"
-            style={{
-              boxShadow: "0 30px 70px rgba(1,80,158,0.15)",
-              background: "linear-gradient(145deg, #f0f9ff, #e6fcf9)",
-            }}
+            className="relative z-10 w-full overflow-hidden"
+            style={{ aspectRatio: `${ourTeamImage.width} / ${ourTeamImage.height}` }}
           >
             <div
-              className="flex w-full flex-col items-center justify-center gap-4 dark:bg-[#121214]"
-              style={{ aspectRatio: "16 / 10" }}
+              className="relative h-full w-full overflow-hidden p-[2.5px]"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(0,188,161,0.5) 0%, rgba(1,80,158,0.35) 50%, rgba(0,188,161,0.25) 100%)",
+              }}
             >
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#00BCA1" strokeWidth="1.2">
-                <rect x="3" y="3" width="18" height="18" rx="3" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-              <p className="text-sm font-bold text-[#00BCA1]">{t("imagePlaceholder")}</p>
+              <div
+                className="relative h-full w-full overflow-hidden"
+                style={{
+                  background: "transparent",
+                }}
+              >
+                <Image
+                  src={ourTeamImage}
+                  alt="Our team"
+                  width={ourTeamImage.width}
+                  height={ourTeamImage.height}
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="h-auto w-full"
+                  priority
+                  unoptimized
+                />
+              </div>
             </div>
           </div>
 
-          <div className="absolute -left-4 -top-6 z-20 flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-3 shadow-xl dark:border-white/5 dark:bg-[#1c1c1e]">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-[#00BCA1] to-[#01509e]">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
-            </div>
-            <div>
-              <p className="m-0 text-[10px] font-bold uppercase text-gray-400">{t("teamSizeLabel")}</p>
-              <p className="m-0 text-lg font-black text-[#01509e] dark:text-white">{t("teamSizeValue")}</p>
+          {/* Premium Established Badge */}
+          <div className="absolute -right-3 bottom-10 z-30">
+            <div
+              className="rounded-2xl border-2 border-white/90 px-6 py-4 dark:border-white/15"
+              style={{
+                background:
+                  "linear-gradient(135deg, #01509e 0%, #0047a3 100%)",
+              }}
+            >
+              <p className="m-0 text-[8px] font-bold uppercase tracking-[0.15em] text-white/90">
+                {t("established")}
+              </p>
+              <p className="m-0 text-2xl font-black text-white">
+                2026
+              </p>
             </div>
           </div>
 
-          <div className="absolute -right-4 bottom-10 z-20 rounded-2xl bg-[#01509e] px-6 py-3 shadow-xl dark:bg-[#00BCA1]">
-            <p className="m-0 text-[10px] font-bold uppercase text-white/70 dark:text-black/70">{t("established")}</p>
-            <p className="m-0 text-xl font-black text-white dark:text-[#09090B]">2026</p>
-          </div>
+          {/* Decorative Top Right Accent */}
+          <div
+            className="absolute -top-1 -right-1 w-24 h-24 z-5 opacity-60 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at center, rgba(0,188,161,0.4), transparent 70%)",
+              filter: "blur(24px)",
+            }}
+          />
+
+          {/* Decorative Bottom Left Accent */}
+          <div
+            className="absolute -bottom-1 -left-1 w-28 h-28 z-5 opacity-50 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at center, rgba(1,80,158,0.3), transparent 70%)",
+              filter: "blur(28px)",
+            }}
+          />
         </div>
       </div>
     </section>
