@@ -400,7 +400,7 @@ export function Header() {
 
   // Shared dropdown panel styles
   const dropdownPanelCls =
-    'rounded-[13px] border border-black/[0.08] dark:border-white/[0.07] ' +
+    'rounded-[13px] border border-black/[0.045] dark:border-white/[0.09] ' +
     'bg-white dark:bg-[#111110] ' +
     'shadow-[0_4px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.04)] ' +
     'dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),0_1px_4px_rgba(0,0,0,0.3)] p-3';
