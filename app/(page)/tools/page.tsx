@@ -286,9 +286,6 @@ export default function ToolsPage() {
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
   const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
 
-  const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState('All')
-
   const tools = [
     { id: 'subfinder',   name: 'Subfinder',     category: 'Recon',   description: t('items.subfinder'),   tags: ['subdomain', 'passive', 'dns'] },
     { id: 'naabu',       name: 'Naabu',         category: 'Recon',   description: t('items.naabu'),       tags: ['port-scan', 'network'] },
@@ -305,24 +302,6 @@ export default function ToolsPage() {
     { id: 'katana',      name: 'Katana',        category: 'Fuzzing', description: t('items.katana'),      tags: ['crawler', 'js'] },
     { id: 'gobuster',    name: 'Gobuster',      category: 'Fuzzing', description: t('items.gobuster'),    tags: ['bruteforce', 'dns'] },
   ]
-
-  const categories = [
-    { key: 'All', label: t('categories.all') },
-    { key: 'Recon', label: t('categories.recon') },
-    { key: 'Vuln', label: t('categories.vuln') },
-    { key: 'Fuzzing', label: t('categories.fuzzing') },
-  ]
-
-  const filtered = tools.filter((tool) => {
-    const matchCat = activeCategory === 'All' || tool.category === activeCategory
-    const q = search.toLowerCase()
-    const matchSearch =
-      !q ||
-      tool.name.toLowerCase().includes(q) ||
-      tool.description.toLowerCase().includes(q) ||
-      tool.tags.some((tag) => tag.includes(q))
-    return matchCat && matchSearch
-  })
 
   const Icon = ({ id }: { id: string }) => {
     const Comp = icons[id]
@@ -347,8 +326,7 @@ export default function ToolsPage() {
           {/* Teal accent glow — bottom left */}
           <div className="absolute left-1/4 bottom-0 w-[320px] h-55 rounded-full bg-[#00BCA1]/5 blur-[80px] dark:bg-[#00BCA1]/12" />
           {/* Right glow behind knife */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600
-          px] h-150 rounded-full bg-[#00BCA1]/5 blur-[130px] dark:bg-[#1e4068]/50" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-150 rounded-full bg-[#00BCA1]/5 blur-[130px] dark:bg-[#1e4068]/50" />
           {/* Subtle top-right highlight */}
           <div className="absolute top-0 right-1/4 w-75 h-50 rounded-full bg-[#00BCA1]/4 blur-[80px] dark:bg-[#2a5080]/30" />
         </div>
@@ -394,40 +372,37 @@ export default function ToolsPage() {
                 <CategoryStatBar tools={tools} />
               </div>
 
-              {/* Search + filters — always stacked: search on top, filters below */}
+              {/* Navigation Buttons */}
               <div className="flex flex-col gap-3">
-                <div className="relative max-w-sm">
-                  <div className="absolute inset-y-0 left-3 flex items-center text-[#9A9A9A] pointer-events-none">
-                    <SearchIcon />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={t('searchPlaceholder')}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#F7F5F0] dark:bg-white/6 border border-black/9 dark:border-white/10 rounded-xl text-sm text-[#1A1A1A] dark:text-white placeholder-[#9A9A9A] dark:placeholder-[#5A7A96] focus:border-[#00BCA1] focus:ring-1 focus:ring-[#00BCA1] transition outline-none"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.key}
-                      onClick={() => setActiveCategory(cat.key)}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
-                        activeCategory === cat.key
-                          ? 'bg-[#00BCA1] text-white border-[#00BCA1] shadow-sm dark:shadow-[0_0_20px_rgba(0,188,161,0.35)]'
-                          : 'bg-white dark:bg-white/5 text-[#5C5C5C] dark:text-[#7FA8C9] border-black/9 dark:border-white/10 hover:border-[#00BCA1] hover:text-[#00BCA1]'
-                      }`}
-                    >
-                      {cat.label}
-                      {cat.key !== 'All' && (
-                        <span className={`ml-1.5 text-xs ${activeCategory === cat.key ? 'opacity-70' : 'text-[#9A9A9A]'}`}>
-                          ({tools.filter((t) => t.category === cat.key).length})
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                <p className="text-sm font-medium text-[#5C5C5C] dark:text-[#9A9A9A]">Explore by category</p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById('recon-section');
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="px-5 py-3 rounded-xl text-sm font-semibold border border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Recon
+                  </button>
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById('vuln-section');
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="px-5 py-3 rounded-xl text-sm font-semibold border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Vulnerability
+                  </button>
+                  <button
+                    onClick={() => {
+                      const element = document.getElementById('fuzzing-section');
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="px-5 py-3 rounded-xl text-sm font-semibold border border-purple-200 dark:border-purple-800/50 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/50 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Fuzzing
+                  </button>
                 </div>
               </div>
             </div>
@@ -454,420 +429,371 @@ export default function ToolsPage() {
 
       {/* ── Category Sections ───────────────────────────────────── */}
 
-      {/* No results state */}
-      {filtered.length === 0 && (
-        <div className="text-center py-24 text-[#9A9A9A]">
-          <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 flex items-center justify-center mx-auto mb-4">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-              <circle cx="22" cy="22" r="14" stroke="#9A9A9A" strokeWidth="2"/>
-              <path d="M32 32L44 44" stroke="#9A9A9A" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <p className="text-lg font-medium text-[#1A1A1A] dark:text-[#EDEDED]">{t('noResults')}</p>
-          <p className="text-sm mt-1">{t('tryDifferent')}</p>
-          {search && (
-            <button
-              onClick={() => { setSearch(''); setActiveCategory('All'); }}
-              className="mt-4 text-sm text-[#00BCA1] font-medium hover:underline"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      )}
-
       {/* ── RECON SECTION ── */}
-      {(activeCategory === 'All' || activeCategory === 'Recon') && tools.filter(t => t.category === 'Recon').some(tool => {
-        const q = search.toLowerCase()
-        return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-      }) && (
-        <div>
-          {/* Recon Full-Screen Hero with Animated Background */}
-          <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
-            <CategoryHeroBackground tint="#3B82F6" />
+      <div id="recon-section">
+        {/* Recon Full-Screen Hero with Animated Background */}
+        <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
+          <CategoryHeroBackground tint="#3B82F6" />
 
-            {/* Layered ambient background glows */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Light mode: soft blue glow left */}
-              <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-blue-400/8 blur-[140px] dark:bg-blue-600/25" />
-              {/* Blue accent glow — bottom left */}
-              <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-blue-400/6 blur-[100px] dark:bg-blue-400/15" />
-              {/* Right glow */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-blue-400/7 blur-[150px] dark:bg-blue-500/20" />
-              {/* Subtle top-right highlight */}
-              <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-blue-400/5 blur-[100px] dark:bg-blue-400/12" />
-            </div>
+          {/* Layered ambient background glows */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Light mode: soft blue glow left */}
+            <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-blue-400/8 blur-[140px] dark:bg-blue-600/25" />
+            {/* Blue accent glow — bottom left */}
+            <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-blue-400/6 blur-[100px] dark:bg-blue-400/15" />
+            {/* Right glow */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-blue-400/7 blur-[150px] dark:bg-blue-500/20" />
+            {/* Subtle top-right highlight */}
+            <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-blue-400/5 blur-[100px] dark:bg-blue-400/12" />
+          </div>
 
-            {/* Content Grid */}
-            <div className="relative h-full w-full flex items-center justify-center">
-              <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-                      <span className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400">{t('categories.recon')}</span>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
-                        Reconnaissance Tools
-                      </h2>
-                      <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
-                        {t('hero.reconDescription')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 mt-4">
-                      <span className="text-sm font-semibold text-[#9A9A9A] bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50 px-4 py-2 rounded-lg">
-                        {tools.filter(t => t.category === 'Recon').length} tools
-                      </span>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Right: Animated Grid Pattern */}
-                  <div className="hidden lg:flex items-center justify-end h-full">
-                    <div className="relative w-full max-w-md h-96">
-                      <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                          <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.3"/>
-                            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.05"/>
-                          </linearGradient>
-                        </defs>
-                        {/* Curved grid lines */}
-                        {Array.from({ length: 8 }).map((_, i) => (
-                          <g key={`row-${i}`}>
-                            <path
-                              d={`M 0 ${(i + 1) * 50} Q 100 ${(i + 1) * 50 - 30} 200 ${(i + 1) * 50} T 400 ${(i + 1) * 50}`}
-                              stroke="#3B82F6"
-                              strokeWidth="1.5"
-                              fill="none"
-                              opacity="0.4"
-                            />
-                          </g>
-                        ))}
-                        {Array.from({ length: 8 }).map((_, i) => (
-                          <g key={`col-${i}`}>
-                            <path
-                              d={`M ${(i + 1) * 50} 0 Q ${(i + 1) * 50 - 30} 100 ${(i + 1) * 50} 200 T ${(i + 1) * 50} 400`}
-                              stroke="#3B82F6"
-                              strokeWidth="1.5"
-                              fill="none"
-                              opacity="0.4"
-                            />
-                          </g>
-                        ))}
-                        {/* Center target circles */}
-                        <circle cx="200" cy="200" r="60" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.6"/>
-                        <circle cx="200" cy="200" r="40" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.4"/>
-                        <circle cx="200" cy="200" r="20" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.3"/>
-                      </svg>
-                    </div>
+          {/* Content Grid */}
+          <div className="relative h-full w-full flex items-center justify-center">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400">{t('categories.recon')}</span>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
+                      Reconnaissance Tools
+                    </h2>
+                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
+                      {t('hero.reconDescription')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 mt-4">
+                    <span className="text-sm font-semibold text-[#9A9A9A] bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50 px-4 py-2 rounded-lg">
+                      {tools.filter(t => t.category === 'Recon').length} tools
+                    </span>
+                  </div>
+                </motion.div>
+                
+                {/* Right: Animated Grid Pattern */}
+                <div className="hidden lg:flex items-center justify-end h-full">
+                  <div className="relative w-full max-w-md h-96">
+                    <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.3"/>
+                          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.05"/>
+                        </linearGradient>
+                      </defs>
+                      {/* Curved grid lines */}
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <g key={`row-${i}`}>
+                          <path
+                            d={`M 0 ${(i + 1) * 50} Q 100 ${(i + 1) * 50 - 30} 200 ${(i + 1) * 50} T 400 ${(i + 1) * 50}`}
+                            stroke="#3B82F6"
+                            strokeWidth="1.5"
+                            fill="none"
+                            opacity="0.4"
+                          />
+                        </g>
+                      ))}
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <g key={`col-${i}`}>
+                          <path
+                            d={`M ${(i + 1) * 50} 0 Q ${(i + 1) * 50 - 30} 100 ${(i + 1) * 50} 200 T ${(i + 1) * 50} 400`}
+                            stroke="#3B82F6"
+                            strokeWidth="1.5"
+                            fill="none"
+                            opacity="0.4"
+                          />
+                        </g>
+                      ))}
+                      {/* Center target circles */}
+                      <circle cx="200" cy="200" r="60" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.6"/>
+                      <circle cx="200" cy="200" r="40" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.4"/>
+                      <circle cx="200" cy="200" r="20" fill="none" stroke="#3B82F6" strokeWidth="2" opacity="0.3"/>
+                    </svg>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* Recon Tools Grid */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {tools.filter(tool => {
-                if (tool.category !== 'Recon') return false
-                const q = search.toLowerCase()
-                return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-              }).map((tool) => (
-                <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-blue-400/40 hover:shadow-[0_4px_24px_0_rgba(96,165,250,0.08)] transition-all duration-200 cursor-pointer">
-                  <div className="h-0.5 w-full bg-blue-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  <div className="p-6 flex flex-col gap-4 flex-1">
-                    <div className="flex items-start justify-between">
-                      <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-800/50 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
-                        <Icon id={tool.id} />
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap justify-end">
-                        {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
-                        <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800">
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
-                          {t('categories.recon')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
-                      <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                      {tool.tags.map(tag => (
-                        <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
-                    <a href="#" className="text-blue-500 dark:text-blue-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
-                      {t('primaryCta')}
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
         </div>
-      )}
+        {/* Recon Tools Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {tools.filter(tool => tool.category === 'Recon').map((tool) => (
+              <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-blue-400/40 hover:shadow-[0_4px_24px_0_rgba(96,165,250,0.08)] transition-all duration-200 cursor-pointer">
+                <div className="h-0.5 w-full bg-blue-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <div className="p-6 flex flex-col gap-4 flex-1">
+                  <div className="flex items-start justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-800/50 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
+                      <Icon id={tool.id} />
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
+                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        {t('categories.recon')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
+                    <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {tool.tags.map(tag => (
+                      <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
+                  <a href="#" className="text-blue-500 dark:text-blue-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
+                    {t('primaryCta')}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
       {/* ── VULN SECTION ── */}
-      {(activeCategory === 'All' || activeCategory === 'Vuln') && tools.filter(t => t.category === 'Vuln').some(tool => {
-        const q = search.toLowerCase()
-        return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-      }) && (
-        <div>
-          {/* Vuln Full-Screen Hero with Animated Background */}
-          <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
-            <CategoryHeroBackground tint="#EF4444" />
+      <div id="vuln-section">
+        {/* Vuln Full-Screen Hero with Animated Background */}
+        <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
+          <CategoryHeroBackground tint="#EF4444" />
 
-            {/* Layered ambient background glows */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Light mode: soft red glow left */}
-              <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-red-400/8 blur-[140px] dark:bg-red-600/25" />
-              {/* Red accent glow — bottom left */}
-              <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-red-400/6 blur-[100px] dark:bg-red-400/15" />
-              {/* Right glow */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-red-400/7 blur-[150px] dark:bg-red-500/20" />
-              {/* Subtle top-right highlight */}
-              <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-red-400/5 blur-[100px] dark:bg-red-400/12" />
-            </div>
+          {/* Layered ambient background glows */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Light mode: soft red glow left */}
+            <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-red-400/8 blur-[140px] dark:bg-red-600/25" />
+            {/* Red accent glow — bottom left */}
+            <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-red-400/6 blur-[100px] dark:bg-red-400/15" />
+            {/* Right glow */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-red-400/7 blur-[150px] dark:bg-red-500/20" />
+            {/* Subtle top-right highlight */}
+            <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-red-400/5 blur-[100px] dark:bg-red-400/12" />
+          </div>
 
-            {/* Content Grid */}
-            <div className="relative h-full w-full flex items-center justify-center">
-              <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                      <span className="text-xs font-semibold uppercase tracking-widest text-red-500 dark:text-red-400">{t('categories.vuln')}</span>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
-                        Vulnerability Scanning
-                      </h2>
-                      <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
-                        {t('hero.vulnDescription')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 mt-4">
-                      <span className="text-sm font-semibold text-[#9A9A9A] bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-800/50 px-4 py-2 rounded-lg">
-                        {tools.filter(t => t.category === 'Vuln').length} tools
-                      </span>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Right: Animated Concentric Circles */}
-                  <div className="hidden lg:flex items-center justify-end h-full">
-                    <div className="relative w-full max-w-md h-96">
-                      <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                          <radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#EF4444" stopOpacity="0.2"/>
-                            <stop offset="100%" stopColor="#EF4444" stopOpacity="0.05"/>
-                          </radialGradient>
-                        </defs>
-                        {/* Concentric circles */}
-                        {Array.from({ length: 12 }).map((_, i) => (
-                          <circle
-                            key={i}
-                            cx="200"
-                            cy="200"
-                            r={30 + i * 20}
-                            fill="none"
-                            stroke="#EF4444"
-                            strokeWidth="1.5"
-                            opacity={0.5 - (i * 0.04)}
-                          />
-                        ))}
-                        {/* Center dot */}
-                        <circle cx="200" cy="200" r="6" fill="#EF4444" opacity="0.6"/>
-                      </svg>
-                    </div>
+          {/* Content Grid */}
+          <div className="relative h-full w-full flex items-center justify-center">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-red-500 dark:text-red-400">{t('categories.vuln')}</span>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
+                      Vulnerability Scanning
+                    </h2>
+                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
+                      {t('hero.vulnDescription')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 mt-4">
+                    <span className="text-sm font-semibold text-[#9A9A9A] bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-800/50 px-4 py-2 rounded-lg">
+                      {tools.filter(t => t.category === 'Vuln').length} tools
+                    </span>
+                  </div>
+                </motion.div>
+                
+                {/* Right: Animated Concentric Circles */}
+                <div className="hidden lg:flex items-center justify-end h-full">
+                  <div className="relative w-full max-w-md h-96">
+                    <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="#EF4444" stopOpacity="0.2"/>
+                          <stop offset="100%" stopColor="#EF4444" stopOpacity="0.05"/>
+                        </radialGradient>
+                      </defs>
+                      {/* Concentric circles */}
+                      {Array.from({ length: 12 }).map((_, i) => (
+                        <circle
+                          key={i}
+                          cx="200"
+                          cy="200"
+                          r={30 + i * 20}
+                          fill="none"
+                          stroke="#EF4444"
+                          strokeWidth="1.5"
+                          opacity={0.5 - (i * 0.04)}
+                        />
+                      ))}
+                      {/* Center dot */}
+                      <circle cx="200" cy="200" r="6" fill="#EF4444" opacity="0.6"/>
+                    </svg>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* Vuln Tools Grid */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {tools.filter(tool => {
-                if (tool.category !== 'Vuln') return false
-                const q = search.toLowerCase()
-                return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-              }).map((tool) => (
-                <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-red-400/40 hover:shadow-[0_4px_24px_0_rgba(248,113,113,0.08)] transition-all duration-200 cursor-pointer">
-                  <div className="h-0.5 w-full bg-red-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  <div className="p-6 flex flex-col gap-4 flex-1">
-                    <div className="flex items-start justify-between">
-                      <div className="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800/50 flex items-center justify-center text-red-500 dark:text-red-400 shrink-0">
-                        <Icon id={tool.id} />
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap justify-end">
-                        {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
-                        <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800">
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500" />
-                          {t('categories.vuln')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
-                      <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                      {tool.tags.map(tag => (
-                        <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
-                    <a href="#" className="text-red-500 dark:text-red-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
-                      {t('primaryCta')}
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
         </div>
-      )}
+        {/* Vuln Tools Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {tools.filter(tool => tool.category === 'Vuln').map((tool) => (
+              <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-red-400/40 hover:shadow-[0_4px_24px_0_rgba(248,113,113,0.08)] transition-all duration-200 cursor-pointer">
+                <div className="h-0.5 w-full bg-red-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <div className="p-6 flex flex-col gap-4 flex-1">
+                  <div className="flex items-start justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800/50 flex items-center justify-center text-red-500 dark:text-red-400 shrink-0">
+                      <Icon id={tool.id} />
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
+                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500" />
+                        {t('categories.vuln')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
+                    <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {tool.tags.map(tag => (
+                      <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
+                  <a href="#" className="text-red-500 dark:text-red-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
+                    {t('primaryCta')}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
       {/* ── FUZZING SECTION ── */}
-      {(activeCategory === 'All' || activeCategory === 'Fuzzing') && tools.filter(t => t.category === 'Fuzzing').some(tool => {
-        const q = search.toLowerCase()
-        return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-      }) && (
-        <div>
-          {/* Fuzzing Full-Screen Hero with Animated Background */}
-          <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
-            <CategoryHeroBackground tint="#A855F7" />
+      <div id="fuzzing-section">
+        {/* Fuzzing Full-Screen Hero with Animated Background */}
+        <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
+          <CategoryHeroBackground tint="#A855F7" />
 
-            {/* Layered ambient background glows */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Light mode: soft purple glow left */}
-              <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-purple-400/8 blur-[140px] dark:bg-purple-600/25" />
-              {/* Purple accent glow — bottom left */}
-              <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-purple-400/6 blur-[100px] dark:bg-purple-400/15" />
-              {/* Right glow */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-purple-400/7 blur-[150px] dark:bg-purple-500/20" />
-              {/* Subtle top-right highlight */}
-              <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-purple-400/5 blur-[100px] dark:bg-purple-400/12" />
-            </div>
+          {/* Layered ambient background glows */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Light mode: soft purple glow left */}
+            <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-purple-400/8 blur-[140px] dark:bg-purple-600/25" />
+            {/* Purple accent glow — bottom left */}
+            <div className="absolute left-1/4 bottom-0 w-100 h-75 rounded-full bg-purple-400/6 blur-[100px] dark:bg-purple-400/15" />
+            {/* Right glow */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-175 h-175 rounded-full bg-purple-400/7 blur-[150px] dark:bg-purple-500/20" />
+            {/* Subtle top-right highlight */}
+            <div className="absolute top-0 right-1/4 w-100 h-62.5 rounded-full bg-purple-400/5 blur-[100px] dark:bg-purple-400/12" />
+          </div>
 
-            {/* Content Grid */}
-            <div className="relative h-full w-full flex items-center justify-center">
-              <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-                      <span className="text-xs font-semibold uppercase tracking-widest text-purple-500 dark:text-purple-400">{t('categories.fuzzing')}</span>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
-                        Fuzzing & Discovery
-                      </h2>
-                      <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
-                        {t('hero.fuzzingDescription')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 mt-4">
-                      <span className="text-sm font-semibold text-[#9A9A9A] bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 px-4 py-2 rounded-lg">
-                        {tools.filter(t => t.category === 'Fuzzing').length} tools
-                      </span>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Right: Animated Wave Pattern */}
-                  <div className="hidden lg:flex items-center justify-end h-full">
-                    <div className="relative w-full max-w-md h-96">
-                      <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#A855F7" stopOpacity="0.3"/>
-                            <stop offset="100%" stopColor="#A855F7" stopOpacity="0.05"/>
-                          </linearGradient>
-                        </defs>
-                        {/* Wave pattern */}
-                        {Array.from({ length: 8 }).map((_, i) => (
-                          <path
-                            key={i}
-                            d={`M 0 ${50 + i * 40} Q 50 ${50 + i * 40 - 20} 100 ${50 + i * 40} T 200 ${50 + i * 40} T 300 ${50 + i * 40} T 400 ${50 + i * 40}`}
-                            stroke="#A855F7"
-                            strokeWidth="2"
-                            fill="none"
-                            opacity={0.6 - (i * 0.06)}
-                          />
-                        ))}
-                        {/* Diagonal lines for fuzz effect */}
-                        {Array.from({ length: 6 }).map((_, i) => (
-                          <line
-                            key={`diag-${i}`}
-                            x1={i * 60}
-                            y1="0"
-                            x2={i * 60 + 400}
-                            y2="400"
-                            stroke="#A855F7"
-                            strokeWidth="1"
-                            opacity="0.3"
-                          />
-                        ))}
-                      </svg>
-                    </div>
+          {/* Content Grid */}
+          <div className="relative h-full w-full flex items-center justify-center">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-purple-500 dark:text-purple-400">{t('categories.fuzzing')}</span>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
+                      Fuzzing & Discovery
+                    </h2>
+                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
+                      {t('hero.fuzzingDescription')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 mt-4">
+                    <span className="text-sm font-semibold text-[#9A9A9A] bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 px-4 py-2 rounded-lg">
+                      {tools.filter(t => t.category === 'Fuzzing').length} tools
+                    </span>
+                  </div>
+                </motion.div>
+                
+                {/* Right: Animated Wave Pattern */}
+                <div className="hidden lg:flex items-center justify-end h-full">
+                  <div className="relative w-full max-w-md h-96">
+                    <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#A855F7" stopOpacity="0.3"/>
+                          <stop offset="100%" stopColor="#A855F7" stopOpacity="0.05"/>
+                        </linearGradient>
+                      </defs>
+                      {/* Wave pattern */}
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <path
+                          key={i}
+                          d={`M 0 ${50 + i * 40} Q 50 ${50 + i * 40 - 20} 100 ${50 + i * 40} T 200 ${50 + i * 40} T 300 ${50 + i * 40} T 400 ${50 + i * 40}`}
+                          stroke="#A855F7"
+                          strokeWidth="2"
+                          fill="none"
+                          opacity={0.6 - (i * 0.06)}
+                        />
+                      ))}
+                      {/* Diagonal lines for fuzz effect */}
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <line
+                          key={`diag-${i}`}
+                          x1={i * 60}
+                          y1="0"
+                          x2={i * 60 + 400}
+                          y2="400"
+                          stroke="#A855F7"
+                          strokeWidth="1"
+                          opacity="0.3"
+                        />
+                      ))}
+                    </svg>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* Fuzzing Tools Grid */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-14">
-            <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {tools.filter(tool => {
-                if (tool.category !== 'Fuzzing') return false
-                const q = search.toLowerCase()
-                return !q || tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q) || tool.tags.some(tag => tag.includes(q))
-              }).map((tool) => (
-                <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-purple-400/40 hover:shadow-[0_4px_24px_0_rgba(192,132,252,0.08)] transition-all duration-200 cursor-pointer">
-                  <div className="h-0.5 w-full bg-purple-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  <div className="p-6 flex flex-col gap-4 flex-1">
-                    <div className="flex items-start justify-between">
-                      <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800/50 flex items-center justify-center text-purple-500 dark:text-purple-400 shrink-0">
-                        <Icon id={tool.id} />
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap justify-end">
-                        {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
-                        <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800">
-                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500" />
-                          {t('categories.fuzzing')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
-                      <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                      {tool.tags.map(tag => (
-                        <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
-                    <a href="#" className="text-purple-500 dark:text-purple-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
-                      {t('primaryCta')}
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
         </div>
-      )}
+        {/* Fuzzing Tools Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-14">
+          <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {tools.filter(tool => tool.category === 'Fuzzing').map((tool) => (
+              <motion.div key={tool.id} variants={cardMotion} className="group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden hover:border-purple-400/40 hover:shadow-[0_4px_24px_0_rgba(192,132,252,0.08)] transition-all duration-200 cursor-pointer">
+                <div className="h-0.5 w-full bg-purple-400/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <div className="p-6 flex flex-col gap-4 flex-1">
+                  <div className="flex items-start justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800/50 flex items-center justify-center text-purple-500 dark:text-purple-400 shrink-0">
+                      <Icon id={tool.id} />
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {tool.badge && <span className="text-[10px] font-bold uppercase tracking-wider bg-[#00BCA1] text-white px-2.5 py-1 rounded-md">{tool.badge}</span>}
+                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-md border flex items-center gap-1 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500" />
+                        {t('categories.fuzzing')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className={`${subtitleTextClass} font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-snug`}>{tool.name}</h3>
+                    <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] leading-relaxed ${descriptionTextClass}`}>{tool.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {tool.tags.map(tag => (
+                      <span key={tag} className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
+                  <a href="#" className="text-purple-500 dark:text-purple-400 text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all">
+                    {t('primaryCta')}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
     </motion.div>
   )
