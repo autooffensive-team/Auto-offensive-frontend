@@ -99,12 +99,12 @@ const RIGHT_HEXES: HexDef[] = [
 
 // ─── Animation timing ────────────────────────────────────────────────
 const SPEEDS = {
-  CORNER_POP_UP:       0.55,
-  CORNER_SPREAD:       2.05,
+  CORNER_POP_UP:       0.15,
+  CORNER_SPREAD:       0.05,
   CORNER_SPREAD_DELAY: 0.45,
-  TEXT_POP_IN:         1.5,
-  TEXT_POP_IN_DELAY:   0.95,
-  INITIAL_DELAY:       2.35,
+  TEXT_POP_IN:         0.5,
+  TEXT_POP_IN_DELAY:   0.65,
+  INITIAL_DELAY:       0.55,
 };
 
 // ─── Star-field ──────────────────────────────────────────────────────
@@ -291,7 +291,7 @@ const CORNER_ANCHOR: Record<"tl"|"tr"|"bl"|"br", string> = {
 // t0=0  t1=popUpEnd  t2=spreadStart  t3=1
 const POP_T   = SPEEDS.CORNER_POP_UP;
 const HOLD_T  = SPEEDS.CORNER_SPREAD_DELAY;
-const SPREAD_T = 0.32;
+const SPREAD_T = 0.1;
 const TOTAL_T  = POP_T + HOLD_T + SPREAD_T;
 
 const KF_TIMES = [0, POP_T / TOTAL_T, (POP_T + HOLD_T) / TOTAL_T, 1];
