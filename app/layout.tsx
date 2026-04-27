@@ -8,6 +8,7 @@ import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale } from "next-intl/server";
 import { OfflineProvider } from "@/components/providers/offline-provider";
+import { PwaProvider } from "@/components/providers/pwa-provider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,6 +40,7 @@ const notoKhmer = Noto_Sans_Khmer({
 export const metadata: Metadata = {
   title: "Auto-Offensive | Next-Gen PaaS for Hackers",
   description: "Automated Security Workflows and Pentesting Platform",
+  manifest: "/manifest.webmanifest",
 };
 
 export default async function RootLayout({
@@ -71,6 +73,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <PwaProvider />
           <NextIntlClientProvider messages={messages}>
             <OfflineProvider>
               <LayoutWrapper>{children}</LayoutWrapper>
