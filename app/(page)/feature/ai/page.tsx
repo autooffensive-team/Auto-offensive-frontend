@@ -2,8 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
-import { Brain, ArrowRight, ExternalLink, Zap, Wrench, RefreshCw, Map } from "lucide-react";
-import { FiBarChart, FiLink2, FiFileText } from "react-icons/fi";
+import { Brain, ArrowRight, ExternalLink, Zap, Wrench, RefreshCw, Map, BarChart, Link2, FileText } from "lucide-react";
 
 const severityData = [
   { label: "Critical", count: 38, color: "#ef4444", pct: 31 },
@@ -31,7 +30,7 @@ export default function AIFeature() {
   const workflowSteps = [
     {
       num: "1",
-      icon: FiBarChart,
+      icon: BarChart,
       title: t("workflow.steps.0.title"),
       desc: t("workflow.steps.0.desc"),
     },
@@ -43,16 +42,16 @@ export default function AIFeature() {
     },
     {
       num: "3",
-      icon: FiFileText,
+      icon: FileText,
       title: t("workflow.steps.2.title"),
       desc: t("workflow.steps.2.desc"),
     },
   ];
 
   const dashboardBullets = [
-    { icon: FiBarChart, text: t("dashboard.bullets.0") },
-    { icon: FiLink2, text: t("dashboard.bullets.1") },
-    { icon: FiFileText, text: t("dashboard.bullets.2") },
+    { icon: BarChart, text: t("dashboard.bullets.0") },
+    { icon: Link2, text: t("dashboard.bullets.1") },
+    { icon: FileText, text: t("dashboard.bullets.2") },
   ];
 
   const aiEdgeItems = [

@@ -140,14 +140,14 @@ function CoreChip({
   className,
   bodyFontFamily,
   displayFontFamily,
-  eyebrow,
+  
   title,
   body,
 }: {
   className: string
   bodyFontFamily: string
   displayFontFamily: string
-  eyebrow: string
+ 
   title: string
   body: string
 }) {
@@ -168,7 +168,7 @@ function CoreChip({
           className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#00d0b2]"
           style={{ fontFamily: bodyFontFamily }}
         >
-          {eyebrow}
+     
         </p>
         <h3
           className="mt-2 text-[1.2rem] font-bold leading-tight text-white md:text-[1.35rem]"
@@ -226,7 +226,7 @@ export function Architecture() {
       : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
   const copy = isKhmer
     ? {
-        eyebrow: 'ស្ថាបត្យកម្មប្រព័ន្ធ',
+      
         titleLine1: 'Branded Data Paths និង',
         titleLine2: 'Real-Time System Flow',
         description:
@@ -253,7 +253,6 @@ export function Architecture() {
         },
       }
     : {
-        eyebrow: 'System Architecture',
         titleLine1: 'Branded Data Paths,',
         titleLine2: 'Real-Time System Flow',
         description:
@@ -303,7 +302,6 @@ export function Architecture() {
             className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#00a896] md:text-[12px]"
             style={{ fontFamily: bodyFontFamily }}
           >
-            {copy.eyebrow}
           </p>
           <h2
             className="text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-slate-900 dark:text-white md:text-[3rem] lg:text-[3.7rem]"
@@ -360,7 +358,7 @@ export function Architecture() {
                 className="left-1/2 top-1/2 w-62.5 -translate-x-1/2 -translate-y-1/2"
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
-                eyebrow={copy.coreEyebrow}
+      
                 title={copy.coreTitle}
                 body={copy.coreBody}
               />

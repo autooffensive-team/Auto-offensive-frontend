@@ -289,7 +289,6 @@ export default function OurMission() {
 
   const copy = isKhmer
     ? {
-        strip: "// បេសកកម្មរបស់យើង",
         next: "បន្ទាប់",
         terminal: [
           "aof scan --target app.example.com",
@@ -307,7 +306,6 @@ export default function OurMission() {
         aria: "ទៅកាន់ស្លាយ",
       }
     : {
-        strip: "// Our Mission",
         next: "NEXT",
         terminal: [
           "aof scan --target app.example.com",
@@ -627,9 +625,7 @@ export default function OurMission() {
           <div className="ms-bg-glow absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(0,208,178,.04)_0%,transparent_70%)]" />
 
           <div className="ms-top-strip absolute top-0 left-0 right-0 z-10 flex items-center justify-between border-b border-[rgba(0,208,178,.14)] px-[4%] py-3.5">
-            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-[rgba(0,208,178,.5)]">
-              {copy.strip}
-            </span>
+            <span />
             <span className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-[rgba(0,208,178,.5)]">
               <span ref={counterRef}>01 — 04</span>
             </span>

@@ -95,7 +95,7 @@
       "titleLine3": "for hacker",
       "description": "Continuously scan your infrastructure for vulnerabilities - faster, smarter, and at scale. No manual setup. Just results.",
       "primaryCta": "Start Scanning",
-      "secondaryCta": "View Sample Report",
+      "secondaryCta": "Preview Report",
       "scroll": "Scroll",
       "stats": {
         "completed": "Scans completed",
@@ -117,8 +117,7 @@
       "subtitle": "Watch a quick walkthrough of the platform, tools, and workflow experience."
     },
     "team": {
-      "eyebrow": "Our company",
-      "titleLine1": "In our company,",
+      "titleLine1": "In our team,",
       "titleLine2": "we build",
       "titleLine3": "what we use",
       "paragraph1": "We launched as a team of passionate professionals and we've kept that mindset ever since. Our experts still drive product development today, focusing relentlessly on accuracy, speed, and control.",
@@ -153,7 +152,7 @@
     "features": {
       "sectionEyebrow": "Platform Capabilities",
       "sectionTitleLine1": "What You Can Do",
-      "sectionTitleLine2": "with Auto Offensive",
+      "sectionTitleLine2": "with Reffensive",
       "exploreCapability": "Explore capability"
     }
   },
@@ -208,6 +207,7 @@
       "secondaryCta": "View Docs"
     },
     "grid": {
+      "sectionSubtitle": "Enterprise-grade tools designed for security professionals",
       "web": {
         "title": "Web-Based Pentesting Automation",
         "desc": "Orchestrate complex security workflows without touching a terminal. Launch industrial-grade tools like Subfinder for discovery, Nmap for port mapping, and Nuclei for vulnerability scanning through a unified, high-fidelity interface."
@@ -565,6 +565,11 @@
     "tryDifferent": "Try a different search or category",
     "primaryCta": "Try for Free",
     "popular": "POPULAR",
+    "hero": {
+      "reconDescription": "Speed up large-scale recon operations, eliminate noise, and deliver professionally customizable reports with a comprehensive range of recon tools for efficient penetration testing and vulnerability assessments.",
+      "vulnDescription": "Identify and verify vulnerabilities across your infrastructure with powerful scanning tools. Detect security weaknesses, misconfigurations, and known vulnerabilities with precise, actionable results.",
+      "fuzzingDescription": "Discover hidden endpoints, directories, and vulnerabilities with intelligent fuzzing tools. Map attack surfaces, identify web technologies, and generate comprehensive reports for thorough security testing."
+    },
     "categories": {
       "all": "All",
       "recon": "Recon",

@@ -78,7 +78,6 @@ export default function Values() {
 
   const ui = isKhmer
     ? {
-        eyebrow: "តម្លៃស្នូល",
         titleTop: "ស្ថាបនាលើ",
         titleAccent: "គោលការណ៍",
         titleBottom: "ដែលសំខាន់ពិតៗ",
@@ -88,7 +87,6 @@ export default function Values() {
         bgLabel: "VALUES",
       }
     : {
-        eyebrow: "Core Values",
         titleTop: "Built on",
         titleAccent: "principles",
         titleBottom: "that matter",
@@ -342,26 +340,6 @@ export default function Values() {
           z-index: 2;
         }
         .vs-left-inner { max-width: 380px; }
-        .vs-eyebrow {
-          font-size: .62rem;
-          font-weight: 600;
-          letter-spacing: .14em;
-          text-transform: uppercase;
-          color: rgba(0,208,178,.6);
-          margin-bottom: 1.4rem;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .vs-eyebrow::before {
-          content: "";
-          width: 22px;
-          height: 1.5px;
-          background: #00D0B2;
-          border-radius: 2px;
-          opacity: .5;
-          display: inline-block;
-        }
         .vs-title {
           font-size: clamp(2rem, 3vw, 2.8rem);
           font-weight: 700;
@@ -566,7 +544,6 @@ export default function Values() {
             <div className="vs-grid">
               <div className="vs-left">
                 <div className="vs-left-inner">
-                  <div className="vs-eyebrow">{ui.eyebrow}</div>
                   <h2 className="vs-title" style={{ fontFamily: titleFont }}>
                     {ui.titleTop} <span className="vs-title-ac">{ui.titleAccent}</span>
                     <br />

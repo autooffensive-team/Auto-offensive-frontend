@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 interface VideoThumbnailPlayerProps {
   title: string;
@@ -92,12 +93,14 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
               )
             ) : (
               <>
-                <img
+                <Image
                   src={thumbnailUrl}
                   alt={title}
+                  fill
                   className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${
                     isHovered ? 'scale-[1.04]' : 'scale-100'
                   }`}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,0,0,0.38)_0%,rgba(0,0,0,0.08)_45%,rgba(0,0,0,0.62)_100%)]" />
                 <div className="absolute inset-x-0 bottom-0 h-2/5 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.62)_62%,rgba(0,0,0,0.84)_100%)]" />

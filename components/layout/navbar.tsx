@@ -26,7 +26,7 @@ import {
 type ToolItem = {
   title: string;
   href: string;
-  icon: string; 
+  icon: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
@@ -52,23 +52,27 @@ const toolLinks: ToolItem[] = [
   { title: 'Naabu',        href: '#', icon: '/icons/nabuu.webp'        },
   { title: 'Nmap',         href: '#', icon: '/icons/nmap.webp'         },
   { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.webp'       },
-  { title: 'URL Fuzzer',   href: '#', icon: '/icons/url.webp'    },
+  { title: 'URL Fuzzer',   href: '#', icon: '/icons/url.webp'          },
   { title: 'WPScan',       href: '#', icon: '/icons/wpscan.webp'       },
   { title: 'SQLi',         href: '#', icon: '/icons/sqli.webp'         },
-  { title: 'XSS Strike',   href: '#', icon: '/icons/xss.webp'    },
+  { title: 'XSS Strike',   href: '#', icon: '/icons/xss.webp'          },
   { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.webp'   },
   { title: 'Httpx',        href: '#', icon: '/icons/httpx.webp'        },
   { title: 'Katana',       href: '#', icon: '/icons/katana.webp'       },
-  { title: 'Gobuster',       href: '#', icon: '/icons/gobuster.webp'       },
+  { title: 'Gobuster',     href: '#', icon: '/icons/gobuster.webp'     },
   { title: 'Amass',        href: '#', icon: '/icons/amass.webp'        },
   { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.webp'  },
 ];
 
+const navbarToolLinks = toolLinks.filter(({ title }) =>
+  ['Nmap', 'Naabu', 'Subfinder', 'Katana', 'Httpx', 'Gobuster'].includes(title)
+);
+
 const featureLinks: FeatureItem[] = [
-  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd', icon: '/icons/feature-cicd.webp'       },
-  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai', icon: '/icons/feature-aipentest.webp'  },
-  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli', icon: '/icons/feature-cli.webp'        },
-  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui', icon: '/icons/feature-automation.webp' },
+  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd',   icon: '/icons/feature-cicd.webp'       },
+  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai',     icon: '/icons/feature-aipentest.webp'  },
+  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli',    icon: '/icons/feature-cli.webp'        },
+  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui',  icon: '/icons/feature-automation.webp' },
 ];
 
 const resourceDocLinks: ResourceItem[] = [
@@ -79,10 +83,17 @@ const resourceDocLinks: ResourceItem[] = [
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
-  { title: 'About Us',    href: '/about-us', icon: '/icons/about_us_icon.webp'   },
-  { title: 'Contact Us',  href: '/contact-us',          icon: '/icons/contact_us_icon.webp' },
-  { title: 'FAQ',         href: '/help-center',          icon: '/icons/faq.webp'     },
+  { title: 'About Us',   href: '/about-us',   icon: '/icons/about_us_icon.webp'   },
+  { title: 'Contact Us', href: '/contact-us', icon: '/icons/contact_us_icon.webp' },
+  { title: 'FAQ',        href: '/help-center', icon: '/icons/faq.webp'            },
 ];
+
+// ── Shared icon box class ────────────────────────────────────────────────────
+const iconBoxCls =
+  'flex shrink-0 items-center justify-center rounded-[8px] ' +
+  'bg-[#F7F5F0] dark:bg-[#1C1C1A] ' +
+  'border border-black/[0.045] dark:border-white/[0.09] ' +
+  'shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)]';
 
 // ── Logo ─────────────────────────────────────────────────────────────────────
 function Logo() {
@@ -102,42 +113,44 @@ function Logo() {
 
 // ── Theme Toggle ─────────────────────────────────────────────────────────────
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="w-14 h-7" />;
-  const isDark = theme === 'dark';
+  if (!mounted) return <div className="size-10 shrink-0 rounded-full" />;
+  const isDark = (theme === 'system' ? resolvedTheme : theme) === 'dark';
   return (
     <button
+      type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label="Toggle theme"
-      className={cn(
-        'relative inline-flex items-center w-14 h-7 rounded-full border-2 transition-colors duration-300 cursor-pointer shrink-0',
-        isDark
-          ? 'bg-gray-700 border-gray-600'
-          : 'bg-gray-200 border-gray-300',
-      )}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      aria-pressed={isDark}
+      className="group relative grid size-10 shrink-0 place-items-center rounded-full border border-black/9 dark:border-white/9 bg-transparent text-zinc-700 transition-all duration-300 dark:text-zinc-100"
     >
-      {/* Sun icon — left */}
-      <span className="absolute left-1 flex items-center justify-center w-5 h-5">
-        <SunIcon className={cn('size-3.5 transition-opacity', isDark ? 'opacity-40' : 'opacity-100 text-amber-500')} />
-      </span>
-      {/* Moon icon — right */}
-      <span className="absolute right-1 flex items-center justify-center w-5 h-5">
-        <MoonIcon className={cn('size-3.5 transition-opacity', isDark ? 'opacity-100 text-blue-300' : 'opacity-40')} />
-      </span>
-      {/* Thumb */}
       <span
         className={cn(
-          'absolute top-0.5 w-5 h-5 rounded-full shadow transition-transform duration-300',
-          isDark ? 'translate-x-7 bg-blue-400' : 'translate-x-0.5 bg-amber-400',
+          'col-start-1 row-start-1 p-1.5 leading-none transition-transform duration-500',
+          isDark
+            ? 'scale-100 rotate-0 text-zinc-400 delay-200'
+            : 'scale-0 rotate-360 text-zinc-400 delay-0',
         )}
-      />
+      >
+        <MoonIcon className="size-5" />
+      </span>
+      <span
+        className={cn(
+          'col-start-1 row-start-1 p-1.5 leading-none transition-transform duration-500',
+          isDark
+            ? 'scale-0 -rotate-360 text-amber-500 delay-0'
+            : 'scale-100 rotate-360 text-amber-500 delay-200',
+        )}
+      >
+        <SunIcon className="size-5" />
+      </span>
+      <span className="sr-only">Toggle theme</span>
     </button>
   );
 }
 
-// ── Language Toggle ───────────────────────────────────────────────────────────
 type Lang = 'en' | 'kh';
 
 function LanguageToggle() {
@@ -145,10 +158,8 @@ function LanguageToggle() {
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
-  const khmerLabel = '\u1781\u17d2\u1798\u17c2\u179a';
   const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
-  const currentLabel = currentLocale === 'en' ? 'EN' : 'KH';
-  const nextLabel = currentLocale === 'en' ? khmerLabel : 'EN';
+  const isEnglish = currentLocale === 'en';
 
   React.useEffect(() => setMounted(true), []);
 
@@ -159,12 +170,12 @@ function LanguageToggle() {
     });
   };
 
-  const options: { value: Lang; label?: string; flagSrc: string }[] = [
-    { value: 'en', flagSrc: '/flags/en.png' },
-    { value: 'kh', flagSrc: '/flags/kh.png' },
+  const options: { value: Lang; flagSrc: string; code: string }[] = [
+    { value: 'en', flagSrc: '/flags/en.png', code: 'EN' },
+    { value: 'kh', flagSrc: '/flags/kh.png', code: 'KH' },
   ];
 
-  if (!mounted) return <div className="w-14 h-7" />;
+  if (!mounted) return <div className="h-10 w-23 shrink-0 rounded-full" />;
 
   const current = options.find(o => o.value === currentLocale) || options[0];
 
@@ -174,72 +185,82 @@ function LanguageToggle() {
       onClick={handleLocaleChange}
       disabled={isPending}
       aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
-      className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-zinc-200/80 bg-white/80 px-2.5 text-zinc-900 shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-100 dark:hover:bg-zinc-900"
+      aria-pressed={!isEnglish}
+      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-[#F7F5F0]/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
     >
-      <Image
-        src={current.flagSrc}
-        alt={current.value}
-        width={18}
-        height={12}
-        className="rounded-xs object-cover"
-      />
-      <span className="text-xs font-semibold tracking-[0.14em]">
-        {currentLabel}
+      <span
+        className={cn(
+          'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-black/9 dark:border-white/9 bg-white dark:bg-zinc-900 transition-all duration-300 ease-out',
+          isEnglish ? 'left-1.25' : 'left-[calc(100%-2rem)]',
+        )}
+      >
+        <Image
+          src={current.flagSrc}
+          alt={current.value}
+          width={28}
+          height={28}
+          className="h-full w-full object-cover"
+        />
       </span>
-      <span className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-        <span className="text-xs">⇄</span>
-        {isPending ? '...' : nextLabel}
+      <span
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2 text-lg font-semibold leading-none tracking-[0.02em] transition-all duration-300 ease-out',
+          isEnglish ? 'right-3 text-left' : 'left-3 text-left',
+          isPending && 'opacity-70',
+        )}
+      >
+        {current.code}
       </span>
     </button>
   );
 }
 
-// ── Tool List Item (image icon, 2-col grid) ───────────────────────────────────
+// ── Tool List Item ────────────────────────────────────────────────────────────
 function ToolItem({ title, href, icon, onClick }: ToolItem) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
     >
-      <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 shadow-sm">
+      <div className={cn(iconBoxCls, 'size-11 md:size-12')}>
         <Image
           src={icon}
           alt={title}
-          width={36}
-          height={36}
-          className="h-9 w-9 object-contain"
+          width={30}
+          height={30}
+          className="h-7.5 w-7.5 object-contain md:h-8 md:w-8"
         />
       </div>
-      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+      <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
         {title}
       </span>
     </Link>
   );
 }
 
-// ── Feature List Item (image icon + description) ──────────────────────────────
+// ── Feature List Item ─────────────────────────────────────────────────────────
 function FeatureItem({ title, description, href, icon, onClick }: FeatureItem) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-start gap-3 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
     >
-      <div className="mt-0.5 flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-background/80 shadow-sm">
+      <div className={cn(iconBoxCls, 'mt-0.5 size-11 md:size-12')}>
         <Image
           src={icon}
           alt={title}
-          width={32}
-          height={32}
-          className="h-8 w-8 object-contain"
+          width={30}
+          height={30}
+          className="h-7.5 w-7.5 object-contain md:h-8 md:w-8"
         />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-foreground">
-          {title} <span className="text-muted-foreground font-normal">:</span>
+        <p className="text-[13px] font-semibold text-foreground leading-snug">
+          {title}
         </p>
-        <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+        <p className="text-[11.5px] text-muted-foreground leading-snug mt-0.5">{description}</p>
       </div>
     </Link>
   );
@@ -258,24 +279,23 @@ function ResourceDocItem({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-start gap-3 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
     >
-      <div className="shrink-0 w-9 h-9 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+      <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
         <Image
           src={icon}
           alt={title}
-          width={24}
-          height={24}
-          style={{ width: 'auto', height: 'auto' }}
-          className="object-contain"
+          width={26}
+          height={26}
+          className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
         />
       </div>
       <div>
-        <p className="text-sm font-semibold text-foreground">
-          {title} <span className="text-muted-foreground font-normal">:</span>
+        <p className="text-[12.5px] font-semibold text-foreground leading-snug">
+          {title}
         </p>
         {description && (
-          <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+          <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{description}</p>
         )}
       </div>
     </Link>
@@ -296,24 +316,23 @@ function ResourceMiscItem({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-2.5 rounded-md px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+      className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
     >
-      <div className="shrink-0 w-8 h-8 rounded-md border border-border bg-background flex items-center justify-center overflow-hidden shadow-sm">
+      <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
         <Image
           src={icon}
           alt={title}
-          width={22}
-          height={22}
-          className="object-contain"
+          width={26}
+          height={26}
+          className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
         />
       </div>
-      <span className="text-sm font-medium text-foreground">{title}</span>
+      <span className="text-[12.5px] font-medium text-foreground">{title}</span>
     </Link>
   );
 
   return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
 }
-
 
 // ── Scroll hook ───────────────────────────────────────────────────────────────
 function useScroll(threshold: number) {
@@ -338,7 +357,7 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
     <div
       id="mobile-menu"
       className={cn(
-        'bg-background/95 [@supports(backdrop-filter:blur(0))]:bg-background/60',
+        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70',
         'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y md:hidden',
       )}
     >
@@ -364,6 +383,9 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const isKhmer = locale === 'kh';
+  const bodyFontFamily = isKhmer
+    ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
+    : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
 
@@ -376,39 +398,59 @@ export function Header() {
     setOpen(false);
   }, [pathname]);
 
+  // Shared dropdown panel styles
+  const dropdownPanelCls =
+    'rounded-[13px] border border-black/[0.045] dark:border-white/[0.09] ' +
+    'bg-white dark:bg-[#111110] ' +
+    'shadow-[0_4px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.04)] ' +
+    'dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),0_1px_4px_rgba(0,0,0,0.3)] p-3';
+
   return (
     <header
-      className={cn('sticky top-0 z-50 w-full border-b border-transparent', {
-        'bg-background/95 [@supports(backdrop-filter:blur(0))]:bg-background/60': scrolled,
+      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200', {
+        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
-      <nav className="mx-auto z-50 flex h-14 w-full max-w-7xl items-center justify-between px-4">
+      <nav
+        className="mx-auto z-50 flex h-14 w-full max-w-7xl items-center justify-between px-4"
+        style={{ fontFamily: bodyFontFamily }}
+      >
 
-        {/* Left: Logo  */}
-        <div >
+        {/* Left: Logo */}
+        <div>
           <Logo />
         </div>
 
-                {/* Center:  Nav */}
-        <div >
-       
+        {/* Center: Nav */}
+        <div>
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
 
               {/* ── Tools ── */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                <Link href="/tools">  {t('tools')}</Link>
+                  <Link href="/tools">{t('tools')}</Link>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background">
-                  <div className="w-120 rounded-xl border border-border bg-popover shadow-xl p-3">
+                <NavigationMenuContent>
+                  <div className={cn(dropdownPanelCls, 'w-84')}>
                     <ul className="grid grid-cols-2 gap-0.5">
-                      {toolLinks.map((item, i) => (
+                      {navbarToolLinks.map((item, i) => (
                         <li key={i}>
                           <ToolItem {...item} />
                         </li>
                       ))}
                     </ul>
+                    <div className="mt-2 border-t border-black/[0.07] dark:border-white/6 pt-2">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/tools"
+                          className="flex items-center justify-between rounded-[8px] px-2 py-1.5 text-[13px] font-semibold text-primary transition-colors hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A]"
+                        >
+                          <span>See more</span>
+                          <span aria-hidden="true">→</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -416,10 +458,10 @@ export function Header() {
               {/* ── Features ── */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                <Link href="/feature">  {t('features')}</Link>
+                  <Link href="/feature">{t('features')}</Link>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background">
-                  <div className="w-120 rounded-xl border border-border bg-popover shadow-xl p-3">
+                <NavigationMenuContent>
+                  <div className={cn(dropdownPanelCls, 'w-90')}>
                     <ul className="grid grid-cols-2 gap-1">
                       {featureLinks.map((item, i) => (
                         <li key={i}>
@@ -434,13 +476,13 @@ export function Header() {
               {/* ── Resources ── */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                  <Link href="/resource">  {t('resources')}</Link>
+                  <Link href="/resource">{t('resources')}</Link>
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background">
-                  <div className="w-120 rounded-xl border border-border bg-popover shadow-xl p-3">
+                <NavigationMenuContent>
+                  <div className={cn(dropdownPanelCls, 'w-95')}>
                     <div className="grid grid-cols-2 gap-2">
                       {/* Left: doc links */}
-                      <ul className="space-y-0.5 border-r border-border pr-2">
+                      <ul className="space-y-0.5 border-r border-black/[0.07] dark:border-white/6 pr-2">
                         {resourceDocLinks.map((item, i) => (
                           <li key={i}>
                             <ResourceDocItem {...item} asMenuLink />
@@ -463,21 +505,16 @@ export function Header() {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        
 
         {/* Right: Desktop controls */}
         <div className="hidden items-center gap-2 md:flex">
-
-          {/* Language toggle */}
           <LanguageToggle />
-
-          {/* Theme toggle */}
           <ThemeToggle />
-
-          {/* Login / Register */}
-          <Link href="/register"><button className="px-4 py-1.5 rounded-md text-sm font-semibold text-primary  bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
-            {t('loginRegister')}
-          </button></Link>
+          <Link href="/register">
+            <button className="px-4 py-1.5 rounded-md text-sm font-semibold text-primary bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
+              {t('loginRegister')}
+            </button>
+          </Link>
         </div>
 
         {/* Mobile controls */}
@@ -487,7 +524,7 @@ export function Header() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label="Toggle menu"
-            className="flex items-center justify-center size-9 rounded-md border border-border bg-transparent cursor-pointer"
+            className="flex items-center justify-center size-9 rounded-md border border-black/9 dark:border-white/9 bg-transparent cursor-pointer"
           >
             <MenuToggleIcon open={open} className="size-5" duration={300} />
           </button>
@@ -495,9 +532,15 @@ export function Header() {
       </nav>
 
       {/* Mobile Menu */}
-      <MobileMenu open={open} className="flex flex-col justify-between gap-2 overflow-y-auto">
+      <MobileMenu
+        open={open}
+        className="flex flex-col justify-between gap-2 overflow-y-auto"
+        style={{ fontFamily: bodyFontFamily }}
+      >
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background/70 p-3 backdrop-blur-md">
+
+          {/* Preferences */}
+          <div className="flex items-center justify-between rounded-xl border border-black/8 dark:border-white/[0.07] bg-white/70 dark:bg-[#111110]/70 p-3 backdrop-blur-md">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
               <p className="text-sm text-foreground">Language and theme</p>
@@ -508,22 +551,25 @@ export function Header() {
             </div>
           </div>
 
+          {/* Tools */}
           <div className="mt-1 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
-            <Link
-              href="/tools"
-              onClick={() => setOpen(false)}
-              className="text-xs font-medium text-primary"
-            >
-              {isKhmer ? 'បើកទំព័រ' : 'Open page'}
-            </Link>
           </div>
           <div className="grid grid-cols-2 gap-0.5">
-            {toolLinks.map((link, i) => (
+            {navbarToolLinks.map((link, i) => (
               <ToolItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
           </div>
+          <Link
+            href="/tools"
+            onClick={() => setOpen(false)}
+            className="mt-1 flex items-center justify-between rounded-[8px] border border-black/8 dark:border-white/[0.07] px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A]"
+          >
+            <span>See more</span>
+            <span aria-hidden="true">→</span>
+          </Link>
 
+          {/* Features */}
           <div className="mt-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Features</p>
             <Link
@@ -540,6 +586,7 @@ export function Header() {
             ))}
           </div>
 
+          {/* Resources */}
           <div className="mt-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
             <Link
@@ -560,7 +607,8 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 pt-2 border-t border-border">
+        {/* Bottom CTA */}
+        <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.07] dark:border-white/6">
           <Link
             href="/register"
             onClick={() => setOpen(false)}
@@ -573,4 +621,3 @@ export function Header() {
     </header>
   );
 }
-

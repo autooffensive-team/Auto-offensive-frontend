@@ -16,14 +16,21 @@ export default function LayoutWrapper({
   const isAuthPage =
     pathname === "/login" || pathname === "/register";
   const isDashboardPage = pathname.startsWith("/userdashboard") || pathname.startsWith("/guestdashboard");
+  const isAppPage = 
+    pathname.startsWith("/live-scans") || 
+    pathname.startsWith("/medium-scan") || 
+    pathname.startsWith("/live-scan-medium") || 
+    pathname.startsWith("/vulnerabilities");
+
+  const hideHeaderFooter = isAuthPage || isDashboardPage || isAppPage;
 
   return (
     <>
-      {!isAuthPage && !isDashboardPage && <Header />}
+      {!hideHeaderFooter && <Header />}
 
       <main
         className={cn(
-          !isAuthPage && !isDashboardPage && "-mt-14",
+          !hideHeaderFooter && "-mt-14",
           isAuthPage &&
             "min-h-screen flex items-center justify-center"
         )}
@@ -31,8 +38,8 @@ export default function LayoutWrapper({
         {children}
       </main>
 
-      {!isAuthPage && !isDashboardPage && <Footer />}
-      {!isAuthPage && !isDashboardPage && <GoToTop />}
+      {!hideHeaderFooter && <Footer />}
+      {!hideHeaderFooter && <GoToTop />}
     </>
   );
 }
