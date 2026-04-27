@@ -39,4 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+<<<<<<< HEAD
 RTK.md
+=======
+.codex
+>>>>>>> 4ca8871 (feat(basic scan): design UI)
