@@ -565,6 +565,11 @@
     "tryDifferent": "Try a different search or category",
     "primaryCta": "Try for Free",
     "popular": "POPULAR",
+    "hero": {
+      "reconDescription": "Speed up large-scale recon operations, eliminate noise, and deliver professionally customizable reports with a comprehensive range of recon tools for efficient penetration testing and vulnerability assessments.",
+      "vulnDescription": "Identify and verify vulnerabilities across your infrastructure with powerful scanning tools. Detect security weaknesses, misconfigurations, and known vulnerabilities with precise, actionable results.",
+      "fuzzingDescription": "Discover hidden endpoints, directories, and vulnerabilities with intelligent fuzzing tools. Map attack surfaces, identify web technologies, and generate comprehensive reports for thorough security testing."
+    },
     "categories": {
       "all": "All",
       "recon": "Recon",
