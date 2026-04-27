@@ -144,6 +144,11 @@ const cardMotion = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: cubicBezier(0.25, 0.46, 0.45, 0.94) } },
 };
 
+const heroEyebrowTextClass = "text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em]";
+const heroTitleTextClass = "text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.02] tracking-tight";
+const heroDescriptionTextClass = "text-base sm:text-lg lg:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed";
+const heroStatTextClass = "text-xs sm:text-sm font-semibold text-[#9A9A9A]";
+
 // ── Icons ──────────────────────────────────────────────────────────────
 const SearchIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -284,7 +289,7 @@ export default function ToolsPage() {
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
-  const subtitleTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
+  const subtitleTextClass = "text-[16px] md:text-[17px] lg:text-[18px]";
 
   const tools = [
     { id: 'subfinder',   name: 'Subfinder',     category: 'Recon',   description: t('items.subfinder'),   tags: ['subdomain', 'passive', 'dns'] },
@@ -334,22 +339,38 @@ export default function ToolsPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-4 items-center">
 
+            {/* ── Right: Swiss Army Knife Image (on top for mobile) ── */}
+            <div className="relative flex items-center justify-center lg:justify-end order-first lg:order-last">
+              {/* Glow behind image */}
+              <div className="absolute inset-0 flex items-center justify-center lg:justify-end pointer-events-none">
+                <div className="w-85 h-85 rounded-full bg-[#00BCA1]/10 blur-[70px]" />
+              </div>
+              <img
+                src="/document/glass_swiss_army_knife.webp"
+                alt="Pentesting tools suite"
+                className="relative z-10 w-48 sm:w-64 md:w-80 lg:w-100 xl:w-110 object-contain
+                           drop-shadow-[0_24px_64px_rgba(0,188,161,0.18)]
+                           select-none"
+                draggable={false}
+              />
+            </div>
+
             {/* ── Left: Text + Controls ── */}
-            <div className="flex flex-col gap-7 z-10">
+            <div className="flex flex-col gap-7 z-10 text-center lg:text-left order-last lg:order-first">
 
               {/* Title + subtitle */}
               <div className="flex flex-col gap-3">
-                <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold leading-[1.1] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[1.1] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
                   {t('title')}
                 </h1>
-                <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-lg ${descriptionTextClass} leading-relaxed`}>
+                <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-lg mx-auto lg:mx-0 ${descriptionTextClass} leading-relaxed`}>
                   {t('subtitle')}
                 </p>
               </div>
 
               {/* Stats row — always two lines: dots then bar */}
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-4 flex-wrap justify-center lg:justify-start">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
                     <span className="text-xs text-[#9A9A9A] whitespace-nowrap">
@@ -369,13 +390,15 @@ export default function ToolsPage() {
                     </span>
                   </div>
                 </div>
-                <CategoryStatBar tools={tools} />
+                <div className="flex justify-center lg:justify-start">
+                  <CategoryStatBar tools={tools} />
+                </div>
               </div>
 
               {/* Navigation Buttons */}
               <div className="flex flex-col gap-3">
                 <p className="text-sm font-medium text-[#5C5C5C] dark:text-[#9A9A9A]">Explore by category</p>
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap justify-center lg:justify-start">
                   <button
                     onClick={() => {
                       const element = document.getElementById('recon-section');
@@ -405,22 +428,6 @@ export default function ToolsPage() {
                   </button>
                 </div>
               </div>
-            </div>
-
-            {/* ── Right: Swiss Army Knife Image ── */}
-            <div className="relative flex items-center justify-center lg:justify-end">
-              {/* Glow behind image */}
-              <div className="absolute inset-0 flex items-center justify-center lg:justify-end pointer-events-none">
-                <div className="w-85 h-85 rounded-full bg-[#00BCA1]/10 blur-[70px]" />
-              </div>
-              <img
-                src="/document/glass_swiss_army_knife.webp"
-                alt="Pentesting tools suite"
-                className="relative z-10 w-65 sm:w-[320px] lg:w-100 xl:w-110 object-contain
-                           drop-shadow-[0_24px_64px_rgba(0,188,161,0.18)]
-                           select-none"
-                draggable={false}
-              />
             </div>
 
           </div>
@@ -454,21 +461,21 @@ export default function ToolsPage() {
                 <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400">{t('categories.recon')}</span>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
-                      Reconnaissance Tools
-                    </h2>
-                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
-                      {t('hero.reconDescription')}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 mt-4">
-                    <span className="text-sm font-semibold text-[#9A9A9A] bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50 px-4 py-2 rounded-lg">
-                      {tools.filter(t => t.category === 'Recon').length} tools
-                    </span>
-                  </div>
+                      <span className={`${heroEyebrowTextClass} text-blue-500 dark:text-blue-400`}>{t('categories.recon')}</span>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <h2 className={`${heroTitleTextClass} text-[#1A1A1A] dark:text-[#EDEDED]`}>
+                        Reconnaissance Tools
+                      </h2>
+                      <p className={heroDescriptionTextClass}>
+                        {t('hero.reconDescription')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 mt-4">
+                      <span className={`${heroStatTextClass} bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/50 px-4 py-2 rounded-lg`}>
+                        {tools.filter(t => t.category === 'Recon').length} tools
+                      </span>
+                    </div>
                 </motion.div>
                 
                 {/* Right: Animated Grid Pattern */}
@@ -581,18 +588,18 @@ export default function ToolsPage() {
                 <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-red-500 dark:text-red-400">{t('categories.vuln')}</span>
+                    <span className={`${heroEyebrowTextClass} text-red-500 dark:text-red-400`}>{t('categories.vuln')}</span>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
+                    <h2 className={`${heroTitleTextClass} text-[#1A1A1A] dark:text-[#EDEDED]`}>
                       Vulnerability Scanning
                     </h2>
-                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
+                    <p className={heroDescriptionTextClass}>
                       {t('hero.vulnDescription')}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 mt-4">
-                    <span className="text-sm font-semibold text-[#9A9A9A] bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-800/50 px-4 py-2 rounded-lg">
+                    <span className={`${heroStatTextClass} bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-800/50 px-4 py-2 rounded-lg`}>
                       {tools.filter(t => t.category === 'Vuln').length} tools
                     </span>
                   </div>
@@ -696,18 +703,18 @@ export default function ToolsPage() {
                 <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-purple-500 dark:text-purple-400">{t('categories.fuzzing')}</span>
+                    <span className={`${heroEyebrowTextClass} text-purple-500 dark:text-purple-400`}>{t('categories.fuzzing')}</span>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] dark:text-[#EDEDED] leading-tight">
+                    <h2 className={`${heroTitleTextClass} text-[#1A1A1A] dark:text-[#EDEDED]`}>
                       Fuzzing & Discovery
                     </h2>
-                    <p className="text-lg sm:text-xl text-[#5C5C5C] dark:text-[#9A9A9A] max-w-xl leading-relaxed">
+                    <p className={heroDescriptionTextClass}>
                       {t('hero.fuzzingDescription')}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 mt-4">
-                    <span className="text-sm font-semibold text-[#9A9A9A] bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 px-4 py-2 rounded-lg">
+                    <span className={`${heroStatTextClass} bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 px-4 py-2 rounded-lg`}>
                       {tools.filter(t => t.category === 'Fuzzing').length} tools
                     </span>
                   </div>
