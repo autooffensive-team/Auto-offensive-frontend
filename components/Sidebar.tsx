@@ -3,12 +3,13 @@
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  LayoutGrid,
   Activity,
-  Shield,
-  Settings,
+  LayoutGrid,
   LifeBuoy,
   Plus,
+  Settings,
+  Shield,
+  Sparkles,
   User,
 } from "lucide-react";
 
@@ -20,11 +21,11 @@ export default function Sidebar() {
     { label: "Overview", path: "/guestdashboard", icon: LayoutGrid },
     { label: "Live Scans", path: "/live-scans", icon: Activity },
     { label: "Vulnerabilities", path: "/vulnerabilities", icon: Shield },
+    { label: "AI Suggestion", path: "/ai-suggestion", icon: Sparkles },
   ];
 
   return (
     <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen shrink-0 transition-colors">
-      {/* Guest Mode */}
       <div className="px-3 pt-4 mb-4">
         <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -42,14 +43,12 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Unlock Button */}
       <div className="px-3 mb-5">
         <button className="w-full bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-lg py-2 transition">
           Unlock Full Suite
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-2 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.path);
@@ -74,9 +73,9 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* New Scan */}
       <div className="px-3 mb-4">
         <motion.button
+          onClick={() => router.push("/basic-scan")}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="w-full bg-linear-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2"
@@ -86,7 +85,6 @@ export default function Sidebar() {
         </motion.button>
       </div>
 
-      {/* Bottom */}
       <div className="px-2 pb-5 space-y-1">
         {[
           { label: "Settings", icon: Settings },
