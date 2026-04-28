@@ -138,13 +138,22 @@ function StatCard({ value, label }: { value: string; label: string }) {
 }
 
 /* ─── Interactive Tool Toggles ───────────────────── */
-function ToolConfig() {
+function ToolConfig({ items }: { items: { name: string; desc: string }[] }) {
   const [tools, setTools] = useState([
-    { name: "Subfinder", desc: "Subdomain enumeration", on: true, color: "text-[#00BCA1]", bg: "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800" },
-    { name: "Naabu", desc: "Port scanning", on: true, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800" },
-    { name: "Nuclei", desc: "Vulnerability templates", on: true, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800" },
-    { name: "HTTPx", desc: "HTTP probing", on: false, color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800" },
+    { ...items[0], on: true, color: "text-[#00BCA1]", bg: "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800" },
+    { ...items[1], on: true, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800" },
+    { ...items[2], on: true, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800" },
+    { ...items[3], on: false, color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800" },
   ]);
+
+  useEffect(() => {
+    setTools([
+      { ...items[0], on: true, color: "text-[#00BCA1]", bg: "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800" },
+      { ...items[1], on: true, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800" },
+      { ...items[2], on: true, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800" },
+      { ...items[3], on: false, color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800" },
+    ]);
+  }, [items]);
 
   const toggle = (i: number) => {
     setTools(prev => prev.map((t, idx) => idx === i ? { ...t, on: !t.on } : t));
@@ -250,8 +259,10 @@ export default function WebUIFeature() {
       color: "text-blue-500",
       bgLight: "bg-blue-50 border-blue-200",
       bgDark: "dark:bg-blue-950/40 dark:border-blue-800",
-      title: "Review & act",
-      desc: "Get structured results with severity ratings, fix guidance, and exportable reports right in your dashboard.",
+      title: isKhmer ? "ពិនិត្យ & អនុវត្ត" : "Review & act",
+      desc: isKhmer
+        ? "ទទួលបានលទ្ធផលជារចនាសម្ព័ន្ធ មាន severity និងការណែនាំដោះស្រាយ។"
+        : "Get structured results with severity ratings, fix guidance, and exportable reports right in your dashboard.",
     },
   ];
 
@@ -281,6 +292,162 @@ export default function WebUIFeature() {
       desc: t("benefits.items.2.desc"),
     },
   ];
+
+  const heroChecklist = isKhmer
+    ? [
+        "មិនចាំបាច់ដំឡើង",
+        "ប្រើបានគ្រប់ទីកន្លែង",
+        "អាប់ដេតជានិច្ច",
+        "ចែករំលែកជាមួយក្រុមបានងាយស្រួល",
+      ]
+    : [
+        "No installation required",
+        "Works everywhere",
+        "Always up-to-date",
+        "Share with your team",
+      ];
+
+  const heroStats = isKhmer
+    ? [
+        { value: "15+", label: "Tools" },
+        { value: "0 min", label: "Setup" },
+        { value: "99.1%", label: "Uptime" },
+      ]
+    : [
+        { value: "15+", label: "Tools" },
+        { value: "0 min", label: "Setup" },
+        { value: "99.1%", label: "Uptime" },
+      ];
+
+  const liveSection = isKhmer
+    ? {
+        title: "កំណត់ និងស្កេនពេលវេលាជាក់ស្តែង",
+        desc: "បើក/បិទឧបករណ៍ កំណត់ target ហើយមើលលទ្ធផលដែលបង្ហាញភ្លាមៗលើ dashboard។",
+        configTitle: "ជ្រើសរើសឧបករណ៍របស់អ្នក",
+        configDesc: "បើក ឬបិទឧបករណ៍សុវត្ថិភាព ហើយដំណើរការស្កេនភ្លាមៗ។",
+        runScan: "Run Scan",
+      }
+    : {
+        title: "Configure and scan in real time",
+        desc: "Toggle tools, set targets, and watch results stream live to your dashboard.",
+        configTitle: "Select your tools",
+        configDesc: "Toggle security tools on or off, then run your scan.",
+        runScan: "Run Scan",
+      };
+
+  const toolItems = isKhmer
+    ? [
+        { name: "Subfinder", desc: "ស្វែងរក subdomain" },
+        { name: "Naabu", desc: "ស្កេន port" },
+        { name: "Nuclei", desc: "ស្កេន vulnerability" },
+        { name: "HTTPx", desc: "ពិនិត្យ HTTP services" },
+      ]
+    : [
+        { name: "Subfinder", desc: "Subdomain enumeration" },
+        { name: "Naabu", desc: "Port scanning" },
+        { name: "Nuclei", desc: "Vulnerability templates" },
+        { name: "HTTPx", desc: "HTTP probing" },
+      ];
+
+  const compareSection = isKhmer
+    ? {
+        title: "ហេតុអ្វីប្រើ Web UI?",
+        desc: "ប្រៀបធៀបអ្វីដែលត្រូវធ្វើ ដើម្បីដំណើរការឧបករណ៍ដូចគ្នានៅ local និងនៅលើ Nexus Web UI។",
+        recommendedBadge: "Nexus Web UI (ណែនាំ)",
+        browserNative: "Browser-native",
+        browserItems: [
+          "បើក browser",
+          "ជ្រើស tool និង target",
+          "ចុច Run",
+          "លទ្ធផលបង្ហាញភ្លាមៗ",
+          "ចែករំលែកជាមួយក្រុមបាន",
+        ],
+        localInstall: "Local Setup",
+        manualSetup: "ត្រូវដំឡើង tools",
+        localItems: [
+          "ត្រូវដំឡើង tools",
+          "គ្រប់គ្រង dependencies",
+          "កំណត់ PATH",
+          "ចែករំលែកដោយដៃ",
+        ],
+        dockerTitle: "Docker / VPS",
+        selfHosted: "ត្រូវរៀបចំ server",
+        dockerItems: [
+          "ត្រូវរៀបចំ server",
+          "ថែទាំ uptime",
+          "គ្រប់គ្រង network",
+          "update ដោយដៃ",
+        ],
+      }
+    : {
+        title: "Why browser-native?",
+        desc: "Skip the setup headaches. Compare what it takes to run the same tools locally vs. on Nexus.",
+        recommendedBadge: "Nexus Web UI ✦ Recommended",
+        browserNative: "Browser-native",
+        browserItems: [
+          "Open a browser tab",
+          "Select tools & target",
+          "Click Run",
+          "Results stream instantly",
+          "Share link with team",
+        ],
+        localInstall: "Local install",
+        manualSetup: "Manual setup",
+        localItems: [
+          "Install Go + dependencies",
+          "Install each tool individually",
+          "Manage version conflicts",
+          "Configure PATH variables",
+          "Share results manually",
+        ],
+        dockerTitle: "Docker / VPS",
+        selfHosted: "Self-hosted",
+        dockerItems: [
+          "Provision and pay for a VPS",
+          "Build and run containers",
+          "Maintain server uptime",
+          "Handle networking / firewall",
+          "Update images manually",
+        ],
+      };
+
+  const proTip = isKhmer
+    ? {
+        title: "មើលលទ្ធផលភ្លាមៗ (Real-time)",
+        body: "មិនចាំបាច់រង់ចាំ scan បញ្ចប់ទាំងស្រុង។",
+      }
+    : {
+        title: "Pro Tip",
+        body: "Stream results in real-time. No delays, no waiting for full scans to complete.",
+      };
+
+  const webuiLabels = isKhmer
+    ? {
+        heroPrimary: "ចាប់ផ្តើមស្កេន",
+        heroSecondary: "មើល Demo",
+        stepFourTitle: "ពិនិត្យ & អនុវត្ត",
+        stepFourDesc: "ទទួលបានលទ្ធផលជារចនាសម្ព័ន្ធ មាន severity និងការណែនាំដោះស្រាយ។",
+        scanDashboard: "Scan dashboard",
+        running: "running",
+        benefitsTitle: "អត្ថប្រយោជន៍សម្រាប់សហគ្រាស",
+        ctaTitle: "ត្រៀមស្វ័យប្រវត្តិកម្មការស្កេនរបស់អ្នកហើយឬនៅ?",
+        ctaSubtitle: "Reconnaissance pipelines កម្រិតសហគ្រាស ក្នុងរយៈពេលប៉ុន្មានវិនាទី មិនមែនម៉ោងទៀតទេ។",
+        ctaPrimary: "ចាប់ផ្តើមស្កេនឥតគិតថ្លៃ",
+        ctaSecondary: "មើលឯកសារ",
+      }
+    : {
+        heroPrimary: t("hero.primaryCta"),
+        heroSecondary: t("hero.secondaryCta"),
+        stepFourTitle: "Review & act",
+        stepFourDesc: "Get structured results with severity ratings, fix guidance, and exportable reports right in your dashboard.",
+        scanDashboard: "Scan dashboard",
+        running: "running",
+        benefitsTitle: t("benefits.title"),
+        ctaTitle: t("cta.title"),
+        ctaSubtitle: t("cta.subtitle"),
+        ctaPrimary: t("cta.primaryCta"),
+        ctaSecondary: t("cta.secondaryCta"),
+      };
 
   return (
     <div
@@ -344,12 +511,7 @@ export default function WebUIFeature() {
                 custom={2}
                 className="flex flex-col gap-2.5 sm:gap-3 mb-6 sm:mb-8 w-full max-w-md"
               >
-                {[
-                  "No installation required",
-                  "Works everywhere",
-                  "Always up-to-date",
-                  "Share with your team",
-                ].map((item) => (
+                {heroChecklist.map((item) => (
                   <motion.li 
                     key={item} 
                     className="flex items-center justify-center gap-3 text-[15px] md:text-[17px] lg:text-[18px] text-[#52525B] dark:text-[#A1A1AA] lg:justify-start"
@@ -371,13 +533,13 @@ export default function WebUIFeature() {
                   className={`${primaryBtn} min-w-0 flex-1 bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  {t("hero.primaryCta")}
+                  {webuiLabels.heroPrimary}
                 </button>
                 <button
                   className={`${secondaryBtn} min-w-0 flex-1 bg-[#F7F5F0] text-[#18181B] border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
                   <ExternalLink className="w-4 h-4" />
-                  {t("hero.secondaryCta")}
+                  {webuiLabels.heroSecondary}
                 </button>
               </motion.div>
 
@@ -387,9 +549,9 @@ export default function WebUIFeature() {
                 custom={4}
                 className="grid grid-cols-3 gap-2 sm:gap-3 w-full max-w-md"
               >
-                <StatCard value="15+" label="Tools" />
-                <StatCard value="0 min" label="Setup" />
-                <StatCard value="99.1%" label="Uptime" />
+                {heroStats.map((item) => (
+                  <StatCard key={item.label} value={item.value} label={item.label} />
+                ))}
               </motion.div>
             </motion.div>
 
@@ -425,7 +587,7 @@ export default function WebUIFeature() {
             className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#18181B] dark:text-white mb-3"
             style={{ fontFamily: displayFont }}
           >
-            Configure and scan in real time
+            {liveSection.title}
           </motion.h2>
           <motion.p
             variants={fadeUp}
@@ -434,7 +596,7 @@ export default function WebUIFeature() {
             custom={1}
             className={`${bodyText} text-[#52525B] dark:text-[#A1A1AA] max-w-xl`}
           >
-            Toggle tools, set targets, and watch results stream live to your dashboard.
+            {liveSection.desc}
           </motion.p>
         </div>
 
@@ -488,14 +650,14 @@ export default function WebUIFeature() {
               className="text-2xl sm:text-3xl font-bold text-[#18181B] dark:text-white mb-3"
               style={{ fontFamily: displayFont }}
             >
-              Select your tools
+              {liveSection.configTitle}
             </h3>
             <p className={`${smallText} text-[#52525B] dark:text-[#A1A1AA] mb-6`}>
-              Toggle security tools on or off, then run your scan.
+              {liveSection.configDesc}
             </p>
-            <ToolConfig />
+            <ToolConfig items={toolItems} />
             <button className="mt-6 w-full py-3.5 rounded-xl bg-[#00BCA1] text-white font-semibold text-base hover:bg-[#0AAE98] transition-colors duration-200">
-              Run Scan
+              {liveSection.runScan}
             </button>
           </div>
         </motion.div>
@@ -589,17 +751,17 @@ export default function WebUIFeature() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <div className="text-[12px] font-semibold text-[#18181B] dark:text-white mb-3">Scan dashboard</div>
+                  <div className="text-[12px] font-semibold text-[#18181B] dark:text-white mb-3">{webuiLabels.scanDashboard}</div>
                   {/* Fake scan bars */}
                   {[
-                    { label: "Subfinder", w: "85%", color: "bg-[#00BCA1]" },
-                    { label: "Naabu", w: "60%", color: "bg-amber-400" },
-                    { label: "Nuclei", w: "40%", color: "bg-red-400" },
+                    { label: toolItems[0].name, w: "85%", color: "bg-[#00BCA1]" },
+                    { label: toolItems[1].name, w: "60%", color: "bg-amber-400" },
+                    { label: toolItems[2].name, w: "40%", color: "bg-red-400" },
                   ].map((bar) => (
                     <div key={bar.label} className="mb-2">
                       <div className="flex justify-between text-[11px] mb-1">
                         <span className="text-[#52525B] dark:text-[#A1A1AA]">{bar.label}</span>
-                        <span className="text-[#00BCA1]">running</span>
+                        <span className="text-[#00BCA1]">{webuiLabels.running}</span>
                       </div>
                       <div className="h-1.5 bg-[#F7F5F0] dark:bg-[#27272A] rounded-full">
                         <motion.div
@@ -617,10 +779,10 @@ export default function WebUIFeature() {
               {/* Note */}
               <div className="rounded-xl bg-[#18181B] border border-white/5 p-4">
                 <div className="text-[11px] font-bold font-mono text-amber-400 mb-1.5 tracking-widest uppercase">
-                  Pro Tip
+                  {proTip.title}
                 </div>
                 <p className="text-[12px] text-[#94A3B8] font-mono leading-relaxed">
-                  Stream results in real-time. No delays, no waiting for full scans to complete.
+                  {proTip.body}
                 </p>
               </div>
             </div>
@@ -645,7 +807,7 @@ export default function WebUIFeature() {
             className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#18181B] dark:text-white mb-3"
             style={{ fontFamily: displayFont }}
           >
-            Why browser-native?
+            {compareSection.title}
           </motion.h2>
           <motion.p
             variants={fadeUp}
@@ -654,7 +816,7 @@ export default function WebUIFeature() {
             custom={1}
             className={`${bodyText} text-[#52525B] dark:text-[#A1A1AA] max-w-xl`}
           >
-            Skip the setup headaches. Compare what it takes to run the same tools locally vs. on Nexus.
+            {compareSection.desc}
           </motion.p>
         </div>
 
@@ -673,16 +835,10 @@ export default function WebUIFeature() {
             {/* Nexus */}
             <div className="rounded-2xl bg-white dark:bg-[#111113] border-2 border-[#00BCA1] p-6">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-[#0F6E56] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 mb-4">
-                Nexus Web UI ✦ Recommended
+                {compareSection.recommendedBadge}
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">Browser-native</h3>
-              {[
-                "Open a browser tab",
-                "Select tools & target",
-                "Click Run",
-                "Results stream instantly",
-                "Share link with team",
-              ].map((item) => (
+              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">{compareSection.browserNative}</h3>
+              {compareSection.browserItems.map((item) => (
                 <div key={item} className="flex items-center gap-2.5 text-sm sm:text-base text-[#52525B] dark:text-[#A1A1AA] mb-2.5">
                   <CheckCircle2 className="w-5 h-5 text-[#00BCA1] shrink-0" />
                   {item}
@@ -693,19 +849,13 @@ export default function WebUIFeature() {
             {/* Local setup */}
             <div className="rounded-2xl bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 p-6">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[#F7F5F0] dark:bg-[#09090B] text-[#71717A] border border-[#E2DDD5] dark:border-white/10 mb-4">
-                Local install
+                {compareSection.localInstall}
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">Manual setup</h3>
-              {[
-                { text: "Install Go + dependencies", ok: false },
-                { text: "Install each tool individually", ok: false },
-                { text: "Manage version conflicts", ok: false },
-                { text: "Configure PATH variables", ok: false },
-                { text: "Share results manually", ok: false },
-              ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2.5 text-sm sm:text-base text-[#52525B] dark:text-[#A1A1AA] mb-2.5">
+              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">{compareSection.manualSetup}</h3>
+              {compareSection.localItems.map((item) => (
+                <div key={item} className="flex items-center gap-2.5 text-sm sm:text-base text-[#52525B] dark:text-[#A1A1AA] mb-2.5">
                   <XCircle className="w-5 h-5 text-[#D85A30] shrink-0" />
-                  {item.text}
+                  {item}
                 </div>
               ))}
             </div>
@@ -713,19 +863,13 @@ export default function WebUIFeature() {
             {/* Docker */}
             <div className="rounded-2xl bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 p-6">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[#F7F5F0] dark:bg-[#09090B] text-[#71717A] border border-[#E2DDD5] dark:border-white/10 mb-4">
-                Docker / VPS
+                {compareSection.dockerTitle}
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">Self-hosted</h3>
-              {[
-                { text: "Provision and pay for a VPS", ok: false },
-                { text: "Build and run containers", ok: false },
-                { text: "Maintain server uptime", ok: false },
-                { text: "Handle networking / firewall", ok: false },
-                { text: "Update images manually", ok: false },
-              ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2.5 text-sm sm:text-base text-[#52525B] dark:text-[#A1A1AA] mb-2.5">
+              <h3 className="text-base sm:text-lg font-bold text-[#18181B] dark:text-white mb-4">{compareSection.selfHosted}</h3>
+              {compareSection.dockerItems.map((item) => (
+                <div key={item} className="flex items-center gap-2.5 text-sm sm:text-base text-[#52525B] dark:text-[#A1A1AA] mb-2.5">
                   <XCircle className="w-5 h-5 text-[#D85A30] shrink-0" />
-                  {item.text}
+                  {item}
                 </div>
               ))}
             </div>
@@ -750,7 +894,7 @@ export default function WebUIFeature() {
             className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#18181B] dark:text-white mb-3"
             style={{ fontFamily: displayFont }}
           >
-            {t("benefits.title")}
+              {webuiLabels.benefitsTitle}
           </motion.h2>
         </div>
 
@@ -820,7 +964,7 @@ export default function WebUIFeature() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight"
               style={{ fontFamily: displayFont }}
             >
-              {t("cta.title")}
+                {webuiLabels.ctaTitle}
             </motion.h2>
             <motion.p
               variants={fadeUp}
@@ -829,7 +973,7 @@ export default function WebUIFeature() {
               custom={2}
               className={`${bodyText} text-[#94A3B8] mb-10 max-w-2xl mx-auto`}
             >
-              {t("cta.subtitle")}
+                {webuiLabels.ctaSubtitle}
             </motion.p>
             <motion.div
               variants={fadeUp}
@@ -840,11 +984,11 @@ export default function WebUIFeature() {
             >
               <button className="px-8 py-3.5 rounded-xl bg-[#00BCA1] text-white font-bold text-base sm:text-lg hover:bg-[#0AAE98] transition-colors duration-200 flex items-center justify-center gap-2">
                 <ArrowRight className="w-4 h-4" />
-                {t("cta.primaryCta")}
+                {webuiLabels.ctaPrimary}
               </button>
               <button className="px-7 py-3.5 rounded-xl border border-white/15 text-white font-semibold text-base sm:text-lg hover:bg-white/5 transition-colors duration-200 flex items-center justify-center gap-2">
                 <ExternalLink className="w-4 h-4" />
-                {t("cta.secondaryCta")}
+                {webuiLabels.ctaSecondary}
               </button>
             </motion.div>
           </div>
