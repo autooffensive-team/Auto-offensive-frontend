@@ -370,14 +370,14 @@ export default function WebUIFeature() {
                 <button
                   className={`${primaryBtn} min-w-0 flex-1 bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
-                  {t("hero.primaryCta")}
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  {t("hero.primaryCta")}
                 </button>
                 <button
                   className={`${secondaryBtn} min-w-0 flex-1 bg-[#F7F5F0] text-[#18181B] border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
-                  {t("hero.secondaryCta")}
                   <ExternalLink className="w-4 h-4" />
+                  {t("hero.secondaryCta")}
                 </button>
               </motion.div>
 
@@ -839,12 +839,12 @@ export default function WebUIFeature() {
               className="flex flex-col sm:flex-row gap-3 justify-center"
             >
               <button className="px-8 py-3.5 rounded-xl bg-[#00BCA1] text-white font-bold text-base sm:text-lg hover:bg-[#0AAE98] transition-colors duration-200 flex items-center justify-center gap-2">
-                {t("cta.primaryCta")}
                 <ArrowRight className="w-4 h-4" />
+                {t("cta.primaryCta")}
               </button>
               <button className="px-7 py-3.5 rounded-xl border border-white/15 text-white font-semibold text-base sm:text-lg hover:bg-white/5 transition-colors duration-200 flex items-center justify-center gap-2">
-                {t("cta.secondaryCta")}
                 <ExternalLink className="w-4 h-4" />
+                {t("cta.secondaryCta")}
               </button>
             </motion.div>
           </div>

@@ -149,22 +149,10 @@ export default function AIFeature() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
             >
-              {/* Badge */}
-              <motion.div
-                variants={fadeUp}
-                custom={0}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 mb-6 w-fit"
-              >
-                <Brain className="w-3.5 h-3.5 text-[#00BCA1]" />
-                <span className="text-xs font-semibold text-[#0F6E56] dark:text-emerald-400 tracking-widest uppercase">
-                  {t("hero.badge")}
-                </span>
-              </motion.div>
-
               {/* Title */}
               <motion.h1
                 variants={fadeUp}
-                custom={1}
+                custom={0}
                 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight tracking-tight mb-6 text-[#18181B] dark:text-white max-w-2xl"
                 style={{ fontFamily: displayFontFamily }}
               >
@@ -177,7 +165,7 @@ export default function AIFeature() {
               {/* Subtitle */}
               <motion.p
                 variants={fadeUp}
-                custom={2}
+                custom={1}
                 className={`${bodyText} text-[#52525B] dark:text-[#A1A1AA] mb-8 max-w-xl`}
               >
                 {t("hero.subtitle")}
@@ -186,16 +174,16 @@ export default function AIFeature() {
               {/* CTA Buttons */}
               <motion.div
                 variants={fadeUp}
-                custom={3}
+                custom={2}
                 className="flex w-full max-w-md flex-row gap-3 sm:gap-4 lg:justify-start"
               >
                 <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#00BCA1] text-white hover:bg-[#0AAE98] transition-all duration-300 hover:-translate-y-0.5">
-                  {t("hero.primaryCta")}
                   <ArrowRight className="w-4 h-4" />
+                  {t("hero.primaryCta")}
                 </button>
                 <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#F7F5F0] text-[#18181B] border border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] transition-all duration-300 hover:-translate-y-0.5">
-                  {t("hero.secondaryCta")}
                   <ExternalLink className="w-4 h-4" />
+                  {t("hero.secondaryCta")}
                 </button>
               </motion.div>
             </motion.div>
@@ -583,12 +571,12 @@ export default function AIFeature() {
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
             >
               <button className="px-8 py-3.5 rounded-lg bg-[#00BCA1] text-white font-bold text-base sm:text-[15px] hover:bg-[#0AAE98] transition-colors duration-300 flex items-center justify-center gap-2">
-                {t("cta.primaryCta")}
                 <ArrowRight className="w-4 h-4" />
+                {t("cta.primaryCta")}
               </button>
               <button className="px-8 py-3.5 rounded-lg border border-white/15 text-white font-semibold text-base sm:text-[15px] hover:bg-white/5 transition-colors duration-300 flex items-center justify-center gap-2">
-                {t("cta.secondaryCta")}
                 <ExternalLink className="w-4 h-4" />
+                {t("cta.secondaryCta")}
               </button>
             </motion.div>
           </div>
