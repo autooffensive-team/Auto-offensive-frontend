@@ -104,7 +104,7 @@ function TerminalHero() {
         </div>
       </div>
       {/* Terminal body */}
-      <div className="min-h-[176px] p-5 font-mono text-[12px] leading-relaxed sm:min-h-[192px]">
+      <div className="min-h-44 p-5 font-mono text-[12px] leading-relaxed sm:min-h-48">
         {lines.slice(0, visibleLines).map((line, i) => (
           <motion.div
             key={i}
@@ -120,7 +120,7 @@ function TerminalHero() {
         <motion.span
           animate={{ opacity: [1, 0, 1] }}
           transition={{ duration: 1, repeat: Infinity }}
-          className="inline-block w-2 h-[14px] bg-emerald-500 align-middle"
+          className="inline-block w-2 h-3.5 bg-emerald-500 align-middle"
         />
       </div>
     </div>
@@ -605,7 +605,7 @@ export default function WebUIFeature() {
           variants={fadeInScale}
           initial="hidden"
           animate={liveInView ? "visible" : "hidden"}
-          className="relative flex min-h-[420px] overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
+          className="relative flex min-h-105 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             ml-4 md:ml-6 rounded-r-[28px]
             border-y border-r border-[#E2DDD5] dark:border-white/10
             transition-colors duration-300
@@ -638,7 +638,7 @@ export default function WebUIFeature() {
                 <motion.span
                   animate={{ opacity: [1, 0, 1] }}
                   transition={{ duration: 0.9, repeat: Infinity }}
-                  className="inline-block w-2 h-[13px] bg-emerald-500 align-middle"
+                  className="inline-block w-2 h-3.25 bg-emerald-500 align-middle"
                 />
               </div>
             </div>
@@ -698,7 +698,7 @@ export default function WebUIFeature() {
           variants={fadeInScale}
           initial="hidden"
           animate={howInView ? "visible" : "hidden"}
-          className="relative flex min-h-[380px] overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
+          className="relative flex min-h-95 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             mr-4 md:mr-6 rounded-l-[28px]
             border-y border-l border-[#E2DDD5] dark:border-white/10
             transition-colors duration-300
@@ -708,7 +708,7 @@ export default function WebUIFeature() {
           <div className="flex flex-1 flex-col justify-center bg-[#F7F5F0] dark:bg-[#09090B] px-6 py-8 md:px-12 md:py-12">
             <div className="relative">
               {/* Connecting line */}
-              <div className="absolute left-[19px] top-10 bottom-10 w-px bg-[#E2DDD5] dark:bg-white/10 z-0" />
+              <div className="absolute left-4.75 top-10 bottom-10 w-px bg-[#E2DDD5] dark:bg-white/10 z-0" />
               <div className="flex flex-col gap-6 relative z-10">
                 {howSteps.map((step, i) => (
                   <motion.div

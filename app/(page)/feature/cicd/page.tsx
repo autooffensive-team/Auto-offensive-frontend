@@ -339,7 +339,7 @@ export default function CICDFeature() {
                 whileHover={{ y: -4 }}
                 className={`rounded-xl p-5 sm:p-6 border transition-all duration-300 ${
                   step.active
-                    ? "border-[#00BCA1] bg-gradient-to-br from-[#00BCA1]/5 to-[#0AAE98]/5 dark:from-[#00BCA1]/10 dark:to-[#0AAE98]/10"
+                    ? "border-[#00BCA1] bg-linear-to-br from-[#00BCA1]/5 to-[#0AAE98]/5 dark:from-[#00BCA1]/10 dark:to-[#0AAE98]/10"
                     : "border-[#E2DDD5] dark:border-white/10 bg-white dark:bg-[#111113]"
                 }`}
               >

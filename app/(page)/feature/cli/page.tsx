@@ -98,7 +98,7 @@ function AnimatedCLI() {
       </div>
 
       {/* Terminal body */}
-      <div className="p-5 font-mono text-[12px] leading-relaxed min-h-[250px] space-y-1">
+      <div className="p-5 font-mono text-[12px] leading-relaxed min-h-62.5 space-y-1">
         {cliLines.slice(0, visibleLines).map((line, i) => (
           <motion.div
             key={i}
@@ -114,7 +114,7 @@ function AnimatedCLI() {
           <motion.span
             animate={{ opacity: [1, 0, 1] }}
             transition={{ duration: 1, repeat: Infinity }}
-            className="inline-block w-2 h-[14px] bg-emerald-500 align-middle"
+            className="inline-block w-2 h-3.5 bg-emerald-500 align-middle"
           />
         )}
       </div>
