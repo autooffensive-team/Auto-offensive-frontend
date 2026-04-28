@@ -312,7 +312,7 @@ export default function WebUIFeature() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
             {/* Left — Content */}
             <motion.div 
-              className="flex flex-col justify-center lg:max-w-xl"
+              className="flex flex-col items-center justify-center text-center lg:max-w-xl lg:items-start lg:text-left"
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
             >
@@ -352,7 +352,7 @@ export default function WebUIFeature() {
                 ].map((item) => (
                   <motion.li 
                     key={item} 
-                    className="flex items-center gap-3 text-[15px] md:text-[17px] lg:text-[18px] text-[#52525B] dark:text-[#A1A1AA]"
+                    className="flex items-center justify-center gap-3 text-[15px] md:text-[17px] lg:text-[18px] text-[#52525B] dark:text-[#A1A1AA] lg:justify-start"
                     variants={fadeUp}
                   >
                     <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#00BCA1] shrink-0" />
@@ -365,16 +365,16 @@ export default function WebUIFeature() {
               <motion.div
                 variants={fadeUp}
                 custom={3}
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto mb-8"
+                className="flex w-full max-w-md flex-row gap-3 sm:gap-4 mb-8 lg:justify-start"
               >
                 <button
-                  className={`${primaryBtn} bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
+                  className={`${primaryBtn} min-w-0 flex-1 bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
                   {t("hero.primaryCta")}
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
                 <button
-                  className={`${secondaryBtn} bg-[#F7F5F0] text-[#18181B] border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] px-6 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
+                  className={`${secondaryBtn} min-w-0 flex-1 bg-[#F7F5F0] text-[#18181B] border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px]`}
                 >
                   {t("hero.secondaryCta")}
                   <ExternalLink className="w-4 h-4" />

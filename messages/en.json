@@ -479,7 +479,7 @@
         "titleLine1": "Orchestrate Scans",
         "titleLine2": "Without the CLI.",
         "subtitle": "Guardian AI bridges the gap between powerful open-source security tools and enterprise-grade usability. Run Subfinder, Naabu, and Nuclei in a seamless, unified workflow.",
-        "primaryCta": "Launch First Scan",
+        "primaryCta": "Start Scan",
         "secondaryCta": "Watch Demo",
         "terminal": {
           "title": "guardian-ai terminal",
