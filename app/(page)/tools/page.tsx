@@ -331,7 +331,7 @@ export default function ToolsPage() {
           {/* Teal accent glow — bottom left */}
           <div className="absolute left-1/4 bottom-0 w-[320px] h-55 rounded-full bg-[#00BCA1]/5 blur-[80px] dark:bg-[#00BCA1]/12" />
           {/* Right glow behind knife */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-150 rounded-full bg-[#00BCA1]/5 blur-[130px] dark:bg-[#1e4068]/50" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-[#00BCA1]/5 blur-[130px] dark:bg-[#1e4068]/50" />
           {/* Subtle top-right highlight */}
           <div className="absolute top-0 right-1/4 w-75 h-50 rounded-full bg-[#00BCA1]/4 blur-[80px] dark:bg-[#2a5080]/30" />
         </div>
