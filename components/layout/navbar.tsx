@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
+import AuthorizedUserIndicator from '@/components/auth/authorized-user-indicator';
+import { authClient } from '@/lib/auth-client';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -382,6 +384,7 @@ export function Header() {
   const t = useTranslations('nav');
   const locale = useLocale();
   const pathname = usePathname();
+  const { data: session, isPending: isSessionPending } = authClient.useSession();
   const isKhmer = locale === 'kh';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
@@ -404,6 +407,21 @@ export function Header() {
     'bg-white dark:bg-[#111110] ' +
     'shadow-[0_4px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.04)] ' +
     'dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),0_1px_4px_rgba(0,0,0,0.3)] p-3';
+  const authAction = isSessionPending ? (
+    <div
+      aria-hidden="true"
+      className="h-9 w-9 rounded-full border border-black/8 bg-black/[0.04] dark:border-white/[0.08] dark:bg-white/[0.06]"
+    />
+  ) : session ? (
+    <AuthorizedUserIndicator />
+  ) : (
+    <Link
+      href="/register"
+      className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+    >
+      {t('signUp')}
+    </Link>
+  );
 
   return (
     <header
@@ -510,11 +528,7 @@ export function Header() {
         <div className="hidden items-center gap-2 md:flex">
           <LanguageToggle />
           <ThemeToggle />
-          <Link href="/register">
-            <button className="px-4 py-1.5 rounded-md text-sm font-semibold text-primary bg-transparent cursor-pointer hover:bg-primary/10 transition-colors">
-              {t('loginRegister')}
-            </button>
-          </Link>
+          {authAction}
         </div>
 
         {/* Mobile controls */}
@@ -609,13 +623,24 @@ export function Header() {
 
         {/* Bottom CTA */}
         <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.07] dark:border-white/6">
-          <Link
-            href="/register"
-            onClick={() => setOpen(false)}
-            className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-          >
-            {t('loginRegister')}
-          </Link>
+          {isSessionPending ? (
+            <div
+              aria-hidden="true"
+              className="h-10 w-full rounded-md border border-black/8 bg-black/[0.04] dark:border-white/[0.08] dark:bg-white/[0.06]"
+            />
+          ) : session ? (
+            <div className="flex justify-center">
+              <AuthorizedUserIndicator className="h-10 w-10" />
+            </div>
+          ) : (
+            <Link
+              href="/register"
+              onClick={() => setOpen(false)}
+              className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+            >
+              {t('signUp')}
+            </Link>
+          )}
         </div>
       </MobileMenu>
     </header>

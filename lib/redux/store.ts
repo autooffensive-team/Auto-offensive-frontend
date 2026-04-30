@@ -1,14 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { backendApi } from "@/lib/redux/services/backend-api";
+import { baseApi } from "@/lib/redux/services/base-api";
 
 export function makeStore() {
   return configureStore({
     reducer: {
-      [backendApi.reducerPath]: backendApi.reducer,
+      [baseApi.reducerPath]: baseApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(backendApi.middleware),
+      getDefaultMiddleware().concat(baseApi.middleware),
   });
 }
 

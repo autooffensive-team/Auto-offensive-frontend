@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { LoaderCircle } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import KeycloakLoginButton from "@/components/auth/keycloak-login-button";
@@ -48,48 +49,30 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const callbackURL = getCallbackUrl(params?.callbackUrl);
   const errorText = getErrorText(params?.error);
   const manualLogin = isManualLogin(params?.manual);
-  const oauthErrorCallbackURL = `/login?callbackUrl=${encodeURIComponent(callbackURL)}&error=oauth_start_failed`;
-
   const shouldAutoStartLogin = !manualLogin && !errorText;
 
-  const signInResult = shouldAutoStartLogin
-    ? await auth.api
-        .signInWithOAuth2({
-          headers: requestHeaders,
-          body: {
-            providerId: "keycloak",
-            callbackURL,
-            errorCallbackURL: oauthErrorCallbackURL,
-          },
-        })
-        .catch(() => null)
-    : null;
-
-  if (signInResult?.url) {
-    redirect(signInResult.url);
-  }
-
-  const fallbackErrorText =
-    errorText || (shouldAutoStartLogin && !signInResult ? "Unable to start login. Please try again." : "");
-
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-12">
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+    <main className="flex min-h-screen items-center justify-center bg-white px-6 py-12">
+      <div className="w-full max-w-sm text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50">
+          <LoaderCircle
+            className={`h-6 w-6 text-sky-700 ${shouldAutoStartLogin ? "animate-spin" : ""}`}
+          />
+        </div>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
           Auto Offensive
         </p>
         <h1 className="mt-3 text-2xl font-semibold text-slate-900">
-          Redirecting to login
+          {shouldAutoStartLogin ? "Redirecting to login page" : "Continue to login"}
         </h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Authentication is handled by Keycloak.
+        <p className="mt-3 text-sm leading-6 text-slate-600">
           {shouldAutoStartLogin
-            ? " You will be redirected automatically."
-            : " Click below when you want to sign in again."}
+            ? "Please wait a moment while we take you to Keycloak."
+            : "Your sign-in session needs a quick restart. Continue when you're ready."}
         </p>
 
-        {fallbackErrorText ? (
-          <p className="mt-4 text-sm text-rose-600">{fallbackErrorText}</p>
+        {errorText ? (
+          <p className="mt-4 text-sm text-rose-600">{errorText}</p>
         ) : null}
 
         <div className="mt-6">

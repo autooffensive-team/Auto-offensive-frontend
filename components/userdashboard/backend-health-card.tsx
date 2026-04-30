@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetGatewayHealthQuery } from "@/lib/redux/services/backend-api";
+import { useGetGatewayHealthQuery } from "@/lib/redux/services/gateway/gateway-api";
 
 export default function BackendHealthCard() {
   const { data, error, isLoading, isFetching } = useGetGatewayHealthQuery();

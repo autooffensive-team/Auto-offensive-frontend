@@ -1,8 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export type GatewayHealthResponse = {
-  status: string;
-};
+import { baseApi } from "@/lib/redux/services/base-api";
 
 export type ProxyRequestArgs = {
   path: string;
@@ -15,16 +11,8 @@ function normalizePath(path: string): string {
   return path.replace(/^\/+/, "");
 }
 
-export const backendApi = createApi({
-  reducerPath: "backendApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "/api/backend",
-    credentials: "include",
-  }),
+export const proxyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getGatewayHealth: builder.query<GatewayHealthResponse, void>({
-      query: () => "health",
-    }),
     proxyRequest: builder.mutation<unknown, ProxyRequestArgs>({
       query: ({ path, method = "GET", params, body }) => ({
         url: normalizePath(path),
@@ -36,4 +24,4 @@ export const backendApi = createApi({
   }),
 });
 
-export const { useGetGatewayHealthQuery, useProxyRequestMutation } = backendApi;
+export const { useProxyRequestMutation } = proxyApi;
