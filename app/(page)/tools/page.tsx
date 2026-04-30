@@ -784,7 +784,7 @@ export default function ToolsPage() {
       initial="hidden"
       animate="visible"
       variants={pageMotion}
-      className="min-h-screen mt-17 overflow-x-hidden bg-[#F7F5F0] dark:bg-[#09090B]"
+      className="min-h-screen overflow-x-hidden bg-[#F7F5F0] dark:bg-[#09090B]"
       style={{ fontFamily: bodyFontFamily }}
     >
       {/* ══════════════════════════════════════════════════════════════════════
@@ -806,33 +806,11 @@ export default function ToolsPage() {
 
         {/* ── Hero Content — centered ── */}
         <div
-          className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-14 flex flex-col items-center text-center gap-8"
+          className="relative mx-auto flex min-h-[58vh] w-full max-w-7xl flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 sm:py-14 lg:py-16"
           style={{ zIndex: 10 }}
         >
-          {/* Image */}
-          <div className="relative flex items-center justify-center">
-            {/* Soft glow behind image */}
-            <div
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                width: 320, height: 320,
-                background: 'radial-gradient(circle, rgba(0,188,161,0.18) 0%, transparent 70%)',
-                filter: 'blur(32px)',
-              }}
-            />
-            <img
-              src="/document/glass_swiss_army_knife.webp"
-              alt="Pentesting tools suite"
-              className="relative z-10 w-44 sm:w-56 md:w-64 lg:w-72 object-contain
-                         drop-shadow-[0_24px_64px_rgba(0,188,161,0.22)]
-                         select-none"
-              draggable={false}
-            />
-          </div>
-
-          {/* Text block */}
-          <div className="flex flex-col items-center gap-4 max-w-2xl">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
+          <div className="flex w-full max-w-4xl flex-col items-center gap-5 text-center">
+            <h1 className="text-3xl sm:text-4xl font-display lg:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
               {t('title')}
             </h1>
             <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-lg ${descriptionTextClass} leading-relaxed`}>

@@ -2,7 +2,7 @@
 
 import { ReduxProvider } from "./redux-provider";
 import { OfflineProvider } from "./offline-provider";
-import { PwaProvider } from "./pwa-provider";
+import { PwaProvider } from "../pages/resources/pwa-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
