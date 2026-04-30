@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
+
 const scannedAssetMetrics = [
   {
     label: "IP Addresses",
@@ -183,8 +185,10 @@ const lastScans = [
 ];
 
 export default function UserDashboardPage() {
+  const { data } = useGetAuthMeQuery();
   const totalFindings = vulnerabilityData.reduce((sum, item) => sum + item.count, 0);
   const highestSeverity = Math.max(...vulnerabilityData.map((item) => item.count));
+  const displayName = data?.user.alias_name.trim() || data?.user.username || "there";
 
   return (
     <div className="space-y-6">
@@ -197,6 +201,9 @@ export default function UserDashboardPage() {
             </div>
 
             <div className="space-y-3">
+              <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Welcome back, {displayName}
+              </p>
               <h2 className="display-font max-w-5xl text-3xl font-semibold leading-tight text-slate-950 dark:text-white md:text-5xl">
                 Scanned asset visibility, vulnerability posture, and live scan status.
               </h2>

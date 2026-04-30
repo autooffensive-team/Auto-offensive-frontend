@@ -1,25 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LoaderCircle } from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 type KeycloakLoginButtonProps = {
   callbackURL?: string;
   autoStart?: boolean;
 };
 
-function getErrorMessage(error: unknown): string {
-  if (!error || typeof error !== "object") {
-    return "Unable to start login.";
-  }
-
-  const maybe = error as { message?: unknown };
-  if (typeof maybe.message === "string" && maybe.message.trim()) {
-    return maybe.message;
-  }
-
-  return "Unable to start login.";
+function buildLoginUrl(callbackURL: string): string {
+  return `/auth/keycloak/login?callbackUrl=${encodeURIComponent(callbackURL)}`;
 }
 
 export default function KeycloakLoginButton({
@@ -27,23 +19,11 @@ export default function KeycloakLoginButton({
   autoStart = true,
 }: KeycloakLoginButtonProps) {
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const hasStartedRef = useRef(false);
 
   const startLogin = useCallback(async () => {
     setPending(true);
-    setError(null);
-
-    const result = await authClient.signIn.oauth2({
-      providerId: "keycloak",
-      callbackURL,
-      errorCallbackURL: `/login?callbackUrl=${encodeURIComponent(callbackURL)}`,
-    });
-
-    if (result.error) {
-      setError(getErrorMessage(result.error));
-      setPending(false);
-    }
+    window.location.assign(buildLoginUrl(callbackURL));
   }, [callbackURL]);
 
   useEffect(() => {
@@ -62,26 +42,24 @@ export default function KeycloakLoginButton({
   }, [autoStart, callbackURL, startLogin]);
 
   return (
-    <div className="w-full space-y-3">
-      <p className="text-sm text-slate-600">
-        {pending ? "Redirecting to Keycloak..." : "Preparing login..."}
-      </p>
+    <div className="w-full space-y-4">
+      {autoStart || pending ? (
+        <div className="flex items-center justify-center gap-3 text-sm text-slate-600">
+          <LoaderCircle className="h-4 w-4 animate-spin text-sky-700" />
+          <p>{pending ? "Redirecting to login page..." : "Preparing login..."}</p>
+        </div>
+      ) : null}
       {!autoStart ? (
-        <button
+        <Button
           type="button"
           onClick={() => {
             void startLogin();
           }}
           disabled={pending}
-          className="inline-flex items-center rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl"
         >
-          Try Keycloak login again
-        </button>
-      ) : null}
-      {error ? (
-        <p className="text-sm text-rose-600">
-          {error}
-        </p>
+          {pending ? "Redirecting..." : "Continue to login"}
+        </Button>
       ) : null}
     </div>
   );

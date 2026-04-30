@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import { Providers } from "@/components/providers/providers";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 
@@ -52,7 +53,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             enableSystem
             disableTransitionOnChange
           >
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <Providers>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </Providers>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
