@@ -9,7 +9,7 @@ export default function SignOutButton() {
 
   const handleSignOut = () => {
     setIsPending(true);
-    window.location.assign("/logout?callbackUrl=%2Fuserdashboard");
+    window.location.assign("/logout");
   };
 
   return (
