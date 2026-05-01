@@ -21,7 +21,7 @@ export default function KeycloakLoginButton({
   const [pending, setPending] = useState(false);
   const hasStartedRef = useRef(false);
 
-  const startLogin = useCallback(async () => {
+  const startLogin = useCallback(() => {
     setPending(true);
     window.location.assign(buildLoginUrl(callbackURL));
   }, [callbackURL]);
