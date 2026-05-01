@@ -24,7 +24,7 @@
     "resources": "Resources",
     "pricing": "Pricing",
     "documentation": "Documentation",
-    "loginRegister": "Login / Register"
+    "signUp": "Sign up"
   },
   "footer": {
     "product": "Product",

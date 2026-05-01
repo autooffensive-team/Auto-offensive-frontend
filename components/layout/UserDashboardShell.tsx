@@ -29,6 +29,7 @@ import {
 
 import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
+import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import GoToTop from "@/components/ui/go-to-top";
 
 const mainNavItems = [
@@ -83,6 +84,7 @@ export default function UserDashboardShell({
 }: {
   children: React.ReactNode;
 }) {
+  const { data } = useGetAuthMeQuery();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,10 +101,24 @@ export default function UserDashboardShell({
     return match?.label ?? "Dashboard";
   }, [pathname]);
 
+  const displayName = data?.user.alias_name.trim() || data?.user.username || "User";
+  const email = data?.user.email ?? "";
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "U";
+
   const closeOverlays = () => {
     setMobileMenuOpen(false);
     setNotificationsOpen(false);
     setProfileOpen(false);
+  };
+
+  const handleLogout = () => {
+    closeOverlays();
+    window.location.assign("/logout");
   };
 
   useEffect(() => {
@@ -416,14 +432,14 @@ export default function UserDashboardShell({
                   className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-teal-400 via-cyan-400 to-blue-500 text-sm font-bold text-slate-950">
-                    TA
+                    {initials}
                   </div>
                   <div className="hidden md:block">
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      Taluntun
+                      {displayName}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Security analyst
+                      {email || "Authenticated user"}
                     </p>
                   </div>
                 </button>
@@ -438,10 +454,10 @@ export default function UserDashboardShell({
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
-                          Taluntun
+                          {displayName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          taluntun27@gmail.com
+                          {email}
                         </p>
                       </div>
                       <div className="p-2">
@@ -456,14 +472,14 @@ export default function UserDashboardShell({
                             {item.label}
                           </Link>
                         ))}
-                        <Link
-                          href="/login"
-                          onClick={closeOverlays}
+                        <button
+                          type="button"
+                          onClick={handleLogout}
                           className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
                         >
                           <LogOut size={16} />
                           Logout
-                        </Link>
+                        </button>
                       </div>
                     </motion.div>
                   )}
