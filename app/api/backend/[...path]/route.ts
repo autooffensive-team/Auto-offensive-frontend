@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { readRequiredEnv } from "@/lib/server-env";
+import { readOptionalEnv, readRequiredEnv } from "@/lib/server-env";
 
 export const dynamic = "force-dynamic";
 
-const gatewayBaseUrl = readRequiredEnv("FASTAPI_GATEWAY_URL");
+const gatewayBaseUrl =
+  readOptionalEnv("BACKEND_URL", "") || readRequiredEnv("FASTAPI_GATEWAY_URL");
 const blockedRequestHeaders = new Set([
   "authorization",
   "connection",
@@ -114,6 +115,7 @@ async function proxyRequest(request: NextRequest, context: RouteContext): Promis
 
   const method = request.method.toUpperCase();
   const upstreamUrl = buildUpstreamUrl(path, request.url);
+  console.log("[proxy]", method, upstreamUrl);
 
   const accessToken = await getKeycloakAccessToken(request);
   if (!accessToken) {
