@@ -31,6 +31,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import GoToTop from "@/components/ui/go-to-top";
+import type { AuthMeResponse } from "@/types/auth";
 
 const mainNavItems = [
   { label: "Overview", path: "/userdashboard", icon: LayoutDashboard },
@@ -79,12 +80,26 @@ function isItemActive(pathname: string, path: string) {
   return pathname.startsWith(path);
 }
 
+function getDashboardDisplayName(
+  aliasName?: string,
+  username?: string,
+): string {
+  const trimmedAlias = aliasName?.trim() ?? "";
+  if (!trimmedAlias || trimmedAlias.toLowerCase() === "string") {
+    return username?.trim() || "User";
+  }
+  return trimmedAlias;
+}
+
 export default function UserDashboardShell({
+  initialAuthMe,
   children,
 }: {
+  initialAuthMe?: AuthMeResponse | null;
   children: React.ReactNode;
 }) {
   const { data } = useGetAuthMeQuery();
+  const authMe = data ?? initialAuthMe ?? null;
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -101,8 +116,11 @@ export default function UserDashboardShell({
     return match?.label ?? "Dashboard";
   }, [pathname]);
 
-  const displayName = data?.user.alias_name.trim() || data?.user.username || "User";
-  const email = data?.user.email ?? "";
+  const displayName = getDashboardDisplayName(
+    authMe?.user.alias_name,
+    authMe?.user.username,
+  );
+  const email = authMe?.user.email ?? "";
   const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
@@ -186,6 +204,7 @@ export default function UserDashboardShell({
                     alt="Auto Offensive Logo"
                     width={120}
                     height={120}
+                    style={{ width: "auto", height: "auto" }}
                   />
                 )}
               </div>
