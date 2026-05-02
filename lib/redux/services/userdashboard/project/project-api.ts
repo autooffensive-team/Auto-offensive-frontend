@@ -1,38 +1,14 @@
 import { baseApi } from "@/lib/redux/services/base-api";
+import type {
+  CreateProjectRequest,
+  DeleteProjectRequest,
+  ProjectListResponse,
+  RawProject,
+  UpdateProjectRequest,
+  UserProject,
+} from "@/types/project";
 
-export type UserProject = {
-  project_id: string;
-  name: string;
-  description: string;
-  owner_id: string;
-  created_at: string;
-  last_modified: string;
-};
-
-export type CreateProjectRequest = {
-  name: string;
-  description: string;
-};
-
-export type UpdateProjectRequest = {
-  project_id: string;
-  name?: string;
-  description?: string;
-};
-
-export type DeleteProjectRequest = {
-  project_id: string;
-  cascade?: boolean;
-};
-
-type RawProject = Partial<UserProject> & {
-  id?: string;
-  owner?: string;
-  scan_count?: number;
-  last_scan_at?: string;
-};
-
-type ProjectListResponse = UserProject[] | { projects?: RawProject[] };
+export type { UserProject } from "@/types/project";
 
 function normalizeProject(project: RawProject): UserProject {
   return {
@@ -47,7 +23,9 @@ function normalizeProject(project: RawProject): UserProject {
 }
 
 function normalizeProjectList(response: ProjectListResponse): UserProject[] {
-  const projects = Array.isArray(response) ? response : response.projects ?? [];
+  const projects = Array.isArray(response)
+    ? response
+    : (response.projects ?? []);
   return projects.map(normalizeProject);
 }
 
