@@ -679,8 +679,8 @@ export default function HomeHero() {
             className="
               absolute top-[-1%] left-1/2 -translate-x-1/2 w-[152%] rounded-full z-4
               border-2 border-[rgba(0,208,178,0.7)] dark:border-[rgba(0,208,178,0.9)]
-              [box-shadow:0_0_14px_4px_rgba(0,208,178,0.4),inset_0_0_22px_6px_rgba(0,208,178,0.12)]
-              dark:[box-shadow:0_0_20px_6px_rgba(0,208,178,0.55),0_0_50px_16px_rgba(0,208,178,0.2),inset_0_0_30px_8px_rgba(0,208,178,0.15)]
+              
+              
             "
             style={{ paddingTop:"152%" }}
             initial={{ opacity:0 }}
@@ -745,7 +745,7 @@ export default function HomeHero() {
           <motion.h1
             className="
               text-[clamp(2.8rem,6vw,5rem)] font-bold
-              leading-[1.08] tracking-[-0.02em]
+              leading-[1.08] tracking-[-0.02em] font-display
               text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
               mb-[1.4rem]
             "

@@ -15,13 +15,16 @@ export default function AiBanner() {
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
 
   return (
-    <div className="w-full px-6 pb-8 bg-[#F7F5F0] dark:bg-black">
+    <div className="w-full bg-[#F7F5F0] px-4 pb-8 transition-colors duration-300 dark:bg-[#09090B] sm:px-5 md:px-6">
       <div
-        className="relative pt-15 bg-[#F7F5F0]  dark:bg-black"
-        style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif" }}
+        className="relative pt-8 md:pt-10 lg:pt-12"
+        style={{ fontFamily: bodyFontFamily }}
       >
-        {/* ── Card ── */}
-        <div className="relative rounded-[28px] bg-[#F7F5F0] dark:bg-black overflow-hidden min-h-75 px-16 py-13 flex items-center justify-center max-[900px]:flex-col max-[900px]:px-8 max-[900px]:pt-10 max-[900px]:pb-55">
+        <div className="relative flex min-h-80 items-center justify-center gap-64 overflow-hidden rounded-3xl border border-transparent bg-[#F7F5F0] px-16 py-12 dark:border-white/5 dark:bg-[#111113] max-[900px]:flex-col max-[900px]:gap-0 max-[900px]:px-8 max-[900px]:pt-10 max-[900px]:pb-56 max-[767px]:rounded-[24px] max-[767px]:px-5 max-[767px]:pt-8 max-[767px]:pb-64">
+          <div className="absolute pointer-events-none -left-24 -top-32 h-96 w-md rounded-full bg-[#01509e] opacity-95 blur-3xl dark:opacity-40 max-[767px]:-left-16 max-[767px]:-top-24 max-[767px]:h-72 max-[767px]:w-72" />
+          <div className="absolute pointer-events-none right-14 -top-20 h-80 w-80 rounded-full bg-[#00d0b2] opacity-50 blur-3xl dark:opacity-20 max-[767px]:right-0 max-[767px]:-top-12 max-[767px]:h-56 max-[767px]:w-56" />
+          <div className="absolute pointer-events-none -bottom-32 -right-10 h-80 w-96 rounded-full bg-[#0194c7] opacity-70 blur-3xl dark:opacity-30 max-[767px]:-bottom-24 max-[767px]:-right-12 max-[767px]:h-64 max-[767px]:w-72" />
+          <div className="absolute pointer-events-none left-[42%] top-[20%] h-52 w-64 rounded-full bg-[#00d0b2] opacity-20 blur-3xl dark:opacity-10 max-[900px]:left-1/2 max-[900px]:top-auto max-[900px]:bottom-24 max-[900px]:-translate-x-1/2 max-[767px]:h-40 max-[767px]:w-48" />
 
           <div className="relative z-10 shrink-0 max-w-xl max-[900px]:max-w-136 max-[900px]:text-center">
             <div
