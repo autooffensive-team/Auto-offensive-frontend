@@ -11,7 +11,7 @@ type KeycloakLoginButtonProps = {
 };
 
 function buildLoginUrl(callbackURL: string): string {
-  return `/auth/keycloak/login?callbackUrl=${encodeURIComponent(callbackURL)}`;
+  return `/api/auth/keycloak/login?callbackUrl=${encodeURIComponent(callbackURL)}`;
 }
 
 export default function KeycloakLoginButton({
