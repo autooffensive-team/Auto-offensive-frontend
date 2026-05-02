@@ -6,6 +6,6 @@ export const baseApi = createApi({
     baseUrl: "/api/backend",
     credentials: "include",
   }),
-  tagTypes: ["Auth", "Gateway"],
+  tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report"],
   endpoints: () => ({}),
 });
