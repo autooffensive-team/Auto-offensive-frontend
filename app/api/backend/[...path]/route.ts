@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 const gatewayBaseUrl =
   readOptionalEnv("BACKEND_URL", "") || readRequiredEnv("FASTAPI_GATEWAY_URL");
+const publicProxyPaths = new Set(["users"]);
 const blockedRequestHeaders = new Set([
   "authorization",
   "connection",
@@ -59,6 +60,10 @@ function copyResponseHeaders(source: Headers): Headers {
   return headers;
 }
 
+function isPublicProxyPath(pathSegments: string[]): boolean {
+  return publicProxyPaths.has(pathSegments.join("/"));
+}
+
 async function getKeycloakAccessToken(request: NextRequest): Promise<string | null> {
   const session = await auth.api.getSession({
     headers: request.headers,
@@ -93,10 +98,12 @@ async function proxyToGateway(
   request: NextRequest,
   upstreamUrl: string,
   body: BodyInit | undefined,
-  accessToken: string,
+  accessToken?: string,
 ): Promise<Response> {
   const headers = forwardRequestHeaders(request.headers);
-  headers.set("authorization", `Bearer ${accessToken}`);
+  if (accessToken) {
+    headers.set("authorization", `Bearer ${accessToken}`);
+  }
 
   return fetch(upstreamUrl, {
     method: request.method.toUpperCase(),
@@ -115,10 +122,11 @@ async function proxyRequest(request: NextRequest, context: RouteContext): Promis
 
   const method = request.method.toUpperCase();
   const upstreamUrl = buildUpstreamUrl(path, request.url);
+  const isPublicPath = isPublicProxyPath(path);
   console.log("[proxy]", method, upstreamUrl);
 
-  const accessToken = await getKeycloakAccessToken(request);
-  if (!accessToken) {
+  const accessToken = isPublicPath ? null : await getKeycloakAccessToken(request);
+  if (!isPublicPath && !accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -131,9 +139,9 @@ async function proxyRequest(request: NextRequest, context: RouteContext): Promis
   }
 
   try {
-    let upstreamResponse = await proxyToGateway(request, upstreamUrl, body, accessToken);
+    let upstreamResponse = await proxyToGateway(request, upstreamUrl, body, accessToken ?? undefined);
 
-    if (upstreamResponse.status === 401) {
+    if (!isPublicPath && upstreamResponse.status === 401) {
       const refreshedAccessToken = await refreshKeycloakAccessToken(request);
       if (refreshedAccessToken) {
         upstreamResponse = await proxyToGateway(request, upstreamUrl, body, refreshedAccessToken);
