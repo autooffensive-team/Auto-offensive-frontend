@@ -41,9 +41,20 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
-  const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+  const sansFontStyle = {
+    fontFamily: 'var(--docs-sans-font), sans-serif',
   } as const;
+  const monoFontStyle = {
+    fontFamily: 'var(--docs-mono-font), monospace',
+  } as const;
+  const pageFontVars = {
+    '--docs-sans-font': isKhmer
+      ? 'var(--font-noto-khmer), var(--font-google-sans)'
+      : 'var(--font-google-sans), var(--font-noto-khmer)',
+    '--docs-mono-font': isKhmer
+      ? 'var(--font-jetbrains-mono), var(--font-noto-khmer), var(--font-google-sans)'
+      : 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer)',
+  } as React.CSSProperties;
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -117,6 +128,8 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   return (
     <main
       className={`${bgColor} flex-1 min-w-0 px-8 md:px-10 xl:px-12 pt-12 pb-32`}
+      lang={isKhmer ? 'km' : 'en'}
+      style={{ ...sansFontStyle, ...pageFontVars }}
     >
       {/* Page Header */}
       <div className="mb-12">
@@ -400,7 +413,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+    fontFamily: 'var(--docs-mono-font), monospace',
   } as const;
   const labels = isKhmer
     ? {
@@ -661,7 +674,7 @@ const ErrorReference: React.FC<{
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+    fontFamily: 'var(--docs-mono-font), monospace',
   } as const;
   const copy = isKhmer
     ? {

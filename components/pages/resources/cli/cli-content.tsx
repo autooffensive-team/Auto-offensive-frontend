@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   Archive,
@@ -44,7 +45,7 @@ const TOC_LINKS = [
 ] as const;
 
 const monoFontStyle = {
-  fontFamily: "var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace",
+  fontFamily: "var(--docs-mono-font), monospace",
 } as const;
 
 /* ── Small reusable primitives ─────────────────────────────── */
@@ -123,7 +124,7 @@ function Callout({
         </div>
         <div
           className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.72]"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {children}
         </div>
@@ -231,13 +232,13 @@ function FeatureItem({
       <div className="flex-1 py-3.25 pr-4">
         <div
           className="text-base md:text-[18px] lg:text-[20px] font-semibold text-[#1A1714] dark:text-white mb-0.75 tracking-[-0.01em]"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {title}
         </div>
         <div
           className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.72]"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {desc}
         </div>
@@ -275,13 +276,13 @@ function Step({
       <div className="flex-1 pt-0.5">
         <div
           className="text-base md:text-[18px] lg:text-[20px] font-semibold text-[#1A1714] dark:text-white mb-1"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {title}
         </div>
         <div
           className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.72]"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {desc}
         </div>
@@ -303,7 +304,7 @@ function SectionHeading({
     <h2
       id={id}
       className="doc-section text-[1.8rem] font-bold tracking-[-0.03em] text-[#1A1714] dark:text-white mb-3 pt-11 scroll-mt-6 flex items-center gap-2.5"
-      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+      style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
     >
       {children}
       {badge && (
@@ -319,7 +320,7 @@ function SubHeading({ children }: { children: React.ReactNode }) {
   return (
     <h3
       className="text-[1.2rem] font-semibold tracking-[-0.02em] text-[#1A1714] dark:text-white mt-7 mb-2 scroll-mt-6"
-      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+      style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
     >
       {children}
     </h3>
@@ -330,7 +331,7 @@ function Para({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.82] mb-3"
-      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+      style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
     >
       {children}
     </p>
@@ -361,13 +362,13 @@ function SecItem({
       <div>
         <div
           className="text-base md:text-[18px] lg:text-[20px] font-semibold text-[#1A1714] dark:text-white mb-0.5"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {title}
         </div>
         <div
           className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.65]"
-          style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+          style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
         >
           {desc}
         </div>
@@ -441,7 +442,7 @@ function NotList({ isKhmer }: { isKhmer: boolean }) {
           </span>
           <span
             className="text-base md:text-[18px] lg:text-[20px] font-medium text-[#4A4540] dark:text-[#C9CDD4] flex-1"
-            style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+            style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
           >
             {isKhmer ? "ផ្តល់ជូនជា managed backend service តាមរយៈ" : "Provided as a managed backend service via"}{" "}
             <InlineCode>{item.cmd}</InlineCode>
@@ -503,7 +504,7 @@ function ManagedExecutionList({ isKhmer }: { isKhmer: boolean }) {
                 </td>
                 <td
                   className="px-2 py-3 text-base md:text-[18px] lg:text-[20px] font-medium text-[#4A4540] dark:text-[#C9CDD4] whitespace-nowrap align-middle"
-                  style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+                  style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
                 >
                   {isKhmer ? "ផ្តល់ជូនជា managed backend service តាមរយៈ" : "Provided as a managed backend service via"}{" "}
                   <span className="inline-block whitespace-nowrap">
@@ -563,13 +564,13 @@ function SecurityList({ isKhmer }: { isKhmer: boolean }) {
           <div className="flex-1">
             <div
               className="text-base md:text-[18px] lg:text-[20px] font-semibold text-[#1A1714] dark:text-white mb-1"
-              style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+              style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
             >
               {item.title}
             </div>
             <div
               className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.7]"
-              style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+              style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
             >
               {item.desc}
             </div>
@@ -650,7 +651,7 @@ function TOC({ activeId, isKhmer }: { activeId: string; isKhmer: boolean }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder={isKhmer ? "ស្វែងរកខ្លឹមសារ..." : "Search content..."}
             className="w-full bg-transparent outline-none text-[18px] text-[#4A4540] dark:text-[#E5E7EB] placeholder:text-[#9A9287] dark:placeholder:text-[#8F96A3]"
-            style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+            style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
           />
           <kbd className="shrink-0 font-mono text-[11px] px-2 py-1 rounded-lg border border-[#E2DDD5] dark:border-white/10 bg-[#F6F2EA] dark:bg-white/5 text-[#8B8378] dark:text-[#A1A1AA] shadow-sm">
             Ctrl K
@@ -676,7 +677,7 @@ function TOC({ activeId, isKhmer }: { activeId: string; isKhmer: boolean }) {
                   ? "text-[#00BCA1] border-l-[#00BCA1] font-medium"
                   : "text-[#88837B] dark:text-[#A1A1AA] border-l-transparent hover:text-[#1A1714] dark:hover:text-white"
               }`}
-              style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+              style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
             >
               {link.label}
             </a>
@@ -692,6 +693,14 @@ export default function Content() {
   const [activeId, setActiveId] = useState("installation");
   const locale = useLocale();
   const isKhmer = locale === "kh";
+  const pageFontVars = {
+    "--docs-sans-font": isKhmer
+      ? "var(--font-noto-khmer), var(--font-google-sans)"
+      : "var(--font-google-sans), var(--font-noto-khmer)",
+    "--docs-mono-font": isKhmer
+      ? "var(--font-jetbrains-mono), var(--font-noto-khmer), var(--font-google-sans)"
+      : "var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer)",
+  } as CSSProperties;
 
   useEffect(() => {
     const sections = document.querySelectorAll(".doc-section[id]");
@@ -712,7 +721,8 @@ export default function Content() {
       {/* Main article */}
       <main
         className="flex-1 min-w-0 px-12 xl:px-14 pt-12 pb-32 max-[960px]:px-8 max-[640px]:px-5"
-        style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+        lang={isKhmer ? "km" : "en"}
+        style={{ fontFamily: "var(--docs-sans-font), sans-serif", ...pageFontVars }}
       >
         {/* ── Page Header ── */}
         <div className="mb-2">
@@ -723,13 +733,13 @@ export default function Content() {
 
           <h1
             className="text-[2.4rem] font-bold tracking-[-0.035em] leading-[1.14] text-[#1A1714] dark:text-white mb-3"
-            style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+            style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
           >
             CLI
           </h1>
           <p
             className="text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] leading-[1.82] mb-7 max-w-145 font-normal"
-            style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+            style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
           >
             {isKhmer
               ? "CLI standalone មួយដែលអនុញ្ញាតឱ្យអ្នកដំណើរការ security tools ដែលគាំទ្រពី terminal របស់អ្នក ដោយប្រើ backend ទាំងស្រុង។ មិនចាំបាច់ដំឡើង tools នៅលើម៉ាស៊ីនរបស់អ្នកទេ។"
@@ -925,7 +935,7 @@ export default function Content() {
                     <td className="px-3.5 py-2.5 border-b border-[#E2DDD5] dark:border-white/10 whitespace-nowrap">{row.cat}</td>
                     <td
                       className="px-3.5 py-2.5 border-b border-[#E2DDD5] dark:border-white/10 text-base md:text-[18px] lg:text-[20px] text-[#4A4540] dark:text-[#C9CDD4] whitespace-nowrap"
-                      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+                      style={{ fontFamily: "var(--docs-sans-font), sans-serif" }}
                     >
                       {row.desc}
                     </td>
