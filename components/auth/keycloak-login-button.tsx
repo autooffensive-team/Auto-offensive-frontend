@@ -8,23 +8,25 @@ import { Button } from "@/components/ui/button";
 type KeycloakLoginButtonProps = {
   callbackURL?: string;
   autoStart?: boolean;
+  prompt?: string;
 };
 
-function buildLoginUrl(callbackURL: string): string {
+function buildLoginUrl(callbackURL: string, prompt: string | undefined): string {
   return `/api/auth/keycloak/login?callbackUrl=${encodeURIComponent(callbackURL)}`;
 }
 
 export default function KeycloakLoginButton({
   callbackURL = "/userdashboard",
   autoStart = true,
+  prompt,
 }: KeycloakLoginButtonProps) {
   const [pending, setPending] = useState(false);
   const hasStartedRef = useRef(false);
 
   const startLogin = useCallback(() => {
     setPending(true);
-    window.location.assign(buildLoginUrl(callbackURL));
-  }, [callbackURL]);
+    window.location.assign(buildLoginUrl(callbackURL, prompt));
+  }, [callbackURL, prompt]);
 
   useEffect(() => {
     if (!autoStart) {
