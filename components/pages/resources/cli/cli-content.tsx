@@ -1076,7 +1076,7 @@ export default function Content() {
 
         <DocsFooterNav
           previous={{ href: "/resource/ci-cd", label: "CI/CD Integration" }}
-          next={{ href: "/resource/tool", label: "Tool Reference" }}
+          next={{ href: "/resource/api", label: "API Reference" }}
           previousText={isKhmer ? "មុន" : "Previous"}
           nextText={isKhmer ? "បន្ទាប់" : "Next"}
         />

@@ -383,8 +383,8 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
       <ErrorReference isDark={isDark} textColor={textColor} secondaryText={secondaryText} mutedText={mutedText} borderColor={borderColor} />
 
       <DocsFooterNav
-        previous={{ href: "/resource/cli", label: "CLI" }}
-        next={{ href: "/resource/api", label: "API Reference" }}
+        previous={{ href: "/resource/api", label: "API Reference" }}
+        next={{ href: "/resource/ci-cd", label: "CI/CD Integration" }}
         previousText={copy.previous}
         nextText={copy.next}
       />

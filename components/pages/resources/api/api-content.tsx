@@ -1007,8 +1007,8 @@ Content-Type: application/json`}
       />
 
       <DocsFooterNav
-        previous={{ href: "/resource/tool", label: "Tool Reference" }}
-        next={{ href: "/resource/ci-cd", label: "CI/CD Integration" }}
+        previous={{ href: "/resource/cli", label: "CLI" }}
+        next={{ href: "/resource/tool", label: "Tool Reference" }}
         previousText={isKhmer ? "មុន" : "Previous"}
         nextText={isKhmer ? "បន្ទាប់" : "Next"}
       />

@@ -865,7 +865,7 @@ jobs:
       </section>
 
       <DocsFooterNav
-        previous={{ href: "/resource/api", label: "API Reference" }}
+        previous={{ href: "/resource/tool", label: "Tool Reference" }}
         next={{ href: "/resource/cli", label: "CLI" }}
         previousText={isKhmer ? "មុន" : "Previous"}
         nextText={isKhmer ? "បន្ទាប់" : "Next"}

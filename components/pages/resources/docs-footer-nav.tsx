@@ -23,39 +23,49 @@ export default function DocsFooterNav({
   className = "",
 }: DocsFooterNavProps) {
   const cardClassName =
-    "flex flex-1 items-center gap-3 rounded-xl border border-[#E2DDD5] bg-white px-4 py-3 transition-all duration-150 hover:border-[#CEC9BF] hover:bg-[#F0EDE6] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-[#121214] dark:hover:bg-white/5";
+    "flex flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-200/60 bg-gradient-to-br from-white to-neutral-50/50 px-3 py-2.5 transition-all duration-200 hover:border-neutral-300 hover:shadow-sm dark:border-white/5 dark:from-neutral-950 dark:to-neutral-900/50 dark:hover:border-white/10 dark:hover:shadow-md dark:hover:shadow-white/5 sm:px-4 sm:py-3";
 
   return (
     <div
-      className={`mt-16 flex justify-between gap-4 border-t border-[#E2DDD5] pt-8 dark:border-white/10 max-[640px]:flex-col ${className}`.trim()}
+      className={`mt-12 flex gap-3 border-t border-neutral-200/60 pt-8 dark:border-white/5 ${className}`.trim()}
     >
-      <Link href={previous.href} className={`${cardClassName} max-w-57.5`}>
-        <svg
-          className="h-4 w-4 shrink-0 stroke-[#88837B] fill-none dark:stroke-[#9CA3AF]"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-        >
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-        <div>
-          <div className="mb-0.5 text-[11px] text-[#88837B] dark:text-[#9CA3AF]">{previousText}</div>
-          <div className="text-base font-semibold text-[#1A1714] dark:text-white md:text-[18px] lg:text-[20px]">
-            {previous.label}
+      {/* Previous Button */}
+      <Link href={previous.href} className={cardClassName}>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <svg
+            className="h-3.5 w-3.5 shrink-0 stroke-neutral-400 dark:stroke-neutral-600"
+            viewBox="0 0 24 24"
+            fill="none"
+            strokeWidth={2.5}
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <div className="min-w-0">
+            <div className="text-[9px] uppercase tracking-wider text-neutral-500 dark:text-neutral-500 mb-0.5">
+              {previousText}
+            </div>
+            <div className="text-xs font-semibold leading-tight text-neutral-900 dark:text-neutral-100 truncate sm:text-sm">
+              {previous.label}
+            </div>
           </div>
         </div>
       </Link>
 
-      <Link href={next.href} className={`${cardClassName} max-w-57.5 ml-auto justify-end text-right`}>
-        <div>
-          <div className="mb-0.5 text-[11px] text-[#88837B] dark:text-[#9CA3AF]">{nextText}</div>
-          <div className="text-base font-semibold text-[#1A1714] dark:text-white md:text-[18px] lg:text-[20px]">
+      {/* Next Button */}
+      <Link href={next.href} className={cardClassName}>
+        <div className="min-w-0 text-right flex-1">
+          <div className="text-[9px] uppercase tracking-wider text-neutral-500 dark:text-neutral-500 mb-0.5">
+            {nextText}
+          </div>
+          <div className="text-xs font-semibold leading-tight text-neutral-900 dark:text-neutral-100 truncate sm:text-sm">
             {next.label}
           </div>
         </div>
         <svg
-          className="h-4 w-4 shrink-0 stroke-[#88837B] fill-none dark:stroke-[#9CA3AF]"
+          className="h-3.5 w-3.5 shrink-0 stroke-neutral-400 dark:stroke-neutral-600"
           viewBox="0 0 24 24"
-          strokeWidth={2}
+          fill="none"
+          strokeWidth={2.5}
         >
           <polyline points="9 18 15 12 9 6" />
         </svg>
