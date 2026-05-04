@@ -258,9 +258,7 @@ export default function CICDContent() {
   const workflowSteps = getWorkflowSteps(isKhmer);
   const copy = isKhmer
     ? {
-        breadcrumbDocs: "ឯកសារ",
-        breadcrumbResources: "ធនធាន",
-        breadcrumbCurrent: "Integration CI/CD",
+        breadcrumbCurrent: "CI/CD Integration",
         guideVersion: "Integration Guide · v1.0",
         pageTitle: "CI/CD Integration",
         intro:
@@ -318,9 +316,7 @@ export default function CICDContent() {
         ],
       }
     : {
-        breadcrumbDocs: "Docs",
-        breadcrumbResources: "Resources",
-        breadcrumbCurrent: "Integration CI/CD",
+        breadcrumbCurrent: "CI/CD Integration",
         guideVersion: "Integration Guide · v1.0",
         pageTitle: "CI/CD Integration",
         intro:
@@ -383,18 +379,6 @@ export default function CICDContent() {
       style={sansFontStyle}
     >
       <div className="mb-10">
-        <div className="flex items-center gap-1.5 text-base md:text-[18px] lg:text-[20px] text-[#88837B] dark:text-[#A1A1AA] mb-4.5">
-          <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">
-            {copy.breadcrumbDocs}
-          </a>
-          <span>/</span>
-          <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">
-            {copy.breadcrumbResources}
-          </a>
-          <span>/</span>
-          <span>{copy.breadcrumbCurrent}</span>
-        </div>
-
         <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-[#00BCA1] bg-[rgba(0,188,161,0.07)] border border-[rgba(0,188,161,0.2)] px-2.5 py-0.75 rounded-full mb-3.5">
           <span className="w-1.25 h-1.25 rounded-full bg-[#00BCA1] animate-pulse" />
           {copy.guideVersion}

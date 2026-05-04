@@ -716,14 +716,6 @@ export default function Content() {
       >
         {/* ── Page Header ── */}
         <div className="mb-2">
-          <div className="flex items-center gap-1.5 text-base md:text-[18px] lg:text-[20px] text-[#88837B] dark:text-[#A1A1AA] mb-4.5">
-            <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">Docs</a>
-            <svg className="w-2.75 h-2.75 stroke-[#B5B0A8] fill-none" viewBox="0 0 24 24" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
-            <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">Automation Tools</a>
-            <svg className="w-2.75 h-2.75 stroke-[#B5B0A8] fill-none" viewBox="0 0 24 24" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
-            <span>CLI</span>
-          </div>
-
           <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-[#00BCA1] bg-[rgba(0,188,161,0.07)] border border-[rgba(0,188,161,0.2)] px-2.5 py-0.75 rounded-full mb-3.5">
             <span className="w-1.25 h-1.25 rounded-full bg-[#00BCA1] animate-pulse" />
             {isKhmer ? "ឯកសារមុខងារ · v2.0" : "Feature Documentation · v2.0"}

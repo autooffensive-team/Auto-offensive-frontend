@@ -61,6 +61,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   const copy = isKhmer
     ? {
         docs: 'ឯកសារ',
+        resources: 'ធនធាន',
         toolReference: 'ឯកសារ Tool',
         toolOverview: 'ទិដ្ឋភាពទូទៅនៃ Tool',
         versionBadge: 'Tool Reference · v2.0',
@@ -87,6 +88,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
       }
     : {
         docs: 'Docs',
+        resources: 'Resources',
         toolReference: 'Tool Reference',
         toolOverview: 'Tool Overview',
         versionBadge: 'Tool Reference · v2.0',
@@ -118,18 +120,6 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
     >
       {/* Page Header */}
       <div className="mb-12">
-        <div className={`flex items-center gap-2 ${bodyTextClass} mb-4 ${mutedText}`}>
-          <a href="#" className="hover:opacity-75">{copy.docs}</a>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-          <a href="#" className="hover:opacity-75">{copy.toolReference}</a>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-          <span>{copy.toolOverview}</span>
-        </div>
-
         <div
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase mb-4 ${
             isDark
