@@ -1,6 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  Archive,
+  Ban,
+  Box,
+  Check,
+  ClipboardList,
+  FileText,
+  Globe,
+  HardDriveDownload,
+  Info,
+  KeyRound,
+  Laptop,
+  Lock,
+  LogOut,
+  Package,
+  Radio,
+  SearchCheck,
+  ShieldAlert,
+} from "lucide-react";
 import { useLocale } from "next-intl";
 
 const TOC_LINKS = [
@@ -72,7 +91,7 @@ function Callout({
   children,
 }: {
   type?: "tip" | "info" | "warn" | "ai" | "brand";
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
 }) {
@@ -94,7 +113,7 @@ function Callout({
     <div
       className={`flex gap-3 px-4 py-3 rounded-lg border border-[#E2DDD5] dark:border-white/10 border-l-[3px] my-3.5 dark:bg-white/3 ${styles[type]}`}
     >
-      <span className="text-[14px] shrink-0 mt-0.5">{icon}</span>
+      <span className="shrink-0 mt-0.5 text-[#00BCA1] [&_svg]:size-4">{icon}</span>
       <div className="flex-1">
         <div
           className={`text-[11px] font-bold tracking-[0.07em] uppercase mb-1 ${titleColors[type]}`}
@@ -198,14 +217,14 @@ function FeatureItem({
   desc,
   tag,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   desc: React.ReactNode;
   tag?: React.ReactNode;
 }) {
   return (
     <div className="flex items-start border-b border-[#E2DDD5] dark:border-white/10 last:border-b-0 hover:bg-[#F0EDE6] dark:hover:bg-white/5 transition-colors duration-150">
-      <div className="w-12 shrink-0 flex items-center justify-center py-3.75 text-base">
+      <div className="w-12 shrink-0 flex items-center justify-center py-3.75 text-[#88837B] dark:text-[#A1A1AA] [&_svg]:size-[18px]">
         {icon}
       </div>
       <div className="flex-1 py-3.25 pr-4">
@@ -330,11 +349,11 @@ function SecItem({
   title,
   desc,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   desc: string;
 }) {
-  const newLocal = "text-[15px] flex-shrink-0 mt-px";
+  const newLocal = "flex-shrink-0 mt-px text-[#88837B] dark:text-[#A1A1AA] [&_svg]:size-4";
   return (
     <div className="flex items-start gap-3 px-3.5 py-3 rounded-lg border border-[#E2DDD5] dark:border-white/10 bg-white dark:bg-[#121214] hover:bg-[#F0EDE6] dark:hover:bg-white/5 hover:border-[#CEC9BF] transition-all duration-150">
       <span className={newLocal}>{icon}</span>
@@ -726,9 +745,9 @@ export default function Content() {
 
           <div className="flex flex-wrap gap-4 mb-7 pb-7 border-b border-[#E2DDD5]">
             {[
-              { icon: "🖥️", label: "Cross-platform binary" },
-              { icon: "🔐", label: "Token-based auth" },
-              { icon: "📡", label: "Real-time streaming" },
+              { icon: <Laptop size={16} />, label: "Cross-platform binary" },
+              { icon: <Lock size={16} />, label: "Token-based auth" },
+              { icon: <Radio size={16} />, label: "Real-time streaming" },
             ].map((pill) => (
               <div
                 key={pill.label}
@@ -753,7 +772,7 @@ export default function Content() {
             <Step num={4} title={isKhmer ? "ដំណើរការ scan ដំបូងរបស់អ្នក" : "Run your first scan"} desc={isKhmer ? <>ឥឡូវអ្នកអាចប្រើបានហើយ។ ប្រើ command ដែលគាំទ្រណាមួយដូចជា <InlineCode>pentest subfinder -d example.com</InlineCode> ហើយ results នឹង stream ត្រឡប់មកវិញជាពេលវេលាជាក់ស្តែង។</> : <>You&apos;re ready. Use any supported command like <InlineCode>pentest subfinder -d example.com</InlineCode> — results stream back in real time.</>} last />
           </StepList>
 
-          <Callout type="brand" icon="📦" title={isKhmer ? "មិនចាំបាច់ដំឡើង third-party tools" : "No third-party tools required"}>
+          <Callout type="brand" icon={<Package />} title={isKhmer ? "មិនចាំបាច់ដំឡើង third-party tools" : "No third-party tools required"}>
             {isKhmer ? <>អ្នក <strong className="text-[#1A1714] dark:text-white font-semibold">មិនចាំបាច់</strong> ដំឡើង <InlineCode>subfinder</InlineCode>, <InlineCode>httpx</InlineCode>, <InlineCode>naabu</InlineCode> ឬ scanning tool ផ្សេងៗនៅលើម៉ាស៊ីនរបស់អ្នកទេ។ CLI ទាក់ទងជាមួយ backend ហើយការដំណើរការទាំងអស់កើតឡើងនៅទីនោះ។</> : <>You do <strong className="text-[#1A1714] dark:text-white font-semibold">not</strong> need to install <InlineCode>subfinder</InlineCode>, <InlineCode>httpx</InlineCode>, <InlineCode>naabu</InlineCode>, or any other scanning tool locally. The CLI communicates with the backend — all execution happens there.</>}
           </Callout>
 
@@ -787,9 +806,9 @@ export default function Content() {
           <Para>{isKhmer ? "CLI ប្រើ token-based authentication។ Credentials ត្រូវបានរក្សាទុកយ៉ាងសុវត្ថិភាពនៅក្នុង local config directory របស់អ្នក។ រាល់ CLI requests ទៅ backend ទាមទារ session ដែលមានសុពលភាព។" : "The CLI uses token-based authentication. Credentials are securely stored in your local config directory. All CLI requests to the backend require a valid session."}</Para>
 
           <FeatureList>
-            <FeatureItem icon="🔑" title="Login command" desc={isKhmer ? <>រត់ <InlineCode>pentest login</InlineCode> ដើម្បី authenticate แบบ interactive ឬប្រើ <InlineCode>--token &lt;api-token&gt;</InlineCode> សម្រាប់ការប្រើប្រាស់ non-interactive នៅក្នុង CI environment។</> : <>Run <InlineCode>pentest login</InlineCode> to authenticate interactively, or pass <InlineCode>--token &lt;api-token&gt;</InlineCode> for non-interactive use in CI environments.</>} tag={<Tag variant="muted">Interactive</Tag>} />
-            <FeatureItem icon="🗃️" title={isKhmer ? "Stored credentials" : "Stored credentials"} desc={isKhmer ? "Authentication credentials ត្រូវបានរក្សាទុក locally នៅក្នុង config file របស់អ្នក។ វាមិនត្រូវបានបញ្ជូនឡើយ លើកលែងតែជា bearer tokens នៅពេលធ្វើ API request នីមួយៗ។" : "Authentication credentials are stored locally in your config file. They are never transmitted except as bearer tokens on each API request."} tag={<Tag variant="green">Secure</Tag>} />
-            <FeatureItem icon="🚪" title="Logout" desc={isKhmer ? <>រត់ <InlineCode>pentest logout</InlineCode> ដើម្បីបិទ local session។ token របស់អ្នកនៅតែមានសុពលភាពនៅលើឧបករណ៍ផ្សេងទៀត រហូតទាល់តែអ្នកដកសិទ្ធិវាដោយដៃពី dashboard។</> : <>Run <InlineCode>pentest logout</InlineCode> to revoke the local session. Your token remains valid on other devices until manually revoked from the dashboard.</>} />
+            <FeatureItem icon={<KeyRound />} title="Login command" desc={isKhmer ? <>រត់ <InlineCode>pentest login</InlineCode> ដើម្បី authenticate แบบ interactive ឬប្រើ <InlineCode>--token &lt;api-token&gt;</InlineCode> សម្រាប់ការប្រើប្រាស់ non-interactive នៅក្នុង CI environment។</> : <>Run <InlineCode>pentest login</InlineCode> to authenticate interactively, or pass <InlineCode>--token &lt;api-token&gt;</InlineCode> for non-interactive use in CI environments.</>} tag={<Tag variant="muted">Interactive</Tag>} />
+            <FeatureItem icon={<Archive />} title={isKhmer ? "Stored credentials" : "Stored credentials"} desc={isKhmer ? "Authentication credentials ត្រូវបានរក្សាទុក locally នៅក្នុង config file របស់អ្នក។ វាមិនត្រូវបានបញ្ជូនឡើយ លើកលែងតែជា bearer tokens នៅពេលធ្វើ API request នីមួយៗ។" : "Authentication credentials are stored locally in your config file. They are never transmitted except as bearer tokens on each API request."} tag={<Tag variant="green">Secure</Tag>} />
+            <FeatureItem icon={<LogOut />} title="Logout" desc={isKhmer ? <>រត់ <InlineCode>pentest logout</InlineCode> ដើម្បីបិទ local session។ token របស់អ្នកនៅតែមានសុពលភាពនៅលើឧបករណ៍ផ្សេងទៀត រហូតទាល់តែអ្នកដកសិទ្ធិវាដោយដៃពី dashboard។</> : <>Run <InlineCode>pentest logout</InlineCode> to revoke the local session. Your token remains valid on other devices until manually revoked from the dashboard.</>} />
           </FeatureList>
 
           <CodeBlock title="bash — authentication">
@@ -820,7 +839,7 @@ export default function Content() {
           <SectionHeading id="commands">{isKhmer ? "ការប្រើ Commands" : "Command Execution"}</SectionHeading>
           <Para>{isKhmer ? "CLI command នីមួយៗត្រូវបានផ្គូផ្គងដោយផ្ទាល់ទៅកាន់ backend tool ដែលគាំទ្រ។ CLI នឹង validate input parameters ទាំងអស់មុនពេលផ្ញើ request ហើយ parameters ដែលមិនត្រឹមត្រូវ ឬមិនគាំទ្រ នឹងត្រូវបដិសេធនៅ local មុនពេលមាន network call ណាមួយ។" : "Each CLI command maps directly to a supported backend tool. The CLI validates all input parameters before sending the request — invalid or unsupported parameters are rejected locally before any network call is made."}</Para>
 
-          <Callout type="info" icon="ℹ️" title={isKhmer ? "ទម្រង់ Command" : "Command format"}>
+          <Callout type="info" icon={<Info />} title={isKhmer ? "ទម្រង់ Command" : "Command format"}>
             {isKhmer ? <>Commands អនុវត្តតាមទម្រង់ <InlineCode>pentest &lt;tool&gt; [flags]</InlineCode>។ tool នីមួយៗបង្ហាញតែ flags ដែលវាគាំទ្រប៉ុណ្ណោះ ហើយមិនអនុញ្ញាត arbitrary shell arguments ឱ្យឆ្លងកាត់ទេ។</> : <>Commands follow the pattern <InlineCode>pentest &lt;tool&gt; [flags]</InlineCode>. Each tool exposes only its supported flags — no arbitrary shell arguments are passed through.</>}
           </Callout>
 
@@ -869,8 +888,8 @@ export default function Content() {
 
           <SubHeading>Parameter validation</SubHeading>
           <FeatureList>
-            <FeatureItem icon="✅" title="Local validation" desc={isKhmer ? "CLI ពិនិត្យ flags និង values ទាំងអស់នៅ local មុនពេលផ្ញើ។ flags ដែលត្រូវការ តែខ្វះ, format មិនត្រឹមត្រូវ ឬ parameters ដែលមិនគាំទ្រ នឹងត្រូវរកឃើញភ្លាមៗជាមួយ error message ដែលយល់ងាយ។" : "The CLI checks all flags and values locally before sending. Missing required flags, invalid formats, or unsupported parameters are caught immediately with a helpful error message."} />
-            <FeatureItem icon="🚫" title={isKhmer ? "Unsupported flags ត្រូវបានបដិសេធ" : "Unsupported flags are rejected"} desc={isKhmer ? "ទទួលយកតែ predefined flags សម្រាប់ tool នីមួយៗប៉ុណ្ណោះ។ ការបញ្ជូន arbitrary shell arguments ឬព្យាយាម chain commands មិនត្រូវបានគាំទ្រ ហើយនឹងត្រូវបដិសេធ។" : "Only predefined flags for each tool are accepted. Passing arbitrary shell arguments or attempting to chain commands is not supported and will be refused."} />
+            <FeatureItem icon={<SearchCheck />} title="Local validation" desc={isKhmer ? "CLI ពិនិត្យ flags និង values ទាំងអស់នៅ local មុនពេលផ្ញើ។ flags ដែលត្រូវការ តែខ្វះ, format មិនត្រឹមត្រូវ ឬ parameters ដែលមិនគាំទ្រ នឹងត្រូវរកឃើញភ្លាមៗជាមួយ error message ដែលយល់ងាយ។" : "The CLI checks all flags and values locally before sending. Missing required flags, invalid formats, or unsupported parameters are caught immediately with a helpful error message."} />
+            <FeatureItem icon={<Ban />} title={isKhmer ? "Unsupported flags ត្រូវបានបដិសេធ" : "Unsupported flags are rejected"} desc={isKhmer ? "ទទួលយកតែ predefined flags សម្រាប់ tool នីមួយៗប៉ុណ្ណោះ។ ការបញ្ជូន arbitrary shell arguments ឬព្យាយាម chain commands មិនត្រូវបានគាំទ្រ ហើយនឹងត្រូវបដិសេធ។" : "Only predefined flags for each tool are accepted. Passing arbitrary shell arguments or attempting to chain commands is not supported and will be refused."} />
           </FeatureList>
         </section>
 
@@ -930,10 +949,10 @@ export default function Content() {
           <Para>{isKhmer ? "CLI មិនដែលដំណើរការ tools នៅ local ទេ។ វាដើរតួជាកម្មវិធី client សម្រាប់ validate input, ផ្ញើ structured request ទៅ backend ហើយ stream results ត្រឡប់មកវិញ។" : "The CLI never executes tools locally. It acts purely as a client — validating input, sending a structured request to the backend, and streaming back the results."}</Para>
 
           <FeatureList>
-            <FeatureItem icon="📤" title="Structured request" desc={isKhmer ? "CLI បម្លែង command និង flags របស់អ្នកទៅជា structured JSON request ហើយផ្ញើទៅ Auto Offensive backend តាម authenticated HTTPS connection។" : "The CLI serialises your command and flags into a structured JSON request and sends it to the Auto Offensive backend over an authenticated HTTPS connection."} />
-            <FeatureItem icon="🏗️" title={isKhmer ? "ការបង្កើត scan job" : "Scan job creation"} desc={isKhmer ? "backend ទទួល request, validate វាតាម parameter schema ដែលអនុញ្ញាត ហើយបង្កើត scan job ថ្មីមួយជាមួយ job ID ពិសេស។" : "The backend receives the request, validates it against the allowed parameter schema, and creates a new scan job with a unique job ID."} />
-            <FeatureItem icon="🔒" title="Isolated environment" desc={isKhmer ? "job ដំណើរការនៅក្នុង sandboxed isolated container ដែលគ្រប់គ្រងដោយ backend workers។ execution នីមួយៗមានអាយុកាលខ្លី និងដាច់ដោយឡែកពីគ្នា។" : "The job executes in a sandboxed, isolated container managed by backend workers. Each execution is ephemeral and independent — no state bleeds between jobs."} />
-            <FeatureItem icon="📡" title={isKhmer ? "Results ត្រូវបាន stream ត្រឡប់មកវិញ" : "Results streamed back"} desc={isKhmer ? "នៅពេល tool កំពុងដំណើរការ stdout និង stderr ត្រូវបាន stream ត្រឡប់មក terminal របស់អ្នកជាពេលវេលាជាក់ស្តែង តាម persistent connection ដើម្បីឱ្យមានអារម្មណ៍ដូចដំណើរការនៅ local។" : "As the tool runs, stdout and stderr are streamed in real time back to your terminal via a persistent connection — so it feels like a local execution."} />
+            <FeatureItem icon={<HardDriveDownload />} title="Structured request" desc={isKhmer ? "CLI បម្លែង command និង flags របស់អ្នកទៅជា structured JSON request ហើយផ្ញើទៅ Auto Offensive backend តាម authenticated HTTPS connection។" : "The CLI serialises your command and flags into a structured JSON request and sends it to the Auto Offensive backend over an authenticated HTTPS connection."} />
+            <FeatureItem icon={<Box />} title={isKhmer ? "ការបង្កើត scan job" : "Scan job creation"} desc={isKhmer ? "backend ទទួល request, validate វាតាម parameter schema ដែលអនុញ្ញាត ហើយបង្កើត scan job ថ្មីមួយជាមួយ job ID ពិសេស។" : "The backend receives the request, validates it against the allowed parameter schema, and creates a new scan job with a unique job ID."} />
+            <FeatureItem icon={<Lock />} title="Isolated environment" desc={isKhmer ? "job ដំណើរការនៅក្នុង sandboxed isolated container ដែលគ្រប់គ្រងដោយ backend workers។ execution នីមួយៗមានអាយុកាលខ្លី និងដាច់ដោយឡែកពីគ្នា។" : "The job executes in a sandboxed, isolated container managed by backend workers. Each execution is ephemeral and independent — no state bleeds between jobs."} />
+            <FeatureItem icon={<Radio />} title={isKhmer ? "Results ត្រូវបាន stream ត្រឡប់មកវិញ" : "Results streamed back"} desc={isKhmer ? "នៅពេល tool កំពុងដំណើរការ stdout និង stderr ត្រូវបាន stream ត្រឡប់មក terminal របស់អ្នកជាពេលវេលាជាក់ស្តែង តាម persistent connection ដើម្បីឱ្យមានអារម្មណ៍ដូចដំណើរការនៅ local។" : "As the tool runs, stdout and stderr are streamed in real time back to your terminal via a persistent connection — so it feels like a local execution."} />
           </FeatureList>
         </section>
 
@@ -971,10 +990,10 @@ export default function Content() {
           <Para>{isKhmer ? "Results ត្រូវបានបង្ហាញទាំងក្នុង terminal របស់អ្នក និងរក្សាទុកដោយស្វ័យប្រវត្តិនៅក្នុង backend system។ អ្នកអាចចូលមើលវាម្ដងទៀតពេលក្រោយ ដោយមិនចាំបាច់រត់ scan សារជាថ្មី។" : "Results are both displayed in your terminal and automatically stored in the backend system. You can access them again later without re-running the scan."}</Para>
 
           <FeatureList>
-            <FeatureItem icon="🖥️" title={isKhmer ? "ការបង្ហាញក្នុង terminal" : "Terminal display"} desc={isKhmer ? "output ទាំងអស់ត្រូវបានបោះពុម្ពបន្តផ្ទាល់ទៅ terminal របស់អ្នកនៅពេល job កំពុងដំណើរការ រួមទាំង summary ចុងក្រោយ និង direct link ទៅកាន់ job result page។" : "All output is printed live to your terminal as the job runs — including final summary counts and a direct link to the job result page."} />
-            <FeatureItem icon="💾" title="Automatic backend storage" desc={isKhmer ? "result នីមួយៗត្រូវបានរក្សាទុកដោយស្វ័យប្រវត្តិទៅក្នុង account របស់អ្នក។ Results ត្រូវបានភ្ជាប់ទៅ scan job និង project ដែលត្រូវគ្នានៅក្នុង web UI។" : "Every result is automatically saved to your account. Results are attached to the corresponding scan job and project in the web UI."} />
-            <FeatureItem icon="🌐" title={isKhmer ? "មើលតាម web UI" : "View via web UI"} desc={isKhmer ? "ចូលមើល job result ចាស់ៗណាមួយពី Auto Offensive web dashboard ដោយមាន AI analysis, severity scoring និង report generation ពេញលេញ។" : "Access any past job result from the Auto Offensive web dashboard — with full AI analysis, severity scoring, and report generation available."} />
-            <FeatureItem icon="📋" title={isKhmer ? "រួមបញ្ចូលក្នុង reports" : "Included in reports"} desc={isKhmer ? "CLI job results អាចរួមបញ្ចូលក្នុង security reports ដែលបានបង្កើត ដូចគ្នានឹង results ពី web UI scans ដែរ ហើយគាំទ្រ PDF, DOCX, Excel និង JSON។" : "CLI job results can be included in generated security reports just like results from web UI scans — PDF, DOCX, Excel, and JSON all supported."} />
+            <FeatureItem icon={<Laptop />} title={isKhmer ? "ការបង្ហាញក្នុង terminal" : "Terminal display"} desc={isKhmer ? "output ទាំងអស់ត្រូវបានបោះពុម្ពបន្តផ្ទាល់ទៅ terminal របស់អ្នកនៅពេល job កំពុងដំណើរការ រួមទាំង summary ចុងក្រោយ និង direct link ទៅកាន់ job result page។" : "All output is printed live to your terminal as the job runs — including final summary counts and a direct link to the job result page."} />
+            <FeatureItem icon={<HardDriveDownload />} title="Automatic backend storage" desc={isKhmer ? "result នីមួយៗត្រូវបានរក្សាទុកដោយស្វ័យប្រវត្តិទៅក្នុង account របស់អ្នក។ Results ត្រូវបានភ្ជាប់ទៅ scan job និង project ដែលត្រូវគ្នានៅក្នុង web UI។" : "Every result is automatically saved to your account. Results are attached to the corresponding scan job and project in the web UI."} />
+            <FeatureItem icon={<Globe />} title={isKhmer ? "មើលតាម web UI" : "View via web UI"} desc={isKhmer ? "ចូលមើល job result ចាស់ៗណាមួយពី Auto Offensive web dashboard ដោយមាន AI analysis, severity scoring និង report generation ពេញលេញ។" : "Access any past job result from the Auto Offensive web dashboard — with full AI analysis, severity scoring, and report generation available."} />
+            <FeatureItem icon={<ClipboardList />} title={isKhmer ? "រួមបញ្ចូលក្នុង reports" : "Included in reports"} desc={isKhmer ? "CLI job results អាចរួមបញ្ចូលក្នុង security reports ដែលបានបង្កើត ដូចគ្នានឹង results ពី web UI scans ដែរ ហើយគាំទ្រ PDF, DOCX, Excel និង JSON។" : "CLI job results can be included in generated security reports just like results from web UI scans — PDF, DOCX, Excel, and JSON all supported."} />
           </FeatureList>
         </section>
 
@@ -1020,12 +1039,12 @@ export default function Content() {
 
           <div className="hidden">
           <SecGrid>
-            <SecItem icon="🚫" title="Predefined tools only" desc="Only the supported tool set is accessible. Requests for unlisted tools or custom binaries are rejected before execution." />
-            <SecItem icon="🔍" title="Parameter validation" desc="Every request is validated against the allowed parameter schema on both the CLI and the backend. Injection attempts are blocked." />
-            <SecItem icon="📦" title="Isolated execution" desc="Each job runs in its own isolated container. There is no shared state, no persistent filesystem access, and no system-level exposure." />
-            <SecItem icon="🔐" title="Authenticated requests" desc="All CLI requests require a valid API token. Unauthenticated or expired sessions are rejected immediately with a clear error." />
-            <SecItem icon="📝" title="Audit log" desc="Every command, job, and result is logged against your account. Full audit history is available from the web dashboard." />
-            <SecItem icon="⛔" title="No arbitrary execution" desc="The CLI does not support shell pass-through, piping, or arbitrary command injection. The execution surface is completely controlled." />
+            <SecItem icon={<Ban />} title="Predefined tools only" desc="Only the supported tool set is accessible. Requests for unlisted tools or custom binaries are rejected before execution." />
+            <SecItem icon={<SearchCheck />} title="Parameter validation" desc="Every request is validated against the allowed parameter schema on both the CLI and the backend. Injection attempts are blocked." />
+            <SecItem icon={<Package />} title="Isolated execution" desc="Each job runs in its own isolated container. There is no shared state, no persistent filesystem access, and no system-level exposure." />
+            <SecItem icon={<Lock />} title="Authenticated requests" desc="All CLI requests require a valid API token. Unauthenticated or expired sessions are rejected immediately with a clear error." />
+            <SecItem icon={<ClipboardList />} title="Audit log" desc="Every command, job, and result is logged against your account. Full audit history is available from the web dashboard." />
+            <SecItem icon={<ShieldAlert />} title="No arbitrary execution" desc="The CLI does not support shell pass-through, piping, or arbitrary command injection. The execution surface is completely controlled." />
           </SecGrid>
           </div>
           <SecurityList isKhmer={isKhmer} />
@@ -1041,7 +1060,7 @@ export default function Content() {
             <NotList isKhmer={isKhmer} />
           </div>
 
-          <Callout type="tip" icon="✅" title={isKhmer ? "អត្ថប្រយោជន៍នៃ managed execution" : "Benefits of managed execution"}>
+          <Callout type="tip" icon={<Check />} title={isKhmer ? "អត្ថប្រយោជន៍នៃ managed execution" : "Benefits of managed execution"}>
             {isKhmer ? <><strong className="text-[#1A1714] dark:text-white font-semibold">Environment ស្ថិតស្ថេរ</strong> — scan នីមួយៗដំណើរការលើ infrastructure ដែលគ្រប់គ្រងដូចគ្នា មិនថា local OS របស់អ្នកជាអ្វីក៏ដោយ។
             <br /><br />
             <strong className="text-[#1A1714] dark:text-white font-semibold">Centralised updates</strong> — tools ត្រូវបានធ្វើបច្ចុប្បន្នភាពដោយ platform។ អ្នកតែងតែប្រើ version ចុងក្រោយដោយមិនចាំបាច់ធ្វើអ្វីបន្ថែម។

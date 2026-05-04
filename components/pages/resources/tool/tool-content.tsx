@@ -3,9 +3,17 @@
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
 import {
+  AlertTriangle,
+  ClipboardList,
+  FileJson,
+  FileText,
+  Globe,
+  Lock,
+  Settings,
   Wrench,
   Shield,
   CheckCircle,
+  Siren,
 } from 'lucide-react';
 
 interface ToolContentProps {
@@ -267,7 +275,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
             isDark ? 'bg-white/5' : 'bg-[rgba(0,188,161,0.07)]'
           }`}
         >
-          <div className="text-xl shrink-0">🔒</div>
+          <Lock size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-[#00BCA1] mb-2`}>
               {copy.remoteTitle}
@@ -351,16 +359,16 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
 
         <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
           {[
-            { icon: '📄', title: 'Plain text (default)', desc: isKhmer ? 'លទ្ធផលមួយបន្ទាត់មួយ ត្រូវបាន stream ទៅ stdout និងរក្សាទុកជា .txt។ អាចអានបានងាយ ហើយបញ្ជូនបន្តទៅ tools ផ្សេង ឬ grep។' : 'One result per line, streamed to stdout and saved as .txt. Human-readable, easy to pipe into other tools or grep.' },
-            { icon: '🗂️', title: 'JSON / JSONL', desc: isKhmer ? 'Structured output ដែលមាន JSON object មួយក្នុងមួយបន្ទាត់ (JSONL)។ រួមមាន metadata fields ទាំងអស់ក្នុងមួយ result។' : 'Structured output with one JSON object per line (JSONL). Includes all metadata fields per result — use -json or -oJ flags depending on the tool.' },
-            { icon: '🌐', title: 'Web UI structured view', desc: isKhmer ? 'លទ្ធផលទាំងអស់ត្រូវបាន parse និងរក្សាទុកដោយស្វ័យប្រវត្តិទៅ structured data model របស់ platform។ អាច view, filter និង sort ពី dashboard។' : 'All results are automatically parsed and stored in the platform\'s structured data model, regardless of raw output format. View, filter, and sort results from the dashboard.' },
-            { icon: '📋', title: 'Report export', desc: isKhmer ? 'លទ្ធផលពី tool ណាមួយអាចបញ្ចូលក្នុង generated reports បាន ដូចជា PDF, DOCX, Excel និង JSON តាម Reporting module។' : 'Results from any tool can be included in generated reports — PDF, DOCX, Excel, and JSON formats available via the Reporting module.' },
+            { icon: <FileText size={22} />, title: 'Plain text (default)', desc: isKhmer ? 'លទ្ធផលមួយបន្ទាត់មួយ ត្រូវបាន stream ទៅ stdout និងរក្សាទុកជា .txt។ អាចអានបានងាយ ហើយបញ្ជូនបន្តទៅ tools ផ្សេង ឬ grep។' : 'One result per line, streamed to stdout and saved as .txt. Human-readable, easy to pipe into other tools or grep.' },
+            { icon: <FileJson size={22} />, title: 'JSON / JSONL', desc: isKhmer ? 'Structured output ដែលមាន JSON object មួយក្នុងមួយបន្ទាត់ (JSONL)។ រួមមាន metadata fields ទាំងអស់ក្នុងមួយ result។' : 'Structured output with one JSON object per line (JSONL). Includes all metadata fields per result — use -json or -oJ flags depending on the tool.' },
+            { icon: <Globe size={22} />, title: 'Web UI structured view', desc: isKhmer ? 'លទ្ធផលទាំងអស់ត្រូវបាន parse និងរក្សាទុកដោយស្វ័យប្រវត្តិទៅ structured data model របស់ platform។ អាច view, filter និង sort ពី dashboard។' : 'All results are automatically parsed and stored in the platform\'s structured data model, regardless of raw output format. View, filter, and sort results from the dashboard.' },
+            { icon: <ClipboardList size={22} />, title: 'Report export', desc: isKhmer ? 'លទ្ធផលពី tool ណាមួយអាចបញ្ចូលក្នុង generated reports បាន ដូចជា PDF, DOCX, Excel និង JSON តាម Reporting module។' : 'Results from any tool can be included in generated reports — PDF, DOCX, Excel, and JSON formats available via the Reporting module.' },
           ].map((item, idx) => (
             <div
               key={idx}
               className={`flex gap-4 p-4 border-b ${borderColor} last:border-b-0 ${hoverBg} transition-colors`}
             >
-              <div className="text-2xl shrink-0">{item.icon}</div>
+              <div className="text-2xl shrink-0 text-[#88837B] dark:text-[#A1A1AA]">{item.icon}</div>
               <div className="flex-1">
                 <div className={`font-semibold ${textColor} mb-1`}>{item.title}</div>
                 <p className={`${bodyTextClass} ${secondaryText}`}>{item.desc}</p>
@@ -556,7 +564,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
       <div className={`border ${borderColor} rounded-lg overflow-hidden mb-8`}>
         <div className={`${isDark ? 'bg-white/5' : 'bg-[#F0EDE6]'} px-6 py-3 border-b ${borderColor}`}>
           <div className="font-bold text-sm tracking-widest uppercase text-[#00BCA1]">
-            ⚙️ {labels.supportedParameters}
+            <Settings size={14} className="inline-block align-[-2px]" /> {labels.supportedParameters}
           </div>
         </div>
 
@@ -636,7 +644,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
             isDark ? 'bg-white/5' : 'bg-[rgba(184,104,0,0.03)]'
           }`}
         >
-          <div className="text-xl shrink-0">⚠️</div>
+          <AlertTriangle size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-yellow-600 mb-2`}>
               {labels.passiveOnly}
@@ -654,7 +662,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
             isDark ? 'bg-white/5' : 'bg-[rgba(196,40,40,0.03)]'
           }`}
         >
-          <div className="text-xl shrink-0">🚨</div>
+          <Siren size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-red-600 mb-2`}>
               {labels.cidrTitle}
