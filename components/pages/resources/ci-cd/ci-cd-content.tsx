@@ -126,7 +126,7 @@ function CodeBlock({
           <div className="w-2.25 h-2.25 rounded-full bg-[#FFBD2E]" />
           <div className="w-2.25 h-2.25 rounded-full bg-[#28CA41]" />
         </div>
-        <span className="font-mono text-[11px] text-white/25 tracking-[0.05em]" style={monoFontStyle}>
+        <span className="font-mono text-[11px] text-white/25 tracking-wider" style={monoFontStyle}>
           {title}
         </span>
         <button

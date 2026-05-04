@@ -160,7 +160,7 @@ function CodeBlock({
           <div className="w-2.25 h-2.25 rounded-full bg-[#FFBD2E]" />
           <div className="w-2.25 h-2.25 rounded-full bg-[#28CA41]" />
         </div>
-        <span className="font-mono text-[11px] text-white/25 tracking-[0.05em]">{title}</span>
+        <span className="font-mono text-[11px] text-white/25 tracking-wider">{title}</span>
         <button
           onClick={handleCopy}
           className="font-mono text-[10px] text-white/30 bg-transparent border-none cursor-pointer hover:text-white/75 hover:bg-white/[0.07] px-2 py-0.5 rounded transition-all duration-150"
@@ -226,7 +226,7 @@ function FeatureItem({
 }) {
   return (
     <div className="flex items-start border-b border-[#E2DDD5] dark:border-white/10 last:border-b-0 hover:bg-[#F0EDE6] dark:hover:bg-white/5 transition-colors duration-150">
-      <div className="w-12 shrink-0 flex items-center justify-center py-3.75 text-[#88837B] dark:text-[#A1A1AA] [&_svg]:size-[18px]">
+      <div className="w-12 shrink-0 flex items-center justify-center py-3.75 text-[#88837B] dark:text-[#A1A1AA] [&_svg]:size-4.5">
         {icon}
       </div>
       <div className="flex-1 py-3.25 pr-4">
