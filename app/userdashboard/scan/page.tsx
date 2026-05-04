@@ -735,7 +735,7 @@ function AdvancedTerminalPanel({
         </div>
       )}
 
-      <div ref={containerRef} className="h-[560px] overflow-hidden" />
+      <div ref={containerRef} className="h-140 overflow-hidden" />
     </motion.section>
   );
 }
@@ -1409,7 +1409,7 @@ function ToolOptionField({
 }) {
   if (option.type === "boolean") {
     return (
-      <label className="flex min-h-[72px] items-center justify-between gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+      <label className="flex min-h-18 items-center justify-between gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
         <div>
           <p className="text-sm font-semibold text-gray-900 dark:text-white">{option.key}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{option.flag} {option.description ?? ""}</p>
@@ -1528,10 +1528,10 @@ function LiveConsole({ run, logs, errors }: { run: ActiveRun; logs: LogLine[]; e
           <Bot size={16} className="text-teal-300" />
           Stream Logs
         </div>
-        <div className="h-[360px] overflow-auto font-mono text-xs leading-5">
+        <div className="h-90 overflow-auto font-mono text-xs leading-5">
           {!logs.length && <p className="text-gray-500">Logs will appear here when a scan starts.</p>}
           {logs.map((line) => (
-            <p key={line.id} className="break-words">
+            <p key={line.id} className="wrap-break-words">
               <span className="text-gray-500">{new Date(line.timestamp).toLocaleTimeString()}</span>{" "}
               <span className="text-teal-300">[{line.source}]</span>{" "}
               <span className="text-blue-300">{line.level}</span> {line.text}
@@ -1549,7 +1549,7 @@ function LiveConsole({ run, logs, errors }: { run: ActiveRun; logs: LogLine[]; e
         {visibleParsed && !rows.length && (
           <div className="space-y-2 font-mono text-xs text-gray-500 dark:text-gray-400">
             {(visibleParsed.lines ?? []).slice(0, 8).map((line, index) => (
-              <p key={`${line}-${index}`} className="break-words">{line}</p>
+              <p key={`${line}-${index}`} className="wrap-break-words">{line}</p>
             ))}
           </div>
         )}
@@ -1567,7 +1567,7 @@ function LiveConsole({ run, logs, errors }: { run: ActiveRun; logs: LogLine[]; e
                 {rows.map((row, index) => (
                   <tr key={index} className="border-b border-gray-100 dark:border-gray-800/70">
                     {columns.map((column) => (
-                      <td key={column.key} className="max-w-[150px] truncate px-2 py-2 text-gray-600 dark:text-gray-400">
+                      <td key={column.key} className="max-w-37.5 truncate px-2 py-2 text-gray-600 dark:text-gray-400">
                         {String(row[column.key] ?? "")}
                       </td>
                     ))}
