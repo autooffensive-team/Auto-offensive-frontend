@@ -4,7 +4,11 @@ import { betterAuth } from "better-auth";
 import { toNextJsHandler, nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 
-import { isProduction, readOptionalEnv, readRequiredEnv } from "@/lib/server-env";
+import {
+  isProduction,
+  readOptionalEnv,
+  readRequiredEnv,
+} from "@/lib/server-env";
 
 const appUrl = readOptionalEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
 const keycloakIssuer = readRequiredEnv("KEYCLOAK_ISSUER");

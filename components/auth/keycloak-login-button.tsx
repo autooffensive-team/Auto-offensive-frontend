@@ -11,16 +11,8 @@ type KeycloakLoginButtonProps = {
   prompt?: string;
 };
 
-function buildLoginUrl(callbackURL: string, prompt?: string): string {
-  const params = new URLSearchParams({
-    callbackUrl: callbackURL,
-  });
-
-  if (prompt) {
-    params.set("prompt", prompt);
-  }
-
-  return `/api/auth/keycloak/login?${params.toString()}`;
+function buildLoginUrl(callbackURL: string, prompt: string | undefined): string {
+  return `/api/auth/keycloak/login?callbackUrl=${encodeURIComponent(callbackURL)}`;
 }
 
 export default function KeycloakLoginButton({

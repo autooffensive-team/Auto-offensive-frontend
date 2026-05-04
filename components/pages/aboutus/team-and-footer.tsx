@@ -2,11 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { useLocale } from "next-intl";
+import Image from "next/image";
 
 const SOCIAL_LINKS = {
   github: { label: "GitHub", Icon: IconGithub },
   telegram: { label: "Telegram", Icon: IconTelegram },
   linkedin: { label: "LinkedIn", Icon: IconLinkedin },
+
 };
 
 const MENTORS = [
@@ -114,7 +116,7 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
       <div className="tf-node-badge">{String(index + 1).padStart(2, "0")}</div>
       <div className="relative z-2 flex justify-center pt-3 mb-5">
         <div className="tf-photo-outer relative w-50 h-50 bg-[rgba(0,208,178,0.05)] rounded-full flex items-center justify-center">
-          <img src={m.img} alt={displayName} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
+          <Image src={m.img} alt={displayName} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
           <span className="tf-status-dot" />
         </div>
       </div>
