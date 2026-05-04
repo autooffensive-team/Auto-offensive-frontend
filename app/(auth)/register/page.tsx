@@ -12,7 +12,7 @@ export default function RegisterPage() {
           
         <Link href="/">  {/* Light Logo */}
           <Image
-            src="/Auto_offensive_Light-mode.png"
+            src="/Auto_Offensive_Light-mode.png"
             alt="Auto Offensive Logo"
             width={208}
             height={208}
@@ -21,7 +21,7 @@ export default function RegisterPage() {
 
           <Link href="/">  {/* Dark Logo */}
           <Image
-            src="/Auto_offensive_Dark-mode.png"
+            src="/Auto_Offensive_Dark-mode.png"
             alt="Auto Offensive Logo"
             width={208}
             height={208}
@@ -29,7 +29,7 @@ export default function RegisterPage() {
           /></Link>
 
           <Image
-            src="/fox.png"
+            src="/fox.webp"
             alt="Auto Offensive Mascot"
             width={420}
             height={420}

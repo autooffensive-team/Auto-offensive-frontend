@@ -1,28 +1,130 @@
 "use client";
 
-import { useState } from "react";
-import {  EyeOff, UserRound, Mail, Lock, Rocket } from "lucide-react";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { EyeOff, Lock, Mail, Rocket, UserRound } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
+type RegisterFormState = {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  alias_name: string;
+  avatar_profile: string;
+};
+
+const initialFormState: RegisterFormState = {
+  username: "",
+  email: "",
+  password: "",
+  first_name: "",
+  last_name: "",
+  alias_name: "",
+  avatar_profile: "",
+};
 
 export default function RegisterForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [form, setForm] = useState<RegisterFormState>(initialFormState);
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!agreed || pending) {
+      return;
+    }
+
+    setPending(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const registerPayload = {
+        ...form,
+        alias_name: form.alias_name.trim() || form.username.trim(),
+        avatar_profile: form.avatar_profile.trim(),
+      };
+
+      const response = await fetch("/api/backend/users", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(registerPayload),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { message?: string; detail?: string | { message?: string }[] }
+        | null;
+
+      if (!response.ok) {
+        const detailText =
+          typeof payload?.detail === "string"
+            ? payload.detail
+            : Array.isArray(payload?.detail)
+              ? payload.detail
+                  .map((item) => item.message)
+                  .filter(Boolean)
+                  .join(", ")
+              : "";
+
+        setErrorMessage(
+          detailText || payload?.message || "Unable to create account. Please try again.",
+        );
+        return;
+      }
+
+      setSuccessMessage("Account created successfully. You can log in now.");
+      setForm(initialFormState);
+      setAgreed(false);
+
+      const callbackUrl = searchParams.get("callbackUrl");
+      const nextUrl =
+        callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+          ? `/login?manual=1&prompt=login&callbackUrl=${encodeURIComponent(callbackUrl)}`
+          : "/login?manual=1&prompt=login&callbackUrl=%2Fuserdashboard";
+
+      window.setTimeout(() => {
+        router.replace(nextUrl);
+      }, 1200);
+    } catch {
+      setErrorMessage("Unable to reach the registration service. Please try again.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <div className="w-full max-w-md">
-      
-      {/* Title */}
-      <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight">
+      <h2 className="mb-1 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
         Create Account
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
+      <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
         Initialize your security console access.
       </p>
 
-     {/* Social Buttons */}
-      <div className="flex gap-3 mb-6">
-        <button className="flex-1 border border-gray-200 text-gray-800 py-2.5 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-black transition">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <div className="mb-6">
+        <Link
+          href="/login?manual=1"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-900"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path
               d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9086c1.7018-1.5668 2.6836-3.874 2.6836-6.615z"
               fill="#4285F4"
@@ -40,113 +142,159 @@ export default function RegisterForm() {
               fill="#EA4335"
             />
           </svg>
-         <span className="text-taupe-950 dark:text-white"> Google</span>
-        </button>
-        <button className="flex-1 border border-gray-200 text-gray-800 py-2.5 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm hover:bg-gray-50  dark:hover:bg-black transition">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="dark:hidden">
-            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" fill="black" />
-        </svg>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="hidden dark:block">
-            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" fill="white" />
-        </svg>
-      <span className="text-taupe-950 dark:text-white"> GitHub</span>
-        </button>
+          Continue with Google
+        </Link>
       </div>
 
-      {/* Divider */}
-      <div className="flex items-center mb-6">
-        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-        <span className="px-4 text-gray-400 dark:text-gray-500 text-xs font-semibold tracking-widest uppercase">
+      <div className="mb-6 flex items-center">
+        <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        <span className="px-4 text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
           Verification Required
         </span>
-        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+        <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
       </div>
 
-      {/* Full Name */}
-      <div className="mb-4">
-        <label className="block text-xs font-bold tracking-widest text-gray-700 dark:text-gray-300 mb-1.5 uppercase">
-          Full Name
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Ta lun Tun"
-            className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none focus:ring-2 focus:ring-teal-400 transition text-sm pr-10"
-          />
-          <UserRound className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">
+            Username
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="taluntun"
+              required
+              autoComplete="username"
+              className="w-full rounded-xl bg-slate-100 px-4 py-3 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
+            />
+            <UserRound className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+          </div>
         </div>
-      </div>
 
-      {/* Email */}
-      <div className="mb-4">
-        <label className="block text-xs font-bold tracking-widest text-gray-700 dark:text-gray-300 mb-1.5 uppercase">
-          Email
-        </label>
-        <div className="relative">
-          <input
-            type="email"
-            placeholder="example@gmail.com"
-            className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none focus:ring-2 focus:ring-teal-400 transition text-sm pr-10"
-          />
-          <Mail className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">
+              First Name
+            </label>
+            <input
+              type="text"
+              name="first_name"
+              value={form.first_name}
+              onChange={handleChange}
+              placeholder="Ta"
+              required
+              autoComplete="given-name"
+              className="w-full rounded-xl bg-slate-100 px-4 py-3 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">
+              Last Name
+            </label>
+            <input
+              type="text"
+              name="last_name"
+              value={form.last_name}
+              onChange={handleChange}
+              placeholder="Tun"
+              required
+              autoComplete="family-name"
+              className="w-full rounded-xl bg-slate-100 px-4 py-3 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Password */}
-      <div className="mb-2">
-        <label className="block text-xs font-bold tracking-widest text-gray-700 dark:text-gray-300 mb-1.5 uppercase">
-          Password
-        </label>
-        <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••••••"
-            className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none focus:ring-2 focus:ring-teal-400 transition text-sm pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-          >
-            {showPassword ? <EyeOff size={16} /> : <Lock size={16} />}
-          </button>
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">
+            Email
+          </label>
+          <div className="relative">
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="example@gmail.com"
+              required
+              autoComplete="email"
+              className="w-full rounded-xl bg-slate-100 px-4 py-3 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
+            />
+            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+          </div>
         </div>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 text-center">
-          Min. 12 characters with symbolic entropy.
-        </p>
-      </div>
 
-      {/* Checkbox */}
-      <div className="flex items-start gap-3 mb-6 mt-4">
-        <input
-          type="checkbox"
-          checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-0.5 w-4 h-4 accent-primary"
-        />
-        <label className="text-sm text-gray-500 dark:text-gray-400">
-          I accept the{" "}
-          <span className="text-primary font-semibold">Security Protocols</span>{" "}
-          and{" "}
-          <span className="text-primary font-semibold">Data Governance</span>.
-        </label>
-      </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className="w-full rounded-xl bg-slate-100 px-4 py-3 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Lock size={16} />}
+            </button>
+          </div>
+          <p className="mt-1.5 text-center text-xs text-gray-400 dark:text-gray-500">
+            Use at least 8 characters for your password.
+          </p>
+        </div>
 
-      {/* Button */}
-      <button
-        disabled={!agreed}
-        className="w-full bg-teal-400 hover:bg-primary text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
-      >
-        Create Account <Rocket size={18} />
-      </button>
+        {errorMessage ? (
+          <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+            {errorMessage}
+          </p>
+        ) : null}
 
-      {/* Login */}
-      <p className="text-center text-sm mt-6 text-gray-500 dark:text-gray-400">
-        Already registered?{" "}
-        <Link
-          href="/login"
-          className="text-primary font-semibold hover:text-teal-600"
+        {successMessage ? (
+          <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
+            {successMessage}
+          </p>
+        ) : null}
+
+        <div className="mt-4 flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(event) => setAgreed(event.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-primary"
+          />
+          <label className="text-sm text-gray-500 dark:text-gray-400">
+            I accept the{" "}
+            <span className="font-semibold text-primary">Security Protocols</span> and{" "}
+            <span className="font-semibold text-primary">Data Governance</span>.
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          disabled={!agreed || pending}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 py-3.5 font-semibold text-white disabled:opacity-50"
         >
+          {pending ? "Creating Account..." : "Create Account"} <Rocket size={18} />
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        Already registered?{" "}
+        <Link href="/login" className="font-semibold text-primary hover:text-teal-600">
           Log in
         </Link>
       </p>

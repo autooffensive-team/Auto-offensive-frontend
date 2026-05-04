@@ -34,6 +34,16 @@ function isManualLogin(raw: string | string[] | undefined): boolean {
   return value === "1" || value.toLowerCase() === "true";
 }
 
+function getPrompt(raw: string | string[] | undefined): string | undefined {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed || undefined;
+}
+
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const requestHeaders = await headers();
 
@@ -49,6 +59,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const callbackURL = getCallbackUrl(params?.callbackUrl);
   const errorText = getErrorText(params?.error);
   const manualLogin = isManualLogin(params?.manual);
+  const prompt = getPrompt(params?.prompt);
   const shouldAutoStartLogin = !manualLogin && !errorText;
 
   return (
@@ -76,7 +87,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         ) : null}
 
         <div className="mt-6">
-          <KeycloakLoginButton callbackURL={callbackURL} autoStart={shouldAutoStartLogin} />
+          <KeycloakLoginButton
+            callbackURL={callbackURL}
+            autoStart={shouldAutoStartLogin}
+            prompt={prompt}
+          />
         </div>
 
         <p className="mt-6 text-sm text-slate-600">

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { easeOut } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
+
 export default function Hero() {
   const t = useTranslations("resourcePage")
 
@@ -90,7 +91,7 @@ export default function Hero() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="order-2 text-center md:order-1 md:text-left"
+            className="order-2 text-center md:order-1 md:text-left "
           >
             <motion.span
               variants={itemVariants}
@@ -100,9 +101,9 @@ export default function Hero() {
             </motion.span>
             <motion.h1
               variants={itemVariants}
-              className="display-font text-4xl md:text-5xl font-bold text-foreground mb-3 leading-tight text-balance"
+              className="display-font text-4xl md:text-5xl font-display font-bold text-foreground mb-3 leading-tight text-balance"
             >
-              {t('hero.titleLine1')} <span className='text-primary'>{t('hero.titleLine2')}</span>
+              {t('hero.titleLine1')} <span className='text-primary font-display'>{t('hero.titleLine2')}</span>
             </motion.h1>
             <motion.p
               variants={itemVariants}

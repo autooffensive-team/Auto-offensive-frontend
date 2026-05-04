@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   const messages = await getMessages();
   return (
-    <html lang={locale} suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, notoKhmer.variable, "font-sans", geist.variable)}
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, notoKhmer.variable, "font-sans", geist.variable)}
     >
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>

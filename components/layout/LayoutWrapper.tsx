@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -23,6 +24,15 @@ export default function LayoutWrapper({
     pathname.startsWith("/vulnerabilities");
 
   const hideHeaderFooter = isAuthPage || isDashboardPage || isAppPage;
+
+  const previousPathname = React.useRef(pathname);
+
+  React.useEffect(() => {
+    if (previousPathname.current !== pathname) {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      previousPathname.current = pathname;
+    }
+  }, [pathname]);
 
   return (
     <>
