@@ -21,6 +21,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { useLocale } from "next-intl";
+import DocsFooterNav from "@/components/pages/resources/docs-footer-nav";
 
 const TOC_LINKS = [
   { href: "#installation", label: "Installation & Setup" },
@@ -1073,6 +1074,14 @@ export default function Content() {
           </Callout>
         </section>
 
+        <DocsFooterNav
+          previous={{ href: "/resource/ci-cd", label: "CI/CD Integration" }}
+          next={{ href: "/resource/tool", label: "Tool Reference" }}
+          previousText={isKhmer ? "មុន" : "Previous"}
+          nextText={isKhmer ? "បន្ទាប់" : "Next"}
+        />
+
+        {false && <>
         {/* Prev / Next */}
           <div className="flex justify-between gap-4 pt-9 mt-10 border-t border-[#E2DDD5] dark:border-white/10 max-[640px]:flex-col">
           <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-[#E2DDD5] dark:border-white/10 max-w-57.5 flex-1 bg-white dark:bg-[#121214] hover:border-[#CEC9BF] hover:bg-[#F0EDE6] dark:hover:bg-white/5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-150 cursor-pointer">
@@ -1090,6 +1099,7 @@ export default function Content() {
             <svg className="w-3.75 h-3.75 stroke-[#88837B] fill-none shrink-0" viewBox="0 0 24 24" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
           </div>
         </div>
+        </>}
       </main>
 
       {/* Right TOC */}

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
+import DocsFooterNav from "@/components/pages/resources/docs-footer-nav";
 import {
   AlertTriangle,
   ClipboardList,
@@ -381,31 +382,12 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
       {/* ─── Error Reference ─── */}
       <ErrorReference isDark={isDark} textColor={textColor} secondaryText={secondaryText} mutedText={mutedText} borderColor={borderColor} />
 
-      {/* Navigation */}
-      <div className={`mt-16 pt-8 border-t ${borderColor} flex justify-between gap-4`}>
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColor} flex-1 max-w-xs cursor-pointer ${hoverBg} transition-all`}
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          <div>
-            <div className={`${bodyTextClass} ${mutedText}`}>{copy.previous}</div>
-            <div className={`font-semibold ${textColor}`}>CLI</div>
-          </div>
-        </div>
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColor} flex-1 max-w-xs cursor-pointer ${hoverBg} transition-all ml-auto`}
-        >
-          <div className="text-right">
-            <div className={`${bodyTextClass} ${mutedText}`}>{copy.next}</div>
-            <div className={`font-semibold ${textColor}`}>{copy.reportGeneration}</div>
-          </div>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
+      <DocsFooterNav
+        previous={{ href: "/resource/cli", label: "CLI" }}
+        next={{ href: "/resource/api", label: "API Reference" }}
+        previousText={copy.previous}
+        nextText={copy.next}
+      />
     </main>
   );
 };

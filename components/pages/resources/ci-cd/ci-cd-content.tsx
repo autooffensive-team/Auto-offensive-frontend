@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useLocale } from "next-intl";
+import DocsFooterNav from "@/components/pages/resources/docs-footer-nav";
 
 const sansFontStyle = {
   fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
@@ -862,6 +863,13 @@ jobs:
           ))}
         </div>
       </section>
+
+      <DocsFooterNav
+        previous={{ href: "/resource/api", label: "API Reference" }}
+        next={{ href: "/resource/cli", label: "CLI" }}
+        previousText={isKhmer ? "មុន" : "Previous"}
+        nextText={isKhmer ? "បន្ទាប់" : "Next"}
+      />
     </article>
   );
 }
