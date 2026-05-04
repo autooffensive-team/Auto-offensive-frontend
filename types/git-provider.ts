@@ -1,5 +1,17 @@
 export type GitProvider = "github" | "gitlab";
 
+export type ProviderAccount = {
+  id?: string;
+  user_id?: string;
+  provider_type?: string;
+  provider_account_id?: string;
+  provider_username?: string;
+  provider_email?: string;
+  status?: string;
+  connected_at?: string;
+  updated_at?: string;
+};
+
 export type ProviderRepository = {
   provider?: GitProvider;
   repository_id?: string;
@@ -9,6 +21,10 @@ export type ProviderRepository = {
   default_branch?: string;
   web_url?: string;
   description?: string | null;
+  provider_username?: string;
+  updated_at?: string;
+  clone_url?: string;
+  ssh_url?: string;
 };
 
 export type ProviderRepositoryBranch = {
@@ -23,11 +39,23 @@ export type ProviderRepositoriesResponse = {
   message?: string;
 };
 
+export type ProviderAccountsResponse = {
+  provider?: GitProvider;
+  accounts?: ProviderAccount[];
+  message?: string;
+};
+
 export type ProviderRepositoryBranchesResponse = {
   provider?: GitProvider;
   full_name?: string;
   default_branch?: string;
   branches?: ProviderRepositoryBranch[];
+  message?: string;
+};
+
+export type ProviderConnectUrlResponse = {
+  provider?: GitProvider;
+  connect_url?: string;
   message?: string;
 };
 

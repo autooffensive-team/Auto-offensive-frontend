@@ -30,6 +30,21 @@ export type ScanStatusResponse = {
   phases: ScanPhaseResponse[];
 };
 
+export type ScanDetailResponse = {
+  scan_id: string;
+  project_key: string;
+  sonar_project_key: string;
+  repo_url: string;
+  branch: string;
+  status: ScanStatus;
+  progress: number;
+  created_at: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  error_message: string;
+  phases: ScanPhaseResponse[];
+};
+
 export type ScanLogChunkResponse = {
   scan_id: string;
   phase: string;

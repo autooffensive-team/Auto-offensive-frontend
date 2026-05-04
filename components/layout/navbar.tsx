@@ -653,7 +653,7 @@ export function Header() {
 
         {/* Bottom CTA */}
         <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.07] dark:border-white/6">
-          {isSessionPending ? (
+          {session?.session.token ? (
             <div
               aria-hidden="true"
               className="h-10 w-full rounded-md border border-black/8 bg-black/[0.04] dark:border-white/[0.08] dark:bg-white/[0.06]"
