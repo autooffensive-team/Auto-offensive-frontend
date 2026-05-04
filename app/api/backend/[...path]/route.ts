@@ -7,8 +7,9 @@ export const dynamic = "force-dynamic";
 
 const gatewayBaseUrl =
   readOptionalEnv("BACKEND_URL", "") || readRequiredEnv("FASTAPI_GATEWAY_URL");
-const publicProxyPaths = new Set(["users"]);
+const publicProxyPaths = new Set(["users", "tools", "categories"]);
 const blockedRequestHeaders = new Set([
+  "accept-encoding",
   "authorization",
   "connection",
   "cookie",
