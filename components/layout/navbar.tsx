@@ -18,6 +18,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import {
   SunIcon,
@@ -50,20 +51,20 @@ type ResourceItem = {
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '#', icon: '/icons/subfinder.webp'    },
-  { title: 'Naabu',        href: '#', icon: '/icons/nabuu.webp'        },
-  { title: 'Nmap',         href: '#', icon: '/icons/nmap.webp'         },
-  { title: 'Nuclei',       href: '#', icon: '/icons/nuclei.webp'       },
-  { title: 'URL Fuzzer',   href: '#', icon: '/icons/url.webp'          },
-  { title: 'WPScan',       href: '#', icon: '/icons/wpscan.webp'       },
-  { title: 'SQLi',         href: '#', icon: '/icons/sqli.webp'         },
-  { title: 'XSS Strike',   href: '#', icon: '/icons/xss.webp'          },
-  { title: 'Kiterunner',   href: '#', icon: '/icons/kiterunner.webp'   },
-  { title: 'Httpx',        href: '#', icon: '/icons/httpx.webp'        },
-  { title: 'Katana',       href: '#', icon: '/icons/katana.webp'       },
-  { title: 'Gobuster',     href: '#', icon: '/icons/gobuster.webp'     },
-  { title: 'Amass',        href: '#', icon: '/icons/amass.webp'        },
-  { title: 'Assetfinder',  href: '#', icon: '/icons/assetfinder.webp'  },
+  { title: 'Subfinder',    href: '/tools', icon: '/icons/subfinder.webp'    },
+  { title: 'Naabu',        href: '/tools', icon: '/icons/nabuu.webp'        },
+  { title: 'Nmap',         href: '/tools', icon: '/icons/nmap.webp'         },
+  { title: 'Nuclei',       href: '/tools', icon: '/icons/nuclei.webp'       },
+  { title: 'URL Fuzzer',   href: '/tools', icon: '/icons/url.webp'          },
+  { title: 'WPScan',       href: '/tools', icon: '/icons/wpscan.webp'       },
+  { title: 'SQLi',         href: '/tools', icon: '/icons/sqli.webp'         },
+  { title: 'XSS Strike',   href: '/tools', icon: '/icons/xss.webp'          },
+  { title: 'Kiterunner',   href: '/tools', icon: '/icons/kiterunner.webp'   },
+  { title: 'Httpx',        href: '/tools', icon: '/icons/httpx.webp'        },
+  { title: 'Katana',       href: '/tools', icon: '/icons/katana.webp'       },
+  { title: 'Gobuster',     href: '/tools', icon: '/icons/gobuster.webp'     },
+  { title: 'Amass',        href: '/tools', icon: '/icons/amass.webp'        },
+  { title: 'Assetfinder',  href: '/tools', icon: '/icons/assetfinder.webp'  },
 ];
 
 const navbarToolLinks = toolLinks.filter(({ title }) =>
@@ -337,6 +338,23 @@ function ResourceMiscItem({
 }
 
 // ── Scroll hook ───────────────────────────────────────────────────────────────
+function DesktopNavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <NavigationMenuLink asChild>
+      <Link
+        href={href}
+        scroll
+        className={cn(
+          navigationMenuTriggerStyle(),
+          'bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-active:bg-transparent data-active:text-primary text-foreground font-semibold'
+        )}
+      >
+        {label}
+      </Link>
+    </NavigationMenuLink>
+  );
+}
+
 function useScroll(threshold: number) {
   const [scrolled, setScrolled] = React.useState(false);
   const onScroll = React.useCallback(() => {
@@ -410,7 +428,7 @@ export function Header() {
   const authAction = isSessionPending ? (
     <div
       aria-hidden="true"
-      className="h-9 w-9 rounded-full border border-black/8 bg-black/[0.04] dark:border-white/[0.08] dark:bg-white/[0.06]"
+      className="h-9 w-9 rounded-full border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
     />
   ) : session ? (
     <AuthorizedUserIndicator />
@@ -445,9 +463,13 @@ export function Header() {
             <NavigationMenuList>
 
               {/* ── Tools ── */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                  <Link href="/tools">{t('tools')}</Link>
+              <NavigationMenuItem className="flex items-center">
+                <DesktopNavLink href="/tools" label={t('tools')} />
+                <NavigationMenuTrigger
+                  aria-label={`${t('tools')} menu`}
+                  className="h-9 rounded-md bg-transparent px-2 hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground"
+                >
+                  <span className="sr-only">{t('tools')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className={cn(dropdownPanelCls, 'w-84')}>
@@ -474,9 +496,13 @@ export function Header() {
               </NavigationMenuItem>
 
               {/* ── Features ── */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                  <Link href="/feature">{t('features')}</Link>
+              <NavigationMenuItem className="flex items-center">
+                <DesktopNavLink href="/feature" label={t('features')} />
+                <NavigationMenuTrigger
+                  aria-label={`${t('features')} menu`}
+                  className="h-9 rounded-md bg-transparent px-2 hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground"
+                >
+                  <span className="sr-only">{t('features')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className={cn(dropdownPanelCls, 'w-90')}>
@@ -492,9 +518,13 @@ export function Header() {
               </NavigationMenuItem>
 
               {/* ── Resources ── */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground font-semibold">
-                  <Link href="/resource">{t('resources')}</Link>
+              <NavigationMenuItem className="flex items-center">
+                <DesktopNavLink href="/resource" label={t('resources')} />
+                <NavigationMenuTrigger
+                  aria-label={`${t('resources')} menu`}
+                  className="h-9 rounded-md bg-transparent px-2 hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=open]:bg-transparent data-[state=open]:text-primary text-foreground"
+                >
+                  <span className="sr-only">{t('resources')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className={cn(dropdownPanelCls, 'w-95')}>
@@ -626,7 +656,7 @@ export function Header() {
           {isSessionPending ? (
             <div
               aria-hidden="true"
-              className="h-10 w-full rounded-md border border-black/8 bg-black/[0.04] dark:border-white/[0.08] dark:bg-white/[0.06]"
+              className="h-10 w-full rounded-md border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
             />
           ) : session ? (
             <div className="flex justify-center">
