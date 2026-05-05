@@ -19,13 +19,17 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import {
   useGetProviderAccountsQuery,
   useGetProviderRepositoriesQuery,
   useGetProviderRepositoryBranchesQuery,
   useLazyGetProviderConnectUrlQuery,
 } from "@/lib/redux/services/userdashboard/git/git-api";
-import { useTriggerScanMutation } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import {
+  useListCurrentUserScanIdsQuery,
+  useTriggerScanMutation,
+} from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import type {
   GitProvider,
   ProviderAccount,
@@ -179,6 +183,9 @@ export default function CodeScanningNewPageClient() {
   const gitlabAccountsQuery = useGetProviderAccountsQuery("gitlab");
   const githubRepositoriesQuery = useGetProviderRepositoriesQuery("github");
   const gitlabRepositoriesQuery = useGetProviderRepositoriesQuery("gitlab");
+  const currentScanRefsQuery = useListCurrentUserScanIdsQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+  });
   const [triggerScan, { isLoading: isCreating }] = useTriggerScanMutation();
   const [triggerConnectUrl] = useLazyGetProviderConnectUrlQuery();
 
@@ -251,6 +258,14 @@ export default function CodeScanningNewPageClient() {
     asText(branchesQuery.data?.default_branch).trim() ||
     asText(selectedRepository?.default_branch).trim();
   const selectedBranchValue = branch || resolvedDefaultBranch || "";
+  const normalizedProjectKey = normalizeProjectKey(projectKey);
+  const existingProject = useMemo(
+    () =>
+      (currentScanRefsQuery.data?.tasks ?? []).find(
+        (task) => task.project_key === normalizedProjectKey,
+      ) ?? null,
+    [currentScanRefsQuery.data?.tasks, normalizedProjectKey],
+  );
 
   const providerError =
     connectErrors[selectedProvider] ||
@@ -321,6 +336,10 @@ export default function CodeScanningNewPageClient() {
       setSubmitError("Project key is required.");
       return;
     }
+    if (existingProject) {
+      setSubmitError("This SonarQube project already exists. Open the existing project instead of starting another scan.");
+      return;
+    }
     if (!selectedRepository) {
       setSubmitError("Choose a repository from a connected provider.");
       return;
@@ -333,7 +352,7 @@ export default function CodeScanningNewPageClient() {
     setSubmitError(null);
 
     try {
-      const payload = await triggerScan({
+      await triggerScan({
         project_key: trimmedProjectKey,
         branch: selectedBranchValue.trim() || null,
         repo_url: repositoryScanUrl,
@@ -341,11 +360,10 @@ export default function CodeScanningNewPageClient() {
 
       const params = new URLSearchParams({
         started: trimmedProjectKey,
-        scan_id: payload.scan_id,
       });
       router.push(`/userdashboard/code-scanning?${params.toString()}`);
     } catch (error) {
-      setSubmitError(readErrorMessage(error, "Failed to trigger code scan."));
+      setSubmitError(readErrorMessage(error, "Failed to create scanner project."));
     }
   }
 
@@ -364,10 +382,10 @@ export default function CodeScanningNewPageClient() {
             </span>
           </div>
           <h1 className="text-[28px] font-bold leading-tight text-gray-900 dark:text-white">
-            New Code Scanning Run
+            New Code Scanning Project
           </h1>
           <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-            Connect a provider, choose a repository, pick a branch, and trigger a scan.
+            Connect a provider, choose a repository, and create a scanner project once.
           </p>
         </div>
 
@@ -640,11 +658,36 @@ export default function CodeScanningNewPageClient() {
                     <div className="flex items-start justify-between gap-3">
                       <span>Project key</span>
                       <span className="max-w-[220px] break-all text-right font-medium text-gray-900 dark:text-white">
-                        {normalizeProjectKey(projectKey) || "Not set"}
+                        {normalizedProjectKey || "Not set"}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span>Project status</span>
+                      <span
+                        className={`text-right font-medium ${
+                          existingProject
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-gray-900 dark:text-white"
+                        }`}
+                      >
+                        {currentScanRefsQuery.isFetching
+                          ? "Checking..."
+                          : existingProject
+                            ? "Already created"
+                            : "Ready to create"}
                       </span>
                     </div>
                   </div>
                 </div>
+
+                {existingProject ? (
+                  <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-[13px] text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+                    <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                    <span>
+                      This SonarQube project already exists, so another scan cannot be started from this setup flow.
+                    </span>
+                  </div>
+                ) : null}
 
                 {submitError ? (
                   <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-[13px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
@@ -653,19 +696,29 @@ export default function CodeScanningNewPageClient() {
                   </div>
                 ) : null}
 
-                <button
-                  type="button"
-                  onClick={handleCreate}
-                  disabled={isCreating}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-60"
-                >
-                  {isCreating ? (
-                    <LoaderCircle size={15} className="animate-spin" />
-                  ) : (
-                    <Plus size={15} />
-                  )}
-                  {isCreating ? "Triggering scan..." : "Trigger scan"}
-                </button>
+                {existingProject ? (
+                  <Link
+                    href={buildCodeScanningProjectHref(existingProject.project_key)}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-teal-500 bg-teal-50 px-4 py-2.5 text-[14px] font-semibold text-teal-700 transition-colors hover:bg-teal-100 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-300 dark:hover:bg-teal-500/15"
+                  >
+                    <ShieldCheck size={15} />
+                    Open existing project
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleCreate}
+                    disabled={isCreating || currentScanRefsQuery.isFetching}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-500 px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-60"
+                  >
+                    {isCreating ? (
+                      <LoaderCircle size={15} className="animate-spin" />
+                    ) : (
+                      <Plus size={15} />
+                    )}
+                    {isCreating ? "Creating project..." : "Create scanner project"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
