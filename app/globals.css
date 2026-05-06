@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
+@import "@xterm/xterm/css/xterm.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -123,14 +124,6 @@
   --text-200: #e4e4e7;
   --text-300: #a1a1aa;
   --text-400: #71717a;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark Mode */
-    --card: #161616;
-    --border: #27272a;
-  }
 }
 
 /* --- Global Base Styles --- */

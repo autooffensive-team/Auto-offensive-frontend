@@ -1,14 +1,16 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useRef, useState } from "react";
 import { useLocale } from "next-intl";
+import DocsFooterNav from "@/components/pages/resources/docs-footer-nav";
 
 const sansFontStyle = {
-  fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+  fontFamily: "var(--docs-sans-font), sans-serif",
 } as const;
 
 const monoFontStyle = {
-  fontFamily: "var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace",
+  fontFamily: "var(--docs-mono-font), monospace",
 } as const;
 
 function InlineCode({ children }: { children: React.ReactNode }) {
@@ -124,7 +126,7 @@ function CodeBlock({
           <div className="w-2.25 h-2.25 rounded-full bg-[#FFBD2E]" />
           <div className="w-2.25 h-2.25 rounded-full bg-[#28CA41]" />
         </div>
-        <span className="font-mono text-[11px] text-white/25 tracking-[0.05em]" style={monoFontStyle}>
+        <span className="font-mono text-[11px] text-white/25 tracking-wider" style={monoFontStyle}>
           {title}
         </span>
         <button
@@ -253,13 +255,19 @@ function getWorkflowSteps(isKhmer: boolean) {
 export default function CICDContent() {
   const locale = useLocale();
   const isKhmer = locale === "kh";
+  const pageFontVars = {
+    "--docs-sans-font": isKhmer
+      ? "var(--font-noto-khmer), var(--font-google-sans)"
+      : "var(--font-google-sans), var(--font-noto-khmer)",
+    "--docs-mono-font": isKhmer
+      ? "var(--font-jetbrains-mono), var(--font-noto-khmer), var(--font-google-sans)"
+      : "var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer)",
+  } as CSSProperties;
   const capabilityCards = getCapabilityCards(isKhmer);
   const workflowSteps = getWorkflowSteps(isKhmer);
   const copy = isKhmer
     ? {
-        breadcrumbDocs: "ឯកសារ",
-        breadcrumbResources: "ធនធាន",
-        breadcrumbCurrent: "Integration CI/CD",
+        breadcrumbCurrent: "CI/CD Integration",
         guideVersion: "Integration Guide · v1.0",
         pageTitle: "CI/CD Integration",
         intro:
@@ -317,9 +325,7 @@ export default function CICDContent() {
         ],
       }
     : {
-        breadcrumbDocs: "Docs",
-        breadcrumbResources: "Resources",
-        breadcrumbCurrent: "Integration CI/CD",
+        breadcrumbCurrent: "CI/CD Integration",
         guideVersion: "Integration Guide · v1.0",
         pageTitle: "CI/CD Integration",
         intro:
@@ -379,21 +385,10 @@ export default function CICDContent() {
   return (
     <article
       className="w-full min-w-0 px-12 xl:px-14 pt-12 pb-32 max-[960px]:px-8 max-[640px]:px-5"
-      style={sansFontStyle}
+      lang={isKhmer ? "km" : "en"}
+      style={{ ...sansFontStyle, ...pageFontVars }}
     >
       <div className="mb-10">
-        <div className="flex items-center gap-1.5 text-base md:text-[18px] lg:text-[20px] text-[#88837B] dark:text-[#A1A1AA] mb-4.5">
-          <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">
-            {copy.breadcrumbDocs}
-          </a>
-          <span>/</span>
-          <a href="#" className="hover:text-[#1A1714] dark:hover:text-white transition-colors duration-150">
-            {copy.breadcrumbResources}
-          </a>
-          <span>/</span>
-          <span>{copy.breadcrumbCurrent}</span>
-        </div>
-
         <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-[#00BCA1] bg-[rgba(0,188,161,0.07)] border border-[rgba(0,188,161,0.2)] px-2.5 py-0.75 rounded-full mb-3.5">
           <span className="w-1.25 h-1.25 rounded-full bg-[#00BCA1] animate-pulse" />
           {copy.guideVersion}
@@ -862,6 +857,13 @@ jobs:
           ))}
         </div>
       </section>
+
+      <DocsFooterNav
+        previous={{ href: "/resource/tool", label: "Tool Reference" }}
+        next={{ href: "/resource/cli", label: "CLI" }}
+        previousText={isKhmer ? "មុន" : "Previous"}
+        nextText={isKhmer ? "បន្ទាប់" : "Next"}
+      />
     </article>
   );
 }

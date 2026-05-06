@@ -160,7 +160,7 @@ export default function RegisterForm() {
       <p className="text-center text-sm mt-6 text-gray-500">
         Already registered?{" "}
         <Link
-          href="/auth/login"
+          href="/login"
           className="text-teal-500 font-semibold hover:text-teal-600 transition"
         >
           Log in

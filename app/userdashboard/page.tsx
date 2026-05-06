@@ -184,11 +184,25 @@ const lastScans = [
   },
 ];
 
+function getDashboardDisplayName(
+  aliasName?: string,
+  username?: string,
+): string {
+  const trimmedAlias = aliasName?.trim() ?? "";
+  if (!trimmedAlias || trimmedAlias.toLowerCase() === "string") {
+    return username?.trim() || "there";
+  }
+  return trimmedAlias;
+}
+
 export default function UserDashboardPage() {
   const { data } = useGetAuthMeQuery();
   const totalFindings = vulnerabilityData.reduce((sum, item) => sum + item.count, 0);
   const highestSeverity = Math.max(...vulnerabilityData.map((item) => item.count));
-  const displayName = data?.user.alias_name.trim() || data?.user.username || "there";
+  const displayName = getDashboardDisplayName(
+    data?.user.alias_name,
+    data?.user.username,
+  );
 
   return (
     <div className="space-y-6">

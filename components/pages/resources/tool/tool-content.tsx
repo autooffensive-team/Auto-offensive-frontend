@@ -2,10 +2,19 @@
 
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
+import DocsFooterNav from "@/components/pages/resources/docs-footer-nav";
 import {
+  AlertTriangle,
+  ClipboardList,
+  FileJson,
+  FileText,
+  Globe,
+  Lock,
+  Settings,
   Wrench,
   Shield,
   CheckCircle,
+  Siren,
 } from 'lucide-react';
 
 interface ToolContentProps {
@@ -32,9 +41,20 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
-  const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+  const sansFontStyle = {
+    fontFamily: 'var(--docs-sans-font), sans-serif',
   } as const;
+  const monoFontStyle = {
+    fontFamily: 'var(--docs-mono-font), monospace',
+  } as const;
+  const pageFontVars = {
+    '--docs-sans-font': isKhmer
+      ? 'var(--font-noto-khmer), var(--font-google-sans)'
+      : 'var(--font-google-sans), var(--font-noto-khmer)',
+    '--docs-mono-font': isKhmer
+      ? 'var(--font-jetbrains-mono), var(--font-noto-khmer), var(--font-google-sans)'
+      : 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer)',
+  } as React.CSSProperties;
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -52,6 +72,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   const copy = isKhmer
     ? {
         docs: 'ឯកសារ',
+        resources: 'ធនធាន',
         toolReference: 'ឯកសារ Tool',
         toolOverview: 'ទិដ្ឋភាពទូទៅនៃ Tool',
         versionBadge: 'Tool Reference · v2.0',
@@ -78,6 +99,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
       }
     : {
         docs: 'Docs',
+        resources: 'Resources',
         toolReference: 'Tool Reference',
         toolOverview: 'Tool Overview',
         versionBadge: 'Tool Reference · v2.0',
@@ -106,21 +128,11 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
   return (
     <main
       className={`${bgColor} flex-1 min-w-0 px-8 md:px-10 xl:px-12 pt-12 pb-32`}
+      lang={isKhmer ? 'km' : 'en'}
+      style={{ ...sansFontStyle, ...pageFontVars }}
     >
       {/* Page Header */}
       <div className="mb-12">
-        <div className={`flex items-center gap-2 ${bodyTextClass} mb-4 ${mutedText}`}>
-          <a href="#" className="hover:opacity-75">{copy.docs}</a>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-          <a href="#" className="hover:opacity-75">{copy.toolReference}</a>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-          <span>{copy.toolOverview}</span>
-        </div>
-
         <div
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase mb-4 ${
             isDark
@@ -267,7 +279,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
             isDark ? 'bg-white/5' : 'bg-[rgba(0,188,161,0.07)]'
           }`}
         >
-          <div className="text-xl shrink-0">🔒</div>
+          <Lock size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-[#00BCA1] mb-2`}>
               {copy.remoteTitle}
@@ -351,16 +363,16 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
 
         <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
           {[
-            { icon: '📄', title: 'Plain text (default)', desc: isKhmer ? 'លទ្ធផលមួយបន្ទាត់មួយ ត្រូវបាន stream ទៅ stdout និងរក្សាទុកជា .txt។ អាចអានបានងាយ ហើយបញ្ជូនបន្តទៅ tools ផ្សេង ឬ grep។' : 'One result per line, streamed to stdout and saved as .txt. Human-readable, easy to pipe into other tools or grep.' },
-            { icon: '🗂️', title: 'JSON / JSONL', desc: isKhmer ? 'Structured output ដែលមាន JSON object មួយក្នុងមួយបន្ទាត់ (JSONL)។ រួមមាន metadata fields ទាំងអស់ក្នុងមួយ result។' : 'Structured output with one JSON object per line (JSONL). Includes all metadata fields per result — use -json or -oJ flags depending on the tool.' },
-            { icon: '🌐', title: 'Web UI structured view', desc: isKhmer ? 'លទ្ធផលទាំងអស់ត្រូវបាន parse និងរក្សាទុកដោយស្វ័យប្រវត្តិទៅ structured data model របស់ platform។ អាច view, filter និង sort ពី dashboard។' : 'All results are automatically parsed and stored in the platform\'s structured data model, regardless of raw output format. View, filter, and sort results from the dashboard.' },
-            { icon: '📋', title: 'Report export', desc: isKhmer ? 'លទ្ធផលពី tool ណាមួយអាចបញ្ចូលក្នុង generated reports បាន ដូចជា PDF, DOCX, Excel និង JSON តាម Reporting module។' : 'Results from any tool can be included in generated reports — PDF, DOCX, Excel, and JSON formats available via the Reporting module.' },
+            { icon: <FileText size={22} />, title: 'Plain text (default)', desc: isKhmer ? 'លទ្ធផលមួយបន្ទាត់មួយ ត្រូវបាន stream ទៅ stdout និងរក្សាទុកជា .txt។ អាចអានបានងាយ ហើយបញ្ជូនបន្តទៅ tools ផ្សេង ឬ grep។' : 'One result per line, streamed to stdout and saved as .txt. Human-readable, easy to pipe into other tools or grep.' },
+            { icon: <FileJson size={22} />, title: 'JSON / JSONL', desc: isKhmer ? 'Structured output ដែលមាន JSON object មួយក្នុងមួយបន្ទាត់ (JSONL)។ រួមមាន metadata fields ទាំងអស់ក្នុងមួយ result។' : 'Structured output with one JSON object per line (JSONL). Includes all metadata fields per result — use -json or -oJ flags depending on the tool.' },
+            { icon: <Globe size={22} />, title: 'Web UI structured view', desc: isKhmer ? 'លទ្ធផលទាំងអស់ត្រូវបាន parse និងរក្សាទុកដោយស្វ័យប្រវត្តិទៅ structured data model របស់ platform។ អាច view, filter និង sort ពី dashboard។' : 'All results are automatically parsed and stored in the platform\'s structured data model, regardless of raw output format. View, filter, and sort results from the dashboard.' },
+            { icon: <ClipboardList size={22} />, title: 'Report export', desc: isKhmer ? 'លទ្ធផលពី tool ណាមួយអាចបញ្ចូលក្នុង generated reports បាន ដូចជា PDF, DOCX, Excel និង JSON តាម Reporting module។' : 'Results from any tool can be included in generated reports — PDF, DOCX, Excel, and JSON formats available via the Reporting module.' },
           ].map((item, idx) => (
             <div
               key={idx}
               className={`flex gap-4 p-4 border-b ${borderColor} last:border-b-0 ${hoverBg} transition-colors`}
             >
-              <div className="text-2xl shrink-0">{item.icon}</div>
+              <div className="text-2xl shrink-0 text-[#88837B] dark:text-[#A1A1AA]">{item.icon}</div>
               <div className="flex-1">
                 <div className={`font-semibold ${textColor} mb-1`}>{item.title}</div>
                 <p className={`${bodyTextClass} ${secondaryText}`}>{item.desc}</p>
@@ -373,31 +385,12 @@ export const ToolContent: React.FC<ToolContentProps> = ({ isDark = false }) => {
       {/* ─── Error Reference ─── */}
       <ErrorReference isDark={isDark} textColor={textColor} secondaryText={secondaryText} mutedText={mutedText} borderColor={borderColor} />
 
-      {/* Navigation */}
-      <div className={`mt-16 pt-8 border-t ${borderColor} flex justify-between gap-4`}>
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColor} flex-1 max-w-xs cursor-pointer ${hoverBg} transition-all`}
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          <div>
-            <div className={`${bodyTextClass} ${mutedText}`}>{copy.previous}</div>
-            <div className={`font-semibold ${textColor}`}>CLI</div>
-          </div>
-        </div>
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColor} flex-1 max-w-xs cursor-pointer ${hoverBg} transition-all ml-auto`}
-        >
-          <div className="text-right">
-            <div className={`${bodyTextClass} ${mutedText}`}>{copy.next}</div>
-            <div className={`font-semibold ${textColor}`}>{copy.reportGeneration}</div>
-          </div>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
+      <DocsFooterNav
+        previous={{ href: "/resource/api", label: "API Reference" }}
+        next={{ href: "/resource/ci-cd", label: "CI/CD Integration" }}
+        previousText={copy.previous}
+        nextText={copy.next}
+      />
     </main>
   );
 };
@@ -420,7 +413,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+    fontFamily: 'var(--docs-mono-font), monospace',
   } as const;
   const labels = isKhmer
     ? {
@@ -556,7 +549,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
       <div className={`border ${borderColor} rounded-lg overflow-hidden mb-8`}>
         <div className={`${isDark ? 'bg-white/5' : 'bg-[#F0EDE6]'} px-6 py-3 border-b ${borderColor}`}>
           <div className="font-bold text-sm tracking-widest uppercase text-[#00BCA1]">
-            ⚙️ {labels.supportedParameters}
+            <Settings size={14} className="inline-block align-[-2px]" /> {labels.supportedParameters}
           </div>
         </div>
 
@@ -636,7 +629,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
             isDark ? 'bg-white/5' : 'bg-[rgba(184,104,0,0.03)]'
           }`}
         >
-          <div className="text-xl shrink-0">⚠️</div>
+          <AlertTriangle size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-yellow-600 mb-2`}>
               {labels.passiveOnly}
@@ -654,7 +647,7 @@ const ToolSection: React.FC<ToolSectionProps> = ({ toolName, isDark, onCopy, cop
             isDark ? 'bg-white/5' : 'bg-[rgba(196,40,40,0.03)]'
           }`}
         >
-          <div className="text-xl shrink-0">🚨</div>
+          <Siren size={20} className="shrink-0" />
           <div>
             <div className={`font-semibold text-xs uppercase tracking-wide text-red-600 mb-2`}>
               {labels.cidrTitle}
@@ -681,7 +674,7 @@ const ErrorReference: React.FC<{
   const bodyTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const monoFontStyle = {
-    fontFamily: 'var(--font-jetbrains-mono), var(--font-google-sans), var(--font-noto-khmer), monospace',
+    fontFamily: 'var(--docs-mono-font), monospace',
   } as const;
   const copy = isKhmer
     ? {
