@@ -33,7 +33,11 @@ import {
   useListDependenciesQuery,
   useListIssuesQuery,
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
-import { buildCodeScanningIssueHref, buildCodeScanningProjectHref, isLikelyScanId } from "@/lib/scanner-route";
+import {
+  buildCodeScanningIssueHref,
+  buildCodeScanningProjectHref,
+  isLikelyScanId,
+} from "@/lib/scanner-route";
 import { cn } from "@/lib/utils";
 import type {
   DependencyResponse,
@@ -106,7 +110,11 @@ function readPayloadMessage(payload: unknown): string {
     return "";
   }
 
-  const source = payload as { detail?: unknown; message?: unknown; error?: unknown };
+  const source = payload as {
+    detail?: unknown;
+    message?: unknown;
+    error?: unknown;
+  };
   const detail = asText(source.detail).trim();
   if (detail) {
     return detail;
@@ -121,7 +129,10 @@ function readPayloadMessage(payload: unknown): string {
 }
 
 function readErrorMessage(error: unknown, fallback: string): string {
-  const queryError = error as FetchBaseQueryError | { message?: string } | undefined;
+  const queryError = error as
+    | FetchBaseQueryError
+    | { message?: string }
+    | undefined;
   if (!queryError) {
     return fallback;
   }
@@ -136,7 +147,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
     }
   }
 
-  const message = "message" in queryError ? asText(queryError.message).trim() : "";
+  const message =
+    "message" in queryError ? asText(queryError.message).trim() : "";
   return message || fallback;
 }
 
@@ -237,7 +249,11 @@ function getRepoPath(repoUrl: string): string {
   }
 }
 
-function getGrade(value: number, warningAt: number, dangerAt: number): { label: string; tone: GradeTone } {
+function getGrade(
+  value: number,
+  warningAt: number,
+  dangerAt: number,
+): { label: string; tone: GradeTone } {
   if (value <= warningAt) {
     return { label: "A", tone: "green" };
   }
@@ -294,7 +310,9 @@ function getStatusTone(status: string | null | undefined): string {
   }
 }
 
-function getQualityGateTone(status: QualityGateStatus | null | undefined): string {
+function getQualityGateTone(
+  status: QualityGateStatus | null | undefined,
+): string {
   switch (status) {
     case "OK":
       return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
@@ -307,7 +325,9 @@ function getQualityGateTone(status: QualityGateStatus | null | undefined): strin
   }
 }
 
-function getQualityGateLabel(status: QualityGateStatus | null | undefined): string {
+function getQualityGateLabel(
+  status: QualityGateStatus | null | undefined,
+): string {
   if (!status) {
     return "Unavailable";
   }
@@ -342,10 +362,14 @@ function GradeBadge({ grade }: { grade: { label: string; tone: GradeTone } }) {
     <span
       className={cn(
         "inline-flex size-8 items-center justify-center rounded-full text-sm font-bold",
-        grade.tone === "green" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-        grade.tone === "lime" && "bg-lime-100 text-lime-700 dark:bg-lime-500/15 dark:text-lime-300",
-        grade.tone === "red" && "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
-        grade.tone === "muted" && "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+        grade.tone === "green" &&
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+        grade.tone === "lime" &&
+          "bg-lime-100 text-lime-700 dark:bg-lime-500/15 dark:text-lime-300",
+        grade.tone === "red" &&
+          "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
+        grade.tone === "muted" &&
+          "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
       )}
     >
       {grade.label}
@@ -363,7 +387,12 @@ function EmptyPanel({ message }: { message: string }) {
 
 function StatusPill({ status }: { status: string | null | undefined }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getStatusTone(status))}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+        getStatusTone(status),
+      )}
+    >
       {formatStatusLabel(status)}
     </span>
   );
@@ -386,17 +415,27 @@ function TopStatCard({
     <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7da4] dark:text-gray-500">{label}</p>
-          <p className="mt-3 text-2xl font-bold text-[#071120] dark:text-white">{value}</p>
-          <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">{helper}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7da4] dark:text-gray-500">
+            {label}
+          </p>
+          <p className="mt-3 text-2xl font-bold text-[#071120] dark:text-white">
+            {value}
+          </p>
+          <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
+            {helper}
+          </p>
         </div>
         <div
           className={cn(
             "flex size-11 items-center justify-center rounded-xl",
-            accent === "teal" && "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
-            accent === "emerald" && "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-            accent === "amber" && "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
-            accent === "slate" && "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+            accent === "teal" &&
+              "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
+            accent === "emerald" &&
+              "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
+            accent === "amber" &&
+              "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
+            accent === "slate" &&
+              "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
           )}
         >
           <Icon className="size-5" />
@@ -416,8 +455,12 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
         tone === "neutral" && "border-gray-200 dark:border-gray-700",
       )}
     >
-      {tone === "ok" ? <span className="size-2.5 rounded-full bg-emerald-500" /> : null}
-      {tone === "neutral" ? <TimerReset className="size-4 text-gray-500 dark:text-gray-400" /> : null}
+      {tone === "ok" ? (
+        <span className="size-2.5 rounded-full bg-emerald-500" />
+      ) : null}
+      {tone === "neutral" ? (
+        <TimerReset className="size-4 text-gray-500 dark:text-gray-400" />
+      ) : null}
     </span>
   );
 }
@@ -443,13 +486,23 @@ function OverviewMetricCell({
     <div className={cn("p-5", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h3 className="text-sm font-bold text-[#17233f] dark:text-gray-100">{title}</h3>
+          <h3 className="text-sm font-bold text-[#17233f] dark:text-gray-100">
+            {title}
+          </h3>
           <div className="mt-4 flex flex-wrap items-baseline gap-1.5">
-            <span className="text-2xl font-bold leading-none text-[#21314f] dark:text-white">{value}</span>
-            {primaryDetail ? <span className="text-sm text-[#4f6290] dark:text-gray-400">{primaryDetail}</span> : null}
+            <span className="text-2xl font-bold leading-none text-[#21314f] dark:text-white">
+              {value}
+            </span>
+            {primaryDetail ? (
+              <span className="text-sm text-[#4f6290] dark:text-gray-400">
+                {primaryDetail}
+              </span>
+            ) : null}
           </div>
           {secondaryDetail ? (
-            <p className="mt-4 text-sm text-[#4f6290] dark:text-gray-400">{secondaryDetail}</p>
+            <p className="mt-4 text-sm text-[#4f6290] dark:text-gray-400">
+              {secondaryDetail}
+            </p>
           ) : null}
         </div>
         {grade ? <GradeBadge grade={grade} /> : null}
@@ -461,7 +514,9 @@ function OverviewMetricCell({
 
 function PhaseList({ phases }: { phases: ScanPhaseResponse[] }) {
   if (phases.length === 0) {
-    return <EmptyPanel message="No scan phases were returned for this analysis." />;
+    return (
+      <EmptyPanel message="No scan phases were returned for this analysis." />
+    );
   }
 
   return (
@@ -473,8 +528,12 @@ function PhaseList({ phases }: { phases: ScanPhaseResponse[] }) {
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-[#17233f] dark:text-gray-100">{formatStatusLabel(phase.key)}</p>
-              <p className="mt-1 text-xs text-[#6b7da4] dark:text-gray-500">Scanner phase</p>
+              <p className="text-sm font-semibold text-[#17233f] dark:text-gray-100">
+                {formatStatusLabel(phase.key)}
+              </p>
+              <p className="mt-1 text-xs text-[#6b7da4] dark:text-gray-500">
+                Scanner phase
+              </p>
             </div>
             <StatusPill status={phase.status} />
           </div>
@@ -483,7 +542,9 @@ function PhaseList({ phases }: { phases: ScanPhaseResponse[] }) {
               {phase.error_message}
             </p>
           ) : (
-            <p className="mt-3 text-sm text-[#52648f] dark:text-gray-400">No error reported for this phase.</p>
+            <p className="mt-3 text-sm text-[#52648f] dark:text-gray-400">
+              No error reported for this phase.
+            </p>
           )}
         </div>
       ))}
@@ -497,7 +558,9 @@ function DependencyLanguageList({
   dependencySummary: DependencySummaryResponse | null;
 }) {
   if (!dependencySummary?.by_language?.length) {
-    return <EmptyPanel message="Dependency language breakdown is not available for this analysis." />;
+    return (
+      <EmptyPanel message="Dependency language breakdown is not available for this analysis." />
+    );
   }
 
   return (
@@ -507,11 +570,21 @@ function DependencyLanguageList({
           key={row.language}
           className="grid gap-3 border-b border-[#e4eaf4] px-4 py-4 text-sm last:border-b-0 dark:border-gray-800 md:grid-cols-[minmax(0,1fr)_120px_120px_120px_120px]"
         >
-          <span className="font-semibold text-[#17233f] dark:text-gray-100">{row.language}</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.total_dependencies)} total</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.vulnerable_dependencies)} vulnerable</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.outdated_dependencies)} outdated</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.license_issues)} license issues</span>
+          <span className="font-semibold text-[#17233f] dark:text-gray-100">
+            {row.language}
+          </span>
+          <span className="text-[#52648f] dark:text-gray-400">
+            {formatCount(row.total_dependencies)} total
+          </span>
+          <span className="text-[#52648f] dark:text-gray-400">
+            {formatCount(row.vulnerable_dependencies)} vulnerable
+          </span>
+          <span className="text-[#52648f] dark:text-gray-400">
+            {formatCount(row.outdated_dependencies)} outdated
+          </span>
+          <span className="text-[#52648f] dark:text-gray-400">
+            {formatCount(row.license_issues)} license issues
+          </span>
         </div>
       ))}
     </div>
@@ -531,7 +604,9 @@ function FilterChips({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">
+        {label}
+      </p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const active = selected === option.value;
@@ -585,7 +660,8 @@ function IssueList({
   return (
     <div className="space-y-3">
       <div className="text-sm text-[#52648f] dark:text-gray-400">
-        Showing {issues.length} of {total} issue{total === 1 ? "" : "s"} from the scanner API.
+        Showing {issues.length} of {total} issue{total === 1 ? "" : "s"} from
+        the scanner API.
       </div>
 
       <div className="space-y-3">
@@ -600,7 +676,12 @@ function IssueList({
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getIssueSeverityTone(issue.severity))}>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-semibold",
+                      getIssueSeverityTone(issue.severity),
+                    )}
+                  >
                     {issue.severity}
                   </span>
                   <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
@@ -610,7 +691,9 @@ function IssueList({
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{issue.message}</h3>
+                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">
+                    {issue.message}
+                  </h3>
                   <p className="mt-1 font-mono text-xs text-[#52648f] dark:text-gray-400">
                     {issue.file_path}
                     {issue.line > 0 ? `:${issue.line}` : ""}
@@ -618,10 +701,17 @@ function IssueList({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
-                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{issue.rule_key}</span>
-                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{getCweTag(issue)}</span>
+                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">
+                    {issue.rule_key}
+                  </span>
+                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">
+                    {getCweTag(issue)}
+                  </span>
                   {issue.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">
+                    <span
+                      key={tag}
+                      className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -669,9 +759,16 @@ function DependencyFlag({
   );
 }
 
-function collectDependencyToolOptions(items: DependencyResponse[]): FilterOption[] {
-  const tools = Array.from(new Set(items.map((item) => item.tool).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-  return [{ label: "All checkers", value: "" }, ...tools.map((tool) => ({ label: formatLabel(tool), value: tool }))];
+function collectDependencyToolOptions(
+  items: DependencyResponse[],
+): FilterOption[] {
+  const tools = Array.from(
+    new Set(items.map((item) => item.tool).filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b));
+  return [
+    { label: "All checkers", value: "" },
+    ...tools.map((tool) => ({ label: formatLabel(tool), value: tool })),
+  ];
 }
 
 function DependencyList({
@@ -695,13 +792,16 @@ function DependencyList({
   }
 
   if (dependencies.length === 0) {
-    return <EmptyPanel message="No dependencies matched the current checker filters." />;
+    return (
+      <EmptyPanel message="No dependencies matched the current checker filters." />
+    );
   }
 
   return (
     <div className="space-y-3">
       <div className="text-sm text-[#52648f] dark:text-gray-400">
-        Showing {dependencies.length} of {total} dependenc{total === 1 ? "y" : "ies"} from dependency checkers.
+        Showing {dependencies.length} of {total} dependenc
+        {total === 1 ? "y" : "ies"} from dependency checkers.
       </div>
 
       <div className="space-y-3">
@@ -716,7 +816,12 @@ function DependencyList({
             <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
               <div className="min-w-0 space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getDependencySeverityTone(dependency.severity))}>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-semibold",
+                      getDependencySeverityTone(dependency.severity),
+                    )}
+                  >
                     {dependency.severity || "UNKNOWN"}
                   </span>
                   <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
@@ -743,13 +848,25 @@ function DependencyList({
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{dependency.package_name}</h3>
+                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">
+                    {dependency.package_name}
+                  </h3>
                   <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#52648f] dark:text-gray-400">
-                    <span>Installed: {dependency.installed_version || "Unknown"}</span>
-                    <span>Latest: {dependency.latest_version || "Unknown"}</span>
-                    {dependency.fixed_version ? <span>Fixed: {dependency.fixed_version}</span> : null}
-                    {dependency.license ? <span>License: {dependency.license}</span> : null}
-                    {dependency.ecosystem ? <span>Ecosystem: {dependency.ecosystem}</span> : null}
+                    <span>
+                      Installed: {dependency.installed_version || "Unknown"}
+                    </span>
+                    <span>
+                      Latest: {dependency.latest_version || "Unknown"}
+                    </span>
+                    {dependency.fixed_version ? (
+                      <span>Fixed: {dependency.fixed_version}</span>
+                    ) : null}
+                    {dependency.license ? (
+                      <span>License: {dependency.license}</span>
+                    ) : null}
+                    {dependency.ecosystem ? (
+                      <span>Ecosystem: {dependency.ecosystem}</span>
+                    ) : null}
                   </div>
                 </div>
 
@@ -762,7 +879,9 @@ function DependencyList({
                 </div>
 
                 {dependency.description ? (
-                  <p className="text-sm leading-6 text-[#4f6290] dark:text-gray-400">{dependency.description}</p>
+                  <p className="text-sm leading-6 text-[#4f6290] dark:text-gray-400">
+                    {dependency.description}
+                  </p>
                 ) : null}
               </div>
             </div>
@@ -775,7 +894,9 @@ function DependencyList({
 
 function HistoryList({ scans }: { scans: ProjectScanResponse[] }) {
   if (scans.length === 0) {
-    return <EmptyPanel message="No previous analyses were returned for this project." />;
+    return (
+      <EmptyPanel message="No previous analyses were returned for this project." />
+    );
   }
 
   return (
@@ -795,9 +916,14 @@ function HistoryList({ scans }: { scans: ProjectScanResponse[] }) {
                 </span>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
-                <span>Started: {formatDate(scan.started_at || scan.created_at)}</span>
+                <span>
+                  Started: {formatDate(scan.started_at || scan.created_at)}
+                </span>
                 <span>Finished: {formatDate(scan.finished_at)}</span>
-                <span>Progress: {Math.max(0, Math.min(100, Math.round(scan.progress ?? 0)))}%</span>
+                <span>
+                  Progress:{" "}
+                  {Math.max(0, Math.min(100, Math.round(scan.progress ?? 0)))}%
+                </span>
               </div>
             </div>
 
@@ -857,21 +983,30 @@ function InfoGrid({
           key={item.label}
           className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{item.label}</p>
-          <p className="mt-2 break-all text-sm font-medium text-[#17233f] dark:text-gray-100">{item.value}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">
+            {item.label}
+          </p>
+          <p className="mt-2 break-all text-sm font-medium text-[#17233f] dark:text-gray-100">
+            {item.value}
+          </p>
         </div>
       ))}
     </div>
   );
 }
 
-export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }: { scanId: string }) {
+export default function CodeScanningDetailPageClient({
+  scanId: routeIdentifier,
+}: {
+  scanId: string;
+}) {
   const [activeView, setActiveView] = useState<ProjectView>("overview");
   const [typeFilter, setTypeFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
   const [dependencyToolFilter, setDependencyToolFilter] = useState("");
   const [dependencySeverityFilter, setDependencySeverityFilter] = useState("");
-  const [dependencyVulnerableOnly, setDependencyVulnerableOnly] = useState(false);
+  const [dependencyVulnerableOnly, setDependencyVulnerableOnly] =
+    useState(false);
   const [dependencyOutdatedOnly, setDependencyOutdatedOnly] = useState(false);
   const routeUsesScanId = isLikelyScanId(routeIdentifier);
 
@@ -887,7 +1022,9 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
       refetchOnMountOrArgChange: true,
     },
   );
-  const resolvedScanId = routeUsesScanId ? routeIdentifier : routeProjectScansQuery.data?.scans[0]?.scan_id;
+  const resolvedScanId = routeUsesScanId
+    ? routeIdentifier
+    : routeProjectScansQuery.data?.scans[0]?.scan_id;
 
   const {
     data: scanDetail,
@@ -897,34 +1034,39 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: liveStatus, isFetching: isStatusFetching } = useGetScanStatusQuery(resolvedScanId ?? skipToken, {
-    pollingInterval: 5000,
-    refetchOnMountOrArgChange: true,
-  });
-  const { data: scanSummary } = useGetScanSummaryQuery(resolvedScanId ?? skipToken, {
-    refetchOnMountOrArgChange: true,
-  });
-  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(resolvedScanId ?? skipToken, {
-    refetchOnMountOrArgChange: true,
-  });
-  const {
-    data: dependencyListResponse,
-    isFetching: isDependenciesFetching,
-  } = useListDependenciesQuery(
+  const { data: liveStatus, isFetching: isStatusFetching } =
+    useGetScanStatusQuery(resolvedScanId ?? skipToken, {
+      pollingInterval: 5000,
+      refetchOnMountOrArgChange: true,
+    });
+  const { data: scanSummary } = useGetScanSummaryQuery(
+    resolvedScanId ?? skipToken,
     {
-      scan_id: resolvedScanId ?? "",
-      page: 1,
-      page_size: 50,
-      tool: dependencyToolFilter || undefined,
-      severity: dependencySeverityFilter || undefined,
-      vulnerable_only: dependencyVulnerableOnly || undefined,
-      outdated_only: dependencyOutdatedOnly || undefined,
-    },
-    {
-      skip: !resolvedScanId,
       refetchOnMountOrArgChange: true,
     },
   );
+  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(
+    resolvedScanId ?? skipToken,
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const { data: dependencyListResponse, isFetching: isDependenciesFetching } =
+    useListDependenciesQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: 1,
+        page_size: 50,
+        tool: dependencyToolFilter || undefined,
+        severity: dependencySeverityFilter || undefined,
+        vulnerable_only: dependencyVulnerableOnly || undefined,
+        outdated_only: dependencyOutdatedOnly || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      },
+    );
   const { data: allDependenciesResponse } = useListDependenciesQuery(
     {
       scan_id: resolvedScanId ?? "",
@@ -936,22 +1078,20 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
       refetchOnMountOrArgChange: true,
     },
   );
-  const {
-    data: issueResponse,
-    isFetching: isIssuesFetching,
-  } = useListIssuesQuery(
-    {
-      scan_id: resolvedScanId ?? "",
-      page: 1,
-      page_size: 25,
-      type_filter: typeFilter || undefined,
-      severity_filter: severityFilter || undefined,
-    },
-    {
-      skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
-    },
-  );
+  const { data: issueResponse, isFetching: isIssuesFetching } =
+    useListIssuesQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: 1,
+        page_size: 25,
+        type_filter: typeFilter || undefined,
+        severity_filter: severityFilter || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      },
+    );
   const { data: allIssuesResponse } = useListIssuesQuery(
     {
       scan_id: resolvedScanId ?? "",
@@ -976,28 +1116,46 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
     },
   );
 
-  const issues = useMemo(() => issueResponse?.issues ?? [], [issueResponse?.issues]);
-  const allIssues = useMemo(() => allIssuesResponse?.issues ?? [], [allIssuesResponse?.issues]);
-  const dependencies = useMemo(() => dependencyListResponse?.dependencies ?? [], [dependencyListResponse?.dependencies]);
+  const issues = useMemo(
+    () => issueResponse?.issues ?? [],
+    [issueResponse?.issues],
+  );
+  const allIssues = useMemo(
+    () => allIssuesResponse?.issues ?? [],
+    [allIssuesResponse?.issues],
+  );
+  const dependencies = useMemo(
+    () => dependencyListResponse?.dependencies ?? [],
+    [dependencyListResponse?.dependencies],
+  );
   const allDependencies = useMemo(
     () => allDependenciesResponse?.dependencies ?? [],
     [allDependenciesResponse?.dependencies],
   );
   const totalIssues = issueResponse?.total ?? 0;
   const totalDependencies = dependencyListResponse?.total ?? 0;
-  const dependencySummary = dependencySummaryResponse ?? scanSummary?.dependency_summary ?? null;
+  const dependencySummary =
+    dependencySummaryResponse ?? scanSummary?.dependency_summary ?? null;
   const status = liveStatus?.status ?? scanDetail?.status;
   const progress = liveStatus?.progress ?? scanDetail?.progress ?? 0;
-  const phases = liveStatus?.phases?.length ? liveStatus.phases : (scanDetail?.phases ?? []);
+  const phases = liveStatus?.phases?.length
+    ? liveStatus.phases
+    : (scanDetail?.phases ?? []);
   const qualityGate = scanSummary?.quality_gate;
-  const projectKey = scanDetail?.project_key || scanDetail?.sonar_project_key || "Project";
+  const projectKey =
+    scanDetail?.project_key || scanDetail?.sonar_project_key || "Project";
   const repoPath = getRepoPath(scanDetail?.repo_url ?? "");
   const scanCount = projectHistory?.total ?? 0;
   const isRunning = status === "PENDING" || status === "IN_PROGRESS";
   const warningMessage = scanDetail?.error_message?.trim() || null;
-  const openIssues = allIssues.filter((issue) => ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())).length;
+  const openIssues = allIssues.filter((issue) =>
+    ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase()),
+  ).length;
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
-  const dependencyToolOptions = useMemo(() => collectDependencyToolOptions(allDependencies), [allDependencies]);
+  const dependencyToolOptions = useMemo(
+    () => collectDependencyToolOptions(allDependencies),
+    [allDependencies],
+  );
   const qualityGateMessage =
     qualityGate === "WARN"
       ? "The latest analysis passed with warnings."
@@ -1005,7 +1163,8 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
         ? "The latest analysis failed the quality gate."
         : null;
   const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
-  const routeResolutionFailed = !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
+  const routeResolutionFailed =
+    !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
 
   if (isResolvingRoute || isLoading) {
     return (
@@ -1023,11 +1182,16 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
       <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 rounded-2xl border border-[#d7e0ef] bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-950">
         <AlertTriangle className="size-10 text-red-500" />
         <div>
-          <h1 className="text-xl font-bold text-[#17233f] dark:text-white">Unable to load project overview</h1>
+          <h1 className="text-xl font-bold text-[#17233f] dark:text-white">
+            Unable to load project overview
+          </h1>
           <p className="mt-2 max-w-xl text-sm text-[#52648f] dark:text-gray-400">
             {routeResolutionFailed
               ? "No scan history was found for this project key."
-              : readErrorMessage(error, "The scanner detail endpoint did not return a usable payload.")}
+              : readErrorMessage(
+                  error,
+                  "The scanner detail endpoint did not return a usable payload.",
+                )}
           </p>
         </div>
         <Link
@@ -1054,14 +1218,19 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
-                <Link href="/userdashboard/code-scanning" className="font-semibold text-teal-600 hover:underline dark:text-teal-300">
+                <Link
+                  href="/userdashboard/code-scanning"
+                  className="font-semibold text-teal-600 hover:underline dark:text-teal-300"
+                >
                   Code scanning
                 </Link>
                 <span>/</span>
                 <span className="truncate">{projectKey}</span>
               </div>
 
-              <h1 className="mt-2 truncate text-2xl font-bold text-[#071120] dark:text-white">{projectKey}</h1>
+              <h1 className="mt-2 truncate text-2xl font-bold text-[#071120] dark:text-white">
+                {projectKey}
+              </h1>
 
               <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
                 <span className="inline-flex items-center gap-1">
@@ -1072,7 +1241,13 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
                   <GitBranch className="size-3.5" />
                   {scanDetail.branch || "main"}
                 </span>
-                <span>{formatRelativeTime(scanDetail.finished_at || scanDetail.started_at || scanDetail.created_at)}</span>
+                <span>
+                  {formatRelativeTime(
+                    scanDetail.finished_at ||
+                      scanDetail.started_at ||
+                      scanDetail.created_at,
+                  )}
+                </span>
               </div>
             </div>
           </div>
@@ -1080,7 +1255,12 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={status} />
             {scanSummary ? (
-              <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getQualityGateTone(qualityGate))}>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+                  getQualityGateTone(qualityGate),
+                )}
+              >
                 Quality gate {getQualityGateLabel(qualityGate)}
               </span>
             ) : null}
@@ -1122,7 +1302,11 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
           )}
         >
           <div className="flex items-start gap-3">
-            {isRunning ? <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" /> : <ShieldAlert className="mt-0.5 size-4 shrink-0" />}
+            {isRunning ? (
+              <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" />
+            ) : (
+              <ShieldAlert className="mt-0.5 size-4 shrink-0" />
+            )}
             <span>
               {isRunning
                 ? `Scan is ${formatStatusLabel(status)}. Progress is ${Math.max(0, Math.min(100, Math.round(progress)))}%.`
@@ -1132,25 +1316,50 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
         </motion.section>
       ) : null}
 
-      <motion.section {...sectionMotion} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <motion.section
+        {...sectionMotion}
+        className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+      >
         <TopStatCard
           label="Quality Gate"
           value={getQualityGateLabel(qualityGate)}
           helper={scanSummary ? "Latest scan summary" : "Waiting for summary"}
-          accent={qualityGate === "OK" ? "emerald" : qualityGate ? "amber" : "slate"}
+          accent={
+            qualityGate === "OK" ? "emerald" : qualityGate ? "amber" : "slate"
+          }
           icon={qualityGate === "OK" ? ShieldCheck : ShieldAlert}
         />
         <TopStatCard
           label="Scan Status"
           value={formatStatusLabel(status)}
           helper={`${Math.max(0, Math.min(100, Math.round(progress)))}% progress`}
-          accent={status === "SUCCESS" ? "emerald" : status === "FAILED" ? "amber" : "teal"}
-          icon={status === "SUCCESS" ? CheckCircle2 : status === "FAILED" ? AlertTriangle : RefreshCw}
+          accent={
+            status === "SUCCESS"
+              ? "emerald"
+              : status === "FAILED"
+                ? "amber"
+                : "teal"
+          }
+          icon={
+            status === "SUCCESS"
+              ? CheckCircle2
+              : status === "FAILED"
+                ? AlertTriangle
+                : RefreshCw
+          }
         />
         <TopStatCard
           label="Issues"
-          value={formatCount((scanSummary?.bugs ?? 0) + (scanSummary?.vulnerabilities ?? 0) + (scanSummary?.code_smells ?? 0))}
-          helper={scanSummary ? "Bugs, vulnerabilities, and smells" : "Waiting for summary"}
+          value={formatCount(
+            (scanSummary?.bugs ?? 0) +
+              (scanSummary?.vulnerabilities ?? 0) +
+              (scanSummary?.code_smells ?? 0),
+          )}
+          helper={
+            scanSummary
+              ? "Bugs, vulnerabilities, and smells"
+              : "Waiting for summary"
+          }
           accent="teal"
           icon={FileCode2}
         />
@@ -1259,33 +1468,16 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
                 value={`${formatCount(dependencySummary?.critical)} critical`}
                 primaryDetail={`${formatCount(dependencySummary?.high)} high`}
                 secondaryDetail={`${formatCount(dependencySummary?.medium)} medium • ${formatCount(dependencySummary?.low)} low`}
-                ring={(dependencySummary?.critical ?? 0) > 0 ? "bad" : (dependencySummary?.vulnerable ?? 0) > 0 ? "neutral" : "ok"}
+                ring={
+                  (dependencySummary?.critical ?? 0) > 0
+                    ? "bad"
+                    : (dependencySummary?.vulnerable ?? 0) > 0
+                      ? "neutral"
+                      : "ok"
+                }
               />
             </div>
           </section>
-
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.95fr)]">
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-[#071120] dark:text-white">Scan phases</h2>
-                  <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">Live status comes from the scan status endpoint.</p>
-                </div>
-                {isStatusFetching ? <RefreshCw className="size-4 animate-spin text-teal-500" /> : null}
-              </div>
-              <PhaseList phases={phases} />
-            </section>
-
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-lg font-bold text-[#071120] dark:text-white">Dependency breakdown</h2>
-                <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-                  Language totals are pulled from the dependency summary endpoint.
-                </p>
-              </div>
-              <DependencyLanguageList dependencySummary={dependencySummary} />
-            </section>
-          </div>
         </motion.div>
       ) : null}
 
@@ -1293,8 +1485,18 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
         <motion.section {...sectionMotion} className="space-y-5">
           <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
             <div className="grid gap-5 lg:grid-cols-2">
-              <FilterChips label="Issue type" options={issueTypeOptions} selected={typeFilter} onChange={setTypeFilter} />
-              <FilterChips label="Severity" options={severityOptions} selected={severityFilter} onChange={setSeverityFilter} />
+              <FilterChips
+                label="Issue type"
+                options={issueTypeOptions}
+                selected={typeFilter}
+                onChange={setTypeFilter}
+              />
+              <FilterChips
+                label="Severity"
+                options={severityOptions}
+                selected={severityFilter}
+                onChange={setSeverityFilter}
+              />
             </div>
           </div>
 
@@ -1329,7 +1531,9 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
               <DependencyFlag
                 active={dependencyVulnerableOnly}
                 label="Vulnerable only"
-                onClick={() => setDependencyVulnerableOnly((current) => !current)}
+                onClick={() =>
+                  setDependencyVulnerableOnly((current) => !current)
+                }
               />
               <DependencyFlag
                 active={dependencyOutdatedOnly}
@@ -1349,37 +1553,50 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
             />
             <TopStatCard
               label="Vulnerable"
-              value={formatCount(dependencies.filter((item) => item.is_vulnerable).length)}
+              value={formatCount(
+                dependencies.filter((item) => item.is_vulnerable).length,
+              )}
               helper="Current filtered list"
               accent="amber"
               icon={ShieldAlert}
             />
             <TopStatCard
               label="Outdated"
-              value={formatCount(dependencies.filter((item) => item.is_outdated).length)}
+              value={formatCount(
+                dependencies.filter((item) => item.is_outdated).length,
+              )}
               helper="Current filtered list"
               accent="slate"
               icon={RefreshCw}
             />
             <TopStatCard
               label="License Issues"
-              value={formatCount(dependencies.filter((item) => item.has_license_issue).length)}
+              value={formatCount(
+                dependencies.filter((item) => item.has_license_issue).length,
+              )}
               helper="Current filtered list"
               accent="emerald"
               icon={Info}
             />
           </div>
 
-          <DependencyList dependencies={dependencies} total={totalDependencies} isLoading={isDependenciesFetching} />
+          <DependencyList
+            dependencies={dependencies}
+            total={totalDependencies}
+            isLoading={isDependenciesFetching}
+          />
         </motion.section>
       ) : null}
 
       {activeView === "activity" ? (
         <motion.section {...sectionMotion} className="space-y-4">
           <div>
-            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project activity</h2>
+            <h2 className="text-lg font-bold text-[#071120] dark:text-white">
+              Project activity
+            </h2>
             <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-              This list comes from the current-user project scans endpoint for the same project key.
+              This list comes from the current-user project scans endpoint for
+              the same project key.
             </p>
           </div>
           <HistoryList scans={projectHistory?.scans ?? []} />
@@ -1389,9 +1606,12 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
       {activeView === "info" ? (
         <motion.section {...sectionMotion} className="space-y-4">
           <div>
-            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project information</h2>
+            <h2 className="text-lg font-bold text-[#071120] dark:text-white">
+              Project information
+            </h2>
             <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-              This panel is mapped directly from scan detail and scan status responses.
+              This panel is mapped directly from scan detail and scan status
+              responses.
             </p>
           </div>
           <InfoGrid
