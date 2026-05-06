@@ -126,14 +126,6 @@
   --text-400: #71717a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark Mode */
-    --card: #161616;
-    --border: #27272a;
-  }
-}
-
 /* --- Global Base Styles --- */
 @layer base {
   body {
