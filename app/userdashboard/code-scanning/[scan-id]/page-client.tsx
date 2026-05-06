@@ -1,117 +1,180 @@
 "use client";
 
 import { skipToken } from "@reduxjs/toolkit/query";
+import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { motion } from "framer-motion";
 import {
+  Activity,
   AlertTriangle,
-  ArrowRight,
+  BarChart3,
   CheckCircle2,
+  Clock3,
   ExternalLink,
-  FileWarning,
-  Filter,
+  FileCode2,
+  FolderGit2,
   GitBranch,
-  History,
+  Info,
   LoaderCircle,
-  Search,
-  Settings2,
+  RefreshCw,
   ShieldAlert,
   ShieldCheck,
-  ShieldX,
-  Sparkles,
+  TimerReset,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { ComponentType } from "react";
 
-import { cn } from "@/lib/utils";
 import {
+  useGetDependencySummaryQuery,
   useGetScanDetailQuery,
+  useGetScanStatusQuery,
   useGetScanSummaryQuery,
   useListCurrentUserScansQuery,
+  useListDependenciesQuery,
   useListIssuesQuery,
-  useTriggerScanMutation,
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import { buildCodeScanningIssueHref, buildCodeScanningProjectHref, isLikelyScanId } from "@/lib/scanner-route";
+import { cn } from "@/lib/utils";
 import type {
+  DependencyResponse,
+  DependencySummaryResponse,
   IssueResponse,
   ProjectScanResponse,
-  ScanSummaryResponse,
+  QualityGateStatus,
+  ScanPhaseResponse,
+  ScanStatus,
 } from "@/types/scanner";
-import { FaGithub } from "react-icons/fa";
 
-type TabKey = "overview" | "findings" | "activity" | "settings";
-type SeverityBucket = "critical" | "high" | "medium" | "low";
+type ProjectView = "overview" | "issues" | "dependencies" | "activity" | "info";
+type GradeTone = "green" | "lime" | "red" | "muted";
 
-type TrendPoint = {
-  scanId: string;
+type NavItem = {
+  id: ProjectView;
   label: string;
-  value: number;
-  status: ProjectScanResponse["status"];
+  icon: ComponentType<{ className?: string }>;
 };
 
-type ActivityEvent = {
-  title: string;
-  detail: string;
-  at: string | null;
-  tone: "default" | "success" | "warning" | "danger";
+type FilterOption = {
+  label: string;
+  value: string;
 };
 
-const severityOrder: SeverityBucket[] = ["critical", "high", "medium", "low"];
+const projectNavItems: NavItem[] = [
+  { id: "overview", label: "Overview", icon: BarChart3 },
+  { id: "issues", label: "Issues", icon: FileCode2 },
+  { id: "dependencies", label: "Dependencies", icon: FolderGit2 },
+  { id: "activity", label: "Activity", icon: Activity },
+  { id: "info", label: "Project information", icon: Info },
+];
 
-const severityTone: Record<SeverityBucket, string> = {
-  critical: "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-200",
-  high: "border-orange-400/20 bg-orange-400/10 text-orange-700 dark:text-orange-200",
-  medium: "border-amber-400/20 bg-amber-400/10 text-amber-700 dark:text-amber-200",
-  low: "border-sky-400/20 bg-sky-400/10 text-sky-700 dark:text-sky-200",
-};
+const issueTypeOptions: FilterOption[] = [
+  { label: "All", value: "" },
+  { label: "Bugs", value: "BUG" },
+  { label: "Vulnerabilities", value: "VULNERABILITY" },
+  { label: "Code smells", value: "CODE_SMELL" },
+];
 
-const severityBarTone: Record<SeverityBucket, string> = {
-  critical: "bg-red-500",
-  high: "bg-orange-400",
-  medium: "bg-amber-300",
-  low: "bg-sky-400",
-};
+const severityOptions: FilterOption[] = [
+  { label: "All severities", value: "" },
+  { label: "Blocker", value: "BLOCKER" },
+  { label: "Critical", value: "CRITICAL" },
+  { label: "Major", value: "MAJOR" },
+  { label: "Minor", value: "MINOR" },
+  { label: "Info", value: "INFO" },
+];
 
-const pageFontFamily = "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
-const shellPanelClass =
-  "rounded-[2rem] border border-black/6 bg-white/80 shadow-xl shadow-slate-200/40 backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/70 dark:shadow-black/20";
-const innerPanelClass =
-  "rounded-[1.6rem] border border-black/6 bg-white/85 shadow-sm shadow-slate-200/50 backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/50 dark:shadow-black/20";
-const mutedPanelClass =
-  "rounded-[1.4rem] border border-black/6 bg-slate-50/85 dark:border-white/10 dark:bg-white/5";
-const inputClass =
-  "w-full rounded-full border border-black/8 bg-white/90 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-500/30 focus:ring-2 focus:ring-teal-500/15 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100";
+const dependencySeverityOptions: FilterOption[] = [
+  { label: "All severities", value: "" },
+  { label: "Critical", value: "CRITICAL" },
+  { label: "High", value: "HIGH" },
+  { label: "Medium", value: "MEDIUM" },
+  { label: "Low", value: "LOW" },
+];
+
 const sectionMotion = {
-  initial: { opacity: 0, y: 18 },
+  initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.35, ease: "easeOut" as const },
+  transition: { duration: 0.24, ease: "easeOut" as const },
 };
 
-function normalizeSeverity(value: string): SeverityBucket {
-  const upper = value.toUpperCase();
-  if (upper === "BLOCKER" || upper === "CRITICAL") {
-    return "critical";
-  }
-  if (upper === "HIGH" || upper === "MAJOR") {
-    return "high";
-  }
-  if (upper === "MEDIUM" || upper === "MINOR") {
-    return "medium";
-  }
-  return "low";
+function asText(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }
 
-function formatSeverityLabel(value: string): string {
-  return normalizeSeverity(value).replace(/^./, (char) => char.toUpperCase());
+function readPayloadMessage(payload: unknown): string {
+  if (payload == null || typeof payload !== "object") {
+    return "";
+  }
+
+  const source = payload as { detail?: unknown; message?: unknown; error?: unknown };
+  const detail = asText(source.detail).trim();
+  if (detail) {
+    return detail;
+  }
+
+  const message = asText(source.message).trim();
+  if (message) {
+    return message;
+  }
+
+  return asText(source.error).trim();
 }
 
-function formatDateTime(value: string | null | undefined): string {
+function readErrorMessage(error: unknown, fallback: string): string {
+  const queryError = error as FetchBaseQueryError | { message?: string } | undefined;
+  if (!queryError) {
+    return fallback;
+  }
+
+  if ("status" in queryError) {
+    const payloadMessage = readPayloadMessage(queryError.data);
+    if (payloadMessage) {
+      return payloadMessage;
+    }
+    if (typeof queryError.status === "number") {
+      return `Request failed with status ${queryError.status}`;
+    }
+  }
+
+  const message = "message" in queryError ? asText(queryError.message).trim() : "";
+  return message || fallback;
+}
+
+function formatRelativeTime(value: string | null | undefined): string {
+  if (!value) {
+    return "Analysis time not available";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Analysis time not available";
+  }
+
+  const diffMs = Date.now() - date.getTime();
+  const diffMinutes = Math.max(1, Math.round(diffMs / 60000));
+  if (diffMinutes < 60) {
+    return `Last analysis ${diffMinutes} min ago`;
+  }
+
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) {
+    return `Last analysis ${diffHours} hr ago`;
+  }
+
+  const diffDays = Math.round(diffHours / 24);
+  return `Last analysis ${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+}
+
+function formatDate(value: string | null | undefined): string {
   if (!value) {
     return "Unavailable";
   }
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return "Unavailable";
   }
+
   return new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",
@@ -121,38 +184,51 @@ function formatDateTime(value: string | null | undefined): string {
   }).format(date);
 }
 
-function formatShortDate(value: string | null | undefined): string {
-  if (!value) {
-    return "Now";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "Now";
-  }
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
-
 function formatPercent(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) {
-    return "0%";
-  }
-  return `${Math.round(value)}%`;
-}
-
-function formatDecimal(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return "0.0%";
   }
   return `${value.toFixed(1)}%`;
 }
 
+function formatCount(value: number | null | undefined): string {
+  return new Intl.NumberFormat("en").format(value ?? 0);
+}
+
+function formatStatusLabel(value: string | null | undefined): string {
+  if (!value) {
+    return "Unknown";
+  }
+
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatLabel(value: string | null | undefined): string {
+  if (!value) {
+    return "Unknown";
+  }
+
+  return value
+    .replace(/[_-]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function getProjectInitial(projectKey: string): string {
+  return projectKey.trim().charAt(0).toUpperCase() || "P";
+}
+
 function getRepoPath(repoUrl: string): string {
   if (!repoUrl) {
-    return "github.com/daichhav/web-application";
+    return "Repository not provided";
   }
+
   try {
     const parsed = new URL(repoUrl);
     return `${parsed.host}${parsed.pathname.replace(/\.git$/i, "")}`;
@@ -161,248 +237,414 @@ function getRepoPath(repoUrl: string): string {
   }
 }
 
+function getGrade(value: number, warningAt: number, dangerAt: number): { label: string; tone: GradeTone } {
+  if (value <= warningAt) {
+    return { label: "A", tone: "green" };
+  }
+  if (value <= dangerAt) {
+    return { label: "B", tone: "lime" };
+  }
+  return { label: "E", tone: "red" };
+}
+
+function getIssueSeverityTone(severity: string): string {
+  switch (severity.toUpperCase()) {
+    case "BLOCKER":
+      return "bg-red-600 text-white";
+    case "CRITICAL":
+      return "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300";
+    case "MAJOR":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300";
+    case "MINOR":
+      return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
+    default:
+      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+  }
+}
+
+function getDependencySeverityTone(severity: string): string {
+  switch (severity.toUpperCase()) {
+    case "CRITICAL":
+      return "bg-red-600 text-white";
+    case "HIGH":
+      return "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300";
+    case "MEDIUM":
+      return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300";
+    case "LOW":
+      return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
+    default:
+      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+  }
+}
+
+function getStatusTone(status: string | null | undefined): string {
+  switch (status) {
+    case "SUCCESS":
+      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
+    case "IN_PROGRESS":
+      return "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20";
+    case "PENDING":
+      return "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20";
+    case "PARTIAL":
+      return "bg-orange-50 text-orange-700 ring-1 ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20";
+    case "FAILED":
+      return "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20";
+    default:
+      return "bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700";
+  }
+}
+
+function getQualityGateTone(status: QualityGateStatus | null | undefined): string {
+  switch (status) {
+    case "OK":
+      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
+    case "WARN":
+      return "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20";
+    case "ERROR":
+      return "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20";
+    default:
+      return "bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700";
+  }
+}
+
+function getQualityGateLabel(status: QualityGateStatus | null | undefined): string {
+  if (!status) {
+    return "Unavailable";
+  }
+
+  if (status === "OK") {
+    return "Passed";
+  }
+
+  if (status === "WARN") {
+    return "Warning";
+  }
+
+  return "Failed";
+}
+
 function getCweTag(issue: IssueResponse): string {
   const matchedTag = issue.tags.find((tag) => /^cwe[-_:]?\d+$/i.test(tag));
   if (matchedTag) {
     return matchedTag.toUpperCase().replace(/[_:]/g, "-");
   }
+
   const matchedRule = issue.rule_key.match(/cwe[-_:]?(\d+)/i);
   if (matchedRule) {
     return `CWE-${matchedRule[1]}`;
   }
+
   return issue.tags[0]?.toUpperCase() || issue.rule_key.toUpperCase();
 }
 
-function buildFailedConditions(
-  summary: ScanSummaryResponse | undefined,
-  severityCounts: Record<SeverityBucket, number>,
-): Array<{ label: string; value: string; target: string }> {
-  if (!summary) {
-    return [
-      { label: "Security gate", value: "Awaiting summary", target: "Scan summary required" },
-    ];
-  }
-
-  const conditions: Array<{ label: string; value: string; target: string }> = [];
-  if (summary.coverage < 80) {
-    conditions.push({
-      label: "Coverage below baseline",
-      value: formatPercent(summary.coverage),
-      target: "Target 80%+",
-    });
-  }
-  if (summary.duplications > 3) {
-    conditions.push({
-      label: "Duplications above threshold",
-      value: formatDecimal(summary.duplications),
-      target: "Target under 3.0%",
-    });
-  }
-  if (severityCounts.critical > 0) {
-    conditions.push({
-      label: "Critical findings remain open",
-      value: `${severityCounts.critical} active`,
-      target: "Target 0 critical",
-    });
-  }
-  if ((summary.dependency_summary?.critical ?? 0) > 0) {
-    conditions.push({
-      label: "Critical vulnerable dependencies",
-      value: `${summary.dependency_summary?.critical ?? 0} packages`,
-      target: "Target 0 critical",
-    });
-  }
-  if (summary.vulnerabilities > 0 && conditions.length === 0) {
-    conditions.push({
-      label: "Vulnerability backlog detected",
-      value: `${summary.vulnerabilities} findings`,
-      target: "Target 0 vulnerabilities",
-    });
-  }
-  return conditions;
+function GradeBadge({ grade }: { grade: { label: string; tone: GradeTone } }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex size-8 items-center justify-center rounded-full text-sm font-bold",
+        grade.tone === "green" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+        grade.tone === "lime" && "bg-lime-100 text-lime-700 dark:bg-lime-500/15 dark:text-lime-300",
+        grade.tone === "red" && "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
+        grade.tone === "muted" && "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+      )}
+    >
+      {grade.label}
+    </span>
+  );
 }
 
-function buildActivityEvents(
-  scan: {
-    branch: string;
-    created_at: string | null;
-    started_at: string | null;
-    finished_at: string | null;
-    status: string;
-  },
-  issueCount: number,
-  resolvedCount: number,
-  failedConditions: Array<{ label: string }>,
-): ActivityEvent[] {
-  const events: ActivityEvent[] = [
-    {
-      title: "Scan triggered",
-      detail: `Queued for branch ${scan.branch || "default"}`,
-      at: scan.created_at,
-      tone: "default",
-    },
-  ];
-
-  if (scan.started_at) {
-    events.push({
-      title: "Analysis started",
-      detail: "Source checkout and static analysis pipeline started",
-      at: scan.started_at,
-      tone: "default",
-    });
-  }
-
-  if (scan.finished_at) {
-    events.push({
-      title: "Scan completed",
-      detail: `${issueCount} findings processed in the latest run`,
-      at: scan.finished_at,
-      tone: scan.status === "FAILED" ? "danger" : "success",
-    });
-  }
-
-  if (issueCount > 0) {
-    events.push({
-      title: "New issue found",
-      detail: `${issueCount} findings are visible in this run`,
-      at: scan.finished_at || scan.started_at,
-      tone: "warning",
-    });
-  }
-
-  if (resolvedCount > 0) {
-    events.push({
-      title: "Issue resolved",
-      detail: `${resolvedCount} findings moved out of active status`,
-      at: scan.finished_at || scan.started_at,
-      tone: "success",
-    });
-  }
-
-  if (failedConditions.length > 0) {
-    events.push({
-      title: "Quality gate failed",
-      detail: failedConditions[0].label,
-      at: scan.finished_at || scan.started_at,
-      tone: "danger",
-    });
-  }
-
-  return events.sort((left, right) => {
-    const leftTime = left.at ? new Date(left.at).getTime() : 0;
-    const rightTime = right.at ? new Date(right.at).getTime() : 0;
-    return rightTime - leftTime;
-  });
+function EmptyPanel({ message }: { message: string }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-[#d7e0ef] bg-white p-8 text-center text-sm text-[#52648f] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+      {message}
+    </div>
+  );
 }
 
-function Sparkline({ points }: { points: TrendPoint[] }) {
-  const width = 360;
-  const height = 124;
-  const padding = 14;
+function StatusPill({ status }: { status: string | null | undefined }) {
+  return (
+    <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getStatusTone(status))}>
+      {formatStatusLabel(status)}
+    </span>
+  );
+}
 
-  if (points.length === 0) {
+function TopStatCard({
+  label,
+  value,
+  helper,
+  accent,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  helper: string;
+  accent: "teal" | "emerald" | "amber" | "slate";
+  icon: ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7da4] dark:text-gray-500">{label}</p>
+          <p className="mt-3 text-2xl font-bold text-[#071120] dark:text-white">{value}</p>
+          <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">{helper}</p>
+        </div>
+        <div
+          className={cn(
+            "flex size-11 items-center justify-center rounded-xl",
+            accent === "teal" && "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
+            accent === "emerald" && "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
+            accent === "amber" && "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
+            accent === "slate" && "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+          )}
+        >
+          <Icon className="size-5" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex size-10 items-center justify-center rounded-full border-4",
+        tone === "ok" && "border-emerald-100 dark:border-emerald-500/20",
+        tone === "bad" && "border-red-700 dark:border-red-500",
+        tone === "neutral" && "border-gray-200 dark:border-gray-700",
+      )}
+    >
+      {tone === "ok" ? <span className="size-2.5 rounded-full bg-emerald-500" /> : null}
+      {tone === "neutral" ? <TimerReset className="size-4 text-gray-500 dark:text-gray-400" /> : null}
+    </span>
+  );
+}
+
+function OverviewMetricCell({
+  title,
+  value,
+  primaryDetail,
+  secondaryDetail,
+  grade,
+  ring,
+  className,
+}: {
+  title: string;
+  value: string;
+  primaryDetail?: string;
+  secondaryDetail?: string;
+  grade?: { label: string; tone: GradeTone };
+  ring?: "ok" | "bad" | "neutral";
+  className?: string;
+}) {
+  return (
+    <div className={cn("p-5", className)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h3 className="text-sm font-bold text-[#17233f] dark:text-gray-100">{title}</h3>
+          <div className="mt-4 flex flex-wrap items-baseline gap-1.5">
+            <span className="text-2xl font-bold leading-none text-[#21314f] dark:text-white">{value}</span>
+            {primaryDetail ? <span className="text-sm text-[#4f6290] dark:text-gray-400">{primaryDetail}</span> : null}
+          </div>
+          {secondaryDetail ? (
+            <p className="mt-4 text-sm text-[#4f6290] dark:text-gray-400">{secondaryDetail}</p>
+          ) : null}
+        </div>
+        {grade ? <GradeBadge grade={grade} /> : null}
+        {ring ? <RingIndicator tone={ring} /> : null}
+      </div>
+    </div>
+  );
+}
+
+function PhaseList({ phases }: { phases: ScanPhaseResponse[] }) {
+  if (phases.length === 0) {
+    return <EmptyPanel message="No scan phases were returned for this analysis." />;
+  }
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-2">
+      {phases.map((phase) => (
+        <div
+          key={phase.key}
+          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-[#17233f] dark:text-gray-100">{formatStatusLabel(phase.key)}</p>
+              <p className="mt-1 text-xs text-[#6b7da4] dark:text-gray-500">Scanner phase</p>
+            </div>
+            <StatusPill status={phase.status} />
+          </div>
+          {phase.error_message ? (
+            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
+              {phase.error_message}
+            </p>
+          ) : (
+            <p className="mt-3 text-sm text-[#52648f] dark:text-gray-400">No error reported for this phase.</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DependencyLanguageList({
+  dependencySummary,
+}: {
+  dependencySummary: DependencySummaryResponse | null;
+}) {
+  if (!dependencySummary?.by_language?.length) {
+    return <EmptyPanel message="Dependency language breakdown is not available for this analysis." />;
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
+      {dependencySummary.by_language.map((row) => (
+        <div
+          key={row.language}
+          className="grid gap-3 border-b border-[#e4eaf4] px-4 py-4 text-sm last:border-b-0 dark:border-gray-800 md:grid-cols-[minmax(0,1fr)_120px_120px_120px_120px]"
+        >
+          <span className="font-semibold text-[#17233f] dark:text-gray-100">{row.language}</span>
+          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.total_dependencies)} total</span>
+          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.vulnerable_dependencies)} vulnerable</span>
+          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.outdated_dependencies)} outdated</span>
+          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.license_issues)} license issues</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FilterChips({
+  label,
+  options,
+  selected,
+  onChange,
+}: {
+  label: string;
+  options: FilterOption[];
+  selected: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => {
+          const active = selected === option.value;
+          return (
+            <button
+              key={option.value || option.label}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={cn(
+                "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                active
+                  ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
+                  : "bg-white text-[#52648f] ring-1 ring-[#d7e0ef] hover:bg-[#f4f8fd] dark:bg-gray-950 dark:text-gray-400 dark:ring-gray-800 dark:hover:bg-gray-900",
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function IssueList({
+  projectKey,
+  issues,
+  total,
+  isLoading,
+}: {
+  projectKey: string;
+  issues: IssueResponse[];
+  total: number;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
     return (
-      <div className="flex h-[124px] items-center justify-center rounded-[1.4rem] border border-black/6 bg-slate-50/80 text-sm text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
-        Scan trend will appear after historical summaries are available.
+      <div className="flex min-h-56 items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
+        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
+          <LoaderCircle className="size-4 animate-spin text-teal-500" />
+          Loading issues...
+        </div>
       </div>
     );
   }
 
-  const values = points.map((point) => point.value);
-  const maxValue = Math.max(...values, 1);
-  const minValue = Math.min(...values, 0);
-  const step = points.length === 1 ? 0 : (width - padding * 2) / (points.length - 1);
-
-  const path = points
-    .map((point, index) => {
-      const x = padding + index * step;
-      const normalized = maxValue === minValue ? 0.5 : (point.value - minValue) / (maxValue - minValue);
-      const y = height - padding - normalized * (height - padding * 2);
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-    })
-    .join(" ");
+  if (issues.length === 0) {
+    return <EmptyPanel message="No issues matched the current filters." />;
+  }
 
   return (
-    <div className="space-y-4">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="h-[124px] w-full overflow-visible rounded-[1.5rem] border border-black/6 bg-[radial-gradient(circle_at_top,rgba(0,208,178,0.16),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(241,245,249,0.9))] p-2 dark:border-white/10 dark:bg-[radial-gradient(circle_at_top,rgba(0,208,178,0.18),transparent_42%),linear-gradient(180deg,rgba(15,23,42,0.9),rgba(2,6,23,0.8))]"
-        aria-hidden="true"
-      >
-        {[0, 1, 2].map((row) => (
-          <line
-            key={row}
-            x1={padding}
-            x2={width - padding}
-            y1={padding + ((height - padding * 2) / 2) * row}
-            y2={padding + ((height - padding * 2) / 2) * row}
-            stroke="rgba(100,116,139,0.20)"
-            strokeDasharray="3 5"
-          />
-        ))}
-        <path d={path} fill="none" stroke="#00D0B2" strokeWidth="3" strokeLinecap="round" />
-        {points.map((point, index) => {
-          const x = padding + index * step;
-          const normalized = maxValue === minValue ? 0.5 : (point.value - minValue) / (maxValue - minValue);
-          const y = height - padding - normalized * (height - padding * 2);
-          return (
-            <g key={point.scanId}>
-              <circle cx={x} cy={y} r="4" fill="#ffffff" stroke="#00D0B2" strokeWidth="2" />
-              <text x={x} y={height - 2} textAnchor="middle" fill="#64748b" fontSize="11">
-                {point.label}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-        {points.map((point) => (
-          <div
-            key={point.scanId}
-            className="rounded-[1.3rem] border border-black/6 bg-white/85 px-3 py-2.5 dark:border-white/10 dark:bg-white/5"
+    <div className="space-y-3">
+      <div className="text-sm text-[#52648f] dark:text-gray-400">
+        Showing {issues.length} of {total} issue{total === 1 ? "" : "s"} from the scanner API.
+      </div>
+
+      <div className="space-y-3">
+        {issues.map((issue) => (
+          <motion.div
+            key={issue.key}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
           >
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{point.label}</div>
-            <div className="mt-1 text-lg font-semibold text-slate-950 dark:text-white">{point.value}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">{point.status.replace("_", " ")}</div>
-          </div>
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getIssueSeverityTone(issue.severity))}>
+                    {issue.severity}
+                  </span>
+                  <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
+                    {formatStatusLabel(issue.type)}
+                  </span>
+                  <StatusPill status={issue.status} />
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{issue.message}</h3>
+                  <p className="mt-1 font-mono text-xs text-[#52648f] dark:text-gray-400">
+                    {issue.file_path}
+                    {issue.line > 0 ? `:${issue.line}` : ""}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
+                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{issue.rule_key}</span>
+                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{getCweTag(issue)}</span>
+                  {issue.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-start">
+                <Link
+                  href={buildCodeScanningIssueHref(projectKey, issue.key)}
+                  className="inline-flex items-center justify-center rounded-xl border border-[#d7e0ef] px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
+                >
+                  View detail
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
     </div>
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  note,
-  tone = "default",
-}: {
-  label: string;
-  value: string;
-  note: string;
-  tone?: "default" | "danger";
-}) {
-  return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.18 }}
-      className={cn(innerPanelClass, "p-5")}
-    >
-      <div className="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">{label}</div>
-      <div
-        className={cn(
-          "mt-4 text-3xl font-semibold text-slate-950 dark:text-white",
-          tone === "danger" && "text-red-700 dark:text-red-200",
-        )}
-      >
-        {value}
-      </div>
-      <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">{note}</div>
-    </motion.div>
-  );
-}
-
-function TabButton({
+function DependencyFlag({
   active,
   label,
   onClick,
@@ -416,10 +658,10 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200",
+        "rounded-full px-3 py-1.5 text-sm font-medium transition",
         active
-          ? "border-teal-500/20 bg-teal-500/10 text-teal-700 shadow-sm dark:text-teal-300"
-          : "border-black/8 bg-white/75 text-slate-500 hover:border-teal-500/20 hover:text-slate-900 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-400 dark:hover:text-white",
+          ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
+          : "bg-white text-[#52648f] ring-1 ring-[#d7e0ef] hover:bg-[#f4f8fd] dark:bg-gray-950 dark:text-gray-400 dark:ring-gray-800 dark:hover:bg-gray-900",
       )}
     >
       {label}
@@ -427,22 +669,300 @@ function TabButton({
   );
 }
 
-function CodeScanningDetailPageClient({ scanId }: { scanId: string }) {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>("overview");
-  const [issueSearch, setIssueSearch] = useState("");
-  const [severityFilter, setSeverityFilter] = useState<SeverityBucket | "all">("all");
-  const [selectedBranchOverride, setSelectedBranchOverride] = useState<string | null>(null);
-  const [focusedIssueKey, setFocusedIssueKey] = useState<string | null>(null);
-  const [historyTrend, setHistoryTrend] = useState<TrendPoint[]>([]);
+function collectDependencyToolOptions(items: DependencyResponse[]): FilterOption[] {
+  const tools = Array.from(new Set(items.map((item) => item.tool).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+  return [{ label: "All checkers", value: "" }, ...tools.map((tool) => ({ label: formatLabel(tool), value: tool }))];
+}
 
-  const { data: scanDetail, isLoading, isError, error } = useGetScanDetailQuery(scanId);
-  const { data: scanSummary } = useGetScanSummaryQuery(scanId);
-  const { data: issueResponse } = useListIssuesQuery({
-    scan_id: scanId,
-    page: 1,
-    page_size: 50,
+function DependencyList({
+  dependencies,
+  total,
+  isLoading,
+}: {
+  dependencies: DependencyResponse[];
+  total: number;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return (
+      <div className="flex min-h-56 items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
+        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
+          <LoaderCircle className="size-4 animate-spin text-teal-500" />
+          Loading dependencies...
+        </div>
+      </div>
+    );
+  }
+
+  if (dependencies.length === 0) {
+    return <EmptyPanel message="No dependencies matched the current checker filters." />;
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="text-sm text-[#52648f] dark:text-gray-400">
+        Showing {dependencies.length} of {total} dependenc{total === 1 ? "y" : "ies"} from dependency checkers.
+      </div>
+
+      <div className="space-y-3">
+        {dependencies.map((dependency) => (
+          <motion.div
+            key={`${dependency.package_name}-${dependency.installed_version}-${dependency.cve_id}-${dependency.tool}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
+          >
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div className="min-w-0 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getDependencySeverityTone(dependency.severity))}>
+                    {dependency.severity || "UNKNOWN"}
+                  </span>
+                  <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
+                    {formatLabel(dependency.tool)}
+                  </span>
+                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 text-xs text-[#52648f] dark:bg-gray-900 dark:text-gray-400">
+                    {formatLabel(dependency.language)}
+                  </span>
+                  {dependency.is_vulnerable ? (
+                    <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-300">
+                      Vulnerable
+                    </span>
+                  ) : null}
+                  {dependency.is_outdated ? (
+                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                      Outdated
+                    </span>
+                  ) : null}
+                  {dependency.has_license_issue ? (
+                    <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
+                      License issue
+                    </span>
+                  ) : null}
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{dependency.package_name}</h3>
+                  <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#52648f] dark:text-gray-400">
+                    <span>Installed: {dependency.installed_version || "Unknown"}</span>
+                    <span>Latest: {dependency.latest_version || "Unknown"}</span>
+                    {dependency.fixed_version ? <span>Fixed: {dependency.fixed_version}</span> : null}
+                    {dependency.license ? <span>License: {dependency.license}</span> : null}
+                    {dependency.ecosystem ? <span>Ecosystem: {dependency.ecosystem}</span> : null}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
+                  {dependency.cve_id ? (
+                    <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 font-medium dark:bg-gray-900">
+                      {dependency.cve_id}
+                    </span>
+                  ) : null}
+                </div>
+
+                {dependency.description ? (
+                  <p className="text-sm leading-6 text-[#4f6290] dark:text-gray-400">{dependency.description}</p>
+                ) : null}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HistoryList({ scans }: { scans: ProjectScanResponse[] }) {
+  if (scans.length === 0) {
+    return <EmptyPanel message="No previous analyses were returned for this project." />;
+  }
+
+  return (
+    <div className="space-y-3">
+      {scans.map((scan) => (
+        <div
+          key={scan.scan_id}
+          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
+        >
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill status={scan.status} />
+                <span className="inline-flex items-center gap-1 text-sm text-[#52648f] dark:text-gray-400">
+                  <GitBranch className="size-3.5" />
+                  {scan.branch || "main"}
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
+                <span>Started: {formatDate(scan.started_at || scan.created_at)}</span>
+                <span>Finished: {formatDate(scan.finished_at)}</span>
+                <span>Progress: {Math.max(0, Math.min(100, Math.round(scan.progress ?? 0)))}%</span>
+              </div>
+            </div>
+
+            <Link
+              href={buildCodeScanningProjectHref(scan.project_key)}
+              className="inline-flex items-center justify-center rounded-xl border border-[#d7e0ef] px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
+            >
+              View analysis
+            </Link>
+          </div>
+
+          {scan.error_message ? (
+            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
+              {scan.error_message}
+            </p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InfoGrid({
+  projectKey,
+  sonarProjectKey,
+  repoUrl,
+  branch,
+  status,
+  createdAt,
+  startedAt,
+  finishedAt,
+}: {
+  projectKey: string;
+  sonarProjectKey: string;
+  repoUrl: string;
+  branch: string;
+  status: ScanStatus | string;
+  createdAt: string | null | undefined;
+  startedAt: string | null | undefined;
+  finishedAt: string | null | undefined;
+}) {
+  const items = [
+    { label: "Project key", value: projectKey || "Unavailable" },
+    { label: "Sonar project key", value: sonarProjectKey || "Unavailable" },
+    { label: "Repository", value: repoUrl || "Unavailable" },
+    { label: "Branch", value: branch || "main" },
+    { label: "Status", value: formatStatusLabel(status) },
+    { label: "Created at", value: formatDate(createdAt) },
+    { label: "Started at", value: formatDate(startedAt) },
+    { label: "Finished at", value: formatDate(finishedAt) },
+  ];
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{item.label}</p>
+          <p className="mt-2 break-all text-sm font-medium text-[#17233f] dark:text-gray-100">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }: { scanId: string }) {
+  const [activeView, setActiveView] = useState<ProjectView>("overview");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [severityFilter, setSeverityFilter] = useState("");
+  const [dependencyToolFilter, setDependencyToolFilter] = useState("");
+  const [dependencySeverityFilter, setDependencySeverityFilter] = useState("");
+  const [dependencyVulnerableOnly, setDependencyVulnerableOnly] = useState(false);
+  const [dependencyOutdatedOnly, setDependencyOutdatedOnly] = useState(false);
+  const routeUsesScanId = isLikelyScanId(routeIdentifier);
+
+  const routeProjectScansQuery = useListCurrentUserScansQuery(
+    routeUsesScanId
+      ? skipToken
+      : {
+          project_key: routeIdentifier,
+          page: 1,
+          page_size: 25,
+        },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const resolvedScanId = routeUsesScanId ? routeIdentifier : routeProjectScansQuery.data?.scans[0]?.scan_id;
+
+  const {
+    data: scanDetail,
+    isLoading,
+    isError,
+    error,
+  } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
+    refetchOnMountOrArgChange: true,
   });
+  const { data: liveStatus, isFetching: isStatusFetching } = useGetScanStatusQuery(resolvedScanId ?? skipToken, {
+    pollingInterval: 5000,
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: scanSummary } = useGetScanSummaryQuery(resolvedScanId ?? skipToken, {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(resolvedScanId ?? skipToken, {
+    refetchOnMountOrArgChange: true,
+  });
+  const {
+    data: dependencyListResponse,
+    isFetching: isDependenciesFetching,
+  } = useListDependenciesQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      page: 1,
+      page_size: 50,
+      tool: dependencyToolFilter || undefined,
+      severity: dependencySeverityFilter || undefined,
+      vulnerable_only: dependencyVulnerableOnly || undefined,
+      outdated_only: dependencyOutdatedOnly || undefined,
+    },
+    {
+      skip: !resolvedScanId,
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const { data: allDependenciesResponse } = useListDependenciesQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      page: 1,
+      page_size: 100,
+    },
+    {
+      skip: !resolvedScanId,
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const {
+    data: issueResponse,
+    isFetching: isIssuesFetching,
+  } = useListIssuesQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      page: 1,
+      page_size: 25,
+      type_filter: typeFilter || undefined,
+      severity_filter: severityFilter || undefined,
+    },
+    {
+      skip: !resolvedScanId,
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const { data: allIssuesResponse } = useListIssuesQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      page: 1,
+      page_size: 100,
+    },
+    {
+      skip: !resolvedScanId,
+      refetchOnMountOrArgChange: true,
+    },
+  );
   const { data: projectHistory } = useListCurrentUserScansQuery(
     scanDetail?.project_key
       ? {
@@ -451,747 +971,441 @@ function CodeScanningDetailPageClient({ scanId }: { scanId: string }) {
           page_size: 12,
         }
       : skipToken,
-  );
-  const [triggerScan, { isLoading: isTriggering }] = useTriggerScanMutation();
-
-  const issueList = useMemo(() => issueResponse?.issues ?? [], [issueResponse?.issues]);
-
-  const severityCounts = useMemo(() => {
-    const counts: Record<SeverityBucket, number> = {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-    };
-    for (const issue of issueList) {
-      counts[normalizeSeverity(issue.severity)] += 1;
-    }
-    return counts;
-  }, [issueList]);
-
-  const failedConditions = useMemo(
-    () => buildFailedConditions(scanSummary, severityCounts),
-    [scanSummary, severityCounts],
+    {
+      refetchOnMountOrArgChange: true,
+    },
   );
 
-  const qualityGateState = failedConditions.length > 0 || scanSummary?.quality_gate === "ERROR" ? "FAILED" : "PASSED";
-  const qualityGateIcon = qualityGateState === "FAILED" ? ShieldX : ShieldCheck;
-  const qualityGateTone =
-    qualityGateState === "FAILED"
-      ? {
-          badge: "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-200",
-          icon: "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-200",
-        }
-      : {
-          badge: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200",
-          icon: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200",
-        };
-
-  const branchOptions = useMemo(() => {
-    const options = new Set<string>();
-    if (scanDetail?.branch) {
-      options.add(scanDetail.branch);
-    }
-    for (const scan of projectHistory?.scans ?? []) {
-      if (scan.branch) {
-        options.add(scan.branch);
-      }
-    }
-    if (options.size === 0) {
-      options.add("main");
-    }
-    return Array.from(options);
-  }, [projectHistory?.scans, scanDetail]);
-
-  const selectedBranch = selectedBranchOverride ?? scanDetail?.branch ?? branchOptions[0] ?? "main";
-
-  const scopedHistory = useMemo(() => {
-    const items = projectHistory?.scans ?? [];
-    if (!selectedBranch) {
-      return items;
-    }
-    return items.filter((scan) => scan.branch === selectedBranch);
-  }, [projectHistory?.scans, selectedBranch]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    const historySlice = scopedHistory.slice(0, 6);
-
-    async function loadTrend() {
-      if (historySlice.length === 0) {
-        setHistoryTrend([]);
-        return;
-      }
-
-      const loaded = await Promise.all(
-        historySlice.map(async (scan) => {
-          if (scan.scan_id === scanId && scanSummary) {
-            return {
-              scanId: scan.scan_id,
-              label: formatShortDate(scan.finished_at || scan.created_at),
-              value: scanSummary.vulnerabilities,
-              status: scan.status,
-            };
-          }
-
-          try {
-            const response = await fetch(
-              `/api/backend/api/v1/scanner/scans/${encodeURIComponent(scan.scan_id)}/summary`,
-              { signal: controller.signal },
-            );
-            if (!response.ok) {
-              return {
-                scanId: scan.scan_id,
-                label: formatShortDate(scan.finished_at || scan.created_at),
-                value: 0,
-                status: scan.status,
-              };
-            }
-            const payload = (await response.json()) as ScanSummaryResponse;
-            return {
-              scanId: scan.scan_id,
-              label: formatShortDate(scan.finished_at || scan.created_at),
-              value: payload.vulnerabilities,
-              status: scan.status,
-            };
-          } catch {
-            return {
-              scanId: scan.scan_id,
-              label: formatShortDate(scan.finished_at || scan.created_at),
-              value: 0,
-              status: scan.status,
-            };
-          }
-        }),
-      );
-
-      if (!cancelled) {
-        setHistoryTrend(loaded.reverse());
-      }
-    }
-
-    void loadTrend();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [scanId, scanSummary, scopedHistory]);
-
-  const filteredIssues = useMemo(() => {
-    return issueList.filter((issue) => {
-      const matchesSearch =
-        issue.message.toLowerCase().includes(issueSearch.toLowerCase()) ||
-        issue.file_path.toLowerCase().includes(issueSearch.toLowerCase()) ||
-        issue.rule_key.toLowerCase().includes(issueSearch.toLowerCase());
-      const matchesSeverity =
-        severityFilter === "all" || normalizeSeverity(issue.severity) === severityFilter;
-      return matchesSearch && matchesSeverity;
-    });
-  }, [issueList, issueSearch, severityFilter]);
-
-  const findingsPreview = useMemo(() => {
-    const sorted = [...issueList].sort((left, right) => {
-      const severityDelta =
-        severityOrder.indexOf(normalizeSeverity(left.severity)) -
-        severityOrder.indexOf(normalizeSeverity(right.severity));
-      if (severityDelta !== 0) {
-        return severityDelta;
-      }
-      return left.line - right.line;
-    });
-    return sorted.slice(0, 5);
-  }, [issueList]);
-
-  const topIssues = useMemo(() => findingsPreview.slice(0, 3), [findingsPreview]);
-
-  const resolvedCount = useMemo(
-    () => issueList.filter((issue) => !["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())).length,
-    [issueList],
+  const issues = useMemo(() => issueResponse?.issues ?? [], [issueResponse?.issues]);
+  const allIssues = useMemo(() => allIssuesResponse?.issues ?? [], [allIssuesResponse?.issues]);
+  const dependencies = useMemo(() => dependencyListResponse?.dependencies ?? [], [dependencyListResponse?.dependencies]);
+  const allDependencies = useMemo(
+    () => allDependenciesResponse?.dependencies ?? [],
+    [allDependenciesResponse?.dependencies],
   );
+  const totalIssues = issueResponse?.total ?? 0;
+  const totalDependencies = dependencyListResponse?.total ?? 0;
+  const dependencySummary = dependencySummaryResponse ?? scanSummary?.dependency_summary ?? null;
+  const status = liveStatus?.status ?? scanDetail?.status;
+  const progress = liveStatus?.progress ?? scanDetail?.progress ?? 0;
+  const phases = liveStatus?.phases?.length ? liveStatus.phases : (scanDetail?.phases ?? []);
+  const qualityGate = scanSummary?.quality_gate;
+  const projectKey = scanDetail?.project_key || scanDetail?.sonar_project_key || "Project";
+  const repoPath = getRepoPath(scanDetail?.repo_url ?? "");
+  const scanCount = projectHistory?.total ?? 0;
+  const isRunning = status === "PENDING" || status === "IN_PROGRESS";
+  const warningMessage = scanDetail?.error_message?.trim() || null;
+  const openIssues = allIssues.filter((issue) => ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())).length;
+  const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
+  const dependencyToolOptions = useMemo(() => collectDependencyToolOptions(allDependencies), [allDependencies]);
+  const qualityGateMessage =
+    qualityGate === "WARN"
+      ? "The latest analysis passed with warnings."
+      : qualityGate === "ERROR"
+        ? "The latest analysis failed the quality gate."
+        : null;
+  const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
+  const routeResolutionFailed = !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
 
-  const activityEvents = useMemo(() => {
-    if (!scanDetail) {
-      return [];
-    }
-    return buildActivityEvents(
-      scanDetail,
-      issueList.length,
-      resolvedCount,
-      failedConditions,
-    );
-  }, [failedConditions, issueList.length, resolvedCount, scanDetail]);
-
-  async function handleScanNow() {
-    if (!scanDetail) {
-      return;
-    }
-    const response = await triggerScan({
-      project_key: scanDetail.project_key,
-      repo_url: scanDetail.repo_url,
-      branch: selectedBranch || scanDetail.branch || "main",
-    }).unwrap();
-    startTransition(() => {
-      router.push(`/userdashboard/code-scanning/${response.scan_id}`);
-    });
-  }
-
-  function handleBranchChange(branch: string) {
-    setSelectedBranchOverride(branch);
-    const nextScan = (projectHistory?.scans ?? []).find((scan) => scan.branch === branch);
-    if (nextScan && nextScan.scan_id !== scanId) {
-      startTransition(() => {
-        router.push(`/userdashboard/code-scanning/${nextScan.scan_id}`);
-      });
-    }
-  }
-
-  if (isLoading) {
+  if (isResolvingRoute || isLoading) {
     return (
-      <div
-        className={cn("min-h-screen p-8", shellPanelClass)}
-        style={{ fontFamily: pageFontFamily }}
-      >
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-            <LoaderCircle className="size-5 animate-spin" />
-            Loading scan detail...
-          </div>
+      <div className="flex min-h-[70vh] items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
+        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
+          <LoaderCircle className="size-5 animate-spin text-teal-500" />
+          Loading project overview...
         </div>
       </div>
     );
   }
 
-  if (isError || !scanDetail) {
+  if (routeResolutionFailed || isError || !scanDetail) {
     return (
-      <div
-        className={cn("min-h-screen p-8", shellPanelClass)}
-        style={{ fontFamily: pageFontFamily }}
-      >
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-          <ShieldAlert className="size-10 text-red-500" />
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950 dark:text-white">Unable to load scan detail</h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              {JSON.stringify(error) || "The scan detail endpoint did not return a usable payload."}
-            </p>
-          </div>
-          <Link
-            href="/userdashboard/code-scanning"
-            className="rounded-full border border-black/8 bg-white/80 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-teal-500/20 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
-          >
-            Back to code scanning
-          </Link>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 rounded-2xl border border-[#d7e0ef] bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-950">
+        <AlertTriangle className="size-10 text-red-500" />
+        <div>
+          <h1 className="text-xl font-bold text-[#17233f] dark:text-white">Unable to load project overview</h1>
+          <p className="mt-2 max-w-xl text-sm text-[#52648f] dark:text-gray-400">
+            {routeResolutionFailed
+              ? "No scan history was found for this project key."
+              : readErrorMessage(error, "The scanner detail endpoint did not return a usable payload.")}
+          </p>
         </div>
+        <Link
+          href="/userdashboard/code-scanning"
+          className="rounded-xl border border-[#b9c6df] px-4 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-900"
+        >
+          Back to code scanning
+        </Link>
       </div>
     );
   }
-
-  const repoPath = getRepoPath(scanDetail.repo_url);
-  const QualityGateIcon = qualityGateIcon;
 
   return (
-    <div
-      className={cn(
-        "min-h-screen rounded-[32px] p-5 md:p-8",
-        "bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.15),transparent_28%),radial-gradient(circle_at_top_right,rgba(22,117,177,0.14),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.95),rgba(241,245,249,0.9))]",
-        "dark:bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(22,117,177,0.14),transparent_26%),linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.85))]",
-      )}
-      style={{ fontFamily: pageFontFamily }}
-    >
-      <div className="mx-auto max-w-7xl space-y-8">
-        <motion.div
-          {...sectionMotion}
-          className={cn(shellPanelClass, "overflow-hidden p-6 md:p-8")}
-        >
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em]", qualityGateTone.badge)}>
-                  <QualityGateIcon className="mr-2 inline size-3.5" />
-                  {qualityGateState}
-                </span>
-                <span className="rounded-full border border-teal-500/20 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-teal-700 dark:text-teal-300">
-                  Auto Offensive
-                </span>
-              </div>
-              <div>
-                <h1 className="display-font text-3xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-white md:text-5xl">
-                  {scanDetail.project_key || "web-application"}
-                </h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 md:text-base">
-                  Deep-dive scan intelligence for this repository, with quality-gate context,
-                  finding prioritization, and recent pipeline activity.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/85 px-4 py-2 text-sm text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
-                  <FaGithub className="size-4 text-slate-500 dark:text-slate-400" />
-                  <span>{repoPath}</span>
-                </div>
-                <a
-                  href={scanDetail.repo_url || undefined}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2 text-sm text-slate-600 transition-colors hover:border-teal-500/20 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white"
-                >
-                  Open repository
-                  <ExternalLink className="size-4" />
-                </a>
-              </div>
+    <div className="space-y-5 text-[#17233f] dark:text-gray-100">
+      <motion.section
+        {...sectionMotion}
+        className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950"
+      >
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div className="flex min-w-0 gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-sm font-bold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
+              {getProjectInitial(projectKey)}
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:w-[420px]">
-              <label className={cn(innerPanelClass, "p-4")}>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                  Branch
-                </div>
-                <div className="flex items-center gap-2">
-                  <GitBranch className="size-4 text-slate-500 dark:text-slate-400" />
-                  <select
-                    value={selectedBranch}
-                    onChange={(event) => handleBranchChange(event.target.value)}
-                    className="w-full bg-transparent text-sm font-medium text-slate-950 outline-none dark:text-white"
-                  >
-                    {branchOptions.map((branch) => (
-                      <option key={branch} value={branch} className="bg-white text-slate-950 dark:bg-slate-950 dark:text-white">
-                        {branch}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </label>
-              <div className={cn(innerPanelClass, "p-4")}>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                  Last scanned
-                </div>
-                <div className="text-sm font-medium text-slate-950 dark:text-white">
-                  {formatDateTime(scanDetail.finished_at || scanDetail.created_at)}
-                </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
+                <Link href="/userdashboard/code-scanning" className="font-semibold text-teal-600 hover:underline dark:text-teal-300">
+                  Code scanning
+                </Link>
+                <span>/</span>
+                <span className="truncate">{projectKey}</span>
               </div>
-              <div className={cn(innerPanelClass, "sm:col-span-2 p-4")}>
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                      Scan controls
-                    </div>
-                    <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                      Latest scan ID <span className="font-mono text-slate-900 dark:text-slate-100">{scanDetail.scan_id}</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleScanNow}
-                    disabled={isTriggering}
-                    className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-slate-950 transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isTriggering ? (
-                      <LoaderCircle className="size-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="size-4" />
-                    )}
-                    Scan now
-                  </button>
-                </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">
-                  Source branch {selectedBranch || scanDetail.branch || "main"} · status {scanDetail.status}
-                </div>
+
+              <h1 className="mt-2 truncate text-2xl font-bold text-[#071120] dark:text-white">{projectKey}</h1>
+
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
+                <span className="inline-flex items-center gap-1">
+                  <FolderGit2 className="size-3.5" />
+                  {repoPath}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <GitBranch className="size-3.5" />
+                  {scanDetail.branch || "main"}
+                </span>
+                <span>{formatRelativeTime(scanDetail.finished_at || scanDetail.started_at || scanDetail.created_at)}</span>
               </div>
             </div>
           </div>
-        </motion.div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <TabButton active={activeTab === "overview"} label="Overview" onClick={() => setActiveTab("overview")} />
-          <TabButton active={activeTab === "findings"} label="Findings" onClick={() => setActiveTab("findings")} />
-          <TabButton active={activeTab === "activity"} label="Activity" onClick={() => setActiveTab("activity")} />
-          <TabButton active={activeTab === "settings"} label="Settings" onClick={() => setActiveTab("settings")} />
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusPill status={status} />
+            {scanSummary ? (
+              <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getQualityGateTone(qualityGate))}>
+                Quality gate {getQualityGateLabel(qualityGate)}
+              </span>
+            ) : null}
+            {scanDetail.repo_url ? (
+              <a
+                href={scanDetail.repo_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#b9c6df] bg-white px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900"
+              >
+                <ExternalLink className="size-4" />
+                Repository
+              </a>
+            ) : null}
+          </div>
         </div>
+      </motion.section>
 
-        {activeTab === "overview" ? (
-          <motion.div {...sectionMotion} className="space-y-8">
-            <div className="grid gap-5 xl:grid-cols-[1.25fr_1fr]">
-              <div className={cn(shellPanelClass, "p-6")}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                      Quality gate
-                    </div>
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className={cn("rounded-2xl border p-3", qualityGateTone.icon)}>
-                        <QualityGateIcon className="size-6" />
-                      </div>
-                      <div>
-                        <div className="text-2xl font-semibold text-slate-950 dark:text-white">{qualityGateState}</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          {failedConditions.length > 0
-                            ? `${failedConditions.length} conditions blocked release`
-                            : "The scan summary is still being evaluated."}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={cn("rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]", qualityGateTone.badge)}>
-                    Quality gate
-                  </div>
-                </div>
-                <div className="mt-6 space-y-3">
-                  {failedConditions.map((condition) => (
-                    <div
-                      key={condition.label}
-                      className={cn(mutedPanelClass, "flex items-center justify-between px-4 py-3")}
-                    >
-                      <div>
-                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">{condition.label}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">{condition.target}</div>
-                      </div>
-                      <div className="text-sm font-semibold text-red-700 dark:text-red-200">{condition.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {warningMessage ? (
+        <motion.section
+          {...sectionMotion}
+          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span>{warningMessage}</span>
+          </div>
+        </motion.section>
+      ) : null}
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <MetricCard
-                  label="Vulnerabilities"
-                  value={String(scanSummary?.vulnerabilities ?? issueList.length)}
-                  note={`${scanSummary?.dependency_summary?.critical ?? severityCounts.critical} critical`}
-                  tone="danger"
-                />
-                <MetricCard
-                  label="Code Smells"
-                  value={String(scanSummary?.code_smells ?? 14)}
-                  note="Refactor candidates"
-                />
-                <MetricCard
-                  label="Coverage"
-                  value={formatPercent(scanSummary?.coverage ?? 41)}
-                  note="Critical paths under target"
-                />
-                <MetricCard
-                  label="Duplications"
-                  value={formatDecimal(scanSummary?.duplications ?? 3.2)}
-                  note="Shared logic to consolidate"
-                />
-              </div>
+      {!warningMessage && (isRunning || qualityGateMessage) ? (
+        <motion.section
+          {...sectionMotion}
+          className={cn(
+            "rounded-2xl px-4 py-3 text-sm",
+            isRunning
+              ? "border border-teal-100 bg-teal-50 text-teal-700 dark:border-teal-500/15 dark:bg-teal-500/10 dark:text-teal-200"
+              : "border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300",
+          )}
+        >
+          <div className="flex items-start gap-3">
+            {isRunning ? <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" /> : <ShieldAlert className="mt-0.5 size-4 shrink-0" />}
+            <span>
+              {isRunning
+                ? `Scan is ${formatStatusLabel(status)}. Progress is ${Math.max(0, Math.min(100, Math.round(progress)))}%.`
+                : qualityGateMessage}
+            </span>
+          </div>
+        </motion.section>
+      ) : null}
+
+      <motion.section {...sectionMotion} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <TopStatCard
+          label="Quality Gate"
+          value={getQualityGateLabel(qualityGate)}
+          helper={scanSummary ? "Latest scan summary" : "Waiting for summary"}
+          accent={qualityGate === "OK" ? "emerald" : qualityGate ? "amber" : "slate"}
+          icon={qualityGate === "OK" ? ShieldCheck : ShieldAlert}
+        />
+        <TopStatCard
+          label="Scan Status"
+          value={formatStatusLabel(status)}
+          helper={`${Math.max(0, Math.min(100, Math.round(progress)))}% progress`}
+          accent={status === "SUCCESS" ? "emerald" : status === "FAILED" ? "amber" : "teal"}
+          icon={status === "SUCCESS" ? CheckCircle2 : status === "FAILED" ? AlertTriangle : RefreshCw}
+        />
+        <TopStatCard
+          label="Issues"
+          value={formatCount((scanSummary?.bugs ?? 0) + (scanSummary?.vulnerabilities ?? 0) + (scanSummary?.code_smells ?? 0))}
+          helper={scanSummary ? "Bugs, vulnerabilities, and smells" : "Waiting for summary"}
+          accent="teal"
+          icon={FileCode2}
+        />
+        <TopStatCard
+          label="Project History"
+          value={formatCount(scanCount)}
+          helper="Recorded analyses for this project"
+          accent="slate"
+          icon={Clock3}
+        />
+      </motion.section>
+
+      <motion.section
+        {...sectionMotion}
+        className="flex gap-2 overflow-x-auto rounded-2xl border border-[#d7e0ef] bg-white p-2 dark:border-gray-800 dark:bg-gray-950"
+      >
+        {projectNavItems.map((item) => {
+          const Icon = item.icon;
+          const active = activeView === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveView(item.id)}
+              className={cn(
+                "inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition",
+                active
+                  ? "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
+                  : "text-[#52648f] hover:bg-[#eef3fb] hover:text-[#253554] dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-100",
+              )}
+            >
+              <Icon className="size-4" />
+              {item.label}
+            </button>
+          );
+        })}
+      </motion.section>
+
+      {activeView === "overview" ? (
+        <motion.div {...sectionMotion} className="space-y-5">
+          <section className="overflow-hidden rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
+            <div className="grid md:grid-cols-3">
+              <OverviewMetricCell
+                title="Security"
+                value={formatCount(scanSummary?.vulnerabilities)}
+                primaryDetail="Open issues"
+                grade={getGrade(scanSummary?.vulnerabilities ?? 0, 0, 2)}
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Reliability"
+                value={formatCount(scanSummary?.bugs)}
+                primaryDetail="Open issues"
+                grade={getGrade(scanSummary?.bugs ?? 0, 0, 5)}
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Maintainability"
+                value={formatCount(scanSummary?.code_smells)}
+                primaryDetail="Open issues"
+                grade={getGrade(scanSummary?.code_smells ?? 0, 10, 50)}
+                className="border-b border-[#d7e0ef] md:border-b-0 dark:border-gray-800"
+              />
             </div>
 
-            <div className="grid gap-5 xl:grid-cols-[1.05fr_1fr]">
-              <div className={cn(shellPanelClass, "p-6")}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                      Severity distribution
-                    </div>
-                    <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">
-                      Current findings by priority
-                    </div>
-                  </div>
-                  <ShieldAlert className="size-5 text-slate-500 dark:text-slate-400" />
-                </div>
-                <div className="mt-6 overflow-hidden rounded-full border border-black/6 bg-slate-100 dark:border-white/10 dark:bg-white/5">
-                  <div className="flex h-4 w-full">
-                    {severityOrder.map((severity) => {
-                      const count = severityCounts[severity];
-                      const total = issueList.length || 1;
-                      return (
-                        <div
-                          key={severity}
-                          className={severityBarTone[severity]}
-                          style={{ width: `${(count / total) * 100}%` }}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {severityOrder.map((severity) => (
-                    <div
-                      key={severity}
-                      className={cn(mutedPanelClass, "px-4 py-3")}
-                    >
-                      <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                        {severity}
-                      </div>
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="text-2xl font-semibold text-slate-950 dark:text-white">{severityCounts[severity]}</span>
-                        <span className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", severityTone[severity])}>
-                          {Math.round((severityCounts[severity] / Math.max(issueList.length, 1)) * 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={cn(shellPanelClass, "p-6")}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                      Scan history
-                    </div>
-                    <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">
-                      Last {Math.max(historyTrend.length, 1)} scans
-                    </div>
-                  </div>
-                  <History className="size-5 text-slate-500 dark:text-slate-400" />
-                </div>
-                <div className="mt-6">
-                  <Sparkline points={historyTrend} />
-                </div>
-              </div>
+            <div className="grid border-t border-[#d7e0ef] md:grid-cols-3 dark:border-gray-800">
+              <OverviewMetricCell
+                title="Accepted issues"
+                value={formatCount(acceptedIssues)}
+                secondaryDetail="Valid issues that were not fixed"
+                ring="neutral"
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Coverage"
+                value={formatPercent(scanSummary?.coverage)}
+                secondaryDetail="Coverage reported by scanner"
+                ring={(scanSummary?.coverage ?? 0) >= 80 ? "ok" : "bad"}
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Duplications"
+                value={formatPercent(scanSummary?.duplications)}
+                secondaryDetail="Duplicated lines percentage"
+                ring={(scanSummary?.duplications ?? 0) <= 3 ? "ok" : "bad"}
+              />
             </div>
 
-            <div className={cn(shellPanelClass, "p-6")}>
+            <div className="grid border-t border-[#d7e0ef] md:grid-cols-3 dark:border-gray-800">
+              <OverviewMetricCell
+                title="Security Hotspots"
+                value={formatCount(scanSummary?.security_hotspots)}
+                grade={getGrade(scanSummary?.security_hotspots ?? 0, 0, 3)}
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Dependency scan"
+                value={formatCount(dependencySummary?.vulnerable)}
+                primaryDetail="Vulnerable packages"
+                secondaryDetail={`${formatCount(dependencySummary?.outdated)} outdated • ${formatCount(dependencySummary?.license_issues)} license issues`}
+                grade={getGrade(dependencySummary?.critical ?? 0, 0, 1)}
+                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
+              />
+              <OverviewMetricCell
+                title="Dependency severity"
+                value={`${formatCount(dependencySummary?.critical)} critical`}
+                primaryDetail={`${formatCount(dependencySummary?.high)} high`}
+                secondaryDetail={`${formatCount(dependencySummary?.medium)} medium • ${formatCount(dependencySummary?.low)} low`}
+                ring={(dependencySummary?.critical ?? 0) > 0 ? "bad" : (dependencySummary?.vulnerable ?? 0) > 0 ? "neutral" : "ok"}
+              />
+            </div>
+          </section>
+
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.95fr)]">
+            <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                    Top issues to fix
-                  </div>
-                  <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">
-                    Highest-priority findings in this scan
-                  </div>
+                  <h2 className="text-lg font-bold text-[#071120] dark:text-white">Scan phases</h2>
+                  <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">Live status comes from the scan status endpoint.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("findings")}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-teal-500/20 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
-                >
-                  Open findings
-                  <ArrowRight className="size-4" />
-                </button>
+                {isStatusFetching ? <RefreshCw className="size-4 animate-spin text-teal-500" /> : null}
               </div>
-              <div className="mt-6 grid gap-4 xl:grid-cols-3">
-                {topIssues.length > 0 ? (
-                  topIssues.map((issue) => {
-                    const severity = normalizeSeverity(issue.severity);
-                    return (
-                      <div
-                        key={issue.key}
-                        className={cn(innerPanelClass, "p-5")}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <span className={cn("rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]", severityTone[severity])}>
-                            {formatSeverityLabel(issue.severity)}
-                          </span>
-                          <span className="rounded-full border border-black/8 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-white/10 dark:text-slate-400">
-                            {getCweTag(issue)}
-                          </span>
-                        </div>
-                        <div className="mt-4 text-lg font-semibold text-slate-950 dark:text-white">{issue.message}</div>
-                        <div className="mt-2 font-mono text-xs text-slate-500 dark:text-slate-400">{issue.file_path}:{issue.line}</div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFocusedIssueKey(issue.key);
-                            setActiveTab("findings");
-                          }}
-                          className="mt-6 inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-teal-500/20 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
-                        >
-                          View fix
-                          <ArrowRight className="size-4" />
-                        </button>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="rounded-[24px] border border-dashed border-black/10 bg-white/75 p-6 dark:border-white/10 dark:bg-white/5 xl:col-span-3">
-                    <div className="text-base font-semibold text-slate-950 dark:text-white">No urgent fixes in the latest scan</div>
-                    <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                      This scan does not currently expose critical issues. Trigger another scan or open the Findings tab for the full issue list.
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
+              <PhaseList phases={phases} />
+            </section>
 
-        {activeTab === "findings" ? (
-          <motion.div {...sectionMotion} className={cn(shellPanelClass, "p-6")}>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <section className="space-y-4">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                  Findings preview
-                </div>
-                <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">
-                  Filterable issue list for this scan
-                </div>
+                <h2 className="text-lg font-bold text-[#071120] dark:text-white">Dependency breakdown</h2>
+                <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
+                  Language totals are pulled from the dependency summary endpoint.
+                </p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <label className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
-                  <input
-                    value={issueSearch}
-                    onChange={(event) => setIssueSearch(event.target.value)}
-                    placeholder="Search findings"
-                    className={cn(inputClass, "pl-9 sm:w-72")}
-                  />
-                </label>
-                <label className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/85 px-3 py-2.5 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">
-                  <Filter className="size-4 text-slate-500 dark:text-slate-400" />
-                  <select
-                    value={severityFilter}
-                    onChange={(event) => setSeverityFilter(event.target.value as SeverityBucket | "all")}
-                    className="bg-transparent outline-none"
-                  >
-                    <option value="all" className="bg-white text-slate-950 dark:bg-slate-950 dark:text-white">All severities</option>
-                    {severityOrder.map((severity) => (
-                      <option key={severity} value={severity} className="bg-white text-slate-950 dark:bg-slate-950 dark:text-white">
-                        {severity}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </div>
-            <div className="mt-6 overflow-hidden rounded-[24px] border border-black/6 dark:border-white/10">
-              <div className="grid grid-cols-[1.1fr_2fr_2.2fr_0.7fr_1fr_1fr] gap-3 border-b border-black/6 bg-slate-50/90 px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-400">
-                <span>Severity</span>
-                <span>Issue name</span>
-                <span>File</span>
-                <span>Line</span>
-                <span>CWE</span>
-                <span>Status</span>
-              </div>
-              <div className="divide-y divide-black/6 bg-white/75 dark:divide-white/10 dark:bg-slate-950/45">
-                {filteredIssues.slice(0, 5).map((issue) => {
-                  const severity = normalizeSeverity(issue.severity);
-                  return (
-                    <div
-                      key={issue.key}
-                      className={cn(
-                        "grid grid-cols-[1.1fr_2fr_2.2fr_0.7fr_1fr_1fr] gap-3 px-4 py-4 text-sm text-slate-700 transition-colors dark:text-slate-200",
-                        focusedIssueKey === issue.key && "bg-teal-500/8",
-                      )}
-                    >
-                      <span className={cn("inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.16em]", severityTone[severity])}>
-                        {formatSeverityLabel(issue.severity)}
-                      </span>
-                      <span className="font-medium text-slate-950 dark:text-white">{issue.message}</span>
-                      <span className="truncate font-mono text-xs text-slate-500 dark:text-slate-400">{issue.file_path}</span>
-                      <span>{issue.line}</span>
-                      <span className="text-slate-600 dark:text-slate-300">{getCweTag(issue)}</span>
-                      <span className="text-slate-500 dark:text-slate-400">{issue.status}</span>
-                    </div>
-                  );
-                })}
-                {filteredIssues.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                    No findings match the current filters.
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
+              <DependencyLanguageList dependencySummary={dependencySummary} />
+            </section>
+          </div>
+        </motion.div>
+      ) : null}
 
-        {activeTab === "activity" ? (
-          <motion.div {...sectionMotion} className={cn(shellPanelClass, "p-6")}>
-            <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Activity</div>
-            <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">Recent scan events</div>
-            <div className="mt-8 space-y-6">
-              {activityEvents.map((event, index) => (
-                <div key={`${event.title}-${index}`} className="relative pl-10">
-                  {index < activityEvents.length - 1 ? (
-                    <div className="absolute left-[11px] top-8 h-[calc(100%+8px)] w-px bg-black/8 dark:bg-white/10" />
-                  ) : null}
-                  <div
-                    className={cn(
-                      "absolute left-0 top-1 flex size-6 items-center justify-center rounded-full border",
-                      event.tone === "danger" && "border-red-500/30 bg-red-500/10 text-red-200",
-                      event.tone === "warning" && "border-amber-400/30 bg-amber-400/10 text-amber-200",
-                      event.tone === "success" && "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
-                      event.tone === "default" && "border-white/15 bg-white/[0.04] text-zinc-300",
-                    )}
-                  >
-                    {event.tone === "danger" ? (
-                      <AlertTriangle className="size-3.5" />
-                    ) : event.tone === "success" ? (
-                      <CheckCircle2 className="size-3.5" />
-                    ) : event.tone === "warning" ? (
-                      <FileWarning className="size-3.5" />
-                    ) : (
-                      <History className="size-3.5" />
-                    )}
-                  </div>
-                  <div className={cn(innerPanelClass, "p-5")}>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="text-base font-semibold text-slate-950 dark:text-white">{event.title}</div>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                        {formatDateTime(event.at)}
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{event.detail}</div>
-                  </div>
-                </div>
-              ))}
+      {activeView === "issues" ? (
+        <motion.section {...sectionMotion} className="space-y-5">
+          <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+            <div className="grid gap-5 lg:grid-cols-2">
+              <FilterChips label="Issue type" options={issueTypeOptions} selected={typeFilter} onChange={setTypeFilter} />
+              <FilterChips label="Severity" options={severityOptions} selected={severityFilter} onChange={setSeverityFilter} />
             </div>
-          </motion.div>
-        ) : null}
+          </div>
 
-        {activeTab === "settings" ? (
-          <motion.div {...sectionMotion} className="grid gap-5 xl:grid-cols-3">
-            <div className={cn(shellPanelClass, "p-6 xl:col-span-2")}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Settings</div>
-                  <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">Repository and scanner context</div>
-                </div>
-                <Settings2 className="size-5 text-slate-500 dark:text-slate-400" />
-              </div>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className={cn(innerPanelClass, "p-5")}>
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Repository</div>
-                  <div className="mt-3 text-sm font-medium text-slate-950 dark:text-white">{repoPath}</div>
-                  <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">{scanDetail.repo_url}</div>
-                </div>
-                <div className={cn(innerPanelClass, "p-5")}>
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Sonar project key</div>
-                  <div className="mt-3 text-sm font-medium text-slate-950 dark:text-white">
-                    {scanDetail.sonar_project_key || scanDetail.project_key}
-                  </div>
-                  <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">Linked to the current scan record</div>
-                </div>
-                <div className={cn(innerPanelClass, "p-5")}>
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Selected branch</div>
-                  <div className="mt-3 text-sm font-medium text-slate-950 dark:text-white">{selectedBranch || scanDetail.branch || "main"}</div>
-                </div>
-                <div className={cn(innerPanelClass, "p-5")}>
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Current scan status</div>
-                  <div className="mt-3 text-sm font-medium text-slate-950 dark:text-white">{scanDetail.status}</div>
-                </div>
-              </div>
+          <IssueList
+            projectKey={scanDetail.project_key || routeIdentifier}
+            issues={issues}
+            total={totalIssues}
+            isLoading={isIssuesFetching}
+          />
+        </motion.section>
+      ) : null}
+
+      {activeView === "dependencies" ? (
+        <motion.section {...sectionMotion} className="space-y-5">
+          <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <FilterChips
+                label="Dependency checker"
+                options={dependencyToolOptions}
+                selected={dependencyToolFilter}
+                onChange={setDependencyToolFilter}
+              />
+              <FilterChips
+                label="Severity"
+                options={dependencySeverityOptions}
+                selected={dependencySeverityFilter}
+                onChange={setDependencySeverityFilter}
+              />
             </div>
-            <div className={cn(shellPanelClass, "p-6")}>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Actions</div>
-              <div className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">Quick controls</div>
-              <div className="mt-6 space-y-3">
-                <button
-                  type="button"
-                  onClick={handleScanNow}
-                  disabled={isTriggering}
-                  className="flex w-full items-center justify-between rounded-[22px] border border-teal-500/20 bg-teal-500/10 px-4 py-3 text-left text-sm text-slate-900 transition-colors hover:bg-teal-500/15 disabled:cursor-not-allowed dark:text-white"
-                >
-                  <span>Trigger scan for this branch</span>
-                  {isTriggering ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("findings")}
-                  className="flex w-full items-center justify-between rounded-[22px] border border-black/8 bg-white/80 px-4 py-3 text-left text-sm text-slate-700 transition-colors hover:border-teal-500/20 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
-                >
-                  <span>Review current findings</span>
-                  <ArrowRight className="size-4" />
-                </button>
-              </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <DependencyFlag
+                active={dependencyVulnerableOnly}
+                label="Vulnerable only"
+                onClick={() => setDependencyVulnerableOnly((current) => !current)}
+              />
+              <DependencyFlag
+                active={dependencyOutdatedOnly}
+                label="Outdated only"
+                onClick={() => setDependencyOutdatedOnly((current) => !current)}
+              />
             </div>
-          </motion.div>
-        ) : null}
-      </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <TopStatCard
+              label="Dependencies"
+              value={formatCount(totalDependencies)}
+              helper="Filtered dependency results"
+              accent="teal"
+              icon={FolderGit2}
+            />
+            <TopStatCard
+              label="Vulnerable"
+              value={formatCount(dependencies.filter((item) => item.is_vulnerable).length)}
+              helper="Current filtered list"
+              accent="amber"
+              icon={ShieldAlert}
+            />
+            <TopStatCard
+              label="Outdated"
+              value={formatCount(dependencies.filter((item) => item.is_outdated).length)}
+              helper="Current filtered list"
+              accent="slate"
+              icon={RefreshCw}
+            />
+            <TopStatCard
+              label="License Issues"
+              value={formatCount(dependencies.filter((item) => item.has_license_issue).length)}
+              helper="Current filtered list"
+              accent="emerald"
+              icon={Info}
+            />
+          </div>
+
+          <DependencyList dependencies={dependencies} total={totalDependencies} isLoading={isDependenciesFetching} />
+        </motion.section>
+      ) : null}
+
+      {activeView === "activity" ? (
+        <motion.section {...sectionMotion} className="space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project activity</h2>
+            <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
+              This list comes from the current-user project scans endpoint for the same project key.
+            </p>
+          </div>
+          <HistoryList scans={projectHistory?.scans ?? []} />
+        </motion.section>
+      ) : null}
+
+      {activeView === "info" ? (
+        <motion.section {...sectionMotion} className="space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project information</h2>
+            <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
+              This panel is mapped directly from scan detail and scan status responses.
+            </p>
+          </div>
+          <InfoGrid
+            projectKey={scanDetail.project_key}
+            sonarProjectKey={scanDetail.sonar_project_key}
+            repoUrl={scanDetail.repo_url}
+            branch={scanDetail.branch}
+            status={status ?? scanDetail.status}
+            createdAt={scanDetail.created_at}
+            startedAt={liveStatus?.started_at ?? scanDetail.started_at}
+            finishedAt={liveStatus?.finished_at ?? scanDetail.finished_at}
+          />
+        </motion.section>
+      ) : null}
     </div>
   );
 }
-
-export default CodeScanningDetailPageClient;
