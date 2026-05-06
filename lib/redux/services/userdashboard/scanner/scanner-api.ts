@@ -32,7 +32,7 @@ import type {
 
 export type { UserProject } from "@/types/project";
 
-const SCANNER_BASE_PATH = "/api/v1/scanner";
+const SCANNER_PROXY_PATH = "scanner";
 const CSV_QUERY_KEYS = new Set(["phases"]);
 
 type QueryScalar = string | number | boolean | null | undefined;
@@ -104,12 +104,12 @@ function buildScannerUrl(pathSegments: string[], query?: Record<string, QueryVal
 
   const search = searchParams.toString();
   return search
-    ? `${SCANNER_BASE_PATH}/${path}?${search}`
-    : `${SCANNER_BASE_PATH}/${path}`;
+    ? `${SCANNER_PROXY_PATH}/${path}?${search}`
+    : `${SCANNER_PROXY_PATH}/${path}`;
 }
 
 function buildProxyScannerUrl(pathSegments: string[], query?: Record<string, QueryValue>): string {
-  return `/api/backend/${buildScannerUrl(pathSegments, query)}`;
+  return `/api/${buildScannerUrl(pathSegments, query)}`;
 }
 
 export const scannerApi = baseApi.injectEndpoints({

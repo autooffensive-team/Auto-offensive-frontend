@@ -311,7 +311,10 @@ function DotGrid({ isDark }: { isDark: boolean }) {
   const rafRef = useRef<number>(0);
   const roRef = useRef<ResizeObserver | null>(null);
   const isDarkRef = useRef(isDark);
-  isDarkRef.current = isDark;
+
+  useEffect(() => {
+    isDarkRef.current = isDark;
+  }, [isDark]);
 
   const GAP = 22;
   const DOT_SIZE = 1.5;

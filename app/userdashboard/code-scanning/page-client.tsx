@@ -6,7 +6,6 @@ import {
   ExternalLink,
   FolderGit2,
   GitBranch,
-  Hash,
   Layers,
   LoaderCircle,
   Plus,
@@ -18,6 +17,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useMemo, useState } from "react";
 
+import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import { useListCurrentUserScanIdsQuery } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import type { ScanTaskRefResponse } from "@/types/scanner";
 
@@ -25,7 +25,6 @@ type StatVariant = "default" | "teal" | "amber" | "red";
 
 type ScanProjectSummary = {
   projectKey: string;
-  latestScanId: string;
   scanCount: number;
 };
 
@@ -102,7 +101,6 @@ function summarizeScanProjects(tasks: ScanTaskRefResponse[] | undefined): ScanPr
 
     summaries.set(task.project_key, {
       projectKey: task.project_key,
-      latestScanId: task.scan_id,
       scanCount: 1,
     });
   }
@@ -145,10 +143,6 @@ function ScanProjectCard({
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-100 px-2 py-1 font-mono text-[11px] text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-          <Hash size={10} className="text-gray-400 dark:text-gray-500" />
-          {project.latestScanId}
-        </span>
         <span className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-100 px-2 py-1 text-[11px] text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
           <GitBranch size={10} className="text-gray-400 dark:text-gray-500" />
           Project key
@@ -158,13 +152,13 @@ function ScanProjectCard({
       <div className="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
         <div className="flex items-center gap-1.5 text-[12px] text-gray-400 dark:text-gray-500">
           <FolderGit2 size={12} />
-          <span>Latest scan reference</span>
+          <span>Project overview</span>
         </div>
 
         <Link
-          href={`/userdashboard/code-scanning/${project.latestScanId}`}
+          href={buildCodeScanningProjectHref(project.projectKey)}
           className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-          title="Open latest scan detail"
+          title="Open project overview"
         >
           <ExternalLink size={14} />
         </Link>
@@ -191,13 +185,10 @@ export default function CodeScanningPageClient() {
 
   const banner = useMemo(() => {
     const started = searchParams.get("started");
-    const scanId = searchParams.get("scan_id");
     if (started) {
       return {
         type: "success" as const,
-        message: scanId
-          ? `Code scan started for "${started}" with scan ID ${scanId}.`
-          : `Code scan started for "${started}".`,
+        message: `Scanner project "${started}" was created successfully.`,
         actionHref: null,
         actionLabel: null,
       };
@@ -288,7 +279,7 @@ export default function CodeScanningPageClient() {
             Code Scanning
           </h1>
           <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-            Review current-user scan references and continue repository onboarding
+            Review code scanning projects and continue repository onboarding
           </p>
         </div>
 
@@ -380,7 +371,7 @@ export default function CodeScanningPageClient() {
           >
             <div className="flex items-center gap-2.5">
               <AlertCircle size={15} />
-              Live refresh failed. Showing the last cached scan references.
+              Live refresh failed. Showing the last cached projects.
             </div>
             <button
               onClick={() => refetch()}
@@ -397,7 +388,7 @@ export default function CodeScanningPageClient() {
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 bg-white py-16 md:col-span-2 dark:border-gray-800 dark:bg-gray-900">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />
             <p className="text-[14px] text-gray-500 dark:text-gray-400">
-              Loading scan references...
+              Loading projects...
             </p>
           </div>
         ) : filtered.length > 0 ? (
@@ -416,12 +407,12 @@ export default function CodeScanningPageClient() {
               <FolderGit2 size={22} className="text-gray-400 dark:text-gray-500" />
             </div>
             <h3 className="text-[16px] font-semibold text-gray-900 dark:text-white">
-              {searchTerm ? "No matching scan references" : "No scan references yet"}
+              {searchTerm ? "No matching projects" : "No projects yet"}
             </h3>
             <p className="mt-1 max-w-xs text-[13px] text-gray-500 dark:text-gray-400">
               {searchTerm
                 ? "Try adjusting your project-key search"
-                : "Create a code scanning project, then start a scan to populate your current-user scan references"}
+                : "Create a code scanning project to populate your project overview"}
             </p>
             {!searchTerm ? (
               <Link

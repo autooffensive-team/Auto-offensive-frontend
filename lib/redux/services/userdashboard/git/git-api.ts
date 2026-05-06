@@ -108,15 +108,15 @@ function normalizeAccount(account: BackendAccount): ProviderAccount {
 }
 
 function buildProviderRepositoriesPath(provider: GitProvider): string {
-  return `integrations/${provider}/repositories`;
+  return `git/${provider}/repositories`;
 }
 
 function buildProviderAccountsPath(provider: GitProvider): string {
-  return `integrations/${provider}/accounts`;
+  return `git/${provider}/accounts`;
 }
 
 function buildProviderConnectUrlPath(provider: GitProvider): string {
-  return `integrations/${provider}/connect-url`;
+  return `git/${provider}/connect-url`;
 }
 
 function buildProviderRepositoryBranchesPath({
@@ -127,7 +127,7 @@ function buildProviderRepositoryBranchesPath({
   if (!resolvedFullName) {
     throw new Error("Repository fullName is required to fetch branches.");
   }
-  return `integrations/${provider}/repositories/branches?full_name=${encodeURIComponent(resolvedFullName)}`;
+  return `git/${provider}/repositories/branches?full_name=${encodeURIComponent(resolvedFullName)}`;
 }
 
 export const gitApi = baseApi.injectEndpoints({
