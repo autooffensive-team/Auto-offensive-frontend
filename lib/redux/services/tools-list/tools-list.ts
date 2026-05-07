@@ -1,6 +1,6 @@
 import { baseApi } from "@/lib/redux/services/base-api";
 
-export type ToolExample = Record<string, unknown>;
+export type ToolExample = string;
 
 export interface ScanPreset {
   name: string;
@@ -59,7 +59,7 @@ function normalizeTool(tool: Partial<Tool>): Tool {
     examples: Array.isArray(tool.examples)
       ? tool.examples.filter(
           (example): example is ToolExample =>
-            typeof example === "object" && example !== null,
+            typeof example === "string" && example.trim().length > 0,
         )
       : [],
     scan_config: {

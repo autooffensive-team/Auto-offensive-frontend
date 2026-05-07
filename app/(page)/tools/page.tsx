@@ -909,10 +909,7 @@ function ToolCard({
 }) {
   const presets = tool.scan_config?.basic?.presets ?? [];
   const mediumCount = tool.scan_config?.medium?.options?.length ?? 0;
-  const exampleEntries =
-    tool.examples && typeof tool.examples === "object" && tool.examples[0] && typeof tool.examples[0] === "object"
-      ? Object.entries(tool.examples[0] as Record<string, unknown>)
-      : [];
+  const examples = Array.isArray(tool.examples) ? tool.examples : [];
 
   return (
     <motion.div
@@ -978,15 +975,15 @@ function ToolCard({
         )}
 
         {/* Example targets */}
-        {exampleEntries.length > 0 && (
+        {examples.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-auto">
-            {exampleEntries.map(([key, val]) => (
+            {examples.map((ex, idx) => (
               <span
-                key={key}
-                title={`${key}: ${String(val)}`}
-                className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono truncate max-w-40"
+                key={idx}
+                title={ex}
+                className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono truncate max-w-full"
               >
-                {key}: {String(val)}
+                {ex}
               </span>
             ))}
           </div>

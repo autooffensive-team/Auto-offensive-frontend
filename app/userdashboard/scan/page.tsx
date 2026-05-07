@@ -33,9 +33,16 @@ export default function ScanPage() {
     mediumSteps,
     mediumTools,
     isSubmitting,
-    run,
-    logs,
-    errors,
+    // Per-mode runtime state
+    basicRun,
+    basicLogs,
+    basicErrors,
+    mediumRun,
+    mediumLogs,
+    mediumErrors,
+    advancedRun,
+    advancedLogs,
+    advancedErrors,
     selectedProject,
     resetRun,
     submitBasic,
@@ -46,6 +53,11 @@ export default function ScanPage() {
     addMediumStep,
     removeMediumStep,
   } = useScanController();
+
+  // Pick the right run/logs/errors for the active non-advanced tab
+  const activeRun = activeTab === "basic" ? basicRun : mediumRun;
+  const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
+  const activeErrors = activeTab === "basic" ? basicErrors : mediumErrors;
 
   return (
     <div className="space-y-5">
@@ -133,9 +145,9 @@ export default function ScanPage() {
             <AdvancedTerminalPanel
               projectId={projectId}
               selectedProject={selectedProject}
-              logs={logs}
-              run={run}
-              errors={errors}
+              logs={advancedLogs}
+              run={advancedRun}
+              errors={advancedErrors}
               isSubmitting={isSubmitting}
               onSubmit={submitAdvanced}
               onReset={() => resetRun("advanced")}
@@ -143,7 +155,14 @@ export default function ScanPage() {
           )}
         </div>
 
-        {activeTab !== "advanced" && <LiveConsole run={run} logs={logs} errors={errors} />}
+        {/* LiveConsole is per-mode — each tab gets its own isolated run/logs/errors */}
+        {activeTab !== "advanced" && (
+          <LiveConsole
+            run={activeRun}
+            logs={activeLogs}
+            errors={activeErrors}
+          />
+        )}
       </div>
     </div>
   );
