@@ -61,10 +61,10 @@ function PreviousPageButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8e2ef] bg-white/90 px-4 py-3 text-sm font-semibold text-[#253554] shadow-sm shadow-slate-200/40 transition-all hover:-translate-y-0.5 hover:border-[#c4d3e6] hover:bg-[#f8fbff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 dark:border-gray-800 dark:bg-gray-950/90 dark:text-gray-100 dark:shadow-black/10 dark:hover:border-gray-700 dark:hover:bg-gray-900 sm:w-auto sm:justify-start"
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
     >
       <ArrowLeft className="size-4 shrink-0" />
-      <span className="truncate">Back to previous page</span>
+      <span>Back to previous page</span>
     </button>
   );
 }
@@ -388,7 +388,7 @@ function PageHeader({
       {...sectionMotion}
       className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+      <div className="flex flex-col gap-5">
         <div className="flex min-w-0 gap-4">
           <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
 
@@ -790,7 +790,7 @@ export default function CodeScanningDetailPageClient({
 
   return (
     <div className="space-y-5 text-[#17233f] dark:text-gray-100">
-      <div className="flex justify-start">
+      <div className="flex items-center justify-between gap-3">
         <PreviousPageButton onClick={handleGoBack} />
       </div>
 

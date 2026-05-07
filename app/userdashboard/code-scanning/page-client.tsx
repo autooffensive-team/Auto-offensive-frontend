@@ -325,12 +325,6 @@ export default function CodeScanningPageClient() {
   });
 
   const banner = useMemo(() => {
-    const started = searchParams.get("started");
-    if (started) return { type: "success" as const, message: `Scanner project "${started}" was created successfully.`, actionHref: null, actionLabel: null };
-
-    const created = searchParams.get("created");
-    if (created) return { type: "success" as const, message: `Scanner project "${created}" created successfully.`, actionHref: null, actionLabel: null };
-
     const provider = searchParams.get("provider");
     const gitState = searchParams.get("git");
     const message = searchParams.get("message");
