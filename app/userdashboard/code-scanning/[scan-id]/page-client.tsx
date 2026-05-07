@@ -5,14 +5,13 @@ import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
+  ArrowLeft,
   BarChart3,
-  Clock3,
   ExternalLink,
   FileCode2,
   FolderGit2,
   GitBranch,
   LoaderCircle,
-  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,9 +28,7 @@ import {
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import { cn } from "@/lib/utils";
 import type {
-  DependencySummaryResponse,
   QualityGateStatus,
-  ScanStatus,
 } from "@/types/scanner";
 
 import { CodeScanOverview } from "./code-scan-overview";
@@ -58,6 +55,19 @@ const sectionMotion = {
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.24, ease: "easeOut" as const },
 };
+
+function PreviousPageButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8e2ef] bg-white/90 px-4 py-3 text-sm font-semibold text-[#253554] shadow-sm shadow-slate-200/40 transition-all hover:-translate-y-0.5 hover:border-[#c4d3e6] hover:bg-[#f8fbff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 dark:border-gray-800 dark:bg-gray-950/90 dark:text-gray-100 dark:shadow-black/10 dark:hover:border-gray-700 dark:hover:bg-gray-900 sm:w-auto sm:justify-start"
+    >
+      <ArrowLeft className="size-4 shrink-0" />
+      <span className="truncate">Back to previous page</span>
+    </button>
+  );
+}
 
 // Utility Functions
 function asText(value: unknown): string {
@@ -364,7 +374,6 @@ function PageHeader({
   status,
   qualityGate,
   repoUrl,
-  scanDetail,
 }: {
   projectKey: string;
   repoPath: string;
@@ -373,7 +382,6 @@ function PageHeader({
   status: string | null | undefined;
   qualityGate: QualityGateStatus | null | undefined;
   repoUrl: string;
-  scanDetail: any;
 }) {
   return (
     <motion.section
@@ -535,6 +543,15 @@ export default function CodeScanningDetailPageClient({
   const [dependencyVulnerableOnly, setDependencyVulnerableOnly] =
     useState(false);
   const [dependencyOutdatedOnly, setDependencyOutdatedOnly] = useState(false);
+
+  function handleGoBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/userdashboard/code-scanning");
+  }
 
   // Check if route identifier is a scan ID
   const routeUsesScanId = /^[a-f0-9-]+$/i.test(routeIdentifier);
@@ -773,6 +790,10 @@ export default function CodeScanningDetailPageClient({
 
   return (
     <div className="space-y-5 text-[#17233f] dark:text-gray-100">
+      <div className="flex justify-start">
+        <PreviousPageButton onClick={handleGoBack} />
+      </div>
+
       <PageHeader
         projectKey={projectKey}
         repoPath={repoPath}
@@ -785,7 +806,6 @@ export default function CodeScanningDetailPageClient({
         status={status}
         qualityGate={qualityGate}
         repoUrl={scanDetail.repo_url}
-        scanDetail={scanDetail}
       />
 
       <AlertSection
