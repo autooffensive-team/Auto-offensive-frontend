@@ -105,7 +105,144 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
   );
 }
 
-// ─── Overview Metric Cell (original) ─────────────────────────────────────────
+// ─── Gauge SVG ────────────────────────────────────────────────────────────────
+function GaugeSVG({
+  pct,
+  color,
+  size = 120,
+}: {
+  pct: number;
+  color: string;
+  size?: number;
+}) {
+  const ref = useRef<SVGSVGElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    if (inView) {
+      const t = setTimeout(() => setAnimated(true), 60);
+      return () => clearTimeout(t);
+    }
+  }, [inView]);
+
+  const cx = size / 2;
+  const cy = size * 0.62;
+  const r = size * 0.38;
+  const startAngle = (-210 * Math.PI) / 180;
+  const endAngle = (30 * Math.PI) / 180;
+  const totalAngle = endAngle - startAngle;
+  const clamped = Math.max(0, Math.min(1, pct / 100));
+  const fillAngle = startAngle + totalAngle * (animated ? clamped : 0);
+
+  const arcPath = (sa: number, ea: number) => {
+    const x1 = cx + r * Math.cos(sa);
+    const y1 = cy + r * Math.sin(sa);
+    const x2 = cx + r * Math.cos(ea);
+    const y2 = cy + r * Math.sin(ea);
+    const lg = ea - sa > Math.PI ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${lg} 1 ${x2} ${y2}`;
+  };
+
+  const dotX = cx + r * Math.cos(fillAngle);
+  const dotY = cy + r * Math.sin(fillAngle);
+  const h = size * 0.68;
+
+  return (
+    <svg
+      ref={ref}
+      width={size}
+      height={h}
+      viewBox={`0 0 ${size} ${h}`}
+      fill="none"
+      className="overflow-visible"
+    >
+      {/* Track */}
+      <path
+        d={arcPath(startAngle, endAngle)}
+        stroke="currentColor"
+        strokeWidth={8}
+        strokeLinecap="round"
+        className="text-[#e4eaf4] dark:text-gray-800"
+        style={{ transition: "stroke-dasharray 0.9s cubic-bezier(0.16,1,0.3,1)" }}
+      />
+      {/* Fill */}
+      {clamped > 0 && (
+        <path
+          d={arcPath(startAngle, fillAngle)}
+          stroke={color}
+          strokeWidth={8}
+          strokeLinecap="round"
+          style={{ transition: "all 0.9s cubic-bezier(0.16,1,0.3,1) 80ms" }}
+        />
+      )}
+      {/* End dot */}
+      {clamped > 0 && (
+        <circle
+          cx={dotX}
+          cy={dotY}
+          r={5}
+          fill={color}
+          style={{ transition: "all 0.9s cubic-bezier(0.16,1,0.3,1) 80ms" }}
+        />
+      )}
+    </svg>
+  );
+}
+
+// ─── tone → gauge color map ───────────────────────────────────────────────────
+const toneGaugeColor: Record<MetricTone, string> = {
+  teal: "#1D9E75",
+  emerald: "#16A34A",
+  amber: "#EF9F27",
+  red: "#E24B4A",
+  blue: "#378ADD",
+  slate: "#888780",
+};
+
+// ─── tone → icon bg / icon color ─────────────────────────────────────────────
+const toneIconStyle: Record<MetricTone, { wrap: string; icon: string }> = {
+  teal: {
+    wrap: "bg-teal-50 dark:bg-teal-500/10",
+    icon: "text-teal-600 dark:text-teal-300",
+  },
+  emerald: {
+    wrap: "bg-emerald-50 dark:bg-emerald-500/10",
+    icon: "text-emerald-600 dark:text-emerald-300",
+  },
+  amber: {
+    wrap: "bg-amber-50 dark:bg-amber-500/10",
+    icon: "text-amber-600 dark:text-amber-300",
+  },
+  red: {
+    wrap: "bg-red-50 dark:bg-red-500/10",
+    icon: "text-red-600 dark:text-red-300",
+  },
+  blue: {
+    wrap: "bg-blue-50 dark:bg-blue-500/10",
+    icon: "text-blue-600 dark:text-blue-300",
+  },
+  slate: {
+    wrap: "bg-slate-100 dark:bg-slate-800",
+    icon: "text-slate-600 dark:text-slate-300",
+  },
+};
+
+// ─── status badge helpers ─────────────────────────────────────────────────────
+const gradeBadgeStyle = (tone: GradeTone) =>
+  tone === "green" || tone === "lime"
+    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+    : tone === "red"
+      ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+      : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400";
+
+const ringBadgeStyle = {
+  ok: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+  bad: "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300",
+  neutral: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
+} as const;
+
+// ─── Overview Metric Cell (gauge style) ──────────────────────────────────────
 interface OverviewMetricCellProps {
   title: string;
   value: string;
@@ -133,85 +270,6 @@ function OverviewMetricCell({
   ring,
   className,
 }: OverviewMetricCellProps) {
-  const toneStyles: Record<
-    MetricTone,
-    {
-      iconWrap: string;
-      icon: string;
-      topLine: string;
-      surface: string;
-      glow: string;
-      border: string;
-    }
-  > = {
-    teal: {
-      iconWrap: "bg-teal-50 dark:bg-teal-500/10",
-      icon: "text-teal-600 dark:text-teal-300",
-      topLine: "from-teal-500 to-teal-300",
-      surface: "from-white via-white to-teal-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-teal-500/5",
-      glow: "bg-teal-500/10",
-      border: "hover:border-teal-200 dark:hover:border-teal-500/20",
-    },
-    emerald: {
-      iconWrap: "bg-emerald-50 dark:bg-emerald-500/10",
-      icon: "text-emerald-600 dark:text-emerald-300",
-      topLine: "from-emerald-500 to-emerald-300",
-      surface: "from-white via-white to-emerald-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-emerald-500/5",
-      glow: "bg-emerald-500/10",
-      border: "hover:border-emerald-200 dark:hover:border-emerald-500/20",
-    },
-    amber: {
-      iconWrap: "bg-amber-50 dark:bg-amber-500/10",
-      icon: "text-amber-600 dark:text-amber-300",
-      topLine: "from-amber-500 to-amber-300",
-      surface: "from-white via-white to-amber-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-amber-500/5",
-      glow: "bg-amber-500/10",
-      border: "hover:border-amber-200 dark:hover:border-amber-500/20",
-    },
-    red: {
-      iconWrap: "bg-red-50 dark:bg-red-500/10",
-      icon: "text-red-600 dark:text-red-300",
-      topLine: "from-red-500 to-red-300",
-      surface: "from-white via-white to-red-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-red-500/5",
-      glow: "bg-red-500/10",
-      border: "hover:border-red-200 dark:hover:border-red-500/20",
-    },
-    blue: {
-      iconWrap: "bg-blue-50 dark:bg-blue-500/10",
-      icon: "text-blue-600 dark:text-blue-300",
-      topLine: "from-blue-500 to-blue-300",
-      surface: "from-white via-white to-blue-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-blue-500/5",
-      glow: "bg-blue-500/10",
-      border: "hover:border-blue-200 dark:hover:border-blue-500/20",
-    },
-    slate: {
-      iconWrap: "bg-slate-100 dark:bg-slate-800",
-      icon: "text-slate-600 dark:text-slate-300",
-      topLine: "from-slate-500 to-slate-300",
-      surface: "from-white via-white to-slate-50/70 dark:from-gray-950 dark:via-gray-950 dark:to-slate-500/5",
-      glow: "bg-slate-500/10",
-      border: "hover:border-slate-300 dark:hover:border-slate-700",
-    },
-  };
-
-  const gradeStyles: Record<GradeTone, string> = {
-    green:
-      "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
-    lime:
-      "bg-lime-50 text-lime-700 ring-1 ring-lime-200 dark:bg-lime-500/10 dark:text-lime-300 dark:ring-lime-500/20",
-    red:
-      "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20",
-    muted:
-      "bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700",
-  };
-
-  const ringStyles = {
-    ok: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
-    bad: "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20",
-    neutral:
-      "bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700",
-  } as const;
-
   const statusLabel = grade
     ? `Grade ${grade.label}`
     : ring === "ok"
@@ -222,144 +280,131 @@ function OverviewMetricCell({
           ? "Tracked"
           : null;
 
-  const statusStyles = grade
-    ? gradeStyles[grade.tone]
+  const statusStyle = grade
+    ? gradeBadgeStyle(grade.tone)
     : ring
-      ? ringStyles[ring]
-      : ringStyles.neutral;
+      ? ringBadgeStyle[ring]
+      : ringBadgeStyle.neutral;
 
-  const toneStyle = toneStyles[tone];
-  const normalizedGraphValue =
-    graphValue == null ? null : Math.max(0, Math.min(100, graphValue));
-  const segmentedTotal =
-    graphSegments?.reduce((sum, segment) => sum + Math.max(segment.value, 0), 0) ?? 0;
+  const gaugeColor = toneGaugeColor[tone];
+  const normalizedPct =
+    graphValue == null ? 0 : Math.max(0, Math.min(100, graphValue));
+  const segTotal =
+    graphSegments?.reduce((s, x) => s + Math.max(x.value, 0), 0) ?? 0;
+
+  const iconStyle = toneIconStyle[tone];
 
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-[24px] border border-[#e4eaf4] bg-linear-to-br p-5 transition-all duration-300 dark:border-gray-800",
-        toneStyle.surface,
-        toneStyle.border,
-        className
+        "flex flex-col rounded-[16px] border border-[#e4eaf4] bg-white p-4 dark:border-gray-800 dark:bg-gray-950",
+        className,
       )}
     >
-      <div
-        className={cn(
-          "absolute -right-8 -top-8 h-24 w-24 rounded-full blur-2xl transition-opacity duration-300 group-hover:opacity-100",
-          toneStyle.glow,
-          "opacity-70"
-        )}
-      />
-      <div className="flex h-full flex-col">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
-            <div
-              className={cn(
-                "mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl shadow-inner",
-                toneStyle.iconWrap
-              )}
-            >
-              <Icon className={cn("size-5", toneStyle.icon)} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7a8db4] dark:text-gray-500">
-                Metric
-              </p>
-              <h3 className="mt-1.5 text-sm font-semibold text-[#17233f] dark:text-gray-100">
-                {title}
-              </h3>
-            </div>
+      {/* Header: icon + title + badge */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          {/* Icon bubble */}
+          <div
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center rounded-xl",
+              iconStyle.wrap,
+            )}
+          >
+            <Icon className={cn("size-4", iconStyle.icon)} />
           </div>
-          {statusLabel ? (
-            <span
-              className={cn(
-                "inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
-                statusStyles
-              )}
-            >
-              {statusLabel}
-            </span>
-          ) : null}
+          <div>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#7a8db4] dark:text-gray-500">
+              Metric
+            </p>
+            <h3 className="mt-0.5 text-[13px] font-medium text-[#17233f] dark:text-gray-100">
+              {title}
+            </h3>
+          </div>
         </div>
+        {statusLabel && (
+          <span
+            className={cn(
+              "mt-0.5 inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide",
+              statusStyle,
+            )}
+          >
+            {statusLabel}
+          </span>
+        )}
+      </div>
 
-        <div className="mt-7">
-          <div className="flex flex-wrap items-end gap-3">
-            <span className="font-mono text-[2rem] font-bold leading-none tracking-[-0.04em] text-[#071120] dark:text-white">
-              {value}
-            </span>
-            {primaryDetail && (
-              <span className="inline-flex items-center rounded-full border border-[#e4eaf4] bg-white/80 px-2.5 py-1 text-[11px] font-medium text-[#52648f] dark:border-gray-800 dark:bg-gray-900/80 dark:text-gray-300">
-                {primaryDetail}
-              </span>
+      {/* Gauge or Segmented bar */}
+      {graphSegments && graphSegments.length > 0 ? (
+        /* Segmented bar (used for Dependency severity) */
+        <div className="my-3 space-y-2">
+          <div className="flex h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-gray-800">
+            {segTotal > 0 ? (
+              graphSegments.map((seg, i) => (
+                <div
+                  key={i}
+                  className="h-full transition-all duration-500"
+                  style={{
+                    width: `${(Math.max(seg.value, 0) / segTotal) * 100}%`,
+                    backgroundColor: seg.color,
+                  }}
+                />
+              ))
+            ) : (
+              <div className="h-full w-full bg-[#d9e2f0] dark:bg-gray-700" />
             )}
           </div>
-          {secondaryDetail && (
-            <p className="mt-3 max-w-[32ch] text-sm leading-6 text-[#4f6290] dark:text-gray-400">
-              {secondaryDetail}
-            </p>
-          )}
-          {graphSegments && graphSegments.length > 0 ? (
-            <div className="mt-4 space-y-2">
-              <div className="flex h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-gray-800">
-                {segmentedTotal > 0 ? (
-                  graphSegments.map((segment, index) => (
-                    <div
-                      key={`${title}-segment-${index}`}
-                      className="h-full transition-all duration-500"
-                      style={{
-                        width: `${(Math.max(segment.value, 0) / segmentedTotal) * 100}%`,
-                        backgroundColor: segment.color,
-                      }}
-                    />
-                  ))
-                ) : (
-                  <div className="h-full w-full bg-[#d9e2f0] dark:bg-gray-700" />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {graphSegments.map((segment, index) => (
-                  <span
-                    key={`${title}-legend-${index}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2 py-1 text-[10px] font-medium text-[#52648f] dark:bg-gray-900/80 dark:text-gray-300"
-                  >
-                    <span
-                      className="inline-block size-1.5 rounded-full"
-                      style={{ backgroundColor: segment.color }}
-                    />
-                    {segment.value}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ) : normalizedGraphValue != null ? (
-            <div className="mt-4 space-y-2">
-              <div className="h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-gray-800">
-                <div
-                  className={cn(
-                    "h-full rounded-full bg-linear-to-r transition-all duration-500",
-                    toneStyle.topLine
-                  )}
-                  style={{ width: `${normalizedGraphValue}%` }}
+          {/* Segment legend */}
+          <div className="flex flex-wrap gap-1.5">
+            {graphSegments.map((seg, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1 rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-[#52648f] dark:bg-gray-900/80 dark:text-gray-300"
+              >
+                <span
+                  className="inline-block size-1.5 rounded-full"
+                  style={{ backgroundColor: seg.color }}
                 />
-              </div>
-              <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-wide text-[#8a9bbc] dark:text-gray-500">
-                <span>Impact</span>
-                <span>{Math.round(normalizedGraphValue)}%</span>
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="mt-auto pt-5">
-          <div className="flex items-center justify-between gap-3 border-t border-[#e8edf6] pt-3 dark:border-gray-800">
-            <span className="text-[11px] font-medium text-[#8a9bbc] dark:text-gray-500">
-              Latest scan snapshot
-            </span>
-            <span className="text-[11px] font-medium text-[#52648f] dark:text-gray-400">
-              {title}
-            </span>
+                {seg.value}
+              </span>
+            ))}
           </div>
         </div>
+      ) : (
+        /* Gauge arc */
+        <div className="my-1 flex flex-col items-center">
+          <div className="relative" style={{ width: 120, height: 82 }}>
+            <GaugeSVG pct={normalizedPct} color={gaugeColor} size={120} />
+            {/* Center value */}
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-center">
+              <span className="font-mono text-[17px] font-semibold leading-none text-[#17233f] dark:text-white">
+                {value}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Details */}
+      {primaryDetail && (
+        <p className="text-[11px] text-[#52648f] dark:text-gray-400">
+          {primaryDetail}
+        </p>
+      )}
+      {secondaryDetail && (
+        <p className="mt-1 text-[11px] leading-5 text-[#52648f] dark:text-gray-400">
+          {secondaryDetail}
+        </p>
+      )}
+
+      {/* Footer */}
+      <div className="mt-auto flex items-center justify-between border-t border-[#e8edf6] pt-2 dark:border-gray-800">
+        <span className="text-[10px] text-[#8a9bbc] dark:text-gray-500">
+          Latest scan snapshot
+        </span>
+        <span className="text-[10px] text-[#52648f] dark:text-gray-400">
+          {title}
+        </span>
       </div>
     </div>
   );
@@ -675,7 +720,7 @@ export function CodeScanOverview({
     : rawRiskScore < 3.5 ? "High"
     : "Critical";
 
-  const gradeBadgeStyle = (tone: GradeTone) =>
+  const _gradeBadgeStyle = (tone: GradeTone) =>
     tone === "green" || tone === "lime"
       ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
       : tone === "red"
@@ -687,9 +732,6 @@ export function CodeScanOverview({
   const mntGrade = getGrade(codeSmells, 10, 50);
 
   // ── Donut segment data ─────────────────────────────────────────────────────
-  // Severity palette:
-  // Critical → #DC2626, High → #EA580C, Medium → #D97706, Low → #16A34A,
-  // Info / Safe → #2563EB
   const depSegments: DonutSegment[] = [
     { label: "Critical", count: depCritical, color: "#DC2626" },
     { label: "High",     count: depHigh,     color: "#EA580C" },
@@ -709,7 +751,6 @@ export function CodeScanOverview({
     { label: "Accepted",        count: acceptedIssues,  color: "#2563EB" },
   ];
 
-  // Health: coverage % vs duplication % vs remainder
   const covPct   = Math.round(coverage);
   const dupPct   = Math.round(duplications);
   const restPct  = Math.max(0, 100 - covPct - dupPct);
@@ -718,19 +759,23 @@ export function CodeScanOverview({
     { label: "Duplication", count: dupPct,  color: "#DC2626" },
     { label: "Uncovered",   count: restPct, color: "#2563EB" },
   ];
-  const securityGraph = Math.min(vulnerabilities * 20, 100);
-  const reliabilityGraph = Math.min(bugs * 12, 100);
+
+  const securityGraph        = Math.min(vulnerabilities * 20, 100);
+  const reliabilityGraph     = Math.min(bugs * 12, 100);
   const maintainabilityGraph = Math.min(codeSmells, 100);
-  const acceptedGraph = Math.min(acceptedIssues * 15, 100);
-  const hotspotsGraph = Math.min(hotspots * 15, 100);
-  const dependencyScanGraph =
+  const acceptedGraph        = Math.min(acceptedIssues * 15, 100);
+  const hotspotsGraph        = Math.min(hotspots * 15, 100);
+  const dependencyScanGraph  =
     depTotal > 0
       ? Math.round(((dependencySummary?.vulnerable ?? depTotal) / depTotal) * 100)
       : Math.min((dependencySummary?.vulnerable ?? 0) * 10, 100);
-  const normalizedScanProgress = Math.max(
-    0,
-    Math.min(100, Math.round(scanProgress))
-  );
+  const normalizedScanProgress = Math.max(0, Math.min(100, Math.round(scanProgress)));
+
+  // Calculate dependency severity risk percentage (critical + high out of total)
+  const depSeverityRiskPct =
+    depTotal > 0
+      ? Math.min(((depCritical + depHigh) / depTotal) * 100, 100)
+      : 0;
 
   return (
     <motion.div
@@ -739,7 +784,7 @@ export function CodeScanOverview({
       transition={{ duration: 0.24, ease: "easeOut" }}
       className="space-y-5"
     >
-      {/* ── Row 1: Top Stat Cards (original) ──────────────────────────────── */}
+      {/* ── Row 1: Top Stat Cards ──────────────────────────────────────────── */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <TopStatCard
           label="Quality Gate"
@@ -783,7 +828,7 @@ export function CodeScanOverview({
         />
       </div>
 
-      {/* ── Row 2: 4 Donut Cards (new) ────────────────────────────────────── */}
+      {/* ── Row 2: 4 Donut Cards ──────────────────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <DonutCard
           title="Dependency Risk"
@@ -806,7 +851,7 @@ export function CodeScanOverview({
           segments={codeSegments}
           totalLabel={`${formatCount(totalIssues)} total issues`}
           badgeText={`Grade ${mntGrade.label}`}
-          badgeStyle={gradeBadgeStyle(mntGrade.tone)}
+          badgeStyle={_gradeBadgeStyle(mntGrade.tone)}
           delay={0.1}
         />
         <DonutCard
@@ -815,7 +860,7 @@ export function CodeScanOverview({
           segments={secSegments}
           totalLabel={`${formatCount(vulnerabilities + hotspots + acceptedIssues)} security items`}
           badgeText={`Grade ${secGrade.label}`}
-          badgeStyle={gradeBadgeStyle(secGrade.tone)}
+          badgeStyle={_gradeBadgeStyle(secGrade.tone)}
           delay={0.15}
         />
         <DonutCard
@@ -833,7 +878,7 @@ export function CodeScanOverview({
         />
       </div>
 
-      {/* ── Row 3: Operational Metrics ─────────────────────────────────────── */}
+      {/* ── Row 3: Operational Metrics ──────────────────────────────────────── */}
       <section className="rounded-[28px] border border-[#dfe7f3] bg-linear-to-br from-[#fbfdff] via-white to-[#f5f8fd] p-4 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 sm:p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf7] px-1 pb-4 dark:border-gray-800">
           <div>
@@ -924,27 +969,24 @@ export function CodeScanOverview({
           />
           <OverviewMetricCell
             title="Dependency severity"
-            value={`${formatCount(depCritical)} critical`}
-            primaryDetail={`${formatCount(depHigh)} high`}
+            value={`${formatCount(depTotal)}`}
+            primaryDetail={`${formatCount(depCritical)} critical • ${formatCount(depHigh)} high`}
             secondaryDetail={`${formatCount(depMedium)} medium • ${formatCount(depLow)} low`}
             icon={AlertOctagon}
             tone={
               depCritical > 0
                 ? "red"
-                : (dependencySummary?.vulnerable ?? 0) > 0
+                : depHigh > 0
                   ? "amber"
-                  : "emerald"
+                  : depMedium > 0
+                    ? "amber"
+                    : "emerald"
             }
-            graphSegments={[
-              { value: depCritical, color: "#DC2626" },
-              { value: depHigh, color: "#EA580C" },
-              { value: depMedium, color: "#D97706" },
-              { value: depLow, color: "#16A34A" },
-            ]}
+            graphValue={depSeverityRiskPct}
             ring={
               depCritical > 0
                 ? "bad"
-                : (dependencySummary?.vulnerable ?? 0) > 0
+                : depHigh > 0
                   ? "neutral"
                   : "ok"
             }
