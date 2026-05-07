@@ -483,6 +483,7 @@ function DonutChart({
   thickness?: number;
 }) {
   const total = segments.reduce((s, x) => s + x.count, 0);
+  const drawableSegments = segments.filter((segment) => segment.count > 0);
   const [hovered, setHovered] = useState<DonutSegment | null>(null);
   const [animated, setAnimated] = useState(false);
   const ref = useRef<SVGSVGElement>(null);
@@ -499,15 +500,16 @@ function DonutChart({
   const cy   = size / 2;
   const r    = size / 2 - thickness / 2 - 2;
   const circ = 2 * Math.PI * r;
-  const gap  = total > 1 ? 0.012 : 0;
 
   let cumPct = 0;
-  const arcs = segments.map((seg, i) => {
-    const pct         = total > 0 ? seg.count / total : 0;
-    const adjustedPct = Math.max(pct - gap, 0);
+  const arcs = drawableSegments.map((seg, i) => {
+    const pct = total > 0 ? seg.count / total : 0;
+    const startPct = cumPct;
+    const dash = circ * pct;
     const arc = {
-      offset: circ * (1 - cumPct),
-      dash:   animated ? circ * adjustedPct : 0,
+      offset: -circ * startPct,
+      dash: animated ? dash : 0,
+      gap: Math.max(circ - dash, 0),
       seg,
       pct,
       delay:  i * 80,
@@ -541,7 +543,7 @@ function DonutChart({
               fill="none"
               stroke={a.seg.color}
               strokeWidth={thickness}
-              strokeDasharray={`${a.dash} ${circ}`}
+              strokeDasharray={`${a.dash} ${a.gap}`}
               strokeDashoffset={a.offset}
               strokeLinecap="butt"
               style={{
