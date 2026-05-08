@@ -15,7 +15,10 @@ export function LiveConsole({
   errors: string[];
 }) {
   const visibleParsed = run.parsedSteps.find((step) => (step.data?.length ?? 0) > 0) ?? run.parsedSteps[0];
-  const columns = [...(visibleParsed?.columns ?? []), ...(visibleParsed?.discovered_columns ?? [])].slice(0, 6);
+  const columns = [
+    ...(Array.isArray(visibleParsed?.columns) ? visibleParsed.columns : []),
+    ...(Array.isArray(visibleParsed?.discovered_columns) ? visibleParsed.discovered_columns : []),
+  ].slice(0, 6);
   const rows = visibleParsed?.data?.slice(0, 8) ?? [];
 
   return (
@@ -104,7 +107,7 @@ export function LiveConsole({
         {!visibleParsed && <p className="text-sm text-muted-foreground">Structured rows will appear after parsers produce output.</p>}
         {visibleParsed && !rows.length && (
           <div className="space-y-2 font-mono text-xs text-muted-foreground">
-            {(visibleParsed.lines ?? []).slice(0, 8).map((line, index) => (
+            {(Array.isArray(visibleParsed.lines) ? visibleParsed.lines : []).slice(0, 8).map((line, index) => (
               <p key={`${line}-${index}`} className="break-words">{line}</p>
             ))}
           </div>

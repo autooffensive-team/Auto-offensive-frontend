@@ -25,6 +25,7 @@ const passthroughResponseHeaders = [
   "etag",
   "last-modified",
   "location",
+  "x-accel-buffering",
 ];
 
 export type GatewayRouteContext = {
