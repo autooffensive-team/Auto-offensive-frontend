@@ -18,7 +18,12 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { buildCodeScanningIssueHref, buildCodeScanningProjectHref, isLikelyScanId } from "@/lib/scanner-route";
+import {
+  buildCodeScanningIssueHref,
+  buildCodeScanningProjectHref,
+  isLikelyScanId,
+  resolveIssueKeyFromRouteSegment,
+} from "@/lib/scanner-route";
 import {
   useGetIssueDetailQuery,
   useGetScanDetailQuery,
@@ -266,14 +271,16 @@ function EmptyPanel({ message }: { message: string }) {
 
 function IssueSidebar({
   projectKey,
-  issueKey,
+  activeIssueKey,
   groups,
   total,
+  allIssues,
 }: {
   projectKey: string;
-  issueKey: string;
+  activeIssueKey: string | null;
   groups: IssueGroup[];
   total: number;
+  allIssues: IssueResponse[];
 }) {
   return (
     <aside className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
@@ -289,11 +296,11 @@ function IssueSidebar({
             </p>
             <div className="space-y-1.5">
               {group.issues.map((issue) => {
-                const active = issue.key === issueKey;
+                const active = issue.key === activeIssueKey;
                 return (
                   <Link
                     key={issue.key}
-                    href={buildCodeScanningIssueHref(projectKey, issue.key)}
+                    href={buildCodeScanningIssueHref(projectKey, issue, allIssues)}
                     className={cn(
                       "block rounded px-3 py-2 text-xs font-medium transition-all duration-200",
                       active
@@ -493,10 +500,10 @@ function ActivityPanel({ issue }: { issue: IssueDetailResponse }) {
 
 export default function CodeScanningIssueDetailPageClient({
   scanId,
-  issueKey,
+  issueRouteSegment,
 }: {
   scanId: string;
-  issueKey: string;
+  issueRouteSegment: string;
 }) {
   const [activeTab, setActiveTab] = useState<DetailTab>("where");
   const routeIdentifier = scanId;
@@ -522,21 +529,6 @@ export default function CodeScanningIssueDetailPageClient({
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
     refetchOnMountOrArgChange: true,
   });
-  const {
-    data: issueDetail,
-    isLoading,
-    isError,
-    error,
-  } = useGetIssueDetailQuery(
-    {
-      scan_id: resolvedScanId ?? "",
-      issue_key: issueKey,
-    },
-    {
-      skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
-    },
-  );
   const { data: allIssuesResponse } = useListIssuesQuery(
     {
       scan_id: resolvedScanId ?? "",
@@ -550,9 +542,28 @@ export default function CodeScanningIssueDetailPageClient({
   );
 
   const allIssues = useMemo(() => allIssuesResponse?.issues ?? [], [allIssuesResponse?.issues]);
+  const resolvedIssueKey = useMemo(
+    () => resolveIssueKeyFromRouteSegment(issueRouteSegment, allIssues),
+    [allIssues, issueRouteSegment],
+  );
+  const {
+    data: issueDetail,
+    isLoading,
+    isError,
+    error,
+  } = useGetIssueDetailQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      issue_key: resolvedIssueKey ?? "",
+    },
+    {
+      skip: !resolvedScanId || !resolvedIssueKey,
+      refetchOnMountOrArgChange: true,
+    },
+  );
   const currentIssueSummary = useMemo(
-    () => allIssues.find((item) => item.key === issueKey),
-    [allIssues, issueKey],
+    () => allIssues.find((item) => item.key === resolvedIssueKey),
+    [allIssues, resolvedIssueKey],
   );
   const groupedIssues = useMemo(
     () => groupIssuesByFile(allIssues, issueDetail?.where_is_issue.file_path ?? ""),
@@ -560,8 +571,11 @@ export default function CodeScanningIssueDetailPageClient({
   );
   const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
   const routeResolutionFailed = !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
+  const isIssueListLoading = Boolean(resolvedScanId) && allIssuesResponse === undefined;
+  const isResolvingIssueRoute = !resolvedIssueKey && isIssueListLoading;
+  const issueRouteResolutionFailed = !isIssueListLoading && !resolvedIssueKey;
 
-  if (isResolvingRoute || isScanDetailLoading || isLoading) {
+  if (isResolvingRoute || isResolvingIssueRoute || isScanDetailLoading || isLoading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
@@ -572,7 +586,7 @@ export default function CodeScanningIssueDetailPageClient({
     );
   }
 
-  if (routeResolutionFailed || isError || !issueDetail) {
+  if (routeResolutionFailed || issueRouteResolutionFailed || isError || !issueDetail) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-8 text-center">
         <AlertTriangle className="size-10 text-red-500" />
@@ -581,7 +595,9 @@ export default function CodeScanningIssueDetailPageClient({
           <p className="mt-2 max-w-xl text-sm text-slate-600 dark:text-slate-400">
             {routeResolutionFailed
               ? "No scan history was found for this project key."
-              : readErrorMessage(error, "The scanner issue detail endpoint did not return a usable payload.")}
+              : issueRouteResolutionFailed
+                ? "No issue in this scan matched the URL segment."
+                : readErrorMessage(error, "The scanner issue detail endpoint did not return a usable payload.")}
           </p>
         </div>
         <Link
@@ -697,9 +713,10 @@ export default function CodeScanningIssueDetailPageClient({
           <motion.div {...sectionMotion}>
             <IssueSidebar
               projectKey={scanDetail?.project_key || routeIdentifier}
-              issueKey={issueKey}
+              activeIssueKey={resolvedIssueKey}
               groups={groupedIssues}
               total={allIssuesResponse?.total ?? allIssues.length}
+              allIssues={allIssues}
             />
           </motion.div>
 

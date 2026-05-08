@@ -836,6 +836,7 @@ export default function CodeScanningDetailPageClient({
         <CodeScanIssues
           projectKey={scanDetail.project_key || routeIdentifier}
           issues={issues}
+          allIssues={allIssues}
           total={totalIssues}
           isLoading={isIssuesFetching}
           typeFilter={typeFilter}

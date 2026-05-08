@@ -3,11 +3,11 @@ import CodeScanningIssueDetailPageClient from "./page-client";
 export default async function CodeScanningIssueDetailPage({
   params,
 }: {
-  params: Promise<{ "scan-id": string; "issue-key": string }>;
+  params: Promise<{ "scan-id": string; "issue-key": string[] }>;
 }) {
-  const { "scan-id": rawScanId, "issue-key": rawIssueKey } = await params;
+  const { "scan-id": rawScanId, "issue-key": rawIssueSegments } = await params;
   const scanId = decodeURIComponent(rawScanId);
-  const issueKey = decodeURIComponent(rawIssueKey);
+  const issueRouteSegment = rawIssueSegments.map((segment) => decodeURIComponent(segment)).join("/");
 
-  return <CodeScanningIssueDetailPageClient key={`${scanId}:${issueKey}`} scanId={scanId} issueKey={issueKey} />;
+  return <CodeScanningIssueDetailPageClient key={`${scanId}:${issueRouteSegment}`} scanId={scanId} issueRouteSegment={issueRouteSegment} />;
 }

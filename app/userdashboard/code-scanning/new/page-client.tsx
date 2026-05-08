@@ -20,6 +20,10 @@ import {
   Lock,
   Globe,
   Star,
+  Eye,
+  Code2,
+  Shield,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -31,6 +35,7 @@ import {
   useGetProviderRepositoryBranchesQuery,
   useLazyGetProviderConnectUrlQuery,
 } from "@/lib/redux/services/userdashboard/git/git-api";
+import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import { useTriggerScanMutation } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import type {
   GitProvider,
@@ -40,6 +45,7 @@ import type {
 import { FaGithub, FaGitlab } from "react-icons/fa";
 
 const providers: GitProvider[] = ["github", "gitlab"];
+const FIRST_TIME_CONNECT_NOTICE_KEY = "auto-offensive:first-connect-notice";
 
 const providerMeta: Record<
   GitProvider,
@@ -66,6 +72,103 @@ const providerMeta: Record<
     Icon: FaGitlab,
   },
 };
+
+// ─── Language SVG icons ───────────────────────────────────────────────────────
+
+function IconTypeScript({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#3178C6" />
+      <path d="M150.5 200.5V220c3.7 1.9 8 3.3 13 4.1 5 .9 10.3 1.3 15.8 1.3 5.3 0 10.4-.5 15.2-1.6 4.8-1.1 9-2.8 12.6-5.3 3.6-2.5 6.5-5.7 8.6-9.8 2.1-4.1 3.2-9.1 3.2-15 0-4.3-.6-8.1-1.9-11.3-1.3-3.2-3.1-6.1-5.5-8.6-2.4-2.5-5.3-4.8-8.7-6.8-3.4-2-7.2-3.9-11.4-5.7-3.1-1.3-5.8-2.6-8.2-3.8-2.4-1.2-4.4-2.5-6-3.8-1.6-1.3-2.9-2.7-3.7-4.2-.9-1.5-1.3-3.2-1.3-5.2 0-1.8.4-3.5 1.2-4.9.8-1.4 1.9-2.6 3.4-3.6 1.5-1 3.2-1.7 5.3-2.2 2.1-.5 4.4-.8 6.9-.8 1.8 0 3.7.1 5.7.4 2 .3 4 .7 6 1.3 2 .6 3.9 1.4 5.8 2.4 1.8 1 3.5 2.2 5 3.6v-18.7c-3.2-1.2-6.7-2.1-10.5-2.7-3.8-.6-8-.9-12.7-.9-5.2 0-10.2.6-14.9 1.7-4.7 1.1-8.9 2.9-12.4 5.4-3.5 2.5-6.3 5.7-8.4 9.6-2.1 3.9-3.1 8.6-3.1 14.1 0 7 1.9 12.9 5.8 17.8 3.9 4.9 9.8 9 17.7 12.4 3.2 1.3 6.2 2.6 8.9 3.9 2.7 1.3 5 2.6 6.9 4 1.9 1.4 3.4 3 4.5 4.7 1.1 1.7 1.6 3.7 1.6 5.9 0 1.7-.4 3.3-1.1 4.7-.7 1.4-1.8 2.6-3.2 3.7-1.4 1-3.2 1.8-5.3 2.4-2.1.6-4.6.9-7.3.9-4.8 0-9.5-.8-14.2-2.5-4.7-1.7-9-4.3-13-7.8Z" fill="white"/>
+      <path d="M121.7 120.5H96v-17.4H168v17.4h-25.5v72.5h-20.8v-72.5Z" fill="white"/>
+    </svg>
+  );
+}
+
+function IconJavaScript({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#F7DF1E" />
+      <path d="M67.312 213.932l19.59-11.856c3.78 6.701 7.218 12.371 15.465 12.371 7.905 0 12.89-3.092 12.89-15.12v-81.798h24.057v82.138c0 24.917-14.606 36.259-35.916 36.259-19.245 0-30.416-9.967-36.086-21.994ZM152.381 211.354l19.588-11.341c5.157 8.421 11.859 14.607 23.715 14.607 9.969 0 16.325-4.984 16.325-11.858 0-8.248-6.53-11.17-17.528-15.98l-6.013-2.58c-17.357-7.387-28.87-16.667-28.87-36.257 0-18.044 13.748-31.792 35.229-31.792 15.294 0 26.292 5.328 34.196 19.247l-18.728 12.03c-4.125-7.389-8.591-10.31-15.466-10.31-7.046 0-11.516 4.47-11.516 10.31 0 7.217 4.47 10.14 14.778 14.608l6.014 2.577c20.45 8.765 31.963 17.7 31.963 37.804 0 21.654-17.012 33.51-39.867 33.51-22.339 0-36.774-10.654-43.82-24.575Z" fill="#323330"/>
+    </svg>
+  );
+}
+
+function IconPHP({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#4F5B93"/>
+      <ellipse cx="128" cy="128" rx="112" ry="60" fill="#8892BF"/>
+      <ellipse cx="128" cy="128" rx="112" ry="60" fill="url(#php_g)" opacity="0.4"/>
+      <path d="M80 108h16l-6 40H74l2-12H62l-2 12H44l6-40h16l-4 20h14l4-20ZM104 108h28c8 0 12 4 10 12l-4 16c-2 8-8 12-16 12h-12l-2 12h-16l12-52Zm10 12l-4 16h10c2 0 4-1 4-4l2-8c1-3-1-4-3-4h-9ZM146 108h28c8 0 12 4 10 12l-4 16c-2 8-8 12-16 12h-12l-2 12h-16l12-52Zm10 12l-4 16h10c2 0 4-1 4-4l2-8c1-3-1-4-3-4h-9Z" fill="white"/>
+      <defs><linearGradient id="php_g" x1="16" y1="90" x2="240" y2="166" gradientUnits="userSpaceOnUse"><stop stopColor="white"/><stop offset="1" stopColor="white" stopOpacity="0"/></linearGradient></defs>
+    </svg>
+  );
+}
+
+function IconFlutter({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#54C5F8"/>
+      <path d="M145.38 48L54 139.38l33.56 33.56 124.93-124.94H145.38Z" fill="white"/>
+      <path d="M145.21 152.03L111.62 185.6l33.59 33.59h67.3l-33.56-33.56 33.56-33.6h-67.3Z" fill="white"/>
+      <path d="M111.62 185.6l33.59-33.57-33.56-33.56-33.6 33.6 33.57 33.53Z" fill="#01579B" fillOpacity="0.8"/>
+    </svg>
+  );
+}
+
+function IconJava({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#E76F00"/>
+      <path d="M96 172s-8 4.6 5.6 6.2c16.3 1.9 24.6 1.6 42.6-1.8 0 0 4.7 2.9 11.3 5.5-40.2 17.2-91-1-59.5-9.9ZM90 148s-9 6.6 4.7 8c17.6 1.8 31.5 1.9 55.6-2.7 0 0 3.3 3.3 8.5 5.1-49.2 14.4-104 1.1-68.8-10.4Z" fill="white"/>
+      <path d="M143 100.2c10 11.5-2.7 21.9-2.7 21.9s25.5-13.2 13.8-29.7c-10.9-15.4-19.3-23 26.1-49.3 0 0-71.4 17.8-37.2 57.1Z" fill="white"/>
+      <path d="M184 190.8s5.9 4.9-6.5 8.6c-23.6 7.2-98.2 9.3-118.9.3-7.4-3.2 6.5-7.8 10.9-8.7 4.6-1 7.1-0.8 7.1-0.8-8.2-5.8-53.1 11.3-22.8 16.2 82.5 13.4 150.4-6 130.2-15.6ZM99.5 124.6s-37.5 8.9-13.3 12.2c10.2 1.4 30.6 1.1 49.5-.6 15.5-1.4 31.1-4.4 31.1-4.4s-5.5 2.3-9.4 5c-38.1 10-111.6 5.4-90.4-4.8 17.9-8.6 32.5-7.4 32.5-7.4ZM166 158.5c38.7-20.1 20.8-39.4 8.3-36.8-3.1.6-4.4 1.2-4.4 1.2s1.1-1.8 3.3-2.5c24.5-8.6 43.3 25.4-8 38.9 0 0 .6-.5.8-0.8Z" fill="white"/>
+      <path d="M152 46s21.4 21.4-20.3 54.4c-33.4 26.3-7.6 41.3 0 58.5-19.5-17.5-33.7-32.9-24.1-47.2C121.8 92.5 160.3 82.2 152 46Z" fill="white"/>
+    </svg>
+  );
+}
+
+function IconPython({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#3776AB"/>
+      <path d="M127.5 36c-51.4 0-48.2 22.3-48.2 22.3L79.4 82h49.3v7H57.2S28 85.6 28 137.5c0 51.9 28.7 50 28.7 50h17.2v-24s-.9-28.7 28.2-28.7h48.5s27.3.4 27.3-26.4V63.4S183.2 36 127.5 36Zm-26.9 15.6c4.9 0 8.8 3.9 8.8 8.8 0 4.9-3.9 8.8-8.8 8.8-4.9 0-8.8-3.9-8.8-8.8 0-4.9 3.9-8.8 8.8-8.8Z" fill="#FFD43B"/>
+      <path d="M128.5 220c51.4 0 48.2-22.3 48.2-22.3l-.1-23.7h-49.3v-7h71.5s29.2 3.4 29.2-48.5c0-51.9-28.7-50-28.7-50h-17.2v24s.9 28.7-28.2 28.7H105.4s-27.3-.4-27.3 26.4v44.9S72.8 220 128.5 220Zm26.9-15.6c-4.9 0-8.8-3.9-8.8-8.8 0-4.9 3.9-8.8 8.8-8.8 4.9 0 8.8 3.9 8.8 8.8 0 4.9-3.9 8.8-8.8 8.8Z" fill="#3776AB"/>
+    </svg>
+  );
+}
+
+function IconCSharp({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#512BD4"/>
+      <path d="M128 40L48 87.3v85.4L128 220l80-47.3V87.3L128 40Zm0 20l60 35.5v71L128 202l-60-35.5v-71L128 60Z" fill="white" fillOpacity="0.3"/>
+      <path d="M96.5 152.5c-13.5 0-24.5-11-24.5-24.5s11-24.5 24.5-24.5c9 0 16.8 4.8 21.1 12l17.3-10c-7-12.1-20.1-20.3-35.2-20-24.9.4-44.5 21-43.5 45.9 1 24.4 21.2 43.5 45.6 43.5 14.7 0 27.8-7 36-17.9l-16-11.3c-4.5 5.9-11.4 9.8-19.3 9.8-.3 0-.7 0-1-.1-.3 0-.7.1-1.1.1h-3.9ZM176 120h-8v-8h-8v8h-8v8h8v8h8v-8h8v-8ZM204 120h-8v-8h-8v8h-8v8h8v8h8v-8h8v-8Z" fill="white"/>
+    </svg>
+  );
+}
+
+function IconGo({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="256" height="256" rx="20" fill="#00ACD7"/>
+      <path d="M42 155.5c-.4 0-.5-.2-.3-.5l2.1-2.7c.2-.3.7-.5 1.1-.5h35.7c.4 0 .5.3.3.6l-1.7 2.6c-.2.3-.7.6-1 .6L42 155.5ZM26 165.2c-.4 0-.5-.2-.3-.5l2.1-2.7c.2-.3.7-.5 1.1-.5h45.6c.4 0 .6.3.5.6l-.8 2.4c-.1.4-.5.6-.9.6L26 165.2ZM54 174.9c-.4 0-.5-.3-.3-.6l1.4-2.5c.2-.3.6-.6 1-.6h20c.4 0 .6.3.6.7l-.2 2.4c0 .4-.4.7-.7.7L54 174.9ZM232.5 148.2c-6.3 1.6-10.6 2.8-16.8 4.4-1.5.4-1.6.5-2.9-1-1.5-1.7-2.6-2.8-4.7-3.8-6.3-3.1-12.4-2.2-18.1 1.5-6.8 4.4-10.3 10.9-10.2 19 .1 8 5.6 14.6 13.5 15.7 6.8.9 12.5-1.5 17-6.6.9-1.1 1.7-2.3 2.7-3.7h-19.3c-2.1 0-2.6-1.3-1.9-3 1.3-3.1 3.7-8.3 5.1-10.9.3-.6 1-1.6 2.5-1.6h36.4c-.2 2.7-.2 5.4-.6 8.1-1.1 7.2-3.8 13.8-8.2 19.6-7.2 9.5-16.6 15.4-28.5 17-9.8 1.3-18.9-.6-26.9-6.6-7.4-5.6-11.6-13-12.7-22.2-1.3-10.9 1.9-20.7 8.5-29.3 7.1-9.3 16.5-15.2 28-17.3 9.4-1.7 18.4-.6 26.5 4.9 5.3 3.5 9.1 8.3 11.6 14.3.6.9.2 1.4-1 1.7Z" fill="white"/>
+      <path d="M133 184.5c-9.1-.2-17.4-2.8-24.4-8.8-5.9-5.1-9.6-11.6-10.7-19.3-1.8-12.3 1.5-23.1 9.3-32.4 8.4-10 18.7-14.9 31.6-15.5 11.1-.5 21.3 2 29.9 9 7.9 6.5 12.1 14.8 12.5 25 .5 13.5-4 24.6-13.3 33.6-6.8 6.5-14.9 10.5-24.1 11.8-3.6.5-7.2.5-10.8.6Zm25.8-44.9c-.1-1.3-.1-2.3-.3-3.3-1.8-9.9-10.9-15.5-20.4-13.3-9.3 2.1-15.3 8-17.5 17.4-1.8 7.8 2 15.7 9.2 19 5.5 2.5 11 2.3 16.3-.3 7.8-3.8 12.1-9.9 12.7-19.5Z" fill="white"/>
+    </svg>
+  );
+}
+
+const SUPPORTED_LANGUAGES = [
+  { name: "TypeScript", detail: "npm / yarn", Icon: IconTypeScript },
+  { name: "JavaScript", detail: "npm / yarn", Icon: IconJavaScript },
+  { name: "PHP", detail: "Composer", Icon: IconPHP },
+  { name: "Flutter", detail: "Dart", Icon: IconFlutter },
+  { name: "Java / Kotlin", detail: "Maven · Gradle", Icon: IconJava },
+  { name: "Python", detail: "Pip", Icon: IconPython },
+  { name: "C#", detail: ".NET", Icon: IconCSharp },
+  { name: "Go", detail: "go modules", Icon: IconGo },
+];
 
 function asText(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -139,6 +242,10 @@ function resolveRequestedStep(searchParams: ReturnType<typeof useSearchParams>):
   return rawStep;
 }
 
+function buildFirstTimeConnectNoticeKey(userId: string): string {
+  return `${FIRST_TIME_CONNECT_NOTICE_KEY}:${userId}`;
+}
+
 // ─── Stepper config ───────────────────────────────────────────────────────────
 
 const STEPS = [
@@ -146,6 +253,215 @@ const STEPS = [
   { id: 2, label: "Choose Repository", shortLabel: "Repository", icon: FolderGit2 },
   { id: 3, label: "Scan Configuration", shortLabel: "Configure", icon: ShieldCheck },
 ];
+
+// ─── First-time Onboarding Modal ─────────────────────────────────────────────
+
+function OnboardingModal({
+  onAccept,
+  onClose,
+}: {
+  onAccept: () => void;
+  onClose: () => void;
+}) {
+  const [accepted, setAccepted] = useState(false);
+
+  return (
+    <AnimatePresence>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 md:p-6"
+        style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)" }}
+        onClick={onClose}
+      >
+        {/* Modal card */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 340, damping: 30 }}
+          className="
+            relative w-full sm:max-w-120 md:max-w-130
+            overflow-hidden
+            rounded-t-3xl sm:rounded-3xl
+            border border-gray-200/70 dark:border-gray-700/60
+            bg-white dark:bg-gray-950
+            shadow-xl shadow-black/10
+            max-h-[92dvh] sm:max-h-[88dvh]
+            flex flex-col
+          "
+          onClick={(event) => event.stopPropagation()}
+        >
+          {/* ── Drag handle (mobile only) ── */}
+          <div className="flex justify-center pt-3 pb-1 sm:hidden">
+            <div className="h-1 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+          </div>
+
+          {/* Scrollable body */}
+          <div className="overflow-y-auto flex-1">
+
+            {/* ── Header ── */}
+            <div className="px-5 sm:px-7 pt-4 sm:pt-6 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="
+                  flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center
+                  rounded-xl sm:rounded-2xl
+                  border border-teal-200/70 bg-teal-50
+                  dark:border-teal-500/20 dark:bg-teal-500/10
+                ">
+                  <Shield size={18} className="text-teal-600 dark:text-teal-400" strokeWidth={1.75} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[16px] sm:text-[17px] font-bold text-gray-900 dark:text-white leading-snug">
+                    Before you connect
+                  </p>
+                  <p className="mt-0.5 text-[12px] sm:text-[13px] text-gray-400 dark:text-gray-500">
+                    How Auto Offensive accesses your code
+                  </p>
+                </div>
+                {/* Close button */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close"
+                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-400 transition-all duration-150 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-500 dark:hover:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+                >
+                  <X size={14} strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+
+            {/* ── Divider ── */}
+            <div className="h-px mx-5 sm:mx-7 bg-gray-100 dark:bg-gray-800/80" />
+
+            {/* ── Access info rows ── */}
+            <div className="px-5 sm:px-7 pt-4 pb-3 space-y-2.5">
+              {/* Read-only */}
+              <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-gray-800 dark:bg-gray-900/60">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-500/15">
+                  <Eye size={13} className="text-teal-600 dark:text-teal-400" strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-gray-900 dark:text-white">
+                    Read-only access
+                  </p>
+                  <p className="mt-1 text-[12px] leading-[1.6] text-gray-500 dark:text-gray-400">
+                    After connecting GitHub or GitLab, we can read your authorized repos — public and private.{" "}
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      We never edit, delete, create, or push
+                    </span>{" "}
+                    anything.
+                  </p>
+                </div>
+              </div>
+
+              {/* Scan only */}
+              <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-gray-800 dark:bg-gray-900/60">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-500/15">
+                  <Code2 size={13} className="text-indigo-600 dark:text-indigo-400" strokeWidth={2} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-gray-900 dark:text-white">
+                    Used for scanning only
+                  </p>
+                  <p className="mt-1 text-[12px] leading-[1.6] text-gray-500 dark:text-gray-400">
+                    Access is exclusively used to run security and code analysis scans. Your code is never stored or shared with third parties.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Supported languages ── */}
+            <div className="px-5 sm:px-7 pb-5">
+              <p className="mb-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+                Supported languages & package managers
+              </p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <div
+                    key={lang.name}
+                    className="flex items-center gap-2.5 rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800/80 dark:bg-gray-900/50"
+                  >
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md overflow-hidden">
+                      <lang.Icon size={18} />
+                    </span>
+                    <span className="text-[12px] font-semibold text-gray-800 dark:text-gray-200 truncate">
+                      {lang.name}
+                    </span>
+                    <span className="ml-auto text-[11px] text-gray-400 dark:text-gray-500 shrink-0 hidden sm:inline">
+                      {lang.detail}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Footer: pinned to bottom ── */}
+          <div className="
+            shrink-0
+            border-t border-gray-100 dark:border-gray-800/80
+            bg-gray-50/80 dark:bg-gray-900/60
+            px-5 sm:px-7 pt-4 pb-5 sm:pb-6
+          ">
+            {/* Checkbox */}
+            <label className="
+              flex cursor-pointer items-start gap-3
+              rounded-xl border border-gray-200 bg-white px-4 py-3
+              transition-colors hover:border-gray-300 hover:bg-gray-50/80
+              dark:border-gray-700/80 dark:bg-gray-900/60 dark:hover:border-gray-600
+            ">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600"
+              />
+              <span className="text-[12.5px] sm:text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
+                I understand Auto Offensive has read-only access to my repositories and agree to the{" "}
+                <Link
+                  href="/terms-of-service"
+                  className="font-semibold text-teal-600 underline-offset-2 hover:underline dark:text-teal-400"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Terms of Service
+                </Link>
+                .
+              </span>
+            </label>
+
+            {/* CTA button */}
+            <button
+              type="button"
+              onClick={() => { if (accepted) onAccept(); }}
+              disabled={!accepted}
+              className="
+                mt-3 w-full inline-flex items-center justify-center gap-2
+                rounded-xl bg-teal-500 px-5 py-3
+                text-[13.5px] sm:text-[14px] font-semibold text-white
+                transition-all duration-150
+                hover:bg-teal-600
+                active:scale-[0.99]
+                disabled:cursor-not-allowed disabled:opacity-35
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40
+              "
+            >
+              <CheckCircle2 size={15} strokeWidth={2.5} />
+              Got it — connect my account
+            </button>
+
+            <p className="mt-2.5 text-center text-[11px] text-gray-400 dark:text-gray-600">
+              Shown only once · per account
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -253,13 +569,11 @@ function RepositoryCard({
         }
       `}
     >
-      {/* Selected indicator stripe */}
       {isSelected && (
         <span className="absolute left-0 top-3 bottom-3 w-0.75 rounded-r-full bg-teal-500" />
       )}
 
       <div className="flex items-start gap-3">
-        {/* Provider icon box */}
         <div className={`
           mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors
           ${providerIconColor}
@@ -267,7 +581,6 @@ function RepositoryCard({
           <ProviderIcon size={15} />
         </div>
 
-        {/* Content */}
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-0.5">
             {owner && (
@@ -279,8 +592,6 @@ function RepositoryCard({
               {name}
             </span>
           </div>
-
-
 
           <div className="mt-2 flex items-center gap-3">
             <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
@@ -300,7 +611,6 @@ function RepositoryCard({
           </div>
         </div>
 
-        {/* Checkmark */}
         {isSelected && (
           <div className="shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-teal-500 mt-0.5">
             <CheckCircle2 size={12} strokeWidth={3} className="text-white" />
@@ -333,8 +643,14 @@ export default function CodeScanningNewPageClient() {
   const [connectErrors, setConnectErrors] = useState<Partial<Record<GitProvider, string>>>({});
   const [connectingProvider, setConnectingProvider] = useState<GitProvider | null>(null);
   const [projectKeyTouched, setProjectKeyTouched] = useState(false);
+
+  // ── Onboarding modal state ──
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [isOnboardingReady, setIsOnboardingReady] = useState(false);
+
   const hasAppliedCallbackResume = useRef(false);
 
+  const { data: authMe } = useGetAuthMeQuery();
   const githubAccountsQuery = useGetProviderAccountsQuery("github");
   const gitlabAccountsQuery = useGetProviderAccountsQuery("gitlab");
   const githubRepositoriesQuery = useGetProviderRepositoriesQuery("github");
@@ -375,6 +691,8 @@ export default function CodeScanningNewPageClient() {
 
   const repositories = repositoriesByProvider[selectedProvider];
   const connectedAccounts = accountsByProvider[selectedProvider];
+  const hasAnyConnectedProvider =
+    accountsByProvider.github.length > 0 || accountsByProvider.gitlab.length > 0;
   const filteredRepositories = useMemo(
     () => filterRepositories(repositories, repoSearch),
     [repositories, repoSearch],
@@ -422,6 +740,27 @@ export default function CodeScanningNewPageClient() {
       ? readErrorMessage(gitlabRepositoriesQuery.error, "Unable to load GitLab repositories.")
       : "");
 
+  // ── Determine whether to show onboarding modal ──
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const userId = authMe?.user?.user_id?.trim();
+    if (!userId) return;
+
+    // Already has a connected provider — skip the modal entirely
+    if (hasAnyConnectedProvider) {
+      setShowOnboardingModal(false);
+      setIsOnboardingReady(true);
+      return;
+    }
+
+    const storageKey = buildFirstTimeConnectNoticeKey(userId);
+    const noticeSeen = window.localStorage.getItem(storageKey) === "seen";
+
+    setShowOnboardingModal(!noticeSeen);
+    setIsOnboardingReady(true);
+  }, [authMe?.user?.user_id, hasAnyConnectedProvider]);
+
   useEffect(() => {
     if (initialProvider === "github" || initialProvider === "gitlab") {
       setSelectedProvider(initialProvider);
@@ -429,9 +768,7 @@ export default function CodeScanningNewPageClient() {
   }, [initialProvider]);
 
   useEffect(() => {
-    if (hasAppliedCallbackResume.current) {
-      return;
-    }
+    if (hasAppliedCallbackResume.current) return;
 
     const gitState = searchParams.get("git");
     const provider = searchParams.get("provider");
@@ -439,14 +776,10 @@ export default function CodeScanningNewPageClient() {
       (provider === "github" || provider === "gitlab") &&
       accountsByProvider[provider].length > 0;
 
-    if (!isConnectedProvider) {
-      return;
-    }
+    if (!isConnectedProvider) return;
 
     const shouldResumeRepositoryStep = gitState === "connected" || requestedStep >= 2;
-    if (!shouldResumeRepositoryStep) {
-      return;
-    }
+    if (!shouldResumeRepositoryStep) return;
 
     hasAppliedCallbackResume.current = true;
     setSelectedProvider(provider);
@@ -458,6 +791,23 @@ export default function CodeScanningNewPageClient() {
   }, [accountsByProvider, requestedStep, searchParams]);
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
+
+  function handleOnboardingAccept() {
+    const userId = authMe?.user?.user_id?.trim();
+    if (userId && typeof window !== "undefined") {
+      window.localStorage.setItem(buildFirstTimeConnectNoticeKey(userId), "seen");
+    }
+    setShowOnboardingModal(false);
+  }
+
+  function handleOnboardingClose() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/userdashboard/code-scanning");
+  }
 
   function handleSelectProvider(provider: GitProvider) {
     setSelectedProvider(provider);
@@ -546,9 +896,7 @@ export default function CodeScanningNewPageClient() {
   }
 
   function handleNextFromStep2() {
-    if (!selectedRepository) {
-      return;
-    }
+    if (!selectedRepository) return;
     setCompletedSteps((prev) => new Set([...prev, 2]));
     setCurrentStep(3);
   }
@@ -563,699 +911,657 @@ export default function CodeScanningNewPageClient() {
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-start justify-between gap-4"
-      >
-        <div>
-          <div className="mb-1 flex items-center gap-2">
-            <Zap size={13} className="text-teal-500 dark:text-teal-400" />
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
-              Repository Scanner
-            </span>
-          </div>
-          <h1 className="text-[24px] sm:text-[28px] font-bold leading-tight text-gray-900 dark:text-white">
-            New Code Scanning Run
-          </h1>
-          <p className="mt-1 text-[13px] sm:text-[14px] text-gray-500 dark:text-gray-400">
-            Follow the steps below to connect, select, and trigger a scan.
-          </p>
-        </div>
-        <Link
-          href="/userdashboard/code-scanning"
-          className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-        >
-          <ArrowLeft size={14} />
-          <span className="hidden sm:inline">Back to Projects</span>
-          <span className="sm:hidden">Back</span>
-        </Link>
-      </motion.div>
+    <>
+      {/* ── Onboarding modal (shown only once for new users) ── */}
+      {isOnboardingReady && showOnboardingModal && (
+        <OnboardingModal onAccept={handleOnboardingAccept} onClose={handleOnboardingClose} />
+      )}
 
-      {/* Banner */}
-      {banner ? (
+      <div className="space-y-6">
+        {/* Page header */}
         <motion.div
-          initial={{ opacity: 0, y: -4 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-[13px] ${
-            banner.type === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
-              : "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
-          }`}
+          className="flex items-start justify-between gap-4"
         >
-          {banner.type === "success" ? <CheckCircle2 size={15} /> : <XCircle size={15} />}
-          {banner.message}
-        </motion.div>
-      ) : null}
-
-      {/* Stepper card */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="rounded-[28px] border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
-      >
-        {/* Stepper header */}
-        <div className="px-5 sm:px-8 pt-6 pb-5 border-b border-gray-100 dark:border-gray-800">
-          <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
-
-          {/* Mobile step label */}
-          <div className="mt-3 sm:hidden text-center">
-            <span className="text-[12px] font-semibold text-gray-500 dark:text-gray-400">
-              Step {currentStep} of {STEPS.length}
-            </span>
-            <p className="text-[14px] font-bold text-gray-900 dark:text-white">
-              {STEPS[currentStep - 1]?.label}
+          <div>
+            <div className="mb-1 flex items-center gap-2">
+              <Zap size={13} className="text-teal-500 dark:text-teal-400" />
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+                Repository Scanner
+              </span>
+            </div>
+            <h1 className="text-[24px] sm:text-[28px] font-bold leading-tight text-gray-900 dark:text-white">
+              New Code Scanning Run
+            </h1>
+            <p className="mt-1 text-[13px] sm:text-[14px] text-gray-500 dark:text-gray-400">
+              Follow the steps below to connect, select, and trigger a scan.
             </p>
           </div>
-        </div>
+          <Link
+            href="/userdashboard/code-scanning"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            <ArrowLeft size={14} />
+            <span className="hidden sm:inline">Back to Projects</span>
+            <span className="sm:hidden">Back</span>
+          </Link>
+        </motion.div>
 
-        {/* Step content */}
-        <div className="p-5 sm:p-8">
-          <AnimatePresence mode="wait">
-            {/* ── STEP 1: Connect Provider ── */}
-            {currentStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-              >
-                <div className="mb-5">
-                  <p className="text-[18px] font-bold text-gray-900 dark:text-white">Connect a Provider</p>
-                  <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-                    Select a Git provider and authorize access to continue.
-                  </p>
-                </div>
+        {/* Banner */}
+        {banner ? (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-[13px] ${
+              banner.type === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
+                : "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
+            }`}
+          >
+            {banner.type === "success" ? <CheckCircle2 size={15} /> : <XCircle size={15} />}
+            {banner.message}
+          </motion.div>
+        ) : null}
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 max-w-2xl">
-                  {providers.map((provider) => {
-                    const meta = providerMeta[provider];
-                    const Icon = meta.Icon;
-                    const accounts = accountsByProvider[provider];
-                    const isSelected = provider === selectedProvider;
-                    const isConnected = accounts.length > 0;
+        {/* Stepper card */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="rounded-[28px] border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+        >
+          {/* Stepper header */}
+          <div className="px-5 sm:px-8 pt-6 pb-5 border-b border-gray-100 dark:border-gray-800">
+            <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
 
-                    return (
-                      <div
-                        key={provider}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => handleSelectProvider(provider)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSelectProvider(provider)}
-                        className={`group relative cursor-pointer rounded-2xl border-2 px-5 py-5 text-left transition-all duration-200 ${
-                          isSelected
-                            ? "border-teal-400 bg-teal-50/60 dark:border-teal-500/50 dark:bg-teal-500/10"
-                            : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
-                        }`}
-                      >
-                        {isConnected && (
-                          <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            Connected
-                          </span>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${meta.soft}`}>
-                            <Icon size={22} />
-                          </div>
-                          <div>
-                            <p className="text-[15px] font-bold text-gray-900 dark:text-white">{meta.label}</p>
-                            <p className="mt-0.5 text-[12px] text-gray-500 dark:text-gray-400">
-                              {formatConnectedText(accounts)}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="mt-3 text-[13px] leading-5 text-gray-500 dark:text-gray-400">
-                          {meta.description}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); handleConnectProvider(provider); }}
-                          disabled={connectingProvider === provider}
-                          className={`mt-4 w-full rounded-xl px-4 py-2 text-[13px] font-semibold transition-colors disabled:opacity-50 ${meta.button}`}
-                        >
-                          {connectingProvider === provider
-                            ? "Redirecting..."
-                            : isConnected
-                              ? `Reconnect ${meta.label}`
-                              : `Connect ${meta.label}`}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+            {/* Mobile step label */}
+            <div className="mt-3 sm:hidden text-center">
+              <span className="text-[12px] font-semibold text-gray-500 dark:text-gray-400">
+                Step {currentStep} of {STEPS.length}
+              </span>
+              <p className="text-[14px] font-bold text-gray-900 dark:text-white">
+                {STEPS[currentStep - 1]?.label}
+              </p>
+            </div>
+          </div>
 
-                {providerError && (
-                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-[13px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400 max-w-2xl">
-                    <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                    <span>{providerError}</span>
+          {/* Step content */}
+          <div className="p-5 sm:p-8">
+            <AnimatePresence mode="wait">
+              {/* ── STEP 1: Connect Provider ── */}
+              {currentStep === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <div className="mb-5">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Connect a Provider</p>
+                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                      Select a Git provider and authorize access to continue.
+                    </p>
                   </div>
-                )}
 
-                {/* Step 1 footer */}
-                <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
-                  <p className="text-[13px] text-gray-400 dark:text-gray-500">
-                    {canProceedStep1
-                      ? `${providerMeta[selectedProvider].label} is connected. You can proceed.`
-                      : "Connect a provider to continue."}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleNextFromStep1}
-                    disabled={!canProceedStep1}
-                    className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    Next: Choose Repository
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              </motion.div>
-            )}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 max-w-2xl">
+                    {providers.map((provider) => {
+                      const meta = providerMeta[provider];
+                      const Icon = meta.Icon;
+                      const accounts = accountsByProvider[provider];
+                      const isSelected = provider === selectedProvider;
+                      const isConnected = accounts.length > 0;
 
-            {/* ── STEP 2: Choose Repository ── */}
-            {currentStep === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-              >
-                {/* Header */}
-                <div className="mb-6">
-                  <p className="text-[18px] font-bold text-gray-900 dark:text-white">Choose a Repository</p>
-                  <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-                    Select which repository to scan. Your changes are saved as you select.
-                  </p>
-                </div>
-
-                {/* Two-column layout on md+ */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-5">
-
-                  {/* ── Left column: provider tabs + search + list ── */}
-                  <div className="flex-1 min-w-0">
-
-                    {/* Provider tab switcher — Vercel-style segmented control */}
-                    <div className="mb-4 inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-gray-800 dark:bg-gray-800/60">
-                      {providers.map((provider) => {
-                        const meta = providerMeta[provider];
-                        const Icon = meta.Icon;
-                        const isActive = provider === selectedProvider;
-                        const accounts = accountsByProvider[provider];
-                        const isConnected = accounts.length > 0;
-                        return (
+                      return (
+                        <div
+                          key={provider}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleSelectProvider(provider)}
+                          onKeyDown={(e) => e.key === "Enter" && handleSelectProvider(provider)}
+                          className={`group relative cursor-pointer rounded-2xl border-2 px-5 py-5 text-left transition-all duration-200 ${
+                            isSelected
+                              ? "border-teal-400 bg-teal-50/60 dark:border-teal-500/50 dark:bg-teal-500/10"
+                              : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+                          }`}
+                        >
+                          {isConnected && (
+                            <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              Connected
+                            </span>
+                          )}
+                          <div className="flex items-center gap-3">
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${meta.soft}`}>
+                              <Icon size={22} />
+                            </div>
+                            <div>
+                              <p className="text-[15px] font-bold text-gray-900 dark:text-white">{meta.label}</p>
+                              <p className="mt-0.5 text-[12px] text-gray-500 dark:text-gray-400">
+                                {formatConnectedText(accounts)}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="mt-3 text-[13px] leading-5 text-gray-500 dark:text-gray-400">
+                            {meta.description}
+                          </p>
                           <button
-                            key={provider}
                             type="button"
-                            onClick={() => handleSelectProvider(provider)}
-                            className={`
-                              relative inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-150
-                              ${isActive
-                                ? "bg-white text-gray-900 shadow-sm shadow-gray-200/80 dark:bg-gray-700 dark:text-white dark:shadow-gray-900"
-                                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                              }
-                            `}
+                            onClick={(e) => { e.stopPropagation(); handleConnectProvider(provider); }}
+                            disabled={connectingProvider === provider}
+                            className={`mt-4 w-full rounded-xl px-4 py-2 text-[13px] font-semibold transition-colors disabled:opacity-50 ${meta.button}`}
                           >
-                            <Icon size={13} />
-                            {meta.label}
-                            {isConnected && (
-                              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            )}
+                            {connectingProvider === provider
+                              ? "Redirecting..."
+                              : isConnected
+                                ? `Reconnect ${meta.label}`
+                                : `Connect ${meta.label}`}
                           </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Search input */}
-                    <div className="relative mb-3">
-                      <Search
-                        size={14}
-                        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-                      />
-                      <input
-                        value={repoSearch}
-                        onChange={(e) => setRepoSearch(e.target.value)}
-                        placeholder={`Search ${providerMeta[selectedProvider].label} repositories…`}
-                        className="
-                          w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-14
-                          text-[13px] text-gray-900 placeholder-gray-400
-                          focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20
-                          dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500
-                          dark:focus:border-teal-500
-                        "
-                      />
-                      <span className="
-                        absolute right-3 top-1/2 -translate-y-1/2
-                        rounded-md border border-gray-200 bg-gray-50
-                        px-1.5 py-0.5 text-[10px] font-semibold text-gray-400
-                        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500
-                      ">
-                        {filteredRepositories.length}
-                      </span>
-                    </div>
-
-                    {/* Repository list */}
-                    {connectedAccounts.length === 0 ? (
-                      /* Empty — not connected */
-                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/40">
-                        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                          <FolderGit2 size={18} className="text-gray-400 dark:text-gray-500" />
                         </div>
-                        <p className="text-[14px] font-semibold text-gray-700 dark:text-gray-300">
-                          No account connected
-                        </p>
-                        <p className="mt-1 text-[13px] text-gray-400 dark:text-gray-500 max-w-xs">
-                          Go back and connect{" "}
-                          <span className="font-medium text-gray-600 dark:text-gray-300">
-                            {providerMeta[selectedProvider].label}
-                          </span>{" "}
-                          to load your repositories.
-                        </p>
-                      </div>
-                    ) : filteredRepositories.length === 0 ? (
-                      /* Empty — no match */
-                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-10 text-center dark:border-gray-700 dark:bg-gray-900/40">
-                        <Search size={16} className="mb-2 text-gray-300 dark:text-gray-600" />
-                        <p className="text-[13px] text-gray-400 dark:text-gray-500">
-                          No repositories match <span className="font-medium text-gray-600 dark:text-gray-300">&ldquo;{repoSearch}&rdquo;</span>
-                        </p>
-                      </div>
-                    ) : (
-                      /* Repository list */
-                      <div className="flex flex-col gap-2 max-h-105 overflow-y-auto pr-0.5 -mr-0.5">
-                        {filteredRepositories.map((repository) => {
-                          const key = asText(repository.repository_id) || asText(repository.full_name);
+                      );
+                    })}
+                  </div>
+
+                  {providerError && (
+                    <div className="mt-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-[13px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400 max-w-2xl">
+                      <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                      <span>{providerError}</span>
+                    </div>
+                  )}
+
+                  {/* Step 1 footer */}
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+                    <p className="text-[13px] text-gray-400 dark:text-gray-500">
+                      {canProceedStep1
+                        ? `${providerMeta[selectedProvider].label} is connected. You can proceed.`
+                        : "Connect a provider to continue."}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleNextFromStep1}
+                      disabled={!canProceedStep1}
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next: Choose Repository
+                      <ArrowRight size={15} />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── STEP 2: Choose Repository ── */}
+              {currentStep === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <div className="mb-6">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Choose a Repository</p>
+                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                      Select which repository to scan. Your changes are saved as you select.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-5">
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-4 inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-gray-800 dark:bg-gray-800/60">
+                        {providers.map((provider) => {
+                          const meta = providerMeta[provider];
+                          const Icon = meta.Icon;
+                          const isActive = provider === selectedProvider;
+                          const accounts = accountsByProvider[provider];
+                          const isConnected = accounts.length > 0;
                           return (
-                            <RepositoryCard
-                              key={key}
-                              repository={repository}
-                              provider={selectedProvider}
-                              isSelected={key === selectedRepoKey}
-                              onClick={() => handleSelectRepository(repository)}
-                            />
+                            <button
+                              key={provider}
+                              type="button"
+                              onClick={() => handleSelectProvider(provider)}
+                              className={`
+                                relative inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-150
+                                ${isActive
+                                  ? "bg-white text-gray-900 shadow-sm shadow-gray-200/80 dark:bg-gray-700 dark:text-white dark:shadow-gray-900"
+                                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                }
+                              `}
+                            >
+                              <Icon size={13} />
+                              {meta.label}
+                              {isConnected && (
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              )}
+                            </button>
                           );
                         })}
                       </div>
-                    )}
-                  </div>
 
-                  {/* ── Right column: selected repo summary ── */}
-                  <div className="w-full md:w-60 lg:w-65 shrink-0">
-                    <div className="
-                      sticky top-4 rounded-xl border border-gray-200 bg-gray-50/60
-                      dark:border-gray-800 dark:bg-gray-800/40
-                      overflow-hidden
-                    ">
-                      {/* Header */}
-                      <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
-                          Selected
-                        </p>
+                      <div className="relative mb-3">
+                        <Search
+                          size={14}
+                          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                        />
+                        <input
+                          value={repoSearch}
+                          onChange={(e) => setRepoSearch(e.target.value)}
+                          placeholder={`Search ${providerMeta[selectedProvider].label} repositories…`}
+                          className="
+                            w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-14
+                            text-[13px] text-gray-900 placeholder-gray-400
+                            focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20
+                            dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500
+                            dark:focus:border-teal-500
+                          "
+                        />
+                        <span className="
+                          absolute right-3 top-1/2 -translate-y-1/2
+                          rounded-md border border-gray-200 bg-gray-50
+                          px-1.5 py-0.5 text-[10px] font-semibold text-gray-400
+                          dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500
+                        ">
+                          {filteredRepositories.length}
+                        </span>
                       </div>
 
-                      {selectedRepository ? (
-                        <div className="px-4 py-4 space-y-3">
-                          {/* Repo name */}
-                          <div className="flex items-start gap-2.5">
-                            <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                      {connectedAccounts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/40">
+                          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                            <FolderGit2 size={18} className="text-gray-400 dark:text-gray-500" />
+                          </div>
+                          <p className="text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+                            No account connected
+                          </p>
+                          <p className="mt-1 text-[13px] text-gray-400 dark:text-gray-500 max-w-xs">
+                            Go back and connect{" "}
+                            <span className="font-medium text-gray-600 dark:text-gray-300">
+                              {providerMeta[selectedProvider].label}
+                            </span>{" "}
+                            to load your repositories.
+                          </p>
+                        </div>
+                      ) : filteredRepositories.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-10 text-center dark:border-gray-700 dark:bg-gray-900/40">
+                          <Search size={16} className="mb-2 text-gray-300 dark:text-gray-600" />
+                          <p className="text-[13px] text-gray-400 dark:text-gray-500">
+                            No repositories match <span className="font-medium text-gray-600 dark:text-gray-300">&ldquo;{repoSearch}&rdquo;</span>
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2 max-h-105 overflow-y-auto pr-0.5 -mr-0.5">
+                          {filteredRepositories.map((repository) => {
+                            const key = asText(repository.repository_id) || asText(repository.full_name);
+                            return (
+                              <RepositoryCard
+                                key={key}
+                                repository={repository}
+                                provider={selectedProvider}
+                                isSelected={key === selectedRepoKey}
+                                onClick={() => handleSelectRepository(repository)}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="w-full md:w-60 lg:w-65 shrink-0">
+                      <div className="
+                        sticky top-4 rounded-xl border border-gray-200 bg-gray-50/60
+                        dark:border-gray-800 dark:bg-gray-800/40
+                        overflow-hidden
+                      ">
+                        <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                            Selected
+                          </p>
+                        </div>
+
+                        {selectedRepository ? (
+                          <div className="px-4 py-4 space-y-3">
+                            <div className="flex items-start gap-2.5">
+                              <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                                selectedProvider === "gitlab"
+                                  ? "bg-orange-100 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400"
+                                  : "bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
+                              }`}>
+                                {selectedProvider === "gitlab" ? <FaGitlab size={13} /> : <FaGithub size={13} />}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
+                                  {asText(selectedRepository.name)}
+                                </p>
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                                  {asText(selectedRepository.full_name).split("/")[0]}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 pt-1 border-t border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Visibility</span>
+                                <span className={`
+                                  inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold
+                                  ${selectedRepository.is_private
+                                    ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
+                                    : "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                  }
+                                `}>
+                                  {selectedRepository.is_private ? <Lock size={8} strokeWidth={2.5} /> : <Globe size={8} strokeWidth={2.5} />}
+                                  {selectedRepository.is_private ? "Private" : "Public"}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Default branch</span>
+                                <span className="flex items-center gap-1 text-[11px] font-medium text-gray-700 dark:text-gray-300">
+                                  <GitBranch size={10} strokeWidth={2} />
+                                  {asText(selectedRepository.default_branch) || "main"}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Provider</span>
+                                <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300 capitalize">
+                                  {selectedProvider}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-2 dark:bg-teal-500/10">
+                              <CheckCircle2 size={12} className="text-teal-500 dark:text-teal-400 shrink-0" />
+                              <span className="text-[11px] font-semibold text-teal-700 dark:text-teal-400">
+                                Ready to configure
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
+                            <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${
+                              selectedProvider === "gitlab"
+                                ? "bg-orange-50 text-orange-300 dark:bg-orange-500/10 dark:text-orange-700"
+                                : "bg-gray-100 text-gray-300 dark:bg-gray-700/60 dark:text-gray-600"
+                            }`}>
+                              {selectedProvider === "gitlab" ? <FaGitlab size={16} /> : <FaGithub size={16} />}
+                            </div>
+                            <p className="text-[12px] text-gray-400 dark:text-gray-500 leading-snug">
+                              Pick a repository<br />from the list
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+                    <button
+                      type="button"
+                      onClick={() => handleBackToStep(1)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                    >
+                      <ArrowLeft size={14} />
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextFromStep2}
+                      disabled={!canProceedStep2}
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next: Configure Scan
+                      <ArrowRight size={15} />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── STEP 3: Scan Configuration ── */}
+              {currentStep === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <div className="mb-6">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Scan Configuration</p>
+                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                      Finalize your project key and target branch before triggering the scan.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+                    <div className="space-y-4">
+                      <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+                        <div className="px-4 pt-4 pb-3">
+                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+                            <ShieldCheck size={11} />
+                            Project Key
+                          </label>
+                          <input
+                            value={projectKey}
+                            onChange={(e) => {
+                              setProjectKeyTouched(true);
+                              setProjectKey(e.target.value);
+                            }}
+                            placeholder="github-acme-api-security"
+                            className="
+                              w-full rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-2.5
+                              text-[14px] font-mono text-gray-900 placeholder-gray-300
+                              focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
+                              dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-600
+                              dark:focus:bg-gray-900 transition-colors
+                            "
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500 shrink-0">Normalized:</span>
+                          <code className={`text-[12px] font-mono truncate ${
+                            normalizeProjectKey(projectKey)
+                              ? "text-teal-600 dark:text-teal-400"
+                              : "text-gray-300 dark:text-gray-600 italic"
+                          }`}>
+                            {normalizeProjectKey(projectKey) || "not set"}
+                          </code>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+                        <div className="px-4 pt-4 pb-3">
+                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+                            <GitBranch size={11} />
+                            Target Branch
+                          </label>
+                          <div className="relative">
+                            <GitBranch size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                            <select
+                              value={selectedBranchValue}
+                              onChange={(e) => setBranch(e.target.value)}
+                              disabled={!selectedRepository}
+                              className="
+                                w-full rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3.5 py-2.5
+                                text-[14px] text-gray-900
+                                focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
+                                disabled:opacity-50 disabled:cursor-not-allowed
+                                dark:border-gray-700 dark:bg-gray-800 dark:text-white
+                                dark:focus:bg-gray-900 transition-colors
+                              "
+                            >
+                              <option value="">
+                                {selectedRepository
+                                  ? branchesQuery.isFetching
+                                    ? "Loading branches…"
+                                    : "Select a branch"
+                                  : "Choose a repository first"}
+                              </option>
+                              {branchOptions.map((item) => (
+                                <option key={asText(item.name)} value={asText(item.name)}>
+                                  {asText(item.name)}{item.is_default ? " (default)" : ""}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
+                          {branchesQuery.isFetching ? (
+                            <LoaderCircle size={11} className="animate-spin text-gray-400 dark:text-gray-500" />
+                          ) : (
+                            <GitBranch size={11} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                          )}
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                            {branchesQuery.isFetching
+                              ? "Fetching branches from remote…"
+                              : selectedBranchValue
+                                ? `Scanning branch: ${selectedBranchValue}`
+                                : "Select the branch you want to scan"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {submitError && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
+                        >
+                          <AlertCircle size={14} className="mt-0.5 shrink-0" />
+                          <span>{submitError}</span>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
+                        <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                            Scan Target
+                          </p>
+                        </div>
+                        <div className="px-4 py-3.5 space-y-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
                               selectedProvider === "gitlab"
                                 ? "bg-orange-100 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400"
-                                : "bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
+                                : "bg-slate-100 text-slate-700 dark:bg-slate-600/30 dark:text-slate-300"
                             }`}>
                               {selectedProvider === "gitlab" ? <FaGitlab size={13} /> : <FaGithub size={13} />}
                             </div>
                             <div className="min-w-0">
                               <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
-                                {asText(selectedRepository.name)}
+                                {asText(selectedRepository?.name) || "—"}
                               </p>
                               <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
-                                {asText(selectedRepository.full_name).split("/")[0]}
+                                {asText(selectedRepository?.full_name).split("/")[0] || providerMeta[selectedProvider].label}
                               </p>
                             </div>
                           </div>
 
-                          {/* Meta rows */}
-                          <div className="space-y-2 pt-1 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] text-gray-400 dark:text-gray-500">Visibility</span>
-                              <span className={`
-                                inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold
-                                ${selectedRepository.is_private
-                                  ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
-                                  : "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                                }
-                              `}>
-                                {selectedRepository.is_private ? <Lock size={8} strokeWidth={2.5} /> : <Globe size={8} strokeWidth={2.5} />}
-                                {selectedRepository.is_private ? "Private" : "Public"}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] text-gray-400 dark:text-gray-500">Default branch</span>
-                              <span className="flex items-center gap-1 text-[11px] font-medium text-gray-700 dark:text-gray-300">
-                                <GitBranch size={10} strokeWidth={2} />
-                                {asText(selectedRepository.default_branch) || "main"}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] text-gray-400 dark:text-gray-500">Provider</span>
-                              <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300 capitalize">
-                                {selectedProvider}
-                              </span>
-                            </div>
-                          </div>
+                          <div className="border-t border-gray-200 dark:border-gray-700" />
 
-                          {/* Confirm badge */}
-                          <div className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-2 dark:bg-teal-500/10">
-                            <CheckCircle2 size={12} className="text-teal-500 dark:text-teal-400 shrink-0" />
-                            <span className="text-[11px] font-semibold text-teal-700 dark:text-teal-400">
-                              Ready to configure
-                            </span>
+                          <div className="space-y-2">
+                            {[
+                              {
+                                label: "Branch",
+                                value: selectedBranchValue.trim() || "—",
+                                icon: <GitBranch size={10} strokeWidth={2} />,
+                                mono: false,
+                              },
+                              {
+                                label: "Clone URL",
+                                value: repositoryScanUrl
+                                  ? repositoryScanUrl.replace(/^https?:\/\//, "")
+                                  : "—",
+                                icon: null,
+                                mono: true,
+                              },
+                            ].map(({ label, value, icon, mono }) => (
+                              <div key={label} className="flex items-start justify-between gap-2">
+                                <span className="shrink-0 text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1">
+                                  {icon}
+                                  {label}
+                                </span>
+                                <span className={`text-right text-[11px] break-all text-gray-700 dark:text-gray-300 max-w-37.5 ${mono ? "font-mono" : "font-medium"}`}>
+                                  {value}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
-                          <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${
-                            selectedProvider === "gitlab"
-                              ? "bg-orange-50 text-orange-300 dark:bg-orange-500/10 dark:text-orange-700"
-                              : "bg-gray-100 text-gray-300 dark:bg-gray-700/60 dark:text-gray-600"
-                          }`}>
-                            {selectedProvider === "gitlab" ? <FaGitlab size={16} /> : <FaGithub size={16} />}
-                          </div>
-                          <p className="text-[12px] text-gray-400 dark:text-gray-500 leading-snug">
-                            Pick a repository<br />from the list
+                      </div>
+
+                      <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
+                        <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                            Readiness
                           </p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Step 2 footer */}
-                <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => handleBackToStep(1)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                  >
-                    <ArrowLeft size={14} />
-                    Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextFromStep2}
-                    disabled={!canProceedStep2}
-                    className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    Next: Configure Scan
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* ── STEP 3: Scan Configuration ── */}
-            {currentStep === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.22 }}
-              >
-                {/* Header */}
-                <div className="mb-6">
-                  <p className="text-[18px] font-bold text-gray-900 dark:text-white">Scan Configuration</p>
-                  <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-                    Finalize your project key and target branch before triggering the scan.
-                  </p>
-                </div>
-
-                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-
-                  {/* ── Left: form fields ── */}
-                  <div className="space-y-4">
-
-                    {/* Project key field */}
-                    <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
-                      <div className="px-4 pt-4 pb-3">
-                        <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
-                          <ShieldCheck size={11} />
-                          Project Key
-                        </label>
-                        <input
-                          value={projectKey}
-                          onChange={(e) => {
-                            setProjectKeyTouched(true);
-                            setProjectKey(e.target.value);
-                          }}
-                          placeholder="github-acme-api-security"
-                          className="
-                            w-full rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-2.5
-                            text-[14px] font-mono text-gray-900 placeholder-gray-300
-                            focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
-                            dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-600
-                            dark:focus:bg-gray-900 transition-colors
-                          "
-                        />
-                      </div>
-                      {/* Live normalized preview */}
-                      <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
-                        <span className="text-[11px] text-gray-400 dark:text-gray-500 shrink-0">Normalized:</span>
-                        <code className={`text-[12px] font-mono truncate ${
-                          normalizeProjectKey(projectKey)
-                            ? "text-teal-600 dark:text-teal-400"
-                            : "text-gray-300 dark:text-gray-600 italic"
-                        }`}>
-                          {normalizeProjectKey(projectKey) || "not set"}
-                        </code>
-                      </div>
-                    </div>
-
-                    {/* Branch field */}
-                    <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
-                      <div className="px-4 pt-4 pb-3">
-                        <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
-                          <GitBranch size={11} />
-                          Target Branch
-                        </label>
-                        <div className="relative">
-                          <GitBranch size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                          <select
-                            value={selectedBranchValue}
-                            onChange={(e) => setBranch(e.target.value)}
-                            disabled={!selectedRepository}
-                            className="
-                              w-full rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3.5 py-2.5
-                              text-[14px] text-gray-900
-                              focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
-                              disabled:opacity-50 disabled:cursor-not-allowed
-                              dark:border-gray-700 dark:bg-gray-800 dark:text-white
-                              dark:focus:bg-gray-900 transition-colors
-                            "
-                          >
-                            <option value="">
-                              {selectedRepository
-                                ? branchesQuery.isFetching
-                                  ? "Loading branches…"
-                                  : "Select a branch"
-                                : "Choose a repository first"}
-                            </option>
-                            {branchOptions.map((item) => (
-                              <option key={asText(item.name)} value={asText(item.name)}>
-                                {asText(item.name)}{item.is_default ? " (default)" : ""}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      {/* Branch hint footer */}
-                      <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
-                        {branchesQuery.isFetching ? (
-                          <LoaderCircle size={11} className="animate-spin text-gray-400 dark:text-gray-500" />
-                        ) : (
-                          <GitBranch size={11} className="text-gray-400 dark:text-gray-500 shrink-0" />
-                        )}
-                        <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                          {branchesQuery.isFetching
-                            ? "Fetching branches from remote…"
-                            : selectedBranchValue
-                              ? `Scanning branch: ${selectedBranchValue}`
-                              : "Select the branch you want to scan"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Error */}
-                    {submitError && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
-                      >
-                        <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                        <span>{submitError}</span>
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* ── Right: scan summary panel ── */}
-                  <div className="flex flex-col gap-3">
-
-                    {/* Repo context card */}
-                    <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
-                      <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
-                          Scan Target
-                        </p>
-                      </div>
-                      <div className="px-4 py-3.5 space-y-3">
-                        {/* Provider + repo */}
-                        <div className="flex items-center gap-2.5">
-                          <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                            selectedProvider === "gitlab"
-                              ? "bg-orange-100 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400"
-                              : "bg-slate-100 text-slate-700 dark:bg-slate-600/30 dark:text-slate-300"
-                          }`}>
-                            {selectedProvider === "gitlab" ? <FaGitlab size={13} /> : <FaGithub size={13} />}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
-                              {asText(selectedRepository?.name) || "—"}
-                            </p>
-                            <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
-                              {asText(selectedRepository?.full_name).split("/")[0] || providerMeta[selectedProvider].label}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="border-t border-gray-200 dark:border-gray-700" />
-
-                        {/* Meta rows */}
-                        <div className="space-y-2">
+                        <div className="px-4 py-3 space-y-2">
                           {[
-                            {
-                              label: "Branch",
-                              value: selectedBranchValue.trim() || "—",
-                              icon: <GitBranch size={10} strokeWidth={2} />,
-                              mono: false,
-                            },
-                            {
-                              label: "Clone URL",
-                              value: repositoryScanUrl
-                                ? repositoryScanUrl.replace(/^https?:\/\//, "")
-                                : "—",
-                              icon: null,
-                              mono: true,
-                            },
-                          ].map(({ label, value, icon, mono }) => (
-                            <div key={label} className="flex items-start justify-between gap-2">
-                              <span className="shrink-0 text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1">
-                                {icon}
+                            { label: "Repository selected", ok: !!selectedRepository },
+                            { label: "Branch chosen", ok: !!selectedBranchValue.trim() },
+                            { label: "Project key set", ok: !!normalizeProjectKey(projectKey) },
+                            { label: "Clone URL available", ok: !!repositoryScanUrl },
+                          ].map(({ label, ok }) => (
+                            <div key={label} className="flex items-center gap-2">
+                              <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors ${
+                                ok ? "bg-teal-500 text-white" : "bg-gray-200 dark:bg-gray-700"
+                              }`}>
+                                {ok
+                                  ? <CheckCircle2 size={10} strokeWidth={3} />
+                                  : <span className="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-500" />
+                                }
+                              </div>
+                              <span className={`text-[12px] font-medium ${
+                                ok ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"
+                              }`}>
                                 {label}
-                              </span>
-                              <span className={`text-right text-[11px] break-all text-gray-700 dark:text-gray-300 max-w-37.5 ${mono ? "font-mono" : "font-medium"}`}>
-                                {value}
                               </span>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Readiness checklist */}
-                    <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
-                      <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
-                          Readiness
-                        </p>
-                      </div>
-                      <div className="px-4 py-3 space-y-2">
-                        {[
-                          {
-                            label: "Repository selected",
-                            ok: !!selectedRepository,
-                          },
-                          {
-                            label: "Branch chosen",
-                            ok: !!selectedBranchValue.trim(),
-                          },
-                          {
-                            label: "Project key set",
-                            ok: !!normalizeProjectKey(projectKey),
-                          },
-                          {
-                            label: "Clone URL available",
-                            ok: !!repositoryScanUrl,
-                          },
-                        ].map(({ label, ok }) => (
-                          <div key={label} className="flex items-center gap-2">
-                            <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors ${
-                              ok
-                                ? "bg-teal-500 text-white"
-                                : "bg-gray-200 dark:bg-gray-700"
-                            }`}>
-                              {ok
-                                ? <CheckCircle2 size={10} strokeWidth={3} />
-                                : <span className="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-500" />
-                              }
+                        {!!selectedRepository && !!selectedBranchValue.trim() && !!normalizeProjectKey(projectKey) && !!repositoryScanUrl && (
+                          <div className="border-t border-teal-100 bg-teal-50 px-4 py-2.5 dark:border-teal-500/20 dark:bg-teal-500/10">
+                            <div className="flex items-center gap-1.5">
+                              <Zap size={11} className="text-teal-500 dark:text-teal-400 shrink-0" />
+                              <span className="text-[11px] font-semibold text-teal-700 dark:text-teal-400">
+                                All checks passed — ready to scan
+                              </span>
                             </div>
-                            <span className={`text-[12px] font-medium ${
-                              ok ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"
-                            }`}>
-                              {label}
-                            </span>
                           </div>
-                        ))}
+                        )}
                       </div>
-                      {/* All-clear banner */}
-                      {!!selectedRepository && !!selectedBranchValue.trim() && !!normalizeProjectKey(projectKey) && !!repositoryScanUrl && (
-                        <div className="border-t border-teal-100 bg-teal-50 px-4 py-2.5 dark:border-teal-500/20 dark:bg-teal-500/10">
-                          <div className="flex items-center gap-1.5">
-                            <Zap size={11} className="text-teal-500 dark:text-teal-400 shrink-0" />
-                            <span className="text-[11px] font-semibold text-teal-700 dark:text-teal-400">
-                              All checks passed — ready to scan
-                            </span>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
-                </div>
 
-                {/* Step 3 footer */}
-                <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => handleBackToStep(2)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                  >
-                    <ArrowLeft size={14} />
-                    Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCreate}
-                    disabled={isCreating}
-                    className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-teal-500/30 transition-all hover:bg-teal-600 hover:shadow-teal-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
-                  >
-                    {isCreating ? (
-                      <LoaderCircle size={15} className="animate-spin" />
-                    ) : (
-                      <Zap size={14} />
-                    )}
-                    {isCreating ? "Triggering scan…" : "Trigger Scan"}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-    </div>
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+                    <button
+                      type="button"
+                      onClick={() => handleBackToStep(2)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                    >
+                      <ArrowLeft size={14} />
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCreate}
+                      disabled={isCreating}
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-teal-500/30 transition-all hover:bg-teal-600 hover:shadow-teal-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
+                    >
+                      {isCreating ? (
+                        <LoaderCircle size={15} className="animate-spin" />
+                      ) : (
+                        <Zap size={14} />
+                      )}
+                      {isCreating ? "Triggering scan…" : "Trigger Scan"}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+    </>
   );
 }

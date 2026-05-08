@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import type { IssueResponse } from "@/types/scanner";
+import { buildCodeScanningIssueHref } from "@/lib/scanner-route";
 import { cn } from "@/lib/utils";
 
 type FilterOption = {
@@ -204,15 +205,17 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
 function IssueCard({
   issue,
   projectKey,
+  allIssues,
 }: {
   issue: IssueResponse;
   projectKey: string;
+  allIssues: IssueResponse[];
 }) {
   const severityColors = getIssueSeverityColor(issue.severity);
   const typeIcon = getIssueTypeIcon(issue.type);
 
   return (
-    <Link href={`/userdashboard/code-scanning/${projectKey}/issues/${issue.key}`}>
+    <Link href={buildCodeScanningIssueHref(projectKey, issue, allIssues)}>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -275,6 +278,7 @@ function IssueCard({
 export interface CodeScanIssuesProps {
   projectKey: string;
   issues: IssueResponse[];
+  allIssues: IssueResponse[];
   total: number;
   isLoading: boolean;
   typeFilter: string;
@@ -286,6 +290,7 @@ export interface CodeScanIssuesProps {
 export function CodeScanIssues({
   projectKey,
   issues,
+  allIssues,
   total,
   isLoading,
   typeFilter,
@@ -405,7 +410,7 @@ export function CodeScanIssues({
           ) : (
             <div className="space-y-3">
               {issues.map((issue) => (
-                <IssueCard key={issue.key} issue={issue} projectKey={projectKey} />
+                <IssueCard key={issue.key} issue={issue} projectKey={projectKey} allIssues={allIssues} />
               ))}
             </div>
           )}
