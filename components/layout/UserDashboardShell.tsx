@@ -365,7 +365,7 @@ export default function UserDashboardShell({
               <Link
                 href="/resource"
                 onClick={closeOverlays}
-                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-white md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
               >
                 <BookOpen size={16} />
                 Docs
@@ -378,7 +378,7 @@ export default function UserDashboardShell({
                     setNotificationsOpen((value) => !value);
                     setProfileOpen(false);
                   }}
-                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/80 text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/80 text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                   aria-label="Open notifications"
                 >
                   <Bell size={18} />
@@ -391,7 +391,7 @@ export default function UserDashboardShell({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -438,7 +438,7 @@ export default function UserDashboardShell({
                     setProfileOpen((value) => !value);
                     setNotificationsOpen(false);
                   }}
-                  className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-teal-400 via-cyan-400 to-blue-500 text-sm font-bold text-slate-950">
                     {initials}
@@ -459,7 +459,7 @@ export default function UserDashboardShell({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
