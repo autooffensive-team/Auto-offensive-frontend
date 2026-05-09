@@ -1,10 +1,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LoaderCircle } from "lucide-react";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import KeycloakLoginButton from "@/components/auth/keycloak-login-button";
+import { Button } from "@/components/ui/button";
 
 type LoginPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -93,6 +94,22 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             prompt={prompt}
           />
         </div>
+
+        {!shouldAutoStartLogin ? (
+          <div className="mt-3">
+            <Button
+              asChild
+              type="button"
+              variant="outline"
+              className="w-full rounded-xl border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+            >
+              <Link href="/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Homepage
+              </Link>
+            </Button>
+          </div>
+        ) : null}
 
         <p className="mt-6 text-sm text-slate-600">
           No account yet?{" "}
