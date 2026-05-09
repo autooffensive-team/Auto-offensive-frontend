@@ -262,15 +262,12 @@ function PresetSelector({ presets, selected, onSelect, disabled }: PresetSelecto
                 "focus-within:ring-2 focus-within:ring-primary/30 focus-within:ring-offset-1",
                 // selected state
                 isSelected
-                  ? "border-primary/60 bg-primary/5 shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
+                  ? "border-primary/60 bg-card shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
                   : "border-border bg-card hover:border-primary/40 hover:bg-primary/3",
                 disabled && "pointer-events-none opacity-50"
               )}
             >
-              {/* Selected glow accent line */}
-              {isSelected && (
-                <span className="absolute inset-x-0 top-0 h-0.5 rounded-t-lg bg-primary/60" />
-              )}
+
 
               <div className="flex items-center justify-between gap-3">
                 <span

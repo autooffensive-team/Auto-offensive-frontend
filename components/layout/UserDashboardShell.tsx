@@ -105,6 +105,7 @@ export default function UserDashboardShell({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -135,8 +136,10 @@ export default function UserDashboardShell({
   };
 
   const handleLogout = () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     closeOverlays();
-    window.location.assign("/logout");
+    window.location.replace("/logout");
   };
 
   useEffect(() => {
@@ -494,10 +497,11 @@ export default function UserDashboardShell({
                         <button
                           type="button"
                           onClick={handleLogout}
-                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                          disabled={isLoggingOut}
+                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10"
                         >
                           <LogOut size={16} />
-                          Logout
+                          {isLoggingOut ? "Signing out..." : "Logout"}
                         </button>
                       </div>
                     </motion.div>

@@ -299,7 +299,7 @@ export function AdvancedTerminalPanel({
         </div>
       )}
 
-      <div ref={containerRef} className="h-[560px] overflow-hidden" />
+      <div ref={containerRef} className="h-140 overflow-hidden" />
     </motion.section>
   );
 }
