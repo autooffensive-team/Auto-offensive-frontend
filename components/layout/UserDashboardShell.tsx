@@ -20,7 +20,6 @@ import {
   FileText,
   User,
   Settings,
-  Search,
   LogOut,
   Moon,
   Sun,
@@ -362,18 +361,6 @@ export default function UserDashboardShell({
                 </h1>
               </div>
             </div>
-
-            <div className="hidden flex-1 justify-center lg:flex">
-              <label className="flex w-full max-w-xl items-center gap-3 rounded-full border border-black/8 bg-white/80 px-4 py-3 text-sm shadow-sm dark:border-white/10 dark:bg-white/5">
-                <Search size={16} className="text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search scans, assets, reports, or findings"
-                  className="w-full bg-transparent text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
-                />
-              </label>
-            </div>
-
             <div className="flex items-center gap-2 md:gap-3">
               <Link
                 href="/resource"
