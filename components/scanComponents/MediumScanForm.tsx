@@ -142,7 +142,7 @@ export function MediumScanForm({
               onClick={onAddStep}
               disabled={disabled || !canAddStep}
               className={cn(
-                "gap-1.5 text-xs",
+                "gap-1.5 text-xs border-primary/30 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/50",
                 !canAddStep && "cursor-not-allowed opacity-50"
               )}
               title={!canAddStep ? `Maximum ${MAX_STEPS} steps allowed` : undefined}
