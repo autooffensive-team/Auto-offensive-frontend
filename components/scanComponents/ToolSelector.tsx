@@ -51,7 +51,10 @@ export function ToolSelector({
             id={id}
             placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
             showTrigger
-            className={cn("w-full", isEmpty && "text-muted-foreground")}
+            className={cn(
+              "w-full [&_button[data-slot=combobox-trigger]:hover]:bg-primary/10 [&_button[data-slot=combobox-trigger]:hover]:text-primary [&_button[data-slot=combobox-trigger]:hover_svg]:text-primary",
+              isEmpty && "text-muted-foreground"
+            )}
             value={selectedTool?.tool_name ?? ""}
             readOnly
             aria-label={`Select ${label.toLowerCase()}`}

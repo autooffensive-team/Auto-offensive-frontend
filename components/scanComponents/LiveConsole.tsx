@@ -193,9 +193,6 @@ export function LiveConsole({
         badge={<StatusDot status={run.status} />}
         {...dragProps("status")}
       >
-        <div className="mb-1 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground font-mono">{run.jobId || "No active job"}</p>
-        </div>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Metric label="Mode"     value={run.mode} />
           <Metric label="Steps"    value={String(run.steps.length || 0)} />
