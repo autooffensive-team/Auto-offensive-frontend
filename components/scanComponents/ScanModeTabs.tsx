@@ -60,7 +60,7 @@ export function ScanModeTabs({ value, onChange }: ScanModeTabsProps) {
             className={cn(
               "flex items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               isActive 
-                ? "bg-primary text-primary-foreground shadow-sm" 
+                ? "bg-primary text-primary-foreground" 
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
@@ -87,7 +87,7 @@ export function ScanModePanel({ mode, children, isActive }: ScanModePanelProps) 
       id={`panel-${mode}`}
       role="tabpanel"
       aria-labelledby={`tab-${mode}`}
-      className="rounded-lg border border-border bg-card p-6 shadow-sm"
+      className="rounded-lg border border-border bg-card p-6"
     >
       {children}
     </section>

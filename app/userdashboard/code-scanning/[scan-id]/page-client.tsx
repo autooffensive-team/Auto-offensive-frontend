@@ -12,6 +12,7 @@ import {
   FolderGit2,
   GitBranch,
   LoaderCircle,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -55,6 +56,22 @@ const sectionMotion = {
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.24, ease: "easeOut" as const },
 };
+
+// ─── New Project Badge Component ────────────────────────────────────────────
+
+function NewProjectBadge() {
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.2 }}
+      className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-teal-500/30"
+    >
+      <Sparkles className="size-3.5" />
+      <span>New</span>
+    </motion.div>
+  );
+}
 
 function PreviousPageButton({ onClick }: { onClick: () => void }) {
   return (
@@ -163,6 +180,22 @@ function formatRelativeTime(value: string | null | undefined): string {
 
   const diffDays = Math.round(diffHours / 24);
   return `Last analysis ${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+}
+
+/**
+ * Check if a project is "newly created"
+ * Consider a project new if created within the last 24 hours
+ */
+function isNewProject(createdAt: string | null | undefined): boolean {
+  if (!createdAt) return false;
+
+  const createdDate = new Date(createdAt);
+  if (Number.isNaN(createdDate.getTime())) return false;
+
+  const oneDayAgoMs = 24 * 60 * 60 * 1000;
+  const diffMs = Date.now() - createdDate.getTime();
+
+  return diffMs < oneDayAgoMs;
 }
 
 function formatPercent(value: number | null | undefined): string {
@@ -374,6 +407,7 @@ function PageHeader({
   status,
   qualityGate,
   repoUrl,
+  isNew,
 }: {
   projectKey: string;
   repoPath: string;
@@ -382,12 +416,15 @@ function PageHeader({
   status: string | null | undefined;
   qualityGate: QualityGateStatus | null | undefined;
   repoUrl: string;
+  isNew: boolean;
 }) {
   return (
     <motion.section
       {...sectionMotion}
-      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="relative rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
+      {isNew && <NewProjectBadge />}
+
       <div className="flex flex-col gap-5">
         <div className="flex min-w-0 gap-4">
           <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
@@ -708,6 +745,7 @@ export default function CodeScanningDetailPageClient({
     ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())
   ).length;
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
+  const isNew = isNewProject(scanDetail?.created_at);
 
   const qualityGateMessage =
     qualityGate === "WARN"
@@ -806,6 +844,7 @@ export default function CodeScanningDetailPageClient({
         status={status}
         qualityGate={qualityGate}
         repoUrl={scanDetail.repo_url}
+        isNew={isNew}
       />
 
       <AlertSection

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
@@ -84,7 +84,7 @@ export function AdvancedTerminalPanel({
 
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    return `\r\n\x1b[1m\x1b[32m[${project}@reffensive]\x1b[0m\x1b[1m$ \x1b[0m`;
+    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m`;
   }, []);
 
   // Boot terminal once
@@ -115,7 +115,7 @@ export function AdvancedTerminalPanel({
 
       // Banner
       term.write("\x1b[1m\x1b[36m  ╔══════════════════════════════════════════╗\r\n");
-      term.write("  ║    reffensive  ·  advanced  scan         ║\r\n");
+      term.write("  ║  auto-offensive  ·  advanced  scan      ║\r\n");
       term.write("  ╚══════════════════════════════════════════╝\x1b[0m\r\n");
       term.write("\x1b[90m  Type a command and press Enter to run it.\r\n");
       term.write("  Example: nmap example.com -sV | nuclei\r\n");
@@ -270,7 +270,7 @@ export function AdvancedTerminalPanel({
     <motion.section
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-border bg-card shadow-xl"
+      className="rounded-xl border border-border bg-card"
     >
       {/* Terminal chrome */}
       <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
@@ -281,7 +281,7 @@ export function AdvancedTerminalPanel({
             <span className="h-3 w-3 rounded-full bg-green-500" />
           </div>
           <span className="font-mono text-muted-foreground">
-            {selectedProject ? `${selectedProject.name}@reffensive` : "reffensive"} — advanced scan
+            {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -290,6 +290,14 @@ export function AdvancedTerminalPanel({
               <Loader2 size={11} className="animate-spin" /> Running
             </span>
           )}
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <RotateCcw size={12} />
+            Reset
+          </button>
         </div>
       </div>
 
@@ -299,7 +307,7 @@ export function AdvancedTerminalPanel({
         </div>
       )}
 
-      <div ref={containerRef} className="h-[560px] overflow-hidden" />
+      <div ref={containerRef} className="h-140 overflow-hidden" />
     </motion.section>
   );
 }

@@ -8,8 +8,9 @@ export default function SignOutButton() {
   const [isPending, setIsPending] = useState(false);
 
   const handleSignOut = () => {
+    if (isPending) return;
     setIsPending(true);
-    window.location.assign("/logout");
+    window.location.replace("/logout");
   };
 
   return (

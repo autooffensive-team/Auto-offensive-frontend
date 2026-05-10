@@ -1,10 +1,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LoaderCircle } from "lucide-react";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import KeycloakLoginButton from "@/components/auth/keycloak-login-button";
+import { Button } from "@/components/ui/button";
 
 type LoginPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -86,12 +87,30 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="mt-4 text-sm text-rose-600">{errorText}</p>
         ) : null}
 
-        <div className="mt-6">
-          <KeycloakLoginButton
-            callbackURL={callbackURL}
-            autoStart={shouldAutoStartLogin}
-            prompt={prompt}
-          />
+        <div className="mt-6 flex gap-3 rounded-xl overflow-hidden">
+          <div className="flex-1">
+            <KeycloakLoginButton
+              callbackURL={callbackURL}
+              autoStart={shouldAutoStartLogin}
+              prompt={prompt}
+            />
+          </div>
+
+          {!shouldAutoStartLogin ? (
+            <div className="flex-1">
+              <Button
+                asChild
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+              >
+                <Link href="/">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Homepage
+                </Link>
+              </Button>
+            </div>
+          ) : null}
         </div>
 
         <p className="mt-6 text-sm text-slate-600">
