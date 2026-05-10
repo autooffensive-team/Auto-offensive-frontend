@@ -20,7 +20,6 @@ import {
   FileText,
   User,
   Settings,
-  Search,
   LogOut,
   Moon,
   Sun,
@@ -105,6 +104,7 @@ export default function UserDashboardShell({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -135,8 +135,10 @@ export default function UserDashboardShell({
   };
 
   const handleLogout = () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     closeOverlays();
-    window.location.assign("/logout");
+    window.location.replace("/logout");
   };
 
   useEffect(() => {
@@ -359,23 +361,11 @@ export default function UserDashboardShell({
                 </h1>
               </div>
             </div>
-
-            <div className="hidden flex-1 justify-center lg:flex">
-              <label className="flex w-full max-w-xl items-center gap-3 rounded-full border border-black/8 bg-white/80 px-4 py-3 text-sm shadow-sm dark:border-white/10 dark:bg-white/5">
-                <Search size={16} className="text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search scans, assets, reports, or findings"
-                  className="w-full bg-transparent text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
-                />
-              </label>
-            </div>
-
             <div className="flex items-center gap-2 md:gap-3">
               <Link
                 href="/resource"
                 onClick={closeOverlays}
-                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-white md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
               >
                 <BookOpen size={16} />
                 Docs
@@ -388,7 +378,7 @@ export default function UserDashboardShell({
                     setNotificationsOpen((value) => !value);
                     setProfileOpen(false);
                   }}
-                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/80 text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/80 text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                   aria-label="Open notifications"
                 >
                   <Bell size={18} />
@@ -401,7 +391,7 @@ export default function UserDashboardShell({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -448,7 +438,7 @@ export default function UserDashboardShell({
                     setProfileOpen((value) => !value);
                     setNotificationsOpen(false);
                   }}
-                  className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-teal-400 via-cyan-400 to-blue-500 text-sm font-bold text-slate-950">
                     {initials}
@@ -469,7 +459,7 @@ export default function UserDashboardShell({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
                     >
                       <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                         <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -494,10 +484,11 @@ export default function UserDashboardShell({
                         <button
                           type="button"
                           onClick={handleLogout}
-                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                          disabled={isLoggingOut}
+                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10"
                         >
                           <LogOut size={16} />
-                          Logout
+                          {isLoggingOut ? "Signing out..." : "Logout"}
                         </button>
                       </div>
                     </motion.div>
