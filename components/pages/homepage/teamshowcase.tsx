@@ -170,7 +170,7 @@ export default function TeamShowcase() {
           </div>
 
           {/* Premium Established Badge */}
-          <div className="absolute -right-3 bottom-10 z-30">
+          {/* <div className="absolute -right-3 bottom-10 z-30">
             <div
               className="rounded-2xl border-2 border-white/90 px-6 py-4 dark:border-white/15"
               style={{
@@ -185,7 +185,7 @@ export default function TeamShowcase() {
                 2026
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Decorative Top Right Accent */}
           <div
