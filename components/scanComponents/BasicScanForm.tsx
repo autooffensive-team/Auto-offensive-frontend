@@ -212,7 +212,7 @@ function DraggableWidget({
       className={cn(
         "group relative rounded-xl border bg-card transition-all duration-150",
         isDragging  && "opacity-40 scale-[0.98] border-dashed border-border",
-        isDragOver && !isDragging && "border-primary/60 shadow-[0_0_0_2px_hsl(var(--primary)/0.15)]",
+        isDragOver && !isDragging && "border-primary/60",
         !isDragging && !isDragOver && "border-border"
       )}
     >
@@ -272,7 +272,7 @@ function PresetSelector({ presets, selected, onSelect, disabled }: PresetSelecto
                 "relative flex cursor-pointer flex-col rounded-lg border p-4 transition-all duration-150",
                 "focus-within:ring-2 focus-within:ring-primary/30 focus-within:ring-offset-1",
                 isSelected
-                  ? "border-primary/60 bg-card shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
+                  ? "border-primary/60 bg-card"
                   : "border-border bg-card hover:border-primary/40 hover:bg-primary/3",
                 disabled && "pointer-events-none opacity-50"
               )}

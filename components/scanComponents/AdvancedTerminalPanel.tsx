@@ -270,7 +270,7 @@ export function AdvancedTerminalPanel({
     <motion.section
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-border bg-card shadow-xl"
+      className="rounded-xl border border-border bg-card"
     >
       {/* Terminal chrome */}
       <div className="flex items-center justify-between border-b border-border px-4 py-2.5">

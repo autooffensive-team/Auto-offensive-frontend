@@ -338,14 +338,21 @@ export default function ScanPage() {
 
       {/* BOTTOM SECTION: Full-width stream logs terminal */}
       {activeTab !== "advanced" && (
-        <div className="rounded-xl border border-border bg-card">
-          <div className="flex cursor-default select-none items-center gap-2 border-b border-border/50 px-4 py-2.5">
-            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-              Stream Logs
-            </span>
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-red-500" />
+                <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                <span className="h-3 w-3 rounded-full bg-green-500" />
+              </div>
+              <span className="font-mono text-muted-foreground">
+                {selectedProject ? `${selectedProject.name}@reffensive` : "reffensive"} - {activeTab} stream logs
+              </span>
+            </div>
             {activeLogs.length > 0 && (
-              <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                {activeLogs.length}
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                {activeLogs.length} lines
               </span>
             )}
           </div>

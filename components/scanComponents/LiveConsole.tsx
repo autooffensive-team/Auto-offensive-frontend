@@ -228,7 +228,6 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
               )}
               style={{
                 width: `${run.steps.length === 0 ? 0 : (run.steps.filter(s => s.status.includes("COMPLETED")).length / run.steps.length) * 100}%`,
-                boxShadow: "0 0 8px hsl(var(--primary)/0.6)",
               }}
             />
           </div>
@@ -291,7 +290,7 @@ function DraggablePanel({
       className={cn(
         "group rounded-xl border bg-card transition-all duration-150",
         isDragging  && "opacity-40 scale-[0.98] border-dashed border-border",
-        isDragOver && !isDragging && "border-primary/50 shadow-[0_0_0_2px_hsl(var(--primary)/0.12)]",
+        isDragOver && !isDragging && "border-primary/50",
         !isDragging && !isDragOver && "border-border"
       )}
     >

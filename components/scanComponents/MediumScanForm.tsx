@@ -261,8 +261,8 @@ function DraggableWidget({
       onDragEnd={onDragEnd}
       className={cn(
         "group relative rounded-xl border bg-card transition-all duration-150",
-        isDragging && "opacity-40 scale-[0.98] shadow-none border-dashed",
-        isDragOver && !isDragging && "border-primary/60 shadow-[0_0_0_2px_hsl(var(--primary)/0.15)]",
+        isDragging && "opacity-40 scale-[0.98] border-dashed",
+        isDragOver && !isDragging && "border-primary/60",
         !isDragging && !isDragOver && "border-border"
       )}
     >
