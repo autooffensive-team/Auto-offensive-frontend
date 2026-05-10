@@ -258,8 +258,55 @@ function formatSectionTitle(key: string): string {
   return formatLabel(key);
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function enhanceIssueHtmlContent(html: string): string {
+  if (!html.trim()) {
+    return "";
+  }
+
+  const exampleVariants = [
+    {
+      labels: ["Noncompliant code example", "Non-compliant code example"],
+      type: "noncompliant",
+      className: "issue-example-title issue-example-title--noncompliant",
+    },
+    {
+      labels: ["Compliant solution", "Compliant code example"],
+      type: "compliant",
+      className: "issue-example-title issue-example-title--compliant",
+    },
+  ];
+
+  let nextHtml = html;
+
+  for (const variant of exampleVariants) {
+    for (const label of variant.labels) {
+      const escapedLabel = escapeRegExp(label);
+      const titleWithPrePattern = new RegExp(
+        `<(p|h[1-6])>\\s*${escapedLabel}\\s*<\\/\\1>\\s*<pre(?![^>]*data-diff-type=)([^>]*)>`,
+        "gi",
+      );
+      const titlePattern = new RegExp(`<(p|h[1-6])>\\s*${escapedLabel}\\s*<\\/\\1>`, "gi");
+
+      nextHtml = nextHtml.replace(
+        titleWithPrePattern,
+        `<div class="${variant.className}">${label}</div><pre data-diff-type="${variant.type}"$2>`,
+      );
+      nextHtml = nextHtml.replace(
+        titlePattern,
+        `<div class="${variant.className}">${label}</div>`,
+      );
+    }
+  }
+
+  return nextHtml;
+}
+
 const issueHtmlContentClasses =
-  "issue-html-content space-y-4 text-sm leading-7 text-slate-900 dark:text-slate-100 [&_a]:text-teal-600 [&_a]:underline-offset-2 hover:[&_a]:underline [&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[13px] dark:[&_code]:bg-slate-800 [&_li]:ml-5 [&_li]:list-disc [&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-semibold [&_h4]:mt-5 [&_h4]:text-sm [&_h4]:font-semibold";
+  "issue-html-content space-y-4 text-sm leading-7 text-slate-900 dark:text-slate-100 [&_a]:font-medium [&_a]:text-teal-600 [&_a]:underline-offset-2 hover:[&_a]:underline [&_code]:rounded-md [&_code]:bg-slate-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[13px] dark:[&_code]:bg-slate-800/90 [&_li]:ml-5 [&_li]:list-disc [&_p]:text-[15px] [&_p]:leading-7 [&_strong]:font-semibold [&_strong]:text-slate-950 dark:[&_strong]:text-white [&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-semibold [&_h4]:mt-5 [&_h4]:text-sm [&_h4]:font-semibold";
 
 function EmptyPanel({ message }: { message: string }) {
   return (
@@ -407,6 +454,18 @@ function CodeSnippetPanel({
 function WhyPanel({ issue }: { issue: IssueDetailResponse }) {
   const sections = issue.more_info.description_sections;
   const hasSections = sections.length > 0 || issue.why_is_issue.html_desc.trim().length > 0;
+  const explanationHtml = useMemo(
+    () => enhanceIssueHtmlContent(issue.why_is_issue.html_desc),
+    [issue.why_is_issue.html_desc],
+  );
+  const enhancedSections = useMemo(
+    () =>
+      sections.map((section) => ({
+        ...section,
+        enhancedContent: enhanceIssueHtmlContent(section.content),
+      })),
+    [sections],
+  );
 
   if (!hasSections) {
     return <EmptyPanel message="No rule explanation was returned for this issue." />;
@@ -415,23 +474,37 @@ function WhyPanel({ issue }: { issue: IssueDetailResponse }) {
   return (
     <div className="space-y-4">
       {issue.why_is_issue.html_desc.trim() ? (
-        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white p-5 dark:bg-slate-950">
-          <div
-            className={issueHtmlContentClasses}
-            dangerouslySetInnerHTML={{ __html: issue.why_is_issue.html_desc }}
-          />
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950">
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-700 dark:bg-slate-900/80">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
+              Why is this an issue?
+            </p>
+          </div>
+          <div className="p-5">
+            <div
+              className={issueHtmlContentClasses}
+              dangerouslySetInnerHTML={{ __html: explanationHtml }}
+            />
+          </div>
         </div>
       ) : null}
 
-      {sections.map((section) => (
-        <div key={section.key} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white p-5 dark:bg-slate-950">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-            {formatSectionTitle(section.key)}
-          </h3>
-          <div
-            className={cn("mt-4", issueHtmlContentClasses)}
-            dangerouslySetInnerHTML={{ __html: section.content }}
-          />
+      {enhancedSections.map((section) => (
+        <div
+          key={section.key}
+          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950"
+        >
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-700 dark:bg-slate-900/80">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 dark:text-slate-400">
+              {formatSectionTitle(section.key)}
+            </h3>
+          </div>
+          <div className="p-5">
+            <div
+              className={issueHtmlContentClasses}
+              dangerouslySetInnerHTML={{ __html: section.enhancedContent }}
+            />
+          </div>
         </div>
       ))}
     </div>
@@ -619,44 +692,112 @@ export default function CodeScanningIssueDetailPageClient({
   return (
     <>
       <style jsx global>{`
+        .issue-html-content {
+          color: rgb(15 23 42);
+        }
+
+        .dark .issue-html-content {
+          color: rgb(241 245 249);
+        }
+
+        .issue-html-content > :first-child {
+          margin-top: 0;
+        }
+
+        .issue-html-content > :last-child {
+          margin-bottom: 0;
+        }
+
+        .issue-html-content p + p {
+          margin-top: 0.9rem;
+        }
+
+        .issue-html-content ul,
+        .issue-html-content ol {
+          margin-top: 0.9rem;
+          margin-bottom: 0.9rem;
+        }
+
+        .issue-html-content li + li {
+          margin-top: 0.45rem;
+        }
+
+        .issue-html-content .issue-example-title {
+          display: inline-flex;
+          align-items: center;
+          margin-top: 1.25rem;
+          margin-bottom: 0.75rem;
+          border-radius: 9999px;
+          padding: 0.38rem 0.9rem;
+          font-size: 0.74rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .issue-html-content .issue-example-title--noncompliant {
+          color: rgb(185, 28, 28);
+        }
+
+        .issue-html-content .issue-example-title--compliant {
+          color: rgb(21, 128, 61);
+        }
+
+        .dark .issue-html-content .issue-example-title--noncompliant {
+          color: rgb(252, 165, 165);
+        }
+
+        .dark .issue-html-content .issue-example-title--compliant {
+          color: rgb(134, 239, 172);
+        }
+
         .issue-html-content pre {
           margin-top: 0.75rem;
+          margin-bottom: 0.25rem;
           overflow-x: auto;
-          border: 1px solid var(--color-border-tertiary);
-          border-radius: 0.5rem;
-          background: var(--color-background-primary);
-          padding: 1rem 1.5rem;
+          border-radius: 0;
+          background: rgb(2 6 23 / 0.98);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            0 12px 28px rgba(15, 23, 42, 0.14);
+          padding: 1rem 1.25rem;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
           font-size: 13px;
-          line-height: 1.75;
+          line-height: 1.8;
           white-space: pre-wrap;
+          color: rgb(226, 232, 240);
+          position: relative;
         }
 
-        .issue-html-content pre[data-diff-type="noncompliant"] {
-          background:
-            linear-gradient(
-              to bottom,
-              var(--color-background-primary) 0,
-              var(--color-background-primary) 1rem,
-              rgba(254, 226, 226, 0.95) 1rem,
-              rgba(254, 226, 226, 0.95) calc(100% - 1rem),
-              var(--color-background-primary) calc(100% - 1rem),
-              var(--color-background-primary) 100%
-            );
+        .issue-html-content pre code {
+          display: block;
+          background: transparent;
+          padding: 0;
+          color: inherit;
         }
 
-        .issue-html-content pre[data-diff-type="compliant"] {
-          background:
-            linear-gradient(
-              to bottom,
-              var(--color-background-primary) 0,
-              var(--color-background-primary) 1rem,
-              rgba(220, 252, 231, 0.95) 1rem,
-              rgba(220, 252, 231, 0.95) calc(100% - 1rem),
-              var(--color-background-primary) calc(100% - 1rem),
-              var(--color-background-primary) 100%
-            );
+        .issue-html-content pre .k,
+        .issue-html-content pre .keyword {
+          color: rgb(196, 181, 253);
+          font-weight: 600;
         }
+
+        .issue-html-content pre .s,
+        .issue-html-content pre .string {
+          color: rgb(110, 231, 183);
+        }
+
+        .issue-html-content pre .sym,
+        .issue-html-content pre .operator {
+          color: rgb(103, 232, 249);
+        }
+
+        .issue-html-content pre .c,
+        .issue-html-content pre .comment {
+          color: rgb(148, 163, 184);
+          font-style: italic;
+        }
+
       `}</style>
 
       <div className="space-y-6">
