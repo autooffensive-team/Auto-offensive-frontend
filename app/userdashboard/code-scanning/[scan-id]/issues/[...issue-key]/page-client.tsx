@@ -16,6 +16,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+import Prism from "prismjs";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-typescript";
 import { useMemo, useState } from "react";
 
 import {
@@ -44,6 +47,8 @@ type SnippetLine = {
   lineNumber: number | null;
   html: string;
 };
+
+type PrismLanguage = "javascript" | "typescript";
 
 const tabItems: Array<{ id: DetailTab; label: string; icon: typeof FileCode2 }> = [
   { id: "where", label: "Where is the issue?", icon: FileCode2 },
@@ -262,6 +267,38 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ");
+}
+
+function detectPrismLanguage(code: string): PrismLanguage {
+  if (/\binterface\b|\btype\b|\benum\b|:\s*[A-Z_a-z][\w<>\[\]\s|&?,]*/.test(code)) {
+    return "typescript";
+  }
+
+  return "javascript";
+}
+
+function highlightPreBlocksWithPrism(html: string): string {
+  return html.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/gi, (_, preAttributes, preContent) => {
+    const codeMatch = preContent.match(/<code([^>]*)>([\s\S]*?)<\/code>/i);
+    const codeAttributes = codeMatch?.[1] ?? "";
+    const rawCode = codeMatch?.[2] ?? preContent;
+    const decodedCode = decodeHtmlEntities(rawCode).trimEnd();
+    const language = detectPrismLanguage(decodedCode);
+    const grammar = Prism.languages[language] ?? Prism.languages.javascript;
+    const highlightedCode = Prism.highlight(decodedCode, grammar, language);
+
+    return `<pre${preAttributes}><code${codeAttributes} class="language-${language}">${highlightedCode}</code></pre>`;
+  });
+}
+
 function enhanceIssueHtmlContent(html: string): string {
   if (!html.trim()) {
     return "";
@@ -302,7 +339,7 @@ function enhanceIssueHtmlContent(html: string): string {
     }
   }
 
-  return nextHtml;
+  return highlightPreBlocksWithPrism(nextHtml);
 }
 
 const issueHtmlContentClasses =
@@ -776,26 +813,46 @@ export default function CodeScanningIssueDetailPageClient({
           color: inherit;
         }
 
-        .issue-html-content pre .k,
-        .issue-html-content pre .keyword {
+        .issue-html-content pre .token.keyword,
+        .issue-html-content pre .token.control-flow,
+        .issue-html-content pre .token.module {
           color: rgb(196, 181, 253);
           font-weight: 600;
         }
 
-        .issue-html-content pre .s,
-        .issue-html-content pre .string {
+        .issue-html-content pre .token.string,
+        .issue-html-content pre .token.char,
+        .issue-html-content pre .token.attr-value {
           color: rgb(110, 231, 183);
         }
 
-        .issue-html-content pre .sym,
-        .issue-html-content pre .operator {
+        .issue-html-content pre .token.operator,
+        .issue-html-content pre .token.punctuation,
+        .issue-html-content pre .token.entity {
           color: rgb(103, 232, 249);
         }
 
-        .issue-html-content pre .c,
-        .issue-html-content pre .comment {
+        .issue-html-content pre .token.comment,
+        .issue-html-content pre .token.prolog,
+        .issue-html-content pre .token.doctype {
           color: rgb(148, 163, 184);
           font-style: italic;
+        }
+
+        .issue-html-content pre .token.function,
+        .issue-html-content pre .token.method {
+          color: rgb(147, 197, 253);
+        }
+
+        .issue-html-content pre .token.number,
+        .issue-html-content pre .token.boolean,
+        .issue-html-content pre .token.constant {
+          color: rgb(251, 191, 36);
+        }
+
+        .issue-html-content pre .token.class-name,
+        .issue-html-content pre .token.console {
+          color: rgb(244, 114, 182);
         }
 
       `}</style>
