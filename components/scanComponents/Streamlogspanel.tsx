@@ -1,15 +1,21 @@
 "use client";
 
-import { Bot } from "lucide-react";
+import { Bot, RotateCcw } from "lucide-react";
 import { useRef, useEffect } from "react";
 import type { LogLine } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
 interface StreamLogsPanelProps {
   logs: LogLine[];
+  onReset?: () => void;
+  title?: string;
 }
 
-export function StreamLogsPanel({ logs }: StreamLogsPanelProps) {
+export function StreamLogsPanel({
+  logs,
+  onReset,
+  title = "auto-offensive - stream logs",
+}: StreamLogsPanelProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new logs arrive
@@ -29,14 +35,26 @@ export function StreamLogsPanel({ logs }: StreamLogsPanelProps) {
           </div>
           <div className="flex items-center gap-2">
             <Bot size={13} className="text-muted-foreground/60" />
-            <span className="font-mono text-muted-foreground">reffensive - stream logs</span>
+            <span className="font-mono text-muted-foreground">{title}</span>
           </div>
         </div>
-        {logs.length > 0 && (
-          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-            {logs.length} lines
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {logs.length > 0 && (
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+              {logs.length} lines
+            </span>
+          )}
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <RotateCcw size={12} />
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Logs Container */}

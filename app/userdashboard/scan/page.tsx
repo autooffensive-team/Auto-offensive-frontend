@@ -234,21 +234,11 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold text-foreground">New Scan</h1>
-          <p className="mt-1 text-[16px] text-muted-foreground">
-            Launch Basic, Medium, or Advanced scans and watch live logs as they run.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => resetRun(activeTab)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-        >
-          <RotateCcw size={16} />
-          Reset Console
-        </button>
+      <div>
+        <h1 className="text-[28px] font-bold text-foreground">New Scan</h1>
+        <p className="mt-1 text-[16px] text-muted-foreground">
+          Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+        </p>
       </div>
 
       {metaError && (
@@ -347,14 +337,24 @@ export default function ScanPage() {
                 <span className="h-3 w-3 rounded-full bg-green-500" />
               </div>
               <span className="font-mono text-muted-foreground">
-                {selectedProject ? `${selectedProject.name}@reffensive` : "reffensive"} - {activeTab} stream logs
+                {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
               </span>
             </div>
-            {activeLogs.length > 0 && (
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                {activeLogs.length} lines
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {activeLogs.length > 0 && (
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                  {activeLogs.length} lines
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => resetRun(activeTab)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <RotateCcw size={12} />
+                Reset
+              </button>
+            </div>
           </div>
           <div className="p-4">
             <div className="h-110 overflow-y-auto rounded-lg bg-muted/30 text-xs leading-relaxed font-[Consolas,monospace]">
