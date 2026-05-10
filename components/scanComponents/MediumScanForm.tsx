@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 const MAX_STEPS = 4;
 
 // ─── Default layout order ────────────────────────────────────────────────────
-// Each widget key maps to a display label; order array controls render sequence
 const DEFAULT_LAYOUT: LayoutKey[] = ["target", "pipeline", "submit"];
 type LayoutKey = "target" | "pipeline" | "submit";
 
@@ -49,15 +48,11 @@ export function MediumScanForm({
   const [dragOverWidget, setDragOverWidget] = useState<LayoutKey | null>(null);
   const isCustomLayout = layout.join(",") !== DEFAULT_LAYOUT.join(",");
 
-  const handleWidgetDragStart = (key: LayoutKey) => {
-    setIsDraggingWidget(key);
-  };
+  const handleWidgetDragStart = (key: LayoutKey) => setIsDraggingWidget(key);
 
   const handleWidgetDragOver = (e: React.DragEvent, key: LayoutKey) => {
     e.preventDefault();
-    if (isDraggingWidget && isDraggingWidget !== key) {
-      setDragOverWidget(key);
-    }
+    if (isDraggingWidget && isDraggingWidget !== key) setDragOverWidget(key);
   };
 
   const handleWidgetDrop = (e: React.DragEvent, targetKey: LayoutKey) => {
@@ -322,7 +317,6 @@ function PipelineStep({
   const tool = tools.find((t) => t.tool_id === step.toolId);
   const options = tool?.scan_config?.medium?.options ?? [];
 
-  // Step badge color cycles through a small set so each step is visually distinct
   const badgeColors = [
     "bg-primary/10 text-primary border border-primary/20",
     "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:text-emerald-400",
@@ -338,7 +332,6 @@ function PipelineStep({
         "hover:border-border/80"
       )}
     >
-      {/* Connector line for non-first steps */}
       {index > 0 && (
         <div className="absolute -top-3.5 left-6 flex items-center gap-1.5">
           <ChevronsRight className="h-3.5 w-3.5 text-muted-foreground/40" aria-hidden="true" />
@@ -346,7 +339,6 @@ function PipelineStep({
       )}
 
       <div className="p-4">
-        {/* Step header */}
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span
@@ -383,7 +375,6 @@ function PipelineStep({
           </Button>
         </div>
 
-        {/* Tool selector + timeout */}
         <div className="grid gap-3 sm:grid-cols-2">
           <ToolSelector
             tools={tools}
@@ -406,7 +397,6 @@ function PipelineStep({
           </Field>
         </div>
 
-        {/* Tool-specific options */}
         {options.length > 0 && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {options.map((option) => (

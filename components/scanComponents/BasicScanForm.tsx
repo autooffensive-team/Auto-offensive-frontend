@@ -1,6 +1,11 @@
 "use client";
 
-import { CheckCircle2, GripVertical, LayoutGrid, RotateCcw } from "lucide-react";
+import {
+  CheckCircle2,
+  GripVertical,
+  LayoutGrid,
+  RotateCcw,
+} from "lucide-react";
 import { useState } from "react";
 import { Tool, ScanPreset } from "@/types/scan";
 import { Field } from "./Field";
@@ -41,9 +46,9 @@ export function BasicScanForm({
   const presets = selectedTool?.scan_config?.basic?.presets ?? [];
 
   // ─── Drag state ─────────────────────────────────────────────────────────
-  const [layout, setLayout]       = useState<LayoutKey[]>([...DEFAULT_LAYOUT]);
-  const [dragging, setDragging]   = useState<LayoutKey | null>(null);
-  const [dragOver, setDragOver]   = useState<LayoutKey | null>(null);
+  const [layout, setLayout]     = useState<LayoutKey[]>([...DEFAULT_LAYOUT]);
+  const [dragging, setDragging] = useState<LayoutKey | null>(null);
+  const [dragOver, setDragOver] = useState<LayoutKey | null>(null);
   const isCustom = layout.join(",") !== DEFAULT_LAYOUT.join(",");
 
   const handleDragStart = (key: LayoutKey) => setDragging(key);
@@ -143,6 +148,7 @@ export function BasicScanForm({
         />
       </DraggableWidget>
     ),
+
   };
 
   return (
@@ -175,7 +181,7 @@ export function BasicScanForm({
   );
 }
 
-// ─── DraggableWidget (identical pattern to MediumScanForm) ────────────────────
+// ─── DraggableWidget ──────────────────────────────────────────────────────────
 interface DraggableWidgetProps {
   widgetKey: LayoutKey;
   label: string;
@@ -186,12 +192,15 @@ interface DraggableWidgetProps {
   onDragOver: (e: React.DragEvent, key: LayoutKey) => void;
   onDrop: (e: React.DragEvent, key: LayoutKey) => void;
   onDragEnd: () => void;
+  badge?: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 function DraggableWidget({
   widgetKey, label, children,
   isDragging, isDragOver,
   onDragStart, onDragOver, onDrop, onDragEnd,
+  badge, icon,
 }: DraggableWidgetProps) {
   return (
     <div
@@ -216,9 +225,11 @@ function DraggableWidget({
         )}
       >
         <GripVertical className="h-4 w-4 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground/60" />
+        {icon && <span className="text-muted-foreground/60">{icon}</span>}
         <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
           {label}
         </span>
+        {badge && <span className="ml-1">{badge}</span>}
         {isDragOver && !isDragging && (
           <span className="ml-auto text-[10px] font-medium text-primary">Drop here</span>
         )}
@@ -260,15 +271,12 @@ function PresetSelector({ presets, selected, onSelect, disabled }: PresetSelecto
               className={cn(
                 "relative flex cursor-pointer flex-col rounded-lg border p-4 transition-all duration-150",
                 "focus-within:ring-2 focus-within:ring-primary/30 focus-within:ring-offset-1",
-                // selected state
                 isSelected
                   ? "border-primary/60 bg-card shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
                   : "border-border bg-card hover:border-primary/40 hover:bg-primary/3",
                 disabled && "pointer-events-none opacity-50"
               )}
             >
-
-
               <div className="flex items-center justify-between gap-3">
                 <span
                   className={cn(

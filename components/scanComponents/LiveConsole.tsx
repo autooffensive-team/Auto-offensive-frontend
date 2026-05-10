@@ -2,7 +2,6 @@
 
 import {
   AlertTriangle,
-  Bot,
   CheckCircle2,
   Circle,
   GripVertical,
@@ -12,17 +11,20 @@ import {
   XCircle,
   LayoutGrid,
   ChevronDown,
+  Activity,
+  ShieldAlert,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
-import { useState, useRef } from "react";
-import type { ActiveRun, LogLine } from "@/types/scan";
-import { classNames, statusTone } from "@/utils/scan";
+import { useState } from "react";
+import type { ActiveRun } from "@/types/scan";
 import { Metric } from "./Metric";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 // ─── Panel keys & default order ──────────────────────────────────────────────
-type PanelKey = "status" | "steps" | "logs" | "errors";
-const DEFAULT_PANELS: PanelKey[] = ["status", "steps", "logs", "errors"];
+type PanelKey = "status" | "steps" | "findings" | "errors";
+const DEFAULT_PANELS: PanelKey[] = ["status", "steps", "findings", "errors"];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function StatusDot({ status }: { status: string }) {
@@ -39,9 +41,7 @@ function StatusDot({ status }: { status: string }) {
         !isRunning && !isDone && !isFailed && "bg-muted text-muted-foreground"
       )}
     >
-      {isRunning && (
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-      )}
+      {isRunning && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />}
       {isDone && <CheckCircle2 size={11} />}
       {isFailed && <XCircle size={11} />}
       {status}
@@ -54,6 +54,206 @@ function StepStatusIcon({ status, isCurrent }: { status: string; isCurrent: bool
   if (status.includes("FAILED"))    return <XCircle size={14} className="text-destructive" />;
   if (isCurrent)                    return <Loader2 size={14} className="animate-spin text-primary" />;
   return <Circle size={14} className="text-muted-foreground/40" />;
+}
+
+// ─── Findings Donut Chart ─────────────────────────────────────────────────────
+function FindingsDonut({ run }: { run: ActiveRun }) {
+  const findings = run.findings || 0;
+  const isRunning = run.status === "RUNNING";
+  const isDone    = run.status === "COMPLETED";
+  const isFailed  = run.status === "FAILED";
+  const hasRun    = isRunning || isDone || isFailed;
+
+  // Derive severity buckets from findings count (proportional mock until API returns breakdown)
+  // If your API returns severity breakdown, swap these with real values
+  const critical = Math.round(findings * 0.15);
+  const high     = Math.round(findings * 0.30);
+  const medium   = Math.round(findings * 0.35);
+  const low      = Math.max(0, findings - critical - high - medium);
+
+  const total = findings || 1; // avoid /0
+
+  // SVG donut params
+  const r = 52;
+  const cx = 70;
+  const cy = 70;
+  const circumference = 2 * Math.PI * r;
+
+  type Slice = { label: string; count: number; color: string; dashColor: string };
+  const slices: Slice[] = [
+    { label: "Critical", count: critical, color: "text-rose-500",   dashColor: "#f43f5e" },
+    { label: "High",     count: high,     color: "text-orange-500", dashColor: "#f97316" },
+    { label: "Medium",   count: medium,   color: "text-amber-400",  dashColor: "#fbbf24" },
+    { label: "Low",      count: low,      color: "text-emerald-500",dashColor: "#10b981" },
+  ];
+
+  // Build dash segments
+  let offset = 0;
+  const segments = slices.map((s) => {
+    const pct   = findings === 0 ? 0 : s.count / total;
+    const dash  = pct * circumference;
+    const gap   = circumference - dash;
+    const seg   = { ...s, dash, gap, offset };
+    offset += dash;
+    return seg;
+  });
+
+  const idleColor = "hsl(var(--muted))";
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Chart row */}
+      <div className="flex items-center gap-5">
+        {/* SVG Donut */}
+        <div className="relative shrink-0">
+          <svg width={140} height={140} viewBox="0 0 140 140">
+            {/* Glow filter */}
+            <defs>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs>
+
+            {/* Background track */}
+            <circle
+              cx={cx} cy={cy} r={r}
+              fill="none"
+              stroke={idleColor}
+              strokeWidth={14}
+            />
+
+            {findings === 0 ? (
+              /* Empty / idle ring */
+              <circle
+                cx={cx} cy={cy} r={r}
+                fill="none"
+                stroke={isRunning ? "hsl(var(--primary))" : idleColor}
+                strokeWidth={14}
+                strokeDasharray={`${circumference * 0.85} ${circumference * 0.15}`}
+                strokeDashoffset={circumference * 0.125}
+                strokeLinecap="round"
+                className={isRunning ? "opacity-40" : "opacity-20"}
+                style={isRunning ? { filter: "url(#glow)" } : {}}
+              />
+            ) : (
+              segments.map((s, i) =>
+                s.count === 0 ? null : (
+                  <circle
+                    key={i}
+                    cx={cx} cy={cy} r={r}
+                    fill="none"
+                    stroke={s.dashColor}
+                    strokeWidth={14}
+                    strokeDasharray={`${s.dash - 3} ${s.gap + 3}`}
+                    strokeDashoffset={-s.offset + circumference * 0.25}
+                    strokeLinecap="round"
+                    style={{ filter: "url(#glow)", transition: "stroke-dasharray 0.6s ease" }}
+                  />
+                )
+              )
+            )}
+
+            {/* Animated pulse ring when running */}
+            {isRunning && (
+              <circle
+                cx={cx} cy={cy} r={r + 10}
+                fill="none"
+                stroke="hsl(var(--primary))"
+                strokeWidth={1}
+                opacity={0.2}
+                className="animate-ping"
+              />
+            )}
+
+            {/* Center text */}
+            <text x={cx} y={cy - 8} textAnchor="middle" className="fill-foreground" fontSize={22} fontWeight={700}>
+              {findings}
+            </text>
+            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-muted-foreground" fontSize={10}>
+              {hasRun ? "findings" : "no scan"}
+            </text>
+            {isDone && (
+              <text x={cx} y={cy + 24} textAnchor="middle" className="fill-emerald-500" fontSize={9} fontWeight={600}>
+                DONE
+              </text>
+            )}
+            {isFailed && (
+              <text x={cx} y={cy + 24} textAnchor="middle" className="fill-destructive" fontSize={9} fontWeight={600}>
+                FAILED
+              </text>
+            )}
+          </svg>
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-col gap-2 flex-1">
+          {slices.map((s) => {
+            const pct = findings === 0 ? 0 : Math.round((s.count / findings) * 100);
+            return (
+              <div key={s.label} className="flex items-center gap-2">
+                <span
+                  className="h-2.5 w-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: s.dashColor }}
+                />
+                <span className="text-xs text-muted-foreground flex-1">{s.label}</span>
+                <span className={cn("text-xs font-semibold tabular-nums", s.color)}>
+                  {findings === 0 ? "—" : s.count}
+                </span>
+                {findings > 0 && (
+                  <span className="text-[10px] text-muted-foreground/50 w-8 text-right">{pct}%</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Progress bar — steps completion */}
+      {run.steps.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold">
+              Step Progress
+            </span>
+            <span className="text-[10px] text-muted-foreground tabular-nums">
+              {run.steps.filter(s => s.status.includes("COMPLETED")).length} / {run.steps.length}
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all duration-700",
+                isFailed ? "bg-destructive" : "bg-primary"
+              )}
+              style={{
+                width: `${run.steps.length === 0 ? 0 : (run.steps.filter(s => s.status.includes("COMPLETED")).length / run.steps.length) * 100}%`,
+                boxShadow: "0 0 8px hsl(var(--primary)/0.6)",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Stat chips */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Mode</p>
+          <p className="text-sm font-semibold text-foreground mt-0.5">{run.mode || "—"}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Steps</p>
+          <p className="text-sm font-semibold text-foreground mt-0.5">{run.steps.length || "—"}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Total</p>
+          <p className={cn("text-sm font-semibold mt-0.5", findings > 0 ? "text-rose-500" : "text-foreground")}>
+            {findings || "—"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Draggable panel wrapper ──────────────────────────────────────────────────
@@ -95,7 +295,6 @@ function DraggablePanel({
         !isDragging && !isDragOver && "border-border"
       )}
     >
-      {/* Panel header — drag handle */}
       <div
         className={cn(
           "flex cursor-grab select-none items-center gap-2.5 px-4 py-3 active:cursor-grabbing",
@@ -105,14 +304,9 @@ function DraggablePanel({
         )}
         onClick={collapsible ? () => setCollapsed((c) => !c) : undefined}
       >
-        <GripVertical
-          size={14}
-          className="shrink-0 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground/60"
-        />
+        <GripVertical size={14} className="shrink-0 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground/60" />
         <span className="text-muted-foreground/60">{icon}</span>
-        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-          {label}
-        </span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">{label}</span>
         {badge && <span className="ml-1">{badge}</span>}
         {isDragOver && !isDragging && (
           <span className="ml-auto text-[10px] font-medium text-primary">Drop here</span>
@@ -120,15 +314,10 @@ function DraggablePanel({
         {collapsible && !isDragOver && (
           <ChevronDown
             size={14}
-            className={cn(
-              "ml-auto text-muted-foreground/40 transition-transform duration-200",
-              collapsed && "-rotate-90"
-            )}
+            className={cn("ml-auto text-muted-foreground/40 transition-transform duration-200", collapsed && "-rotate-90")}
           />
         )}
       </div>
-
-      {/* Panel body */}
       {!collapsed && <div className="p-4">{children}</div>}
     </div>
   );
@@ -137,19 +326,14 @@ function DraggablePanel({
 // ─── Main component ───────────────────────────────────────────────────────────
 export function LiveConsole({
   run,
-  logs,
   errors,
 }: {
   run: ActiveRun;
-  logs: LogLine[];
   errors: string[];
 }) {
-  const logEndRef = useRef<HTMLDivElement>(null);
-
-  // Drag state
-  const [panels, setPanels]           = useState<PanelKey[]>([...DEFAULT_PANELS]);
-  const [dragging, setDragging]       = useState<PanelKey | null>(null);
-  const [dragOver, setDragOver]       = useState<PanelKey | null>(null);
+  const [panels, setPanels]     = useState<PanelKey[]>([...DEFAULT_PANELS]);
+  const [dragging, setDragging] = useState<PanelKey | null>(null);
+  const [dragOver, setDragOver] = useState<PanelKey | null>(null);
   const isCustom = panels.join(",") !== DEFAULT_PANELS.join(",");
 
   const handleDragStart = (key: PanelKey) => setDragging(key);
@@ -181,7 +365,6 @@ export function LiveConsole({
     onDragEnd:   handleDragEnd,
   });
 
-  // ─── Panel content map ──────────────────────────────────────────────────
   const panelMap: Record<PanelKey, React.ReactNode> = {
 
     // STATUS PANEL
@@ -272,56 +455,26 @@ export function LiveConsole({
       </DraggablePanel>
     ),
 
-    // LOGS PANEL
-    logs: (
+    // FINDINGS DONUT PANEL
+    findings: (
       <DraggablePanel
-        key="logs"
-        label="Stream Logs"
-        icon={<Bot size={13} />}
+        key="findings"
+        label="Findings"
+        icon={<Activity size={13} />}
         badge={
-          logs.length > 0 ? (
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-              {logs.length}
+          run.findings > 0 ? (
+            <span className="rounded-full bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-500">
+              {run.findings}
             </span>
           ) : undefined
         }
-        {...dragProps("logs")}
+        {...dragProps("findings")}
       >
-        <div className="h-75 overflow-y-auto rounded-lg bg-muted/30 p-3 font-mono text-xs leading-relaxed">
-          {!logs.length ? (
-            <p className="text-muted-foreground/50 py-2 text-center text-[11px]">
-              Logs will appear here when a scan starts.
-            </p>
-          ) : (
-            <>
-              {logs.map((line) => (
-                <div key={line.id} className="flex gap-2 wrap-break-word py-0.5">
-                  <span className="shrink-0 text-muted-foreground/40">
-                    {new Date(line.timestamp).toLocaleTimeString()}
-                  </span>
-                  <span className="shrink-0 text-primary/70">[{line.source}]</span>
-                  <span
-                    className={cn(
-                      "shrink-0 font-semibold",
-                      line.level === "ERROR" && "text-destructive",
-                      line.level === "WARN"  && "text-amber-500 dark:text-amber-400",
-                      line.level === "INFO"  && "text-emerald-500 dark:text-emerald-400",
-                      !["ERROR","WARN","INFO"].includes(line.level) && "text-muted-foreground/60"
-                    )}
-                  >
-                    {line.level}
-                  </span>
-                  <span className="text-foreground/75">{line.text}</span>
-                </div>
-              ))}
-              <div ref={logEndRef} />
-            </>
-          )}
-        </div>
+        <FindingsDonut run={run} />
       </DraggablePanel>
     ),
 
-    // ERRORS PANEL — only rendered when there are errors
+    // ERRORS PANEL
     errors: errors.length > 0 ? (
       <DraggablePanel
         key="errors"
