@@ -22,6 +22,8 @@ function resolveProxyUrl(url: string): string {
   if (
     normalized === "backend" ||
     normalized.startsWith("backend/") ||
+    normalized === "dashboard" ||
+    normalized.startsWith("dashboard/") ||
     normalized === "scanner" ||
     normalized.startsWith("scanner/") ||
     normalized === "git" ||
