@@ -7,6 +7,80 @@ import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useTheme } from "@/components/theme-provider";
 
+const ASCII_ART_ORIGINAL = `                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+                                                          i<                                                                                                    
+                                                           @_~~                                                                                                 
+                                                              +~<~+                                                                                             
+                                                                +~<<~<_\`                                                                                        
+                                                                 @?<<<~~~_/                                                                                     
+                                                                   <~~~~~~~~+          i                                                                        
+                                                                    x<~~++~~~~+-       *~+                                                                      
+                                                                      ?++++++~~~~~+     L?<i                                                                    
+                                           -_{1~+++++++++++~~~~++~+~~++++++++~~~+~~~+u@   ~<<?                                                                  
+                                   ?+}+++~~~~~~~+++++++++++++++++++++++++++++++++++~~~~+  n+<<<\!                                                                
+                            @+?+++++++++~++++++++++++++++++++++++++~~~~+~+++++++++++~~~~+~> +~~~1   1++~-~/                                                     
+                       u__++++++++++++++++++++++++++++~++++++++++~+~~~+~~~+++++++++++~++++++f+~~~~u   _~~~~~~+++]@                                              
+                   *+++++++++++++++++++++++++++++++~~~~~~~~~~~++++~~~+~~~+~+++++++++++++++++~~~~~~~<   -~~~~~~~~~+++_~k                                         
+              })_+~~~~~++++++++++++++++++++++++++++~~~~~~~~~+<J{f~+~+++~+~~+++++++++++++++++++~~~~~~+_   +~~+++~~++~+~++++_)<@                                  
+           ~_+~~~~+++++++++++++++++++++++~+++~~~~~~+~+~j  [(~~~~~~~~~++~~~+++++++++++++++++~~~+~~~~~~~~   -+?~~~~~~~~~~++~~~~~~~_]                              
+       @_-~~~~~~~~~~+++++++++++++++~~+~~+~~~~~~~~++  U]?+~~~~++~~~~~~~++~~~++++++++++++++++~~~~~~~~~~~~+?       )+~+~~~~++~~~~~~~~~+~-z                         
+     <~<<~~~~}1[<~+~~~+++++++++++++~~~~~~~~~~~    c_~+~~~~~~~~+~++~~~~~~~+++++++++++++++++++++~~~~~~~~~~~+           @l1<+~~~~~~~~~~~~~+_~@                     
+  _~|<}            v_~~++++++++++~~~~+++<~    qw?~++++~~~~~~~~~~+~~~~~~_)+++++++++++++++++~++~+~+J{_<~~~~~i                \!(+~~~~~~~~+~~~~~~                   
+                    @~~~~+++~+~+~~~~~x    wmOr~~~+++~+~~~~~~~~~+~~~~}_[++~~~~~+++++~~~+~++~~~++~+~~++  _+~~_                    L-++~~+++~~~_                   
+                     ~~~~~~~~~~~~+c   kqmmj~~~+~+~+++++++++~+++~++ q(~++~~~~~~~~+~~~~~~~~~++++~~+~~~~~<_@+~~~_                      @++~~~~~[                   
+                    |+~~~~~~~~}l    wmmv{~~~~~~~+~++++++++~~~~+| q[~~~~~~~~~~~~~~~<?]+++~+~~~+++++~~~~~~~++~~+<                      ++~+~~~Y                   
+                    )~~~~~~+(    ammmc+++~+++~~~~~++~~~~+~~+~+ mm_~~~~~~~~~~~~~   -~~~~~~~~~++++~~~~~~~~~~++++~+                     +~~++~~%                   
+                   h~~~~~O}   *mmmZ_~~~++~++~~+~~~~~~~~~~~~?  m)~~~~~~~~~~~{    Q+<<?+x     @[_-+~~~~~~++++++++~~i                  J~~~~+~~                    
+                  ]+<<i@   @wmmmO+~~~~~~~++++++~+~+++++++  dmm~~~~~~~~~~~~      w                   i+~~~~~~~++~~~~+L               ~~~++~~+                    
+                 @~<}J   mmmmm0-+~~~~~~++++++++~++++++~   qwX~~+~~~~~~~~/                              z]+++~~~~~~~<u               +~~~+~~<                    
+                 _}@   wwmmmZ[+++++++++++++++++~~~~~<\!  mmm(+++++~~~~~~_                                  &++~~~~~~~?               ?~~~~~~[                    
+                [m   @mmmmm[~+++++++++++++++++~~~~+-   wmm+~+++++~~~~~1                                     /_+~~~~                 ]~~~~~~[                    
+                    Zmmmm-~~~++++++++++++++++~~~~~<  wwmm_++~~+~~~~~~~                                        ><~                   +~~~~~~+                    
+                  bmmmmU~~~~~~++++++++++++++~~~~>  &mmmQ-++++~~~+~~~<_                                                             #~~~~~~~?                    
+                OmmmmX~_~<}1~~~+++++++++++++~~~l  mmmm0+++++++++~~~~<                                                              ~~~~~~<~                     
+               mmmmm0           +++~+++++++++<l wwmmmO?++~++~++++~~~\!                                                             {+~~~~~~<                     
+             wwmmw               >+~~~+~+++~]   mmmmm+~+~~+++++++~~~[                                                             _+~~+~~~L                     
+            mmw                    +~+~~~~~]  @wmmmm?~~++++++++++~~~)                                                             +~~+~~~~                      
+           k                       ++~++~~-  mmmmmm?~~~~~+++++++~~~~l                                                            ~+++~~~~+                      
+                                   @+~~~+f  wwmmmmX~++~~~++++++++~~~~                                                           ~+++++~~+c                      
+                                    ~~~~]  wmmmmmm++~~~~+++++++++~~~+|                                                          <++++~~~-                       
+                                    f~~<  dwmmmmm(++~~~~++++++++~~+~~~                                                         -+++++~~~~                       
+                                     ~~w  mmmmmmQ~++++~~+~~++++++~~~~~                                                        @+++++~~~~                        
+                                     +@  mmmmmmm+~~~~~~++++++++++++~~~~                                                      <++++++~~<@                        
+                                     _  wmmmmmmr~~+~~~~~~++++++++++~~~+_                                                    -+++++~~~~                         
+                                        wmmmmmm{~~~~~~~~~~+~~~+++~~~~~~_                                                   +++~~++~~~_                          
+                                       wmmmmmmm+{~_+~/<~~~~+~~~+~~~~~~~~~                                                 -+~~+~+~~~<                           
+                                       wmmmmO            ]<+~~~++~~~~~~~~*                                               >+~~~+~+~~~l                           
+                                      wwww     __+~~~+/1@   x_+~~~+~~~~~~~<                                            x>+~~~~+~~~~-                            
+                                      qm        ~~~~~~~~~-    w~+~~~++++~~~~                                          1+~~~~~+~~~~<                             
+                                                i~~~~~~~~~+r    <~~~~~~~~~~~{                                        _+++++~~~~~~~                              
+                                                  ~~~~~~~~~~I    @_~~~~~~~~~~+                                     (_+++++++~~~~~x                              
+                                                  l+~~~~~~~~~~     af~~~~~~~~~_                                  ++~++++++~~+~~~                                
+                                                    +~~~~+~~~~+{      t~~~~~~~~~t                              +++~~~++~~~~~~~<                                 
+                                                     <~~~~~~+~~~++      ]~~~~~~~~+                           ?+~~+~++~++~~~~~~                                  
+                                                      +~~~+++~~~~~~\!      +~~~~~~~~-                       1+++~~+~++~~~~~~~+                                   
+                                                       }+~~+~~++~~~~<~      @]~~~<<<<l                  o_+++~++~~++~~++~~_                                     
+                                                         ++~~~~~+~++++++       wv+<<<<<\!              _~~~~~~~~~~~~~++~~~~                                      
+                                                          <~~+~~+~~++++++++          Y~+_f        ~++~~~~~~+++++~+~~~~~~                                        
+                                                            {+~~+~+~~+~~~~~++++_              @]_+++~+++++~~++~~++~~~<?                                         
+                                                              ~~~~~+~++~++~~~++++++       L+~++++++++++++++~++++~~~~~                                           
+                                                               {+~~~~+++++++++++++++++++++++++++++++++++++++++~~~~?@                                            
+                                                                 f+~~~++++++++++++++++++++++~++++++++++++++~~~~<_                                               
+                                                                    ~~+~~++++~~++++++++++++++++++++++++~~~~~~~>                                                 
+                                                                      1+~~~~~~~++++++++++++++++++++++~~~~~~~{                                                   
+                                                                        \![~~~~~~~~++++++++++++++++~~~~~~~+\!                                                     
+                                                                           _~~~~~~~~++++++++++++++~~~~_l                                                        
+                                                                             L-+~+~~~+++++++++~~~~~<[                                                           
+                                                                                 @+~~~~~~~~+~~~++                                                               
+                                                                                     >++~~~~~>                                                                  
+                                                                                        +~<`;
+
 export function AdvancedTerminalPanel({
   projectId,
   selectedProject,
@@ -37,6 +111,9 @@ export function AdvancedTerminalPanel({
   const onResetRef = useRef(onReset);
   const prevStepsRef = useRef<ScanStep[]>([]);
   const prevStatusRef = useRef("idle");
+  const asciiShownRef = useRef(false);
+
+  const asciiCol = resolvedTheme === "dark" ? "#00D0B2" : "#0e7490";
 
   const terminalTheme = useMemo(
     () =>
@@ -87,7 +164,6 @@ export function AdvancedTerminalPanel({
     return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m`;
   }, []);
 
-  // Boot terminal once
   useEffect(() => {
     let disposed = false;
     let ro: ResizeObserver | null = null;
@@ -102,8 +178,9 @@ export function AdvancedTerminalPanel({
       const term = new Terminal({
         cursorBlink: true,
         convertEol: true,
-        fontFamily: "Consolas",
-        fontSize: 16,
+        fontFamily: "Consolas, monospace",
+        fontSize: 18,
+        lineHeight: 1.4,
         scrollback: 5000,
         theme: terminalTheme,
       });
@@ -113,13 +190,18 @@ export function AdvancedTerminalPanel({
       term.open(containerRef.current);
       fitAddon.fit();
 
-      // Banner
-      term.write("\x1b[1m\x1b[36m  ╔══════════════════════════════════════════╗\r\n");
-      term.write("  ║  auto-offensive  ·  advanced  scan      ║\r\n");
+      if (!asciiShownRef.current) {
+        asciiShownRef.current = true;
+        term.write("\x1b[2J\x1b[H");
+        term.write("\r\n");
+        term.write("\x1b[1m\x1b[36m  ╔══════════════════════════════════════════╗\r\n");
+      term.write("  ║  auto-offensive  ·  advanced  scan       ║\r\n");
       term.write("  ╚══════════════════════════════════════════╝\x1b[0m\r\n");
       term.write("\x1b[90m  Type a command and press Enter to run it.\r\n");
       term.write("  Example: nmap example.com -sV | nuclei\r\n");
       term.write("  Ctrl+C to reset.\x1b[0m");
+        term.write("\r\n");
+      }
       term.write(getPrompt());
 
       term.onData((data) => {
@@ -184,14 +266,10 @@ export function AdvancedTerminalPanel({
     }
   }, [terminalTheme]);
 
-  // Write new log lines into terminal as they arrive
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
-    if (logs.length === 0) {
-      logCursorRef.current = 0;
-      return;
-    }
+    if (logs.length === 0) { logCursorRef.current = 0; return; }
     const newLines = logs.slice(logCursorRef.current);
     if (!newLines.length) return;
     logCursorRef.current = logs.length;
@@ -201,13 +279,12 @@ export function AdvancedTerminalPanel({
       const lvl = line.level.toLowerCase();
       if (lvl.includes("error") || lvl.includes("fail")) col = "\x1b[31m";
       else if (lvl.includes("warn")) col = "\x1b[33m";
-      else if (lvl === "done" || lvl === "submitted") col = "\x1b[36m";
-      else if (lvl === "log") col = "\x1b[32m";
+      else if (lvl === "done" || lvl === "submitted") col = "\x1b[32m";
+      else if (lvl === "log") col = "\x1b[36m";
       term.write(`\r\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
     });
   }, [logs]);
 
-  // Write errors
   const prevErrorsLenRef = useRef(0);
   useEffect(() => {
     const term = termRef.current;
@@ -218,7 +295,6 @@ export function AdvancedTerminalPanel({
     newErrs.forEach((e) => term.write(`\r\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
   }, [errors]);
 
-  // Announce step transitions
   useEffect(() => {
     const term = termRef.current;
     if (!term || !run.steps.length) return;
@@ -231,31 +307,27 @@ export function AdvancedTerminalPanel({
     prevStepsRef.current = run.steps;
   }, [run.steps]);
 
-  // React to job status changes
   useEffect(() => {
     const term = termRef.current;
     const status = run.status;
     if (!term || status === prevStatusRef.current) return;
     prevStatusRef.current = status;
-
     if (status === "submitting") {
       term.write(`\r\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
     } else if (status.includes("COMPLETED")) {
-      term.write(`\r\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m`);
+      term.write(`\r\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status.includes("FAILED")) {
-      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m`);
+      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status.includes("CANCELLED") || status.includes("PARTIAL")) {
-      term.write(
-        `\r\x1b[1m\x1b[33m⚠ Scan ${status.replace("JOB_STATUS_", "").toLowerCase()}.\x1b[0m`,
-      );
+      term.write(`\r\x1b[1m\x1b[33m⚠ Scan ${status.replace("JOB_STATUS_", "").toLowerCase()}.\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status === "failed") {
-      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m`);
+      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status === "idle") {
@@ -272,7 +344,7 @@ export function AdvancedTerminalPanel({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border border-border bg-card"
     >
-      {/* Terminal chrome */}
+      {/* ── Title bar — untouched ── */}
       <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
@@ -280,13 +352,13 @@ export function AdvancedTerminalPanel({
             <span className="h-3 w-3 rounded-full bg-yellow-400" />
             <span className="h-3 w-3 rounded-full bg-green-500" />
           </div>
-          <span className="font-mono text-muted-foreground">
+          <span className="font-mono text-muted-foreground text-xs">
             {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
           </span>
         </div>
         <div className="flex items-center gap-2">
           {isSubmitting && (
-            <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex items-center gap-1.5">
               <Loader2 size={11} className="animate-spin" /> Running
             </span>
           )}
@@ -302,12 +374,63 @@ export function AdvancedTerminalPanel({
       </div>
 
       {!projectId && (
-        <div className="border-b border-border bg-amber-500/10 px-4 py-2.5 text-lg text-amber-700 dark:text-amber-400">
+        <div className="rounded-lg border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive m-4">
           ⚠ Select a project above before running a scan.
         </div>
       )}
 
-      <div ref={containerRef} className="h-140 overflow-hidden" />
+      {/* ── Split body ── */}
+      <div
+        className="flex h-144 overflow-hidden"
+        style={{ backgroundColor: terminalTheme.background }}
+      >
+
+        {/* LEFT — ASCII pane, no background set — inherits bg-card from parent */}
+        <div
+          className="relative flex w-100 shrink-0 flex-col items-center justify-center overflow-hidden px-4 py-6"
+          style={{ backgroundColor: terminalTheme.background }}
+        >
+
+          {/* top label */}
+          <span
+            className="absolute top-3 left-0 right-0 text-center font-mono tracking-[0.2em] select-none pointer-events-none"
+            style={{ fontSize: "9px", color: asciiCol, opacity: 0.45 }}
+          >
+            AUTO-OFFENSIVE
+          </span>
+
+          {/* ASCII art */}
+          <pre
+            className="font-mono whitespace-pre select-none pointer-events-none"
+            style={{
+              fontSize: "3.6px",
+              lineHeight: 1.15,
+              letterSpacing: "0.25px",
+              color: asciiCol,
+            }}
+          >
+            {ASCII_ART_ORIGINAL}
+          </pre>
+
+          {/* bottom badge */}
+          <span
+            className="absolute bottom-3 left-0 right-0 text-center font-mono tracking-widest select-none pointer-events-none"
+            style={{ fontSize: "9px", color: asciiCol, opacity: 0.45 }}
+          >
+            ◆ v2.0.0 ◆
+          </span>
+        </div>
+
+        {/* thin divider */}
+        <div className="w-px shrink-0" />
+
+        {/* RIGHT — xterm console */}
+        <div
+          ref={containerRef}
+          className="flex-1 overflow-hidden"
+          style={{ backgroundColor: terminalTheme.background }}
+        />
+      </div>
     </motion.section>
   );
 }
