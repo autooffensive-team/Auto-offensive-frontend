@@ -35,8 +35,13 @@ import {
   useGetProviderRepositoryBranchesQuery,
   useLazyGetProviderConnectUrlQuery,
 } from "@/lib/redux/services/userdashboard/git/git-api";
+import { useGetIntegrationAccountsQuery } from "@/lib/redux/services/userdashboard/integrations/integrations-api";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import { useTriggerScanMutation } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import {
+  areProviderAccountQueriesReady,
+  buildConnectedProviderMap,
+} from "../../../../lib/redux/services/userdashboard/integrations/provider-account-gate";
 import type {
   GitProvider,
   ProviderAccount,
@@ -45,7 +50,6 @@ import type {
 import { FaGithub, FaGitlab } from "react-icons/fa";
 
 const providers: GitProvider[] = ["github", "gitlab"];
-const FIRST_TIME_CONNECT_NOTICE_KEY = "auto-offensive:first-connect-notice";
 
 const providerMeta: Record<
   GitProvider,
@@ -240,10 +244,6 @@ function resolveRequestedStep(searchParams: ReturnType<typeof useSearchParams>):
   if (!Number.isInteger(rawStep)) return 1;
   if (rawStep < 1 || rawStep > STEPS.length) return 1;
   return rawStep;
-}
-
-function buildFirstTimeConnectNoticeKey(userId: string): string {
-  return `${FIRST_TIME_CONNECT_NOTICE_KEY}:${userId}`;
 }
 
 // ─── Stepper config ───────────────────────────────────────────────────────────
@@ -454,7 +454,7 @@ function OnboardingModal({
             </button>
 
             <p className="mt-2.5 text-center text-[11px] text-gray-400 dark:text-gray-600">
-              Shown only once · per account
+              Hidden after a GitHub or GitLab account is connected
             </p>
           </div>
         </motion.div>
@@ -646,11 +646,13 @@ export default function CodeScanningNewPageClient() {
 
   // ── Onboarding modal state ──
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [hasDismissedOnboardingModal, setHasDismissedOnboardingModal] = useState(false);
   const [isOnboardingReady, setIsOnboardingReady] = useState(false);
 
   const hasAppliedCallbackResume = useRef(false);
 
   const { data: authMe } = useGetAuthMeQuery();
+  const integrationAccountsQuery = useGetIntegrationAccountsQuery();
   const githubAccountsQuery = useGetProviderAccountsQuery("github");
   const gitlabAccountsQuery = useGetProviderAccountsQuery("gitlab");
   const githubRepositoriesQuery = useGetProviderRepositoriesQuery("github");
@@ -691,8 +693,14 @@ export default function CodeScanningNewPageClient() {
 
   const repositories = repositoriesByProvider[selectedProvider];
   const connectedAccounts = accountsByProvider[selectedProvider];
-  const hasAnyConnectedProvider =
-    accountsByProvider.github.length > 0 || accountsByProvider.gitlab.length > 0;
+  const connectedProviderMap = buildConnectedProviderMap(
+    integrationAccountsQuery.data ?? [],
+  );
+  const hasConnectedProvider =
+    connectedProviderMap.github || connectedProviderMap.gitlab;
+  const isProviderAccountsReady = areProviderAccountQueriesReady(
+    integrationAccountsQuery,
+  );
   const filteredRepositories = useMemo(
     () => filterRepositories(repositories, repoSearch),
     [repositories, repoSearch],
@@ -742,24 +750,24 @@ export default function CodeScanningNewPageClient() {
 
   // ── Determine whether to show onboarding modal ──
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const userId = authMe?.user?.user_id?.trim();
-    if (!userId) return;
+    if (!userId || !isProviderAccountsReady) return;
 
     // Already has a connected provider — skip the modal entirely
-    if (hasAnyConnectedProvider) {
+    if (hasConnectedProvider) {
       setShowOnboardingModal(false);
       setIsOnboardingReady(true);
       return;
     }
 
-    const storageKey = buildFirstTimeConnectNoticeKey(userId);
-    const noticeSeen = window.localStorage.getItem(storageKey) === "seen";
-
-    setShowOnboardingModal(!noticeSeen);
+    setShowOnboardingModal(!hasDismissedOnboardingModal);
     setIsOnboardingReady(true);
-  }, [authMe?.user?.user_id, hasAnyConnectedProvider]);
+  }, [
+    authMe?.user?.user_id,
+    hasConnectedProvider,
+    hasDismissedOnboardingModal,
+    isProviderAccountsReady,
+  ]);
 
   useEffect(() => {
     if (initialProvider === "github" || initialProvider === "gitlab") {
@@ -774,7 +782,7 @@ export default function CodeScanningNewPageClient() {
     const provider = searchParams.get("provider");
     const isConnectedProvider =
       (provider === "github" || provider === "gitlab") &&
-      accountsByProvider[provider].length > 0;
+      connectedProviderMap[provider];
 
     if (!isConnectedProvider) return;
 
@@ -788,15 +796,12 @@ export default function CodeScanningNewPageClient() {
       return new Set([...prev, 1]);
     });
     setCurrentStep((prev) => (prev < 2 ? 2 : prev));
-  }, [accountsByProvider, requestedStep, searchParams]);
+  }, [connectedProviderMap, requestedStep, searchParams]);
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
 
   function handleOnboardingAccept() {
-    const userId = authMe?.user?.user_id?.trim();
-    if (userId && typeof window !== "undefined") {
-      window.localStorage.setItem(buildFirstTimeConnectNoticeKey(userId), "seen");
-    }
+    setHasDismissedOnboardingModal(true);
     setShowOnboardingModal(false);
   }
 
@@ -912,7 +917,7 @@ export default function CodeScanningNewPageClient() {
 
   return (
     <>
-      {/* ── Onboarding modal (shown only once for new users) ── */}
+      {/* ── Onboarding modal (shown until a provider account is connected) ── */}
       {isOnboardingReady && showOnboardingModal && (
         <OnboardingModal onAccept={handleOnboardingAccept} onClose={handleOnboardingClose} />
       )}
