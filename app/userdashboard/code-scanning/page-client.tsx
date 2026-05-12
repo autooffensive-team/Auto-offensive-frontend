@@ -40,7 +40,8 @@ function summarizeScanProjects(tasks: ScanTaskRefResponse[] | undefined): ScanPr
     if (existing) { existing.scanCount += 1; continue; }
     summaries.set(task.project_key, { projectKey: task.project_key, scanCount: 1 });
   }
-  return Array.from(summaries.values()).sort((a, b) => a.projectKey.localeCompare(b.projectKey));
+  // Preserve insertion order (newest projects appear first)
+  return Array.from(summaries.values());
 }
 
 function getProviderFromKey(projectKey: string): "github" | "gitlab" | "other" {
