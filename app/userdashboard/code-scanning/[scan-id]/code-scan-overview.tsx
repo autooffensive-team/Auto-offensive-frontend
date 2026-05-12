@@ -1565,7 +1565,7 @@ export function CodeScanOverview({
           {(() => {
             const qualityRings = [
               { label: "Security", value: vulnerabilities, percent: securityGraph, color: "#E24B4A", grade: `Grade ${secGrade.label}` },
-              { label: "Reliability", value: bugs, percent: reliabilityGraph, color: "#F59E0B", grade: `Grade ${relGrade.label}` },
+              { label: "Vulnerable Deps", value: dependencySummary?.vulnerable ?? 0, percent: Math.min((dependencySummary?.vulnerable ?? 0) * 2, 100), color: "#F59E0B", grade: `${dependencySummary?.vulnerable ?? 0} packages` },
               { label: "Maintainability", value: codeSmells, percent: maintainabilityGraph, color: "#3B82F6", grade: `Grade ${mntGrade.label}` },
               { label: "Accepted issues", value: acceptedIssues, percent: acceptedGraph, color: "#8B5CF6", grade: "Tracked" },
             ];
