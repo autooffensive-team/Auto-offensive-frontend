@@ -346,7 +346,7 @@ function AddProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -491,7 +491,7 @@ function UpdateProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -611,10 +611,10 @@ export default function ProjectsPageClient({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2.5 text-[14px] font-semibold rounded-xl shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-4 py-2.5 text-[14px] font-semibold rounded-xl shadow-sm transition-colors"
           >
             <Plus size={16} />
-            Add Project
+            Import Repo
           </motion.button>
         </div>
       </motion.div>
@@ -711,17 +711,17 @@ export default function ProjectsPageClient({
             <p className="mt-1 text-[13px] text-gray-500 dark:text-gray-400 max-w-xs">
               {searchTerm
                 ? "Try adjusting your search term"
-                : "Create a project to start scanning for vulnerabilities"}
+                : "Import a repository to start scanning for vulnerabilities"}
             </p>
             {!searchTerm && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowAddModal(true)}
-                className="mt-5 flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 text-[13px] font-semibold rounded-xl transition-colors shadow-sm"
+                className="mt-5 flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-4 py-2 text-[13px] font-semibold rounded-xl transition-colors shadow-sm"
               >
                 <Plus size={14} />
-                Add your first project
+                Import your first repo
               </motion.button>
             )}
           </motion.div>

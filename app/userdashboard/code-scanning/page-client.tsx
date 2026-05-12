@@ -583,10 +583,10 @@ export default function CodeScanningPageClient() {
           </motion.button>
           <Link
             href="/userdashboard/code-scanning/new"
-            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-teal-500 px-3 text-[12px] font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-[13px]"
+            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#00d0b2] px-3 text-[12px] font-semibold text-gray-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-[13px]"
           >
             <Plus size={13} />
-            New Project
+            Import Repo
           </Link>
         </div>
       </motion.div>
@@ -711,15 +711,15 @@ export default function CodeScanningPageClient() {
             <p className="mt-1 max-w-60 text-[11px] text-gray-500 sm:max-w-xs sm:text-[12px] md:text-[13px] dark:text-gray-400">
               {searchTerm
                 ? "Try adjusting your project-key search"
-                : "Create a code scanning project to populate your project overview"}
+                : "Import a repository to start scanning your code"}
             </p>
             {!searchTerm ? (
               <Link
                 href="/userdashboard/code-scanning/new"
-                className="mt-4 flex items-center gap-1.5 rounded-lg bg-teal-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 sm:mt-5 sm:gap-2 sm:px-4 sm:text-[13px]"
+                className="mt-4 flex items-center gap-1.5 rounded-lg bg-[#00d0b2] px-3.5 py-2 text-[12px] font-semibold text-gray-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:mt-5 sm:gap-2 sm:px-4 sm:text-[13px]"
               >
                 <Plus size={13} />
-                Add your first project
+                Import your first repo
               </Link>
             ) : null}
           </motion.div>

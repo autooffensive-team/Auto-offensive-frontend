@@ -613,7 +613,7 @@ function VulnerabilityBarChart({ data }: { data: VulnItem[] }) {
   // Round up to a nice ceiling for Y axis
   const rawStep = maxCount / 5;
   const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-  const niceStep = Math.ceil(rawStep / magnitude) * magnitude || 1;
+  const niceStep = Math.max(1, Math.ceil(rawStep / magnitude) * magnitude);
   const yMax = niceStep * 5;
 
   const yTicks = Array.from({ length: 6 }, (_, i) => yMax - i * niceStep);
@@ -928,7 +928,7 @@ function AssetTrendChart({
   // Nice Y axis
   const rawStep = maxVal / 4;
   const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-  const niceStep = Math.ceil(rawStep / magnitude) * magnitude || 1;
+  const niceStep = Math.max(1, Math.ceil(rawStep / magnitude) * magnitude);
   const yMax = niceStep * 4;
   const yTicks = Array.from({ length: 5 }, (_, i) => yMax - i * niceStep);
 
@@ -1060,7 +1060,7 @@ function AssetTrendChart({
         />
 
         {/* Peak dot + tooltip */}
-        {maxVal > 0 && (
+        {maxVal > 0 && peakIndex >= 0 && (
           <g>
             <circle
               cx={xPos(peakIndex)}
@@ -1096,8 +1096,14 @@ function AssetTrendChart({
         )}
 
         {/* X axis labels */}
-        {labels.map((label, i) =>
-          i % xLabelStep === 0 || i === labels.length - 1 ? (
+        {labels.map((label, i) => {
+          const isStepLabel = i % xLabelStep === 0;
+          const isLastLabel = i === labels.length - 1;
+          // Skip stepped labels that are too close to the forced last label
+          if (isStepLabel && !isLastLabel && labels.length - 1 - i < xLabelStep * 0.6) {
+            return null;
+          }
+          return isStepLabel || isLastLabel ? (
             <text
               key={label}
               x={xPos(i)}
@@ -1109,8 +1115,8 @@ function AssetTrendChart({
             >
               {formatDate(label)}
             </text>
-          ) : null,
-        )}
+          ) : null;
+        })}
       </svg>
     </div>
   );
