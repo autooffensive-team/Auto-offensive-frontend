@@ -910,7 +910,7 @@ function AssetTrendChart({
   datasets: TrendDataset[];
 }) {
   const W = 960;
-  const H = 200;
+  const H = 250;
   const paddingLeft = 40;
   const paddingRight = 12;
   const paddingTop = 12;
