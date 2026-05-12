@@ -921,11 +921,25 @@ function DependencyRiskChart({
   const chartW = W - paddingLeft - paddingRight;
   const chartH = H - paddingTop - paddingBottom;
 
-  const maxVal = Math.max(1, ...categories.map((c) => c.value));
-  const rawStep = maxVal / 4;
-  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-  const niceStep = Math.ceil(rawStep / magnitude) * magnitude || 1;
-  const yMax = niceStep * 4;
+  const maxVal = Math.max(...categories.map((c) => c.value), 0);
+
+  function getNiceIntegerStep(value: number): number {
+    if (value <= 4) {
+      return 1;
+    }
+
+    const roughStep = Math.ceil(value / 4);
+    const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+    const normalized = roughStep / magnitude;
+
+    if (normalized <= 1) return 1 * magnitude;
+    if (normalized <= 2) return 2 * magnitude;
+    if (normalized <= 5) return 5 * magnitude;
+    return 10 * magnitude;
+  }
+
+  const niceStep = getNiceIntegerStep(maxVal);
+  const yMax = Math.max(4, niceStep * 4);
   const yTicks = Array.from({ length: 5 }, (_, i) => yMax - i * niceStep);
 
   function xPos(i: number) {

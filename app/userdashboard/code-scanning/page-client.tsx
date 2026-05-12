@@ -15,11 +15,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import { useListCurrentUserScanIdsQuery } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
-import type { ScanTaskRefResponse } from "@/types/scanner";
+import type { ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -29,6 +29,13 @@ type ScanProjectSummary = {
   projectKey: string;
   scanCount: number;
 };
+
+type IssueSummaryState = {
+  isLoading: boolean;
+  totalIssues: number;
+};
+
+const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -42,6 +49,66 @@ function summarizeScanProjects(tasks: ScanTaskRefResponse[] | undefined): ScanPr
   }
   // Preserve insertion order (newest projects appear first)
   return Array.from(summaries.values());
+}
+
+function summarizeLatestProjectScanIds(
+  tasks: ScanTaskRefResponse[] | undefined,
+): Map<string, string> {
+  const latestScanIds = new Map<string, string>();
+
+  if (!tasks?.length) {
+    return latestScanIds;
+  }
+
+  for (const task of tasks) {
+    if (!task.project_key || !task.scan_id || latestScanIds.has(task.project_key)) {
+      continue;
+    }
+
+    // The API returns newest scans first, so the first scan we see per project
+    // is the current summary we want to count on the overview page.
+    latestScanIds.set(task.project_key, task.scan_id);
+  }
+
+  return latestScanIds;
+}
+
+function getSummaryIssueCount(summary: ScanSummaryResponse): number {
+  return (summary.bugs ?? 0) + (summary.vulnerabilities ?? 0) + (summary.code_smells ?? 0);
+}
+
+function readSeenProjects(): string[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_PROJECTS_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSeenProjects(projectKeys: string[]): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(SEEN_PROJECTS_STORAGE_KEY, JSON.stringify(projectKeys));
+  } catch {
+    // Ignore storage failures and keep UI functional.
+  }
+}
+
+function isNewListProject(project: ScanProjectSummary, seenProjects: Set<string>): boolean {
+  return project.scanCount === 1 && !seenProjects.has(project.projectKey);
 }
 
 function getProviderFromKey(projectKey: string): "github" | "gitlab" | "other" {
@@ -135,20 +202,20 @@ function HexStatCard({
 }) {
   const { stroke, fill, label: labelColor } = HEX_CONFIGS[variant];
 
-  const cx = 55; const cy = 55; const r = 42;
+  const cx = 72; const cy = 72; const r = 58;
   const outerPts = Array.from({ length: 6 }, (_, i) => {
     const a = (Math.PI / 180) * (60 * i - 30);
     return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
   }).join(" ");
-  const ringR = [28, 14];
+  const ringR = [42, 24];
 
-  const newLocal = "sm:h-[56px] sm:w-[56px] md:h-[70px] md:w-[70px]";
+  const newLocal = "h-[68px] w-[68px] sm:h-[78px] sm:w-[78px] md:h-[92px] md:w-[92px]";
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-2.5 overflow-hidden rounded-xl border border-gray-200 bg-white px-3 py-3 sm:gap-3 sm:px-4 sm:py-3.5 md:gap-4 md:px-5 md:py-4 dark:border-gray-800 dark:bg-[#0a0a0a]"
+      className="relative flex items-center gap-3 overflow-hidden rounded-xl border border-gray-200 bg-white px-3.5 py-3.5 sm:gap-3.5 sm:px-4.5 sm:py-4 md:gap-4.5 md:px-5.5 md:py-4.5 dark:border-gray-800 dark:bg-[#0a0a0a]"
     >
       {/* Subtle corner gradient */}
       <span
@@ -158,7 +225,7 @@ function HexStatCard({
 
       {/* Hex SVG — responsive sizing */}
       <div className="shrink-0">
-        <svg width={48} height={48} viewBox="0 0 110 110" className={newLocal}>
+        <svg width={68} height={68} viewBox="0 0 144 144" className={newLocal}>
           {ringR.map((rr) => (
             <polygon
               key={rr}
@@ -177,7 +244,7 @@ function HexStatCard({
             x={cx}
             y={cy + 6}
             textAnchor="middle"
-            fontSize={22}
+            fontSize={30}
             fontWeight={700}
             fill={stroke}
             fontFamily="inherit"
@@ -189,11 +256,11 @@ function HexStatCard({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest sm:text-[11px] md:text-[13px]" style={{ color: labelColor }}>
+        <p className="text-[10px] font-semibold uppercase tracking-widest sm:text-[12px] md:text-[13px]" style={{ color: labelColor }}>
           {label}
         </p>
         <span
-          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2 sm:text-[10px] md:text-[11px]"
+          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2.5 sm:text-[10px] md:text-[11px]"
           style={{
             background: fill,
             color: stroke,
@@ -210,9 +277,20 @@ function HexStatCard({
 
 // ─── Project Card ─────────────────────────────────────────────────────────────
 
-function ScanProjectCard({ project, index }: { project: ScanProjectSummary; index: number }) {
+function ScanProjectCard({
+  project,
+  index,
+  seenProjects,
+  onOpen,
+}: {
+  project: ScanProjectSummary;
+  index: number;
+  seenProjects: Set<string>;
+  onOpen: (projectKey: string) => void;
+}) {
   const provider = getProviderFromKey(project.projectKey);
   const href = buildCodeScanningProjectHref(project.projectKey);
+  const isNew = isNewListProject(project, seenProjects);
 
   const providerLabel = provider === "github" ? "GitHub" : provider === "gitlab" ? "GitLab" : "Repository";
   const providerColor =
@@ -231,8 +309,15 @@ function ScanProjectCard({ project, index }: { project: ScanProjectSummary; inde
       className="group relative flex flex-col rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-teal-400/70 hover:shadow-[0_0_0_1px_rgba(20,184,166,0.15)] dark:border-gray-800 dark:bg-[#0a0a0a] dark:hover:border-teal-500/40"
     >
       {/* Full-card clickable overlay — entire card is now clickable */}
+      {isNew ? (
+        <div className="pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          New
+        </div>
+      ) : null}
       <Link
         href={href}
+        onClick={() => onOpen(project.projectKey)}
         className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
         aria-label={`Open ${project.projectKey} project overview`}
         tabIndex={0}
@@ -294,6 +379,7 @@ function ScanProjectCard({ project, index }: { project: ScanProjectSummary; inde
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            onOpen(project.projectKey);
             window.location.href = href;
           }}
           className="relative z-20 flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[9px] font-medium text-gray-600 transition-all hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 sm:gap-1.5 sm:px-2.5 sm:py-1.5 sm:text-[10px] md:text-[11px] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-teal-500/40 dark:hover:bg-teal-500/10 dark:hover:text-teal-400"
@@ -314,6 +400,11 @@ export default function CodeScanningPageClient() {
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [showRefreshWarning, setShowRefreshWarning] = useState(false);
+  const [seenProjects, setSeenProjects] = useState<Set<string>>(new Set());
+  const [issueSummaryState, setIssueSummaryState] = useState<IssueSummaryState>({
+    isLoading: false,
+    totalIssues: 0,
+  });
 
   const {
     data: scanRefsResponse,
@@ -350,13 +441,100 @@ export default function CodeScanningPageClient() {
   }, [searchParams]);
 
   const scanProjects = useMemo(() => summarizeScanProjects(scanRefsResponse?.tasks), [scanRefsResponse?.tasks]);
+  const latestProjectScanIds = useMemo(
+    () => summarizeLatestProjectScanIds(scanRefsResponse?.tasks),
+    [scanRefsResponse?.tasks],
+  );
   const filtered = useMemo(
     () => scanProjects.filter((p) => p.projectKey.toLowerCase().includes(searchTerm.toLowerCase())),
     [scanProjects, searchTerm],
   );
 
+  useEffect(() => {
+    setSeenProjects(new Set(readSeenProjects()));
+  }, []);
+
+  useEffect(() => {
+    const projectScanIds = scanProjects
+      .map((project) => latestProjectScanIds.get(project.projectKey))
+      .filter((scanId): scanId is string => Boolean(scanId));
+
+    if (projectScanIds.length === 0) {
+      setIssueSummaryState({ isLoading: false, totalIssues: 0 });
+      return;
+    }
+
+    const controller = new AbortController();
+    let isActive = true;
+
+    setIssueSummaryState((current) => ({
+      ...current,
+      isLoading: true,
+    }));
+
+    void Promise.all(
+      projectScanIds.map(async (scanId) => {
+        try {
+          const response = await fetch(`/api/scanner/scans/${encodeURIComponent(scanId)}/summary`, {
+            credentials: "include",
+            signal: controller.signal,
+            cache: "no-store",
+          });
+
+          if (!response.ok) {
+            return 0;
+          }
+
+          const summary = (await response.json()) as ScanSummaryResponse;
+          return getSummaryIssueCount(summary);
+        } catch {
+          return 0;
+        }
+      }),
+    )
+      .then((counts) => {
+        if (!isActive) {
+          return;
+        }
+
+        setIssueSummaryState({
+          isLoading: false,
+          totalIssues: counts.reduce((sum, count) => sum + count, 0),
+        });
+      })
+      .catch(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setIssueSummaryState({
+          isLoading: false,
+          totalIssues: 0,
+        });
+      });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [scanProjects, latestProjectScanIds]);
+
   const totalScans = scanRefsResponse?.total ?? scanRefsResponse?.tasks.length ?? 0;
   const uniqueProjectCount = scanRefsResponse?.project_keys.length ?? scanProjects.length;
+  const totalIssues = issueSummaryState.totalIssues;
+
+  function handleProjectOpen(projectKey: string) {
+    setSeenProjects((current) => {
+      if (current.has(projectKey)) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add(projectKey);
+      writeSeenProjects(Array.from(next));
+      return next;
+    });
+  }
 
   function refreshRouteData() {
     startTransition(() => { router.refresh(); });
@@ -442,7 +620,13 @@ export default function CodeScanningPageClient() {
         <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
         <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
         <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
-        <HexStatCard value={0}                  label="Issues Found"     variant="red"     badge="None"                                         index={3} />
+        <HexStatCard
+          value={totalIssues}
+          label="Issues Found"
+          variant="red"
+          badge={issueSummaryState.isLoading ? "Syncing" : totalIssues === 0 ? "None" : "Active"}
+          index={3}
+        />
       </div>
 
       {/* ── Search ── */}
@@ -503,7 +687,13 @@ export default function CodeScanningPageClient() {
         ) : filtered.length > 0 ? (
           <AnimatePresence>
             {filtered.map((project, index) => (
-              <ScanProjectCard key={project.projectKey} project={project} index={index} />
+              <ScanProjectCard
+                key={project.projectKey}
+                project={project}
+                index={index}
+                seenProjects={seenProjects}
+                onOpen={handleProjectOpen}
+              />
             ))}
           </AnimatePresence>
         ) : (

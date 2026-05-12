@@ -7,7 +7,15 @@ export const authApi = baseApi.injectEndpoints({
       query: () => "auth/me",
       providesTags: [{ type: "Auth", id: "ME" }],
     }),
+    updateUserProfileImage: builder.mutation<Record<string, unknown>, FormData>({
+      query: (body) => ({
+        url: "users/me/profile-image",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Auth", id: "ME" }],
+    }),
   }),
 });
 
-export const { useGetAuthMeQuery } = authApi;
+export const { useGetAuthMeQuery, useUpdateUserProfileImageMutation } = authApi;

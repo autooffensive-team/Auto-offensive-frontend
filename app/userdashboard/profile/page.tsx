@@ -7,12 +7,12 @@ import {
   User,
   Mail,
   Lock,
-  Camera,
   CheckCircle,
   MoreVertical,
 } from "lucide-react";
 import { useState } from "react";
 
+import { UploadProfile } from "@/components/ui/upload-profile";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 
 function formatDate(value: string): string {
@@ -32,19 +32,8 @@ function getDisplayName(aliasName: string, username: string): string {
   return aliasName.trim() || username;
 }
 
-function getInitials(name: string): string {
-  return (
-    name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("") || "U"
-  );
-}
-
 export default function ProfilePage() {
-  const { data, isLoading, isError } = useGetAuthMeQuery();
+  const { data, isLoading, isError, refetch } = useGetAuthMeQuery();
   const user = data?.user;
   const displayName = user ? getDisplayName(user.alias_name, user.username) : "";
 
@@ -118,13 +107,20 @@ export default function ProfilePage() {
         <div className="lg:col-span-1 flex items-start justify-between">
           <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
             <div className="flex flex-col items-center">
-              <div className="relative mb-4">
-                <div className="w-24 h-24 rounded-full bg-linear-to-r from-teal-500 to-blue-500 flex items-center justify-center text-white text-3xl font-bold">
-                  {user ? getInitials(displayName) : <LoaderCircle className="animate-spin" size={28} />}
-                </div>
-                <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                  <Camera size={14} className="text-white" />
-                </button>
+              <div className="mb-4">
+                {user ? (
+                  <UploadProfile
+                    currentImage={user.avatar_profile}
+                    displayName={displayName}
+                    onUploaded={() => {
+                      void refetch();
+                    }}
+                  />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-r from-teal-500 to-blue-500 text-white text-3xl font-bold">
+                    <LoaderCircle className="animate-spin" size={28} />
+                  </div>
+                )}
               </div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {user ? displayName : "Loading..."}

@@ -12,7 +12,7 @@ import {
   FolderGit2,
   GitBranch,
   LoaderCircle,
-  Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -36,6 +36,8 @@ import { CodeScanOverview } from "./code-scan-overview";
 import { CodeScanIssues } from "./code-scan-issues";
 import { CodeScanDependencies } from "./code-scan-dependencies";
 
+const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
+
 type ProjectView = "overview" | "issues" | "dependencies";
 type GradeTone = "green" | "lime" | "red" | "muted";
 
@@ -58,20 +60,6 @@ const sectionMotion = {
 };
 
 // ─── New Project Badge Component ────────────────────────────────────────────
-
-function NewProjectBadge() {
-  return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3, delay: 0.2 }}
-      className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-teal-500/30"
-    >
-      <Sparkles className="size-3.5" />
-      <span>New</span>
-    </motion.div>
-  );
-}
 
 function PreviousPageButton({ onClick }: { onClick: () => void }) {
   return (
@@ -186,18 +174,6 @@ function formatRelativeTime(value: string | null | undefined): string {
  * Check if a project is "newly created"
  * Consider a project new if created within the last 24 hours
  */
-function isNewProject(createdAt: string | null | undefined): boolean {
-  if (!createdAt) return false;
-
-  const createdDate = new Date(createdAt);
-  if (Number.isNaN(createdDate.getTime())) return false;
-
-  const oneDayAgoMs = 24 * 60 * 60 * 1000;
-  const diffMs = Date.now() - createdDate.getTime();
-
-  return diffMs < oneDayAgoMs;
-}
-
 function formatPercent(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return "0.0%";
@@ -281,6 +257,30 @@ function formatStatusLabel(value: string | null | undefined): string {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function markProjectAsSeen(projectKey: string): void {
+  if (typeof window === "undefined" || !projectKey.trim()) {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_PROJECTS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    const current = new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === "string")
+        : [],
+    );
+
+    current.add(projectKey);
+    window.localStorage.setItem(
+      SEEN_PROJECTS_STORAGE_KEY,
+      JSON.stringify(Array.from(current)),
+    );
+  } catch {
+    // Ignore storage failures and keep navigation working.
+  }
 }
 
 // GitHub SVG Icon
@@ -407,7 +407,6 @@ function PageHeader({
   status,
   qualityGate,
   repoUrl,
-  isNew,
 }: {
   projectKey: string;
   repoPath: string;
@@ -416,15 +415,12 @@ function PageHeader({
   status: string | null | undefined;
   qualityGate: QualityGateStatus | null | undefined;
   repoUrl: string;
-  isNew: boolean;
 }) {
   return (
     <motion.section
       {...sectionMotion}
       className="relative rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
-      {isNew && <NewProjectBadge />}
-
       <div className="flex flex-col gap-5">
         <div className="flex min-w-0 gap-4">
           <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
@@ -590,6 +586,19 @@ export default function CodeScanningDetailPageClient({
     router.push("/userdashboard/code-scanning");
   }
 
+  async function handleRefreshPage() {
+    await Promise.allSettled([
+      refetchScanDetail(),
+      refetchScanStatus(),
+      refetchScanSummary(),
+      refetchDependencySummary(),
+      refetchDependencies(),
+      refetchIssues(),
+      routeProjectScansQuery.refetch(),
+    ]);
+    router.refresh();
+  }
+
   // Check if route identifier is a scan ID
   const routeUsesScanId = /^[a-f0-9-]+$/i.test(routeIdentifier);
 
@@ -615,11 +624,12 @@ export default function CodeScanningDetailPageClient({
     isLoading,
     isError,
     error,
+    refetch: refetchScanDetail,
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
     refetchOnMountOrArgChange: true,
   });
 
-  const { data: liveStatus } = useGetScanStatusQuery(
+  const { data: liveStatus, refetch: refetchScanStatus } = useGetScanStatusQuery(
     resolvedScanId ?? skipToken,
     {
       pollingInterval: 5000,
@@ -627,21 +637,21 @@ export default function CodeScanningDetailPageClient({
     }
   );
 
-  const { data: scanSummary } = useGetScanSummaryQuery(
+  const { data: scanSummary, refetch: refetchScanSummary } = useGetScanSummaryQuery(
     resolvedScanId ?? skipToken,
     {
       refetchOnMountOrArgChange: true,
     }
   );
 
-  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(
+  const { data: dependencySummaryResponse, refetch: refetchDependencySummary } = useGetDependencySummaryQuery(
     resolvedScanId ?? skipToken,
     {
       refetchOnMountOrArgChange: true,
     }
   );
 
-  const { data: dependencyListResponse, isFetching: isDependenciesFetching } =
+  const { data: dependencyListResponse, isFetching: isDependenciesFetching, refetch: refetchDependencies } =
     useListDependenciesQuery(
       {
         scan_id: resolvedScanId ?? "",
@@ -670,7 +680,7 @@ export default function CodeScanningDetailPageClient({
     }
   );
 
-  const { data: issueResponse, isFetching: isIssuesFetching } =
+  const { data: issueResponse, isFetching: isIssuesFetching, refetch: refetchIssues } =
     useListIssuesQuery(
       {
         scan_id: resolvedScanId ?? "",
@@ -745,14 +755,18 @@ export default function CodeScanningDetailPageClient({
     ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())
   ).length;
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
-  const isNew = isNewProject(scanDetail?.created_at);
-
   const qualityGateMessage =
     qualityGate === "WARN"
       ? "The latest analysis passed with warnings."
       : qualityGate === "ERROR"
         ? "The latest analysis failed the quality gate."
         : null;
+
+  useEffect(() => {
+    if (scanDetail?.project_key) {
+      markProjectAsSeen(scanDetail.project_key);
+    }
+  }, [scanDetail?.project_key]);
 
   useEffect(() => {
     const normalizedProgress = Math.max(0, Math.min(100, Math.round(progress)));
@@ -830,6 +844,16 @@ export default function CodeScanningDetailPageClient({
     <div className="space-y-5 text-[#17233f] dark:text-gray-100">
       <div className="flex items-center justify-between gap-3">
         <PreviousPageButton onClick={handleGoBack} />
+        <button
+          type="button"
+          onClick={() => {
+            void handleRefreshPage();
+          }}
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
+        >
+          <RefreshCw className="size-4 shrink-0" />
+          <span>Refresh page</span>
+        </button>
       </div>
 
       <PageHeader
@@ -844,7 +868,6 @@ export default function CodeScanningDetailPageClient({
         status={status}
         qualityGate={qualityGate}
         repoUrl={scanDetail.repo_url}
-        isNew={isNew}
       />
 
       <AlertSection
