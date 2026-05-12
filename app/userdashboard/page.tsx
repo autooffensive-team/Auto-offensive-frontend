@@ -28,6 +28,7 @@ import {
   useGetDashboardTopTechnologiesQuery,
   useGetDashboardVulnerabilitySeverityQuery,
 } from "@/lib/redux/services/userdashboard/overiew/overview-api";
+import DashboardOverviewSkeleton from "@/components/skeletons/dashboard-overview-skeleton";
 import type { DashboardMostVulnerableAsset } from "@/types/overview";
 
 // ─── Types (unchanged) ───────────────────────────────────────────────────────
@@ -280,6 +281,11 @@ export default function UserDashboardPage() {
     topPortsQuery.error ||
     topServicesQuery.error ||
     topTechnologiesQuery.error;
+
+  // Show the purpose-built skeleton while primary data is loading
+  if (isLoading && !loadError) {
+    return <DashboardOverviewSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
