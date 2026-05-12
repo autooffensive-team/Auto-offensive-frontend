@@ -991,6 +991,20 @@ function DependencyRiskChart({
             );
           })}
 
+          {/* Filled area beneath line */}
+          <defs>
+            <linearGradient id="depRiskFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#00d0b2" stopOpacity={0.25} />
+              <stop offset="100%" stopColor="#00d0b2" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          {linePath && (
+            <path
+              d={`${linePath} L ${xPos(categories.length - 1)},${paddingTop + chartH} L ${xPos(0)},${paddingTop + chartH} Z`}
+              fill="url(#depRiskFill)"
+            />
+          )}
+
           {/* Smooth line */}
           <path
             d={linePath}
@@ -1550,10 +1564,10 @@ export function CodeScanOverview({
           {/* Chart 1: Code Quality */}
           {(() => {
             const qualityRings = [
-              { label: "Security", value: vulnerabilities, percent: securityGraph, color: "#5eecd5", grade: `Grade ${secGrade.label}` },
-              { label: "Reliability", value: bugs, percent: reliabilityGraph, color: "#00d0b2", grade: `Grade ${relGrade.label}` },
-              { label: "Maintainability", value: codeSmells, percent: maintainabilityGraph, color: "#009d87", grade: `Grade ${mntGrade.label}` },
-              { label: "Accepted issues", value: acceptedIssues, percent: acceptedGraph, color: "#006b5c", grade: "Tracked" },
+              { label: "Security", value: vulnerabilities, percent: securityGraph, color: "#E24B4A", grade: `Grade ${secGrade.label}` },
+              { label: "Reliability", value: bugs, percent: reliabilityGraph, color: "#F59E0B", grade: `Grade ${relGrade.label}` },
+              { label: "Maintainability", value: codeSmells, percent: maintainabilityGraph, color: "#3B82F6", grade: `Grade ${mntGrade.label}` },
+              { label: "Accepted issues", value: acceptedIssues, percent: acceptedGraph, color: "#8B5CF6", grade: "Tracked" },
             ];
 
             return (
@@ -1597,17 +1611,17 @@ export function CodeScanOverview({
           {/* Chart 2: Health & Scans */}
           {(() => {
             const healthRings = [
-              { label: "Coverage", value: formatPercent(coverage), percent: Math.max(coverage, 0), color: "#5eecd5", grade: coverage >= 80 ? "Healthy" : "Needs review" },
-              { label: "Duplications", value: formatPercent(duplications), percent: Math.min(duplications * 10, 100), color: "#00d0b2", grade: duplications <= 3 ? "Healthy" : "Needs review" },
-              { label: "Security Hotspots", value: formatCount(hotspots), percent: hotspotsGraph, color: "#009d87", grade: `Grade ${getGrade(hotspots, 0, 3).label}` },
-              { label: "Dependency scan", value: formatCount(dependencySummary?.vulnerable), percent: dependencyScanGraph, color: "#006b5c", grade: `Grade ${getGrade(depCritical, 0, 1).label}` },
+              { label: "Coverage", value: formatPercent(coverage), percent: Math.max(coverage, 0), color: "#10B981", grade: coverage >= 80 ? "Healthy" : "Needs review" },
+              { label: "Duplications", value: formatPercent(duplications), percent: Math.min(duplications * 10, 100), color: "#06B6D4", grade: duplications <= 3 ? "Healthy" : "Needs review" },
+              { label: "Security Hotspots", value: formatCount(hotspots), percent: hotspotsGraph, color: "#F97316", grade: `Grade ${getGrade(hotspots, 0, 3).label}` },
+              { label: "Reliability", value: formatCount(bugs), percent: reliabilityGraph, color: "#EC4899", grade: `Grade ${relGrade.label}` },
             ];
 
             return (
               <div className="rounded-xl border border-[#e4eaf4] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
                 <div className="mb-4">
                   <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Health & Scans</p>
-                  <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">Coverage, duplication & dependency posture</p>
+                  <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">Coverage, duplication & reliability posture</p>
                 </div>
 
                 <div className="flex flex-col items-center">
