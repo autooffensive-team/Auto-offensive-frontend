@@ -647,7 +647,7 @@ function RadialRingCard({
                 {ring.count}
               </span>
               <span
-                className="min-w-[28px] text-right text-[10px] font-semibold"
+                className="min-w-7 text-right text-[10px] font-semibold"
                 style={{ color: ring.color }}
               >
                 {ring.percent}%

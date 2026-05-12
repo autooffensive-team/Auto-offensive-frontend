@@ -15,6 +15,7 @@ import type { ComponentType } from "react";
 import { useMemo } from "react";
 
 import type { DependencyResponse } from "@/types/scanner";
+import { SeverityDonutChart } from "@/components/charts/SeverityDonutChart";
 import { cn } from "@/lib/utils";
 
 type FilterOption = {
@@ -206,11 +207,12 @@ function DependencySeverityDistribution({
   }, [dependencies]);
 
   const total = dependencies.length;
-  const severities = [
-    { key: "CRITICAL", label: "Critical", color: "bg-red-500" },
-    { key: "HIGH", label: "High", color: "bg-orange-500" },
-    { key: "MEDIUM", label: "Medium", color: "bg-amber-500" },
-    { key: "LOW", label: "Low", color: "bg-green-500" },
+
+  const severityItems = [
+    { key: "CRITICAL", label: "Critical", count: counts.CRITICAL, color: "bg-red-500", strokeColor: "#ef4444" },
+    { key: "HIGH", label: "High", count: counts.HIGH, color: "bg-orange-500", strokeColor: "#f97316" },
+    { key: "MEDIUM", label: "Medium", count: counts.MEDIUM, color: "bg-amber-500", strokeColor: "#f59e0b" },
+    { key: "LOW", label: "Low", count: counts.LOW, color: "bg-green-500", strokeColor: "#22c55e" },
   ];
 
   return (
@@ -218,33 +220,11 @@ function DependencySeverityDistribution({
       <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
         Severity distribution
       </h3>
-      <div className="space-y-2">
-        {severities.map(({ key, label, color }) => {
-          const count = counts[key as keyof typeof counts];
-          const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-
-          return (
-            <div key={key} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-600 dark:text-slate-400">
-                  {label}
-                </span>
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {count} ({percentage}%)
-                </span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className={cn("h-full rounded-full", color)}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <SeverityDonutChart
+        items={severityItems}
+        total={total}
+        centerLabel="Dependencies"
+      />
     </div>
   );
 }

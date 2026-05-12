@@ -844,16 +844,6 @@ export default function CodeScanningDetailPageClient({
     <div className="space-y-5 text-[#17233f] dark:text-gray-100">
       <div className="flex items-center justify-between gap-3">
         <PreviousPageButton onClick={handleGoBack} />
-        <button
-          type="button"
-          onClick={() => {
-            void handleRefreshPage();
-          }}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
-        >
-          <RefreshCw className="size-4 shrink-0" />
-          <span>Refresh page</span>
-        </button>
       </div>
 
       <PageHeader

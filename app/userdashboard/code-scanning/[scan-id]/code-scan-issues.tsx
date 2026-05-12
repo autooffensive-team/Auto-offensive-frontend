@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import type { IssueResponse } from "@/types/scanner";
+import { SeverityDonutChart } from "@/components/charts/SeverityDonutChart";
 import { buildCodeScanningIssueHref } from "@/lib/scanner-route";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ const severityOptions: FilterOption[] = [
   { label: "Critical", value: "CRITICAL" },
   { label: "Major", value: "MAJOR" },
   { label: "Minor", value: "MINOR" },
-  { label: "Info", value: "INFO" },
+  
 ];
 
 function getIssueSeverityColor(severity: string): { bg: string; border: string; text: string; dot: string } {
@@ -154,7 +155,6 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
       CRITICAL: 0,
       MAJOR: 0,
       MINOR: 0,
-      INFO: 0,
     };
     issues.forEach((issue) => {
       const severity = issue.severity.toUpperCase() as keyof typeof dist;
@@ -164,40 +164,23 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
   }, [issues]);
 
   const total = issues.length;
-  const severities = [
-    { key: "BLOCKER", label: "Blocker", color: "bg-red-500" },
-    { key: "CRITICAL", label: "Critical", color: "bg-orange-500" },
-    { key: "MAJOR", label: "Major", color: "bg-amber-500" },
-    { key: "MINOR", label: "Minor", color: "bg-blue-500" },
+
+  const severityItems = [
+    { key: "BLOCKER", label: "Blocker", count: counts.BLOCKER, color: "bg-red-500", strokeColor: "#ef4444" },
+    { key: "CRITICAL", label: "Critical", count: counts.CRITICAL, color: "bg-orange-500", strokeColor: "#f97316" },
+    { key: "MAJOR", label: "Major", count: counts.MAJOR, color: "bg-amber-500", strokeColor: "#f59e0b" },
+    { key: "MINOR", label: "Minor", count: counts.MINOR, color: "bg-blue-500", strokeColor: "#3b82f6" },
+    
   ];
 
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Severity distribution</h3>
-      <div className="space-y-2">
-        {severities.map(({ key, label, color }) => {
-          const count = counts[key as keyof typeof counts];
-          const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-          return (
-            <div key={key} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-600 dark:text-slate-400">{label}</span>
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {count} ({percentage}%)
-                </span>
-              </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className={cn("h-full rounded-full", color)}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <SeverityDonutChart
+        items={severityItems}
+        total={total}
+        centerLabel="Issues"
+      />
     </div>
   );
 }
