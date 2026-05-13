@@ -22,6 +22,8 @@ export type JobSummary = {
   total_findings: number;
   tool_name: string;
   execution_mode: string;
+  finished_at?: string | null;
+  tools_used?: string | null;
 };
 
 export type ListJobsResponse = {

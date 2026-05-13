@@ -15,11 +15,53 @@ type ScanResultsViewProps = {
   jobId: string;
 };
 
+/**
+ * Formats a cell value for display.
+ * If the value is a number that is effectively an integer (e.g. 500.000000),
+ * display it without decimals.
+ */
+function formatCellValue(value: unknown): string {
+  if (value == null) return "—";
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? value.toString() : Math.round(value) === value ? value.toFixed(0) : value.toString();
+  }
+  // Handle string values that look like decimal integers (e.g. "500.000000")
+  if (typeof value === "string") {
+    const num = Number(value);
+    if (!isNaN(num) && value.includes(".") && Number.isInteger(num)) {
+      return num.toFixed(0);
+    }
+  }
+  const str = String(value);
+  return str || "—";
+}
+
+function formatDuration(start: Date, end: Date): string {
+  const ms = end.getTime() - start.getTime();
+  if (ms < 0) return "—";
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
+}
+
 function StepSection({ step }: { step: ParsedStepData }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const hasData = step.columns.length > 0 && step.rows.length > 0;
+  // Sort columns so that any column starting with "_extra" is always last
+  const sortedColumns = [...step.columns].sort((a, b) => {
+    const aIsExtra = a.startsWith("_extra");
+    const bIsExtra = b.startsWith("_extra");
+    if (aIsExtra && !bIsExtra) return 1;
+    if (!aIsExtra && bIsExtra) return -1;
+    return 0;
+  });
+
+  const hasData = sortedColumns.length > 0 && step.rows.length > 0;
   const totalPages = hasData ? Math.ceil(step.rows.length / pageSize) : 0;
 
   const paginatedRows = hasData
@@ -57,7 +99,7 @@ function StepSection({ step }: { step: ParsedStepData }) {
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-800/50">
                 <tr>
-                  {step.columns.map((col) => (
+                  {sortedColumns.map((col) => (
                     <th
                       key={col}
                       className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap"
@@ -76,13 +118,13 @@ function StepSection({ step }: { step: ParsedStepData }) {
                     transition={{ delay: rowIndex * 0.02 }}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   >
-                    {step.columns.map((col) => (
+                    {sortedColumns.map((col) => (
                       <td
                         key={col}
                         className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium max-w-xs truncate"
                         title={String(row[col] ?? "")}
                       >
-                        {String(row[col] ?? "—")}
+                        {formatCellValue(row[col])}
                       </td>
                     ))}
                   </motion.tr>
@@ -150,7 +192,7 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
   }
 
   const sortedSteps = [...(parsedData?.steps ?? [])].sort(
-    (a, b) => a.step_order - b.step_order
+    (a, b) => b.step_order - a.step_order
   );
 
   return (
@@ -175,6 +217,39 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
             Findings:{" "}
             <span className="ml-1">{jobDetails.total_findings}</span>
           </span>
+          {jobDetails.execution_mode && jobDetails.execution_mode !== "unknown" && (
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+              Mode:{" "}
+              <span className="ml-1 capitalize">{jobDetails.execution_mode}</span>
+            </span>
+          )}
+          {jobDetails.finished_at && (
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+              Finished:{" "}
+              <span className="ml-1">
+                {new Date(jobDetails.finished_at).toLocaleString()}
+              </span>
+            </span>
+          )}
+          {jobDetails.started_at && jobDetails.finished_at && (
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+              Duration:{" "}
+              <span className="ml-1">
+                {formatDuration(
+                  new Date(jobDetails.started_at),
+                  new Date(jobDetails.finished_at),
+                )}
+              </span>
+            </span>
+          )}
+          {jobDetails.steps.length > 0 && (
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+              Tools:{" "}
+              <span className="ml-1">
+                {[...new Set(jobDetails.steps.map((s) => s.tool_name))].join(", ")}
+              </span>
+            </span>
+          )}
         </div>
       )}
 

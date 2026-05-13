@@ -192,13 +192,17 @@ export default function ScanJobsTable({
                 <td className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium">
                   {job.status === "running" || job.status === "pending"
                     ? "—"
-                    : formatDateTime(null)}
+                    : formatDateTime(job.finished_at)}
                 </td>
                 <td className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium">
-                  {formatDuration(job.status, job.created_at, null)}
+                  {formatDuration(job.status, job.created_at, job.finished_at)}
                 </td>
                 <td className="px-4 py-3">
-                  {job.tool_name ? (
+                  {job.tools_used ? (
+                    <span className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-[13px] text-gray-600 dark:text-gray-400 font-medium">
+                      {job.tools_used}
+                    </span>
+                  ) : job.tool_name ? (
                     <span className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-[13px] text-gray-600 dark:text-gray-400 font-medium">
                       {job.tool_name}
                     </span>
