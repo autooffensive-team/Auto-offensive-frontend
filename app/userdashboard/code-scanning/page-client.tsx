@@ -547,7 +547,8 @@ export default function CodeScanningPageClient() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-5 md:space-y-6">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
 
       {/* ── Header ── */}
       <motion.div
@@ -724,6 +725,7 @@ export default function CodeScanningPageClient() {
             ) : null}
           </motion.div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -922,32 +922,33 @@ export default function CodeScanningNewPageClient() {
         <OnboardingModal onAccept={handleOnboardingAccept} onClose={handleOnboardingClose} />
       )}
 
-      <div className="space-y-6">
+      <div className="min-h-screen">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
         {/* Page header */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start justify-between gap-4"
+          className="flex items-start justify-between gap-3 sm:gap-4"
         >
           <div>
             <div className="mb-1 flex items-center gap-2">
-              <Zap size={13} className="text-teal-500 dark:text-teal-400" />
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+              <Zap size={11} className="text-teal-500 sm:size-3.25 dark:text-teal-400" />
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-teal-600 sm:text-[10px] md:text-[11px] dark:text-teal-400">
                 Repository Scanner
               </span>
             </div>
-            <h1 className="text-[24px] sm:text-[28px] font-bold leading-tight text-gray-900 dark:text-white">
+            <h1 className="text-lg font-bold leading-tight text-gray-900 sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
               New Code Scanning Run
             </h1>
-            <p className="mt-1 text-[13px] sm:text-[14px] text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
               Follow the steps below to connect, select, and trigger a scan.
             </p>
           </div>
           <Link
             href="/userdashboard/code-scanning"
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 sm:rounded-xl sm:px-3 sm:py-2 sm:text-[13px] md:px-4 md:py-2.5 md:text-sm dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={12} className="sm:size-3.5" />
             <span className="hidden sm:inline">Back to Projects</span>
             <span className="sm:hidden">Back</span>
           </Link>
@@ -974,25 +975,25 @@ export default function CodeScanningNewPageClient() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="rounded-[28px] border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+          className="rounded-xl border border-gray-200 bg-white sm:rounded-2xl dark:border-gray-800 dark:bg-gray-900"
         >
           {/* Stepper header */}
-          <div className="px-5 sm:px-8 pt-6 pb-5 border-b border-gray-100 dark:border-gray-800">
+          <div className="px-3 pt-4 pb-3 border-b border-gray-100 sm:px-5 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 dark:border-gray-800">
             <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
 
             {/* Mobile step label */}
             <div className="mt-3 sm:hidden text-center">
-              <span className="text-[12px] font-semibold text-gray-500 dark:text-gray-400">
+              <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">
                 Step {currentStep} of {STEPS.length}
               </span>
-              <p className="text-[14px] font-bold text-gray-900 dark:text-white">
+              <p className="text-xs font-bold text-gray-900 dark:text-white">
                 {STEPS[currentStep - 1]?.label}
               </p>
             </div>
           </div>
 
           {/* Step content */}
-          <div className="p-5 sm:p-8">
+          <div className="p-3 sm:p-5 md:p-8">
             <AnimatePresence mode="wait">
               {/* ── STEP 1: Connect Provider ── */}
               {currentStep === 1 && (
@@ -1003,9 +1004,9 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-5">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Connect a Provider</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5">
+                    <p className="text-sm font-bold text-gray-900 sm:text-base md:text-lg dark:text-white">Connect a Provider</p>
+                    <p className="mt-1 text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
                       Select a Git provider and authorize access to continue.
                     </p>
                   </div>
@@ -1025,7 +1026,7 @@ export default function CodeScanningNewPageClient() {
                           tabIndex={0}
                           onClick={() => handleSelectProvider(provider)}
                           onKeyDown={(e) => e.key === "Enter" && handleSelectProvider(provider)}
-                          className={`group relative cursor-pointer rounded-2xl border-2 px-5 py-5 text-left transition-all duration-200 ${
+                          className={`group relative cursor-pointer rounded-xl sm:rounded-2xl border-2 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 text-left transition-all duration-200 ${
                             isSelected
                               ? "border-teal-400 bg-teal-50/60 dark:border-teal-500/50 dark:bg-teal-500/10"
                               : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
@@ -1038,7 +1039,7 @@ export default function CodeScanningNewPageClient() {
                             </span>
                           )}
                           <div className="flex items-center gap-3">
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${meta.soft}`}>
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-xl sm:rounded-2xl ${meta.soft}`}>
                               <Icon size={22} />
                             </div>
                             <div>
@@ -1104,9 +1105,9 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-6">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Choose a Repository</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5 md:mb-6">
+                    <p className="text-sm font-bold text-gray-900 sm:text-base md:text-lg dark:text-white">Choose a Repository</p>
+                    <p className="mt-1 text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
                       Select which repository to scan. Your changes are saved as you select.
                     </p>
                   </div>
@@ -1328,15 +1329,15 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-6">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Scan Configuration</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5 md:mb-6">
+                    <p className="text-sm font-bold text-gray-900 sm:text-base md:text-lg dark:text-white">Scan Configuration</p>
+                    <p className="mt-1 text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
                       Finalize your project key and target branch before triggering the scan.
                     </p>
                   </div>
 
-                  <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-                    <div className="space-y-4">
+                  <div className="grid gap-3 sm:gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
                         <div className="px-4 pt-4 pb-3">
                           <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
@@ -1566,6 +1567,7 @@ export default function CodeScanningNewPageClient() {
             </AnimatePresence>
           </div>
         </motion.div>
+      </div>
       </div>
     </>
   );
