@@ -97,7 +97,7 @@ export function MediumScanForm({
             onChange={(e) => onTargetChange(e.target.value)}
             placeholder="example.com or https://example.com"
             disabled={disabled}
-            className="font-mono text-sm"
+            className="font-mono text-xs sm:text-sm"
           />
         </Field>
       </DraggableWidget>
@@ -118,13 +118,13 @@ export function MediumScanForm({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium text-foreground">Pipeline Steps</h3>
+              <h3 className="text-xs sm:text-sm md:text-base font-medium text-gray-900 dark:text-white">Pipeline Steps</h3>
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
                   steps.length >= MAX_STEPS
-                    ? "bg-destructive/10 text-destructive"
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                 )}
               >
                 {steps.length}/{MAX_STEPS}
@@ -137,7 +137,7 @@ export function MediumScanForm({
               onClick={onAddStep}
               disabled={disabled || !canAddStep}
               className={cn(
-                "gap-1.5 text-xs border-primary/30 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/50",
+                "gap-1.5 text-xs border-teal-500/30 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-500/50",
                 !canAddStep && "cursor-not-allowed opacity-50"
               )}
               title={!canAddStep ? `Maximum ${MAX_STEPS} steps allowed` : undefined}
@@ -145,14 +145,14 @@ export function MediumScanForm({
               <Plus className="h-3.5 w-3.5" />
               Add Step
               {!canAddStep && (
-                <span className="ml-1 text-[10px] text-muted-foreground">(max)</span>
+                <span className="ml-1 text-[10px] text-gray-500 dark:text-gray-400">(max)</span>
               )}
             </Button>
           </div>
 
           {steps.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center">
-              <p className="text-sm text-muted-foreground">No pipeline steps yet. Add a step to begin.</p>
+            <div className="rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 p-8 text-center">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">No pipeline steps yet. Add a step to begin.</p>
             </div>
           )}
 
@@ -198,10 +198,10 @@ export function MediumScanForm({
   return (
     <div className="space-y-2">
       {/* Layout customization toolbar */}
-      <div className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
         <div className="flex items-center gap-2">
-          <LayoutGrid className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">
+          <LayoutGrid className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
             Drag sections to reorder your layout
           </span>
         </div>
@@ -211,7 +211,7 @@ export function MediumScanForm({
             variant="ghost"
             size="sm"
             onClick={resetLayout}
-            className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="h-7 gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             <RotateCcw className="h-3 w-3" />
             Reset layout
@@ -260,31 +260,31 @@ function DraggableWidget({
       onDrop={(e) => onDrop(e, widgetKey)}
       onDragEnd={onDragEnd}
       className={cn(
-        "group relative rounded-xl border bg-card transition-all duration-150",
+        "group relative rounded-xl border bg-white dark:bg-gray-900 transition-all duration-150",
         isDragging && "opacity-40 scale-[0.98] border-dashed",
-        isDragOver && !isDragging && "border-primary/60",
-        !isDragging && !isDragOver && "border-border"
+        isDragOver && !isDragging && "border-teal-500/60",
+        !isDragging && !isDragOver && "border-gray-200 dark:border-gray-800"
       )}
     >
       {/* Drag handle header */}
       <div
         className={cn(
-          "flex cursor-grab items-center gap-2 border-b border-border/50 px-4 py-2.5",
+          "flex cursor-grab items-center gap-2 border-b border-gray-200/50 dark:border-gray-800/50 px-4 py-2.5",
           "select-none active:cursor-grabbing",
-          isDragOver && !isDragging && "border-primary/30"
+          isDragOver && !isDragging && "border-teal-500/30"
         )}
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
+        <GripVertical className="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+        <span className="text-[10px] sm:text-[11px] md:text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
           {label}
         </span>
         {isDragOver && !isDragging && (
-          <span className="ml-auto text-[10px] font-medium text-primary">Drop here</span>
+          <span className="ml-auto text-[10px] font-medium text-teal-600 dark:text-teal-400">Drop here</span>
         )}
       </div>
 
       {/* Widget content */}
-      <div className="p-4">{children}</div>
+      <div className="p-3 sm:p-4">{children}</div>
     </div>
   );
 }
@@ -318,7 +318,7 @@ function PipelineStep({
   const options = tool?.scan_config?.medium?.options ?? [];
 
   const badgeColors = [
-    "bg-primary/10 text-primary border border-primary/20",
+    "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20",
     "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:text-emerald-400",
     "bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:text-amber-400",
     "bg-rose-500/10 text-rose-600 border border-rose-500/20 dark:text-rose-400",
@@ -328,18 +328,18 @@ function PipelineStep({
   return (
     <div
       className={cn(
-        "relative rounded-lg border border-border bg-background/50 transition-colors",
-        "hover:border-border/80"
+        "relative rounded-lg border border-gray-200 dark:border-gray-800 bg-background/50 transition-colors",
+        "hover:border-gray-200/80 dark:hover:border-gray-800/80"
       )}
     >
       {index > 0 && (
         <div className="absolute -top-3.5 left-6 flex items-center gap-1.5">
-          <ChevronsRight className="h-3.5 w-3.5 text-muted-foreground/40" aria-hidden="true" />
+          <ChevronsRight className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
         </div>
       )}
 
-      <div className="p-4">
-        <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="p-3 sm:p-4">
+        <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span
               className={cn(
@@ -350,11 +350,11 @@ function PipelineStep({
             >
               {index + 1}
             </span>
-            <span className="text-sm font-medium text-foreground/80">
+            <span className="text-xs sm:text-sm font-medium text-gray-900/80 dark:text-white/80">
               Pipeline Step
             </span>
             {totalSteps > 1 && index < totalSteps - 1 && (
-              <span className="text-xs text-muted-foreground/50">→ next</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">→ next</span>
             )}
           </div>
 
@@ -366,8 +366,8 @@ function PipelineStep({
             disabled={!canRemove || disabled}
             aria-label={`Remove step ${index + 1}`}
             className={cn(
-              "h-7 w-7 text-muted-foreground/50",
-              "hover:bg-destructive/10 hover:text-destructive",
+              "h-7 w-7 text-gray-400 dark:text-gray-500",
+              "hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400",
               "disabled:pointer-events-none disabled:opacity-30"
             )}
           >
@@ -392,7 +392,7 @@ function PipelineStep({
               onChange={(e) => onChange(step.id, { timeout: e.target.value })}
               placeholder="Optional"
               disabled={disabled}
-              className="font-mono text-sm"
+              className="font-mono text-xs sm:text-sm"
             />
           </Field>
         </div>

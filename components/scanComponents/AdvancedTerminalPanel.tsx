@@ -342,30 +342,30 @@ export function AdvancedTerminalPanel({
     <motion.section
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-border bg-card"
+      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
     >
       {/* ── Title bar — untouched ── */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-red-500" />
             <span className="h-3 w-3 rounded-full bg-yellow-400" />
             <span className="h-3 w-3 rounded-full bg-green-500" />
           </div>
-          <span className="font-mono text-muted-foreground text-xs">
+          <span className="font-mono text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs">
             {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
           </span>
         </div>
         <div className="flex items-center gap-2">
           {isSubmitting && (
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex items-center gap-1.5">
+            <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
               <Loader2 size={11} className="animate-spin" /> Running
             </span>
           )}
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
           >
             <RotateCcw size={12} />
             Reset
@@ -374,7 +374,7 @@ export function AdvancedTerminalPanel({
       </div>
 
       {!projectId && (
-        <div className="rounded-lg border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive m-4">
+        <div className="rounded-lg border border-red-200/25 dark:border-red-900/25 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-600 dark:text-red-400 m-4">
           ⚠ Select a project above before running a scan.
         </div>
       )}

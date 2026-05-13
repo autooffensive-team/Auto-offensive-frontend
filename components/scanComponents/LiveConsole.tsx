@@ -35,13 +35,13 @@ function StatusDot({ status }: { status: string }) {
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide",
-        isRunning && "bg-primary/10 text-primary",
+        isRunning && "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400",
         isDone    && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-        isFailed  && "bg-destructive/10 text-destructive",
-        !isRunning && !isDone && !isFailed && "bg-muted text-muted-foreground"
+        isFailed  && "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400",
+        !isRunning && !isDone && !isFailed && "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
       )}
     >
-      {isRunning && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />}
+      {isRunning && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00d0b2]" />}
       {isDone && <CheckCircle2 size={11} />}
       {isFailed && <XCircle size={11} />}
       {status}
@@ -51,9 +51,9 @@ function StatusDot({ status }: { status: string }) {
 
 function StepStatusIcon({ status, isCurrent }: { status: string; isCurrent: boolean }) {
   if (status.includes("COMPLETED")) return <CheckCircle2 size={14} className="text-emerald-500" />;
-  if (status.includes("FAILED"))    return <XCircle size={14} className="text-destructive" />;
-  if (isCurrent)                    return <Loader2 size={14} className="animate-spin text-primary" />;
-  return <Circle size={14} className="text-muted-foreground/40" />;
+  if (status.includes("FAILED"))    return <XCircle size={14} className="text-red-600 dark:text-red-400" />;
+  if (isCurrent)                    return <Loader2 size={14} className="animate-spin text-teal-600 dark:text-teal-400" />;
+  return <Circle size={14} className="text-gray-400 dark:text-gray-500" />;
 }
 
 // ─── Findings Donut Chart ─────────────────────────────────────────────────────
@@ -167,10 +167,10 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
             )}
 
             {/* Center text */}
-            <text x={cx} y={cy - 8} textAnchor="middle" className="fill-foreground" fontSize={22} fontWeight={700}>
+            <text x={cx} y={cy - 8} textAnchor="middle" className="fill-gray-900 dark:fill-white" fontSize={22} fontWeight={700}>
               {findings}
             </text>
-            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-muted-foreground" fontSize={10}>
+            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-gray-500 dark:fill-gray-400" fontSize={10}>
               {hasRun ? "findings" : "no scan"}
             </text>
             {isDone && (
@@ -179,7 +179,7 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
               </text>
             )}
             {isFailed && (
-              <text x={cx} y={cy + 24} textAnchor="middle" className="fill-destructive" fontSize={9} fontWeight={600}>
+              <text x={cx} y={cy + 24} textAnchor="middle" className="fill-red-600 dark:fill-red-400" fontSize={9} fontWeight={600}>
                 FAILED
               </text>
             )}
@@ -196,12 +196,12 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
                   className="h-2.5 w-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: s.dashColor }}
                 />
-                <span className="text-xs text-muted-foreground flex-1">{s.label}</span>
-                <span className={cn("text-xs font-semibold tabular-nums", s.color)}>
+                <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex-1">{s.label}</span>
+                <span className={cn("text-[10px] sm:text-xs font-semibold tabular-nums", s.color)}>
                   {findings === 0 ? "—" : s.count}
                 </span>
                 {findings > 0 && (
-                  <span className="text-[10px] text-muted-foreground/50 w-8 text-right">{pct}%</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 w-8 text-right">{pct}%</span>
                 )}
               </div>
             );
@@ -213,18 +213,18 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
       {run.steps.length > 0 && (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold">
+            <span className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 font-semibold">
               Step Progress
             </span>
-            <span className="text-[10px] text-muted-foreground tabular-nums">
+            <span className="text-[10px] text-gray-500 dark:text-gray-400 tabular-nums">
               {run.steps.filter(s => s.status.includes("COMPLETED")).length} / {run.steps.length}
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-700",
-                isFailed ? "bg-destructive" : "bg-primary"
+                isFailed ? "bg-red-500" : "bg-[#00d0b2]"
               )}
               style={{
                 width: `${run.steps.length === 0 ? 0 : (run.steps.filter(s => s.status.includes("COMPLETED")).length / run.steps.length) * 100}%`,
@@ -236,17 +236,17 @@ function FindingsDonut({ run }: { run: ActiveRun }) {
 
       {/* Stat chips */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Mode</p>
-          <p className="text-sm font-semibold text-foreground mt-0.5">{run.mode || "—"}</p>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100/20 dark:bg-gray-800/20 px-2 sm:px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500">Mode</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{run.mode || "—"}</p>
         </div>
-        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Steps</p>
-          <p className="text-sm font-semibold text-foreground mt-0.5">{run.steps.length || "—"}</p>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100/20 dark:bg-gray-800/20 px-2 sm:px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500">Steps</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{run.steps.length || "—"}</p>
         </div>
-        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60">Total</p>
-          <p className={cn("text-sm font-semibold mt-0.5", findings > 0 ? "text-rose-500" : "text-foreground")}>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100/20 dark:bg-gray-800/20 px-2 sm:px-3 py-2 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500">Total</p>
+          <p className={cn("text-xs sm:text-sm font-semibold mt-0.5", findings > 0 ? "text-rose-500" : "text-gray-900 dark:text-white")}>
             {findings || "—"}
           </p>
         </div>
@@ -288,36 +288,36 @@ function DraggablePanel({
       onDrop={(e) => onDrop(e, panelKey)}
       onDragEnd={onDragEnd}
       className={cn(
-        "group rounded-xl border bg-card transition-all duration-150",
-        isDragging  && "opacity-40 scale-[0.98] border-dashed border-border",
-        isDragOver && !isDragging && "border-primary/50",
-        !isDragging && !isDragOver && "border-border"
+        "group rounded-xl border bg-white dark:bg-gray-900 transition-all duration-150",
+        isDragging  && "opacity-40 scale-[0.98] border-dashed border-gray-200 dark:border-gray-800",
+        isDragOver && !isDragging && "border-teal-500/50",
+        !isDragging && !isDragOver && "border-gray-200 dark:border-gray-800"
       )}
     >
       <div
         className={cn(
           "flex cursor-grab select-none items-center gap-2.5 px-4 py-3 active:cursor-grabbing",
-          "border-b border-border/50",
+          "border-b border-gray-200/50 dark:border-gray-800/50",
           collapsible && "cursor-pointer",
-          isDragOver && !isDragging && "border-primary/20"
+          isDragOver && !isDragging && "border-teal-500/20"
         )}
         onClick={collapsible ? () => setCollapsed((c) => !c) : undefined}
       >
-        <GripVertical size={14} className="shrink-0 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground/60" />
-        <span className="text-muted-foreground/60">{icon}</span>
-        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">{label}</span>
+        <GripVertical size={14} className="shrink-0 text-gray-400 dark:text-gray-500 transition-colors group-hover:text-gray-400 dark:group-hover:text-gray-500" />
+        <span className="text-gray-400 dark:text-gray-500">{icon}</span>
+        <span className="text-[10px] sm:text-[11px] md:text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">{label}</span>
         {badge && <span className="ml-1">{badge}</span>}
         {isDragOver && !isDragging && (
-          <span className="ml-auto text-[10px] font-medium text-primary">Drop here</span>
+          <span className="ml-auto text-[10px] font-medium text-teal-600 dark:text-teal-400">Drop here</span>
         )}
         {collapsible && !isDragOver && (
           <ChevronDown
             size={14}
-            className={cn("ml-auto text-muted-foreground/40 transition-transform duration-200", collapsed && "-rotate-90")}
+            className={cn("ml-auto text-gray-400 dark:text-gray-500 transition-transform duration-200", collapsed && "-rotate-90")}
           />
         )}
       </div>
-      {!collapsed && <div className="p-4">{children}</div>}
+      {!collapsed && <div className="p-3 sm:p-4">{children}</div>}
     </div>
   );
 }
@@ -391,7 +391,7 @@ export function LiveConsole({
         icon={<Radio size={13} />}
         badge={
           run.steps.length > 0 ? (
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
               {run.steps.length}
             </span>
           ) : undefined
@@ -400,7 +400,7 @@ export function LiveConsole({
         {...dragProps("steps")}
       >
         {!run.steps.length ? (
-          <p className="text-xs text-muted-foreground/60 py-1">No steps running yet.</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 py-1">No steps running yet.</p>
         ) : (
           <div className="space-y-2">
             {run.steps.map((step, i) => {
@@ -412,10 +412,10 @@ export function LiveConsole({
                   key={step.step_id}
                   className={cn(
                     "flex items-center justify-between rounded-lg border px-3 py-2.5 transition-colors",
-                    isCurrent && "border-primary/30 bg-primary/5",
+                    isCurrent && "border-teal-500/30 bg-teal-50/50 dark:bg-teal-500/5",
                     isDone    && "border-emerald-500/20 bg-emerald-500/5",
-                    isFailed  && "border-destructive/20 bg-destructive/5",
-                    !isCurrent && !isDone && !isFailed && "border-border bg-muted/20"
+                    isFailed  && "border-red-200/20 dark:border-red-900/20 bg-red-50/50 dark:bg-red-950/5",
+                    !isCurrent && !isDone && !isFailed && "border-gray-200 dark:border-gray-800 bg-gray-100/20 dark:bg-gray-800/20"
                   )}
                 >
                   <div className="flex items-center gap-2.5">
@@ -424,24 +424,24 @@ export function LiveConsole({
                       <span
                         className={cn(
                           "flex h-4 w-4 items-center justify-center rounded text-[9px] font-bold",
-                          isCurrent && "bg-primary/15 text-primary",
+                          isCurrent && "bg-teal-50/50 dark:bg-teal-500/15 text-teal-600 dark:text-teal-400",
                           isDone    && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-                          isFailed  && "bg-destructive/15 text-destructive",
-                          !isCurrent && !isDone && !isFailed && "bg-muted text-muted-foreground"
+                          isFailed  && "bg-red-50/50 dark:bg-red-950/15 text-red-600 dark:text-red-400",
+                          !isCurrent && !isDone && !isFailed && "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                         )}
                       >
                         {i + 1}
                       </span>
-                      <span className="text-sm font-medium text-foreground">{step.tool_name}</span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{step.tool_name}</span>
                     </div>
                   </div>
                   <span
                     className={cn(
                       "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                      isCurrent && "bg-primary/10 text-primary",
+                      isCurrent && "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400",
                       isDone    && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-                      isFailed  && "bg-destructive/10 text-destructive",
-                      !isCurrent && !isDone && !isFailed && "bg-muted text-muted-foreground"
+                      isFailed  && "bg-red-50 dark:bg-red-950/10 text-red-600 dark:text-red-400",
+                      !isCurrent && !isDone && !isFailed && "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                     )}
                   >
                     {step.status.replace("STEP_STATUS_", "")}
@@ -480,7 +480,7 @@ export function LiveConsole({
         label="Scan Errors"
         icon={<AlertTriangle size={13} />}
         badge={
-          <span className="rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] font-bold text-destructive">
+          <span className="rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400">
             {errors.length}
           </span>
         }
@@ -491,7 +491,7 @@ export function LiveConsole({
           {errors.slice(-5).map((error, i) => (
             <div
               key={`${error}-${i}`}
-              className="flex items-start gap-2 rounded-lg border border-destructive/15 bg-destructive/5 px-3 py-2 text-xs text-destructive"
+              className="flex items-start gap-2 rounded-lg border border-red-200/15 dark:border-red-900/15 bg-red-50/50 dark:bg-red-950/5 px-2 sm:px-3 py-2 text-[10px] sm:text-xs text-red-600 dark:text-red-400"
             >
               <AlertTriangle size={12} className="mt-0.5 shrink-0" />
               <span className="wrap-break-word">{error}</span>
@@ -505,10 +505,10 @@ export function LiveConsole({
   return (
     <aside className="space-y-2">
       {/* Drag toolbar */}
-      <div className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
         <div className="flex items-center gap-2">
-          <LayoutGrid size={13} className="text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Drag panels to reorder</span>
+          <LayoutGrid size={13} className="text-gray-500 dark:text-gray-400" />
+          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Drag panels to reorder</span>
         </div>
         {isCustom && (
           <Button
@@ -516,7 +516,7 @@ export function LiveConsole({
             variant="ghost"
             size="sm"
             onClick={() => setPanels([...DEFAULT_PANELS])}
-            className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="h-7 gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             <RotateCcw size={11} />
             Reset

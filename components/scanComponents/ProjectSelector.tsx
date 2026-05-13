@@ -34,7 +34,7 @@ export function ProjectSelector({
     <div className="space-y-2">
       <label 
         htmlFor="project-selector" 
-        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        className="text-[10px] sm:text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         Project
       </label>
@@ -49,7 +49,7 @@ export function ProjectSelector({
             id="project-selector"
             placeholder={loading ? "Loading projects..." : isEmpty ? "No projects available" : "Select a project"}
             showTrigger
-            className={cn("w-full", isEmpty && "text-muted-foreground")}
+            className={cn("w-full", isEmpty && "text-gray-500 dark:text-gray-400")}
             value={selectedProject?.name ?? ""}
             readOnly
             aria-label="Select project"
@@ -79,7 +79,7 @@ export function ProjectSelector({
       </Combobox>
       
       {selectedProject && (
-        <p className="text-xs text-muted-foreground" role="note">
+        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400" role="note">
           Scans will be saved under {selectedProject.name}.
         </p>
       )}
@@ -90,8 +90,8 @@ export function ProjectSelector({
 export function ProjectSelectorSkeleton() {
   return (
     <div className="space-y-2" aria-busy="true" aria-label="Loading project selector">
-      <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-      <div className="h-10 w-full animate-pulse rounded bg-muted" />
+      <div className="h-4 w-16 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+      <div className="h-10 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
     </div>
   );
 }
@@ -99,14 +99,14 @@ export function ProjectSelectorSkeleton() {
 export function ProjectSelectorEmpty({ onCreate }: { onCreate?: () => void }) {
   return (
     <div 
-      className="rounded-lg border border-dashed border-border bg-muted/50 p-6 text-center"
+      className="rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-800/50 p-6 text-center"
       role="status"
     >
-      <p className="text-sm text-muted-foreground">No projects available</p>
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">No projects available</p>
       {onCreate && (
         <button
           onClick={onCreate}
-          className="mt-2 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mt-2 text-xs sm:text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Create your first project
         </button>
