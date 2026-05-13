@@ -151,7 +151,7 @@ export default function ProfilePage() {
           {/* Avatar + Name */}
           <div className="flex items-end gap-4">
             {/* Avatar */}
-            <div className="ring-4 ring-white dark:ring-gray-950 rounded-2xl shadow-xl overflow-hidden">
+            <div className="ring-2 ring-primary rounded-2xl overflow-hidden">
               {user ? (
                 <UploadProfile
                   compact
@@ -160,7 +160,7 @@ export default function ProfilePage() {
                   onUploaded={() => { void refetch(); }}
                 />
               ) : (
-                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-400 flex items-center justify-center">
+                <div className="h-24 w-24 rounded-2xl bg-linear-to-br from-teal-500 to-cyan-400 flex items-center justify-center">
                   <LoaderCircle className="animate-spin text-white" size={28} />
                 </div>
               )}
@@ -213,7 +213,7 @@ export default function ProfilePage() {
           >
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
               {/* Teal top accent */}
-              <div className="h-1 bg-gradient-to-r from-teal-500 to-cyan-400" />
+              <div className="h-1 bg-linear-to-r from-teal-500 to-cyan-400" />
               <div className="p-5 space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
                   Account Details

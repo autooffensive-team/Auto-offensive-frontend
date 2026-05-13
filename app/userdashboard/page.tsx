@@ -458,7 +458,7 @@ export default function UserDashboardPage() {
                                 {formatCompactNumber(ring.scans)}/{formatCompactNumber(ring.issues)}
                               </span>
                               <span
-                                className="min-w-[32px] text-right text-xs md:text-sm font-bold tabular-nums"
+                                className="min-w-8 text-right text-xs md:text-sm font-bold tabular-nums"
                                 style={{ color: ring.color }}
                               >
                                 {ring.percent}%
