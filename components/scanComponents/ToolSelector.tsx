@@ -51,7 +51,10 @@ export function ToolSelector({
             id={id}
             placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
             showTrigger
-            className={cn("w-full", isEmpty && "text-muted-foreground")}
+            className={cn(
+              "w-full [&_button[data-slot=combobox-trigger]:hover]:bg-primary/10 [&_button[data-slot=combobox-trigger]:hover]:text-primary [&_button[data-slot=combobox-trigger]:hover_svg]:text-primary",
+              isEmpty && "text-muted-foreground"
+            )}
             value={selectedTool?.tool_name ?? ""}
             readOnly
             aria-label={`Select ${label.toLowerCase()}`}
@@ -65,13 +68,27 @@ export function ToolSelector({
                 No tools available
               </ComboboxItem>
             ) : (
-              tools.map((tool) => (
+              tools.map((tool, index) => (
                 <ComboboxItem 
                   key={tool.tool_id} 
                   value={tool.tool_id}
                   aria-selected={tool.tool_id === value}
+                  className={cn(
+                    "rounded-none border-b border-border/30 last:border-b-0",
+                    index % 2 === 0 ? "bg-muted/20" : "bg-transparent"
+                  )}
                 >
-                  {tool.tool_name}
+                  <div className="flex flex-col items-start gap-0.5 py-0.5">
+                    <span className="flex items-center gap-2 font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                      {tool.tool_name}
+                    </span>
+                    {tool.tool_description && (
+                      <span className="text-[11px] text-muted-foreground leading-tight text-left pl-3.5">
+                        {tool.tool_description}
+                      </span>
+                    )}
+                  </div>
                 </ComboboxItem>
               ))
             )}

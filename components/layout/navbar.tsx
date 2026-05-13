@@ -649,9 +649,9 @@ export function Header() {
               className="h-10 w-full rounded-md border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
             />
           ) : session ? (
-            <div className="flex justify-center">
-              <AuthorizedUserIndicator className="h-10 w-10" />
-            </div>
+            <AuthorizedUserIndicator
+              className="w-full justify-center rounded-md"
+            />
           ) : (
             <Link
               href="/register"

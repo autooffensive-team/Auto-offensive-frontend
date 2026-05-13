@@ -581,8 +581,8 @@ function DonutChart({
   );
 }
 
-// ─── Donut Card ───────────────────────────────────────────────────────────────
-interface DonutCardProps {
+// ─── Radial Ring Card ─────────────────────────────────────────────────────────
+interface RadialRingCardProps {
   title: string;
   subtitle: string;
   segments: DonutSegment[];
@@ -592,7 +592,7 @@ interface DonutCardProps {
   delay?: number;
 }
 
-function DonutCard({
+function RadialRingCard({
   title,
   subtitle,
   segments,
@@ -600,8 +600,16 @@ function DonutCard({
   badgeStyle,
   totalLabel,
   delay,
-}: DonutCardProps) {
+}: RadialRingCardProps) {
   const total = segments.reduce((s, x) => s + x.count, 0);
+
+  // Use original segment colors for rings
+  const rings = segments.map((seg) => ({
+    percent: total > 0 ? Math.round((seg.count / total) * 100) : 0,
+    color: seg.color,
+    label: seg.label,
+    count: seg.count,
+  }));
 
   return (
     <motion.div
@@ -616,36 +624,671 @@ function DonutCard({
         <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">{subtitle}</p>
       </div>
 
-      {/* Donut + legend side-by-side */}
-      <div className="flex items-center gap-4">
-        <DonutChart segments={segments} size={120} thickness={22} />
+      {/* Radial chart centered */}
+      <div className="flex flex-col items-center">
+        <ConcentricRingChart rings={rings} total={total} />
+      </div>
 
-        <div className="flex flex-1 flex-col gap-2.5">
-          {segments.map((seg) => {
-            const pct = total > 0 ? Math.round((seg.count / total) * 100) : 0;
+      {/* Legend */}
+      <div className="mt-4 space-y-2">
+        {rings.map((ring) => (
+          <div key={ring.label} className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-block size-2.5 rounded-full"
+                style={{ backgroundColor: ring.color }}
+              />
+              <span className="text-[11px] font-medium text-[#52648f] dark:text-gray-400">
+                {ring.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
+                {ring.count}
+              </span>
+              <span
+                className="min-w-[28px] text-right text-[10px] font-semibold"
+                style={{ color: ring.color }}
+              >
+                {ring.percent}%
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 flex items-center justify-between border-t border-[#e4eaf4] pt-3 dark:border-gray-800">
+        <span className="text-[11px] text-[#52648f] dark:text-gray-400">{totalLabel}</span>
+        <span
+          className={cn(
+            "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+            badgeStyle,
+          )}
+        >
+          {badgeText}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Concentric Ring Chart SVG ────────────────────────────────────────────────
+function ConcentricRingChart({
+  rings,
+  total,
+}: {
+  rings: { percent: number; color: string; label: string }[];
+  total: number;
+}) {
+  const size = 180;
+  const cx = size / 2;
+  const cy = size / 2;
+  const strokeWidth = 16;
+  const gap = 5;
+  const ref = useRef<SVGSVGElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    if (inView) {
+      const t = setTimeout(() => setAnimated(true), 60);
+      return () => clearTimeout(t);
+    }
+  }, [inView]);
+
+  return (
+    <svg
+      ref={ref}
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      role="img"
+      aria-label="Concentric ring chart"
+    >
+      {rings.map((ring, i) => {
+        const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
+        if (radius <= 0) return null;
+        const circumference = 2 * Math.PI * radius;
+        const filled = animated ? (ring.percent / 100) * circumference : 0;
+        const unfilled = circumference - filled;
+
+        return (
+          <g key={ring.label}>
+            {/* Background track */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={radius}
+              fill="none"
+              stroke="#E2E8F0"
+              strokeWidth={strokeWidth}
+              className="dark:stroke-gray-700"
+            />
+            {/* Filled arc */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={radius}
+              fill="none"
+              stroke={ring.color}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={`${filled} ${unfilled}`}
+              strokeDashoffset={circumference * 0.25}
+              style={{
+                transition: `stroke-dasharray 1s cubic-bezier(0.16,1,0.3,1) ${i * 150}ms`,
+              }}
+            />
+          </g>
+        );
+      })}
+      {/* Center total */}
+      <text
+        x={cx}
+        y={cy - 4}
+        textAnchor="middle"
+        fontSize={22}
+        fontWeight={800}
+        fill="#00d0b2"
+        fontFamily="inherit"
+      >
+        {total}
+      </text>
+      <text
+        x={cx}
+        y={cy + 12}
+        textAnchor="middle"
+        fontSize={9}
+        fill="#94A3B8"
+        fontFamily="inherit"
+      >
+        total
+      </text>
+    </svg>
+  );
+}
+
+// ─── Operational Ring Chart (4 rings) ─────────────────────────────────────────
+function OperationalRingChart({
+  rings,
+  centerValue,
+  centerLabel,
+}: {
+  rings: { label: string; percent: number; color: string }[];
+  centerValue: string;
+  centerLabel: string;
+}) {
+  const size = 320;
+  const cx = size / 2;
+  const cy = size / 2;
+  const strokeWidth = 20;
+  const gap = 6;
+  const ref = useRef<SVGSVGElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    if (inView) {
+      const t = setTimeout(() => setAnimated(true), 60);
+      return () => clearTimeout(t);
+    }
+  }, [inView]);
+
+  return (
+    <svg
+      ref={ref}
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      role="img"
+      aria-label="Operational metrics ring chart"
+    >
+      {rings.map((ring, i) => {
+        const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
+        if (radius <= 0) return null;
+        const circumference = 2 * Math.PI * radius;
+        const clamped = Math.max(0, Math.min(100, ring.percent));
+        const filled = animated ? (clamped / 100) * circumference : 0;
+        const unfilled = circumference - filled;
+
+        return (
+          <g key={ring.label}>
+            <circle
+              cx={cx}
+              cy={cy}
+              r={radius}
+              fill="none"
+              stroke="#E2E8F0"
+              strokeWidth={strokeWidth}
+              className="dark:stroke-gray-700"
+            />
+            <circle
+              cx={cx}
+              cy={cy}
+              r={radius}
+              fill="none"
+              stroke={ring.color}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={`${filled} ${unfilled}`}
+              strokeDashoffset={circumference * 0.25}
+              style={{
+                transition: `stroke-dasharray 1s cubic-bezier(0.16,1,0.3,1) ${i * 150}ms`,
+              }}
+            />
+          </g>
+        );
+      })}
+      {/* Center content */}
+      <text
+        x={cx}
+        y={cy - 8}
+        textAnchor="middle"
+        fontSize={30}
+        fontWeight={800}
+        fill="#00d0b2"
+        fontFamily="inherit"
+      >
+        {centerValue}
+      </text>
+      <text
+        x={cx}
+        y={cy + 16}
+        textAnchor="middle"
+        fontSize={11}
+        fill="#94A3B8"
+        fontFamily="inherit"
+      >
+        {centerLabel}
+      </text>
+    </svg>
+  );
+}
+
+// ─── Dependency Risk Line Chart ───────────────────────────────────────────────
+function DependencyRiskChart({
+  critical,
+  high,
+  medium,
+  low,
+}: {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}) {
+  const total = critical + high + medium + low;
+  const categories = [
+    { label: "Critical", value: critical, color: "#DC2626" },
+    { label: "High", value: high, color: "#EA580C" },
+    { label: "Medium", value: medium, color: "#D97706" },
+    { label: "Low", value: low, color: "#16A34A" },
+  ];
+
+  // Donut chart calculations
+  const donutSize = 180;
+  const cx = donutSize / 2;
+  const cy = donutSize / 2;
+  const thickness = 24;
+  const r = donutSize / 2 - thickness / 2 - 2;
+  const circ = 2 * Math.PI * r;
+
+  let cumPct = 0;
+  const arcs = categories
+    .filter((c) => c.value > 0)
+    .map((cat) => {
+      const pct = total > 0 ? cat.value / total : 0;
+      const startPct = cumPct;
+      const dash = circ * pct;
+      const arc = {
+        offset: -circ * startPct,
+        dash,
+        gap: Math.max(circ - dash, 0),
+        color: cat.color,
+      };
+      cumPct += pct;
+      return arc;
+    });
+
+  // Line chart calculations
+  const W = 990;
+  const H = 200;
+  const paddingLeft = 30;
+  const paddingRight = 10;
+  const paddingTop = 24;
+  const paddingBottom = 32;
+  const chartW = W - paddingLeft - paddingRight;
+  const chartH = H - paddingTop - paddingBottom;
+
+  const maxVal = Math.max(1, ...categories.map((c) => c.value));
+  const rawStep = maxVal / 4;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+  const niceStep = Math.ceil(rawStep / magnitude) * magnitude || 1;
+  const yMax = niceStep * 4;
+  const yTicks = Array.from({ length: 5 }, (_, i) => yMax - i * niceStep);
+
+  function xPos(i: number) {
+    return paddingLeft + (i / Math.max(1, categories.length - 1)) * chartW;
+  }
+  function yPos(v: number) {
+    return paddingTop + chartH - (v / yMax) * chartH;
+  }
+
+  function buildSmoothPath(): string {
+    if (categories.length < 2) return "";
+    let path = `M ${xPos(0)},${yPos(categories[0].value)}`;
+    for (let i = 1; i < categories.length; i++) {
+      const prevX = xPos(i - 1);
+      const prevY = yPos(categories[i - 1].value);
+      const currX = xPos(i);
+      const currY = yPos(categories[i].value);
+      const cpX = (prevX + currX) / 2;
+      path += ` C ${cpX},${prevY} ${cpX},${currY} ${currX},${currY}`;
+    }
+    return path;
+  }
+
+  const linePath = buildSmoothPath();
+
+  return (
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-5">
+      {/* Left: Line chart */}
+      <div className="flex-1">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          width="100%"
+          height={H}
+          role="img"
+          aria-label="Dependency risk line chart"
+          style={{ overflow: "visible" }}
+        >
+          {/* Grid lines */}
+          {yTicks.map((v) => {
+            const y = yPos(v);
             return (
-              <div key={seg.label} className="flex items-center gap-2">
-                <span
-                  className="size-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: seg.color }}
+              <g key={v}>
+                <line
+                  x1={paddingLeft}
+                  y1={y}
+                  x2={W - paddingRight}
+                  y2={y}
+                  stroke="currentColor"
+                  strokeOpacity={0.07}
+                  strokeWidth={1}
                 />
-                <span className="flex-1 truncate text-[11px] font-medium text-[#52648f] dark:text-gray-400">
-                  {seg.label}
+                <text
+                  x={paddingLeft - 8}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize={10}
+                  fill="#94A3B8"
+                  fontFamily="inherit"
+                >
+                  {v}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Filled area beneath line */}
+          <defs>
+            <linearGradient id="depRiskFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#00d0b2" stopOpacity={0.25} />
+              <stop offset="100%" stopColor="#00d0b2" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          {linePath && (
+            <path
+              d={`${linePath} L ${xPos(categories.length - 1)},${paddingTop + chartH} L ${xPos(0)},${paddingTop + chartH} Z`}
+              fill="url(#depRiskFill)"
+            />
+          )}
+
+          {/* Smooth line */}
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#00d0b2"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          {/* Data points */}
+          {categories.map((cat, i) => (
+            <g key={cat.label}>
+              <circle
+                cx={xPos(i)}
+                cy={yPos(cat.value)}
+                r={8}
+                fill={cat.color}
+                fillOpacity={0.12}
+              />
+              <circle
+                cx={xPos(i)}
+                cy={yPos(cat.value)}
+                r={5}
+                fill={cat.color}
+                stroke="white"
+                strokeWidth={2}
+              />
+              <text
+                x={xPos(i)}
+                y={yPos(cat.value) - 14}
+                textAnchor="middle"
+                fontSize={10}
+                fontWeight={700}
+                fill={cat.color}
+                fontFamily="inherit"
+              >
+                {cat.value}
+              </text>
+              <text
+                x={xPos(i)}
+                y={H - 6}
+                textAnchor="middle"
+                fontSize={10}
+                fill="#52648f"
+                fontFamily="inherit"
+              >
+                {cat.label}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      {/* Right: Legend + Donut */}
+      <div className="flex items-center gap-6">
+        {/* Legend */}
+        <div className="flex flex-col gap-3">
+          {categories.map((cat) => {
+            const pct = total > 0 ? Math.round((cat.value / total) * 100) : 0;
+            return (
+              <div key={cat.label} className="flex items-center gap-2.5">
+                <span
+                  className="inline-block size-3.5 rounded"
+                  style={{ backgroundColor: cat.color }}
+                />
+                <span className="text-sm font-medium text-[#17233f] dark:text-gray-200">
+                  {cat.label}
                 </span>
-                <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
-                  {seg.count}
+                <span className="font-mono text-sm font-bold text-[#17233f] dark:text-white">
+                  {cat.value}
                 </span>
-                <span className="w-7 text-right text-[10px] text-[#8fa0bf] dark:text-gray-500">
+                <span className="text-xs text-[#8fa0bf] dark:text-gray-500">
                   {pct}%
                 </span>
               </div>
             );
           })}
         </div>
+
+        {/* Donut */}
+        <div className="relative shrink-0" style={{ width: donutSize, height: donutSize }}>
+          <svg
+            width={donutSize}
+            height={donutSize}
+            style={{ transform: "rotate(-90deg)" }}
+          >
+            <circle
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="none"
+              stroke="#E2E8F0"
+              strokeWidth={thickness}
+              className="dark:stroke-gray-700"
+            />
+            {total > 0 &&
+              arcs.map((a, i) => (
+                <circle
+                  key={i}
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+                  fill="none"
+                  stroke={a.color}
+                  strokeWidth={thickness}
+                  strokeDasharray={`${a.dash} ${a.gap}`}
+                  strokeDashoffset={a.offset}
+                  strokeLinecap="butt"
+                />
+              ))}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span className="font-mono text-2xl font-bold text-[#17233f] dark:text-white">
+              {total}
+            </span>
+            <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-gray-400">
+              total
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Radar Chart Card ─────────────────────────────────────────────────────────
+interface RadarChartCardProps {
+  title: string;
+  subtitle: string;
+  axes: { label: string; value: number }[];
+  color: string;
+  badgeText: string;
+  badgeStyle: string;
+  totalLabel: string;
+  delay?: number;
+}
+
+function RadarChartCard({
+  title,
+  subtitle,
+  axes,
+  color,
+  badgeText,
+  badgeStyle,
+  totalLabel,
+  delay,
+}: RadarChartCardProps) {
+  const size = 260;
+  const cx = size / 2;
+  const cy = size / 2;
+  const maxRadius = size * 0.4;
+  const gridLevels = 5;
+
+  const maxVal = Math.max(1, ...axes.map((a) => a.value));
+  const numSlices = axes.length;
+  const sliceAngle = (2 * Math.PI) / numSlices;
+  const startAngle = -Math.PI / 2;
+
+  // Colors for each slice — teal gradient from light to deep
+  const SLICE_COLORS = ["#5eecd5", "#33dfca", "#00d0b2", "#009d87", "#006b5c"];
+
+  function polarToXY(angle: number, r: number) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  // Build arc path for a slice
+  function slicePath(index: number, value: number) {
+    const r = (value / maxVal) * maxRadius;
+    const a1 = startAngle + index * sliceAngle;
+    const a2 = a1 + sliceAngle;
+    const p1 = polarToXY(a1, r);
+    const p2 = polarToXY(a2, r);
+    const largeArc = sliceAngle > Math.PI ? 1 : 0;
+    return `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${largeArc} 1 ${p2.x} ${p2.y} Z`;
+  }
+
+  // Grid level values
+  const gridStep = Math.ceil(maxVal / gridLevels);
+  const gridValues = Array.from({ length: gridLevels }, (_, i) => (i + 1) * gridStep);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut", delay: delay ?? 0 }}
+      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+    >
+      {/* Header */}
+      <div className="mb-2">
+        <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">{title}</p>
+        <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">{subtitle}</p>
+      </div>
+
+      {/* Chart + Legend side by side */}
+      <div className="flex items-center gap-4">
+        {/* Polar area chart */}
+        <div className="shrink-0">
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+            {/* Concentric circle grid */}
+            {gridValues.map((val, i) => {
+              const r = ((i + 1) / gridLevels) * maxRadius;
+              return (
+                <circle
+                  key={i}
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+                  fill="none"
+                  stroke="#E2E8F0"
+                  strokeWidth={0.8}
+                  className="dark:stroke-gray-700"
+                />
+              );
+            })}
+
+            {/* Axis lines */}
+            {Array.from({ length: numSlices }, (_, i) => {
+              const angle = startAngle + i * sliceAngle;
+              const p = polarToXY(angle, maxRadius);
+              return (
+                <line
+                  key={i}
+                  x1={cx}
+                  y1={cy}
+                  x2={p.x}
+                  y2={p.y}
+                  stroke="#E2E8F0"
+                  strokeWidth={0.8}
+                  className="dark:stroke-gray-700"
+                />
+              );
+            })}
+
+            {/* Slices */}
+            {axes.map((a, i) => (
+              <path
+                key={a.label}
+                d={slicePath(i, a.value)}
+                fill={SLICE_COLORS[i % SLICE_COLORS.length]}
+                fillOpacity={0.8}
+                stroke="white"
+                strokeWidth={1.5}
+              />
+            ))}
+
+            {/* Grid level labels */}
+            {gridValues.map((val, i) => {
+              const r = ((i + 1) / gridLevels) * maxRadius;
+              return (
+                <text
+                  key={i}
+                  x={cx}
+                  y={cy + r + 12}
+                  textAnchor="middle"
+                  fontSize={9}
+                  fill="#94A3B8"
+                  fontFamily="inherit"
+                >
+                  {val}
+                </text>
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-col gap-2.5">
+          {axes.map((a, i) => (
+            <div key={a.label} className="flex items-center gap-2">
+              <span
+                className="inline-block size-3 rounded-full"
+                style={{ backgroundColor: SLICE_COLORS[i % SLICE_COLORS.length] }}
+              />
+              <span className="text-xs font-medium text-[#17233f] dark:text-gray-200">
+                {a.label}: <span className="font-bold">{a.value}</span>
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-4 flex items-center justify-between border-t border-[#e4eaf4] pt-3 dark:border-gray-800">
+      <div className="mt-3 flex items-center justify-between border-t border-[#e4eaf4] pt-3 dark:border-gray-800">
         <span className="text-[11px] text-[#52648f] dark:text-gray-400">{totalLabel}</span>
         <span
           className={cn(
@@ -830,52 +1473,73 @@ export function CodeScanOverview({
         />
       </div>
 
-      {/* ── Row 2: 4 Donut Cards ──────────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <DonutCard
-          title="Dependency Risk"
-          subtitle="Packages by severity"
-          segments={depSegments}
-          totalLabel={`${formatCount(depTotal)} packages at risk`}
-          badgeText={`${riskLabel} risk`}
-          badgeStyle={
-            depCritical > 0
-              ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
-              : depHigh > 0
-                ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
-                : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
-          }
-          delay={0.05}
+      {/* ── Row 2a: Dependency Risk Line Chart ─────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.05 }}
+        className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Dependency Risk</p>
+            <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">Packages by severity — {formatCount(depTotal)} total at risk</p>
+          </div>
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+              depCritical > 0
+                ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                : depHigh > 0
+                  ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
+                  : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+            )}
+          >
+            {riskLabel} risk
+          </span>
+        </div>
+        <DependencyRiskChart
+          critical={depCritical}
+          high={depHigh}
+          medium={depMedium}
+          low={depLow}
         />
-        <DonutCard
+      </motion.div>
+
+      {/* ── Row 2b: 3 Radar Charts ─────────────────────────────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <RadarChartCard
           title="Code Issues"
           subtitle="Bugs, vulns & smells"
-          segments={codeSegments}
-          totalLabel={`${formatCount(totalIssues)} total issues`}
+          axes={codeSegments.map((s) => ({ label: s.label, value: s.count }))}
+          color="#00d0b2"
           badgeText={`Grade ${mntGrade.label}`}
           badgeStyle={_gradeBadgeStyle(mntGrade.tone)}
+          totalLabel={`${formatCount(totalIssues)} total issues`}
           delay={0.1}
         />
-        <DonutCard
+        <RadarChartCard
           title="Security"
           subtitle="Vulnerabilities & hotspots"
-          segments={secSegments}
-          totalLabel={`${formatCount(vulnerabilities + hotspots + acceptedIssues)} security items`}
+          axes={secSegments.map((s) => ({ label: s.label, value: s.count }))}
+          color="#3B82F6"
           badgeText={`Grade ${secGrade.label}`}
           badgeStyle={_gradeBadgeStyle(secGrade.tone)}
+          totalLabel={`${formatCount(vulnerabilities + hotspots + acceptedIssues)} security items`}
           delay={0.15}
         />
-        <DonutCard
+        <RadarChartCard
           title="Code Health"
           subtitle="Coverage vs duplication"
-          segments={healthSegments}
-          totalLabel="Based on 100% codebase"
+          axes={healthSegments.map((s) => ({ label: s.label, value: s.count }))}
+          color="#F59E0B"
           badgeText={coverage >= 80 ? "Good coverage" : "Low coverage"}
           badgeStyle={
             coverage >= 80
               ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
               : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
           }
+          totalLabel="Based on 100% codebase"
           delay={0.2}
         />
       </div>
@@ -892,107 +1556,104 @@ export function CodeScanOverview({
             </h2>
           </div>
           <span className="inline-flex items-center rounded-full bg-[#eef4fb] px-3 py-1 text-[11px] font-medium text-[#4f6290] dark:bg-gray-900 dark:text-gray-300">
-            9 tracked indicators
+            8 tracked indicators
           </span>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <OverviewMetricCell
-            title="Security"
-            value={formatCount(vulnerabilities)}
-            primaryDetail="Open issues"
-            icon={Shield}
-            tone="red"
-            graphValue={securityGraph}
-            grade={secGrade}
-          />
-          <OverviewMetricCell
-            title="Reliability"
-            value={formatCount(bugs)}
-            primaryDetail="Open issues"
-            icon={Bug}
-            tone="amber"
-            graphValue={reliabilityGraph}
-            grade={relGrade}
-          />
-          <OverviewMetricCell
-            title="Maintainability"
-            value={formatCount(codeSmells)}
-            primaryDetail="Open issues"
-            icon={Wrench}
-            tone="blue"
-            graphValue={maintainabilityGraph}
-            grade={mntGrade}
-          />
-          <OverviewMetricCell
-            title="Accepted issues"
-            value={formatCount(acceptedIssues)}
-            secondaryDetail="Valid issues that were not fixed"
-            icon={ClipboardCheck}
-            tone="slate"
-            graphValue={acceptedGraph}
-            ring="neutral"
-          />
-          <OverviewMetricCell
-            title="Coverage"
-            value={formatPercent(coverage)}
-            secondaryDetail="Coverage reported by scanner"
-            icon={Focus}
-            tone={coverage >= 80 ? "emerald" : "amber"}
-            graphValue={coverage}
-            ring={coverage >= 80 ? "ok" : "bad"}
-          />
-          <OverviewMetricCell
-            title="Duplications"
-            value={formatPercent(duplications)}
-            secondaryDetail="Duplicated lines percentage"
-            icon={Copy}
-            tone={duplications <= 3 ? "emerald" : "red"}
-            graphValue={Math.min(duplications * 10, 100)}
-            ring={duplications <= 3 ? "ok" : "bad"}
-          />
-          <OverviewMetricCell
-            title="Security Hotspots"
-            value={formatCount(hotspots)}
-            icon={Eye}
-            tone={hotspots > 0 ? "amber" : "blue"}
-            graphValue={hotspotsGraph}
-            grade={getGrade(hotspots, 0, 3)}
-          />
-          <OverviewMetricCell
-            title="Dependency scan"
-            value={formatCount(dependencySummary?.vulnerable)}
-            primaryDetail="Vulnerable packages"
-            secondaryDetail={`${formatCount(dependencySummary?.outdated)} outdated • ${formatCount(dependencySummary?.license_issues)} license issues`}
-            icon={Package}
-            tone={depCritical > 0 ? "red" : (dependencySummary?.vulnerable ?? 0) > 0 ? "amber" : "emerald"}
-            graphValue={dependencyScanGraph}
-            grade={getGrade(depCritical, 0, 1)}
-          />
-          <OverviewMetricCell
-            title="Dependency severity"
-            value={`${formatCount(depTotal)}`}
-            primaryDetail={`${formatCount(depCritical)} critical • ${formatCount(depHigh)} high`}
-            secondaryDetail={`${formatCount(depMedium)} medium • ${formatCount(depLow)} low`}
-            icon={AlertOctagon}
-            tone={
-              depCritical > 0
-                ? "red"
-                : depHigh > 0
-                  ? "amber"
-                  : depMedium > 0
-                    ? "amber"
-                    : "emerald"
-            }
-            graphValue={depSeverityRiskPct}
-            ring={
-              depCritical > 0
-                ? "bad"
-                : depHigh > 0
-                  ? "neutral"
-                  : "ok"
-            }
-          />
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Chart 1: Code Quality */}
+          {(() => {
+            const qualityRings = [
+              { label: "Security", value: vulnerabilities, percent: securityGraph, color: "#E24B4A", grade: `Grade ${secGrade.label}` },
+              { label: "Reliability", value: bugs, percent: reliabilityGraph, color: "#F59E0B", grade: `Grade ${relGrade.label}` },
+              { label: "Maintainability", value: codeSmells, percent: maintainabilityGraph, color: "#3B82F6", grade: `Grade ${mntGrade.label}` },
+              { label: "Accepted issues", value: acceptedIssues, percent: acceptedGraph, color: "#8B5CF6", grade: "Tracked" },
+            ];
+
+            return (
+              <div className="rounded-xl border border-[#e4eaf4] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+                <div className="mb-4">
+                  <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Code Quality</p>
+                  <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">Security, reliability & maintainability</p>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <OperationalRingChart rings={qualityRings} centerValue={formatCount(totalIssues)} centerLabel="total issues" />
+                </div>
+
+                <div className="mt-4 space-y-2.5">
+                  {qualityRings.map((ring) => (
+                    <div key={ring.label} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="inline-block size-2.5 rounded-full"
+                          style={{ backgroundColor: ring.color }}
+                        />
+                        <span className="text-[11px] font-medium text-[#52648f] dark:text-gray-400">
+                          {ring.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
+                          {ring.value}
+                        </span>
+                        <span className="text-[10px] text-[#8fa0bf] dark:text-gray-500">
+                          {ring.grade}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Chart 2: Health & Scans */}
+          {(() => {
+            const healthRings = [
+              { label: "Coverage", value: formatPercent(coverage), percent: Math.max(coverage, 0), color: "#10B981", grade: coverage >= 80 ? "Healthy" : "Needs review" },
+              { label: "Duplications", value: formatPercent(duplications), percent: Math.min(duplications * 10, 100), color: "#06B6D4", grade: duplications <= 3 ? "Healthy" : "Needs review" },
+              { label: "Security Hotspots", value: formatCount(hotspots), percent: hotspotsGraph, color: "#F97316", grade: `Grade ${getGrade(hotspots, 0, 3).label}` },
+              { label: "Reliability", value: formatCount(bugs), percent: reliabilityGraph, color: "#EC4899", grade: `Grade ${relGrade.label}` },
+            ];
+
+            return (
+              <div className="rounded-xl border border-[#e4eaf4] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+                <div className="mb-4">
+                  <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Health & Scans</p>
+                  <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">Coverage, duplication & reliability posture</p>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <OperationalRingChart rings={healthRings} centerValue={formatPercent(coverage)} centerLabel="coverage" />
+                </div>
+
+                <div className="mt-4 space-y-2.5">
+                  {healthRings.map((ring) => (
+                    <div key={ring.label} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="inline-block size-2.5 rounded-full"
+                          style={{ backgroundColor: ring.color }}
+                        />
+                        <span className="text-[11px] font-medium text-[#52648f] dark:text-gray-400">
+                          {ring.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
+                          {ring.value}
+                        </span>
+                        <span className="text-[10px] text-[#8fa0bf] dark:text-gray-500">
+                          {ring.grade}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
     </motion.div>
