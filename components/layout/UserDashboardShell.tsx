@@ -32,6 +32,25 @@ import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import GoToTop from "@/components/ui/go-to-top";
 import type { AuthMeResponse } from "@/types/auth";
 
+/**
+ * Resolve an avatar path to a usable image URL.
+ * Handles absolute URLs, data URIs, and relative backend paths.
+ */
+function resolveAvatarUrl(value?: string | null): string | null {
+  const normalized = value?.trim();
+  if (!normalized) return null;
+  if (
+    normalized.startsWith("http://") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("data:") ||
+    normalized.startsWith("blob:") ||
+    normalized.startsWith("/")
+  ) {
+    return normalized;
+  }
+  return `/api/backend/${normalized.replace(/^\/+/, "")}`;
+}
+
 const mainNavItems = [
   { label: "Overview", path: "/userdashboard", icon: LayoutDashboard },
   { label: "Assets", path: "/userdashboard/assets", icon: Globe },
@@ -121,6 +140,7 @@ export default function UserDashboardShell({
     authMe?.user.username,
   );
   const email = authMe?.user.email ?? "";
+  const avatarUrl = resolveAvatarUrl(authMe?.user.avatar_profile);
   const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
@@ -451,8 +471,16 @@ export default function UserDashboardShell({
                   }}
                   className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-teal-400 via-cyan-400 to-blue-500 text-sm font-bold text-slate-950">
-                    {initials}
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-slate-950">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={`${displayName} avatar`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initials
+                    )}
                   </div>
                   <div className="hidden md:block">
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">

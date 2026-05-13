@@ -14,6 +14,8 @@ type UploadProfileProps = {
   currentImage?: string | null;
   displayName?: string;
   onUploaded?: () => void;
+  /** When true, shows only the avatar with a camera badge — no text or buttons visible until a file is picked. */
+  compact?: boolean;
 };
 
 function resolveImageSource(value?: string | null): string | null {
@@ -51,6 +53,7 @@ export function UploadProfile({
   currentImage,
   displayName,
   onUploaded,
+  compact = false,
 }: UploadProfileProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,8 +106,8 @@ export function UploadProfile({
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      setFeedback({ type: "error", message: "Please choose an image smaller than 10MB." });
+    if (file.size > 1 * 1024 * 1024) {
+      setFeedback({ type: "error", message: "Please choose an image smaller than 1MB." });
       clearSelection({ clearFeedback: false });
       return;
     }
@@ -181,7 +184,10 @@ export function UploadProfile({
         <button
           type="button"
           onClick={openFilePicker}
-          className="group relative flex size-24 items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+          className={cn(
+            "group relative flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700",
+            compact ? "size-24 rounded-2xl border-0 border-transparent" : "size-24 rounded-3xl",
+          )}
         >
           {previewImage ? (
             <img
@@ -194,8 +200,8 @@ export function UploadProfile({
               {initials || <User className="size-6" />}
             </div>
           )}
-          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-          <span className="absolute bottom-2 right-2 rounded-full bg-gray-900 p-1.5 text-white shadow-sm">
+          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/30" />
+          <span className="absolute bottom-2 right-2 rounded-full bg-gray-900/80 p-1.5 text-white shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
             <Camera className="size-3.5" />
           </span>
         </button>
@@ -211,42 +217,59 @@ export function UploadProfile({
         ) : null}
       </div>
 
-      <div className="space-y-1 text-center">
-        <p className="max-w-44 truncate text-sm font-medium text-gray-700 dark:text-gray-200">
-          {selectedFile?.name ?? (remoteImage ? "Current profile image" : "Upload a profile image")}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          JPG, PNG, or WebP up to 10MB
-        </p>
-      </div>
+      {/* Show text & buttons only when NOT compact, or when a file is selected (so user can save) */}
+      {(!compact || selectedFile) && (
+        <>
+          <div className="space-y-1 text-center">
+            <p className="max-w-44 truncate text-sm font-medium text-gray-700 dark:text-gray-200">
+              {selectedFile?.name ?? (remoteImage ? "Current profile image" : "Upload a profile image")}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              JPG, PNG, or WebP up to 1MB
+            </p>
+          </div>
 
-      <input
-        id={inputId}
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
+          <input
+            id={inputId}
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        <Button type="button" variant="outline" onClick={openFilePicker} disabled={isUploading}>
-          {selectedFile || remoteImage ? "Change image" : "Upload image"}
-        </Button>
-        <Button type="button" onClick={handleUpload} disabled={!selectedFile || isUploading}>
-          {isUploading ? (
-            <>
-              <LoaderCircle className="mr-2 size-4 animate-spin" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              <Upload className="mr-2 size-4" />
-              Save image
-            </>
-          )}
-        </Button>
-      </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button type="button" variant="outline" onClick={openFilePicker} disabled={isUploading}>
+              {selectedFile || remoteImage ? "Change image" : "Upload image"}
+            </Button>
+            <Button type="button" onClick={handleUpload} disabled={!selectedFile || isUploading}>
+              {isUploading ? (
+                <>
+                  <LoaderCircle className="mr-2 size-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 size-4" />
+                  Save image
+                </>
+              )}
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Hidden input still needed in compact mode for the file picker to work */}
+      {compact && !selectedFile && (
+        <input
+          id={inputId}
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      )}
 
       {feedback ? (
         <p
