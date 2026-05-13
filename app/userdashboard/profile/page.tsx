@@ -213,7 +213,7 @@ export default function ProfilePage() {
           >
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
               {/* Teal top accent */}
-              <div className="h-1 bg-linear-to-r from-teal-500 to-cyan-400" />
+              <div  />
               <div className="p-5 space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
                   Account Details

@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { Camera, ImagePlus, LoaderCircle, Upload, User, X } from "lucide-react";
+import { useEffect, useId, useRef, useState, useCallback } from "react";
+import { Camera, ImagePlus, LoaderCircle, Upload, User, X, Crop } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import ReactCrop, { type Crop as CropType, centerCrop, makeAspectCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type UploadProfileProps = {
   className?: string;
@@ -16,10 +20,11 @@ type UploadProfileProps = {
   compact?: boolean;
 };
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function resolveImageSource(value?: string | null): string | null {
   const normalized = value?.trim();
   if (!normalized) return null;
-
   if (
     normalized.startsWith("http://") ||
     normalized.startsWith("https://") ||
@@ -29,7 +34,6 @@ function resolveImageSource(value?: string | null): string | null {
   ) {
     return normalized;
   }
-
   return `/api/backend/${normalized.replace(/^\/+/, "")}`;
 }
 
@@ -44,6 +48,65 @@ function getInitials(name?: string): string {
   );
 }
 
+/** Pixel-inspect canvas to detect any semi-transparent pixels in a PNG. */
+function checkTransparency(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      // Sample a max 200×200 region to keep it fast
+      canvas.width = Math.min(img.naturalWidth, 200);
+      canvas.height = Math.min(img.naturalHeight, 200);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(false); return; }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] < 255) { resolve(true); return; }
+      }
+      resolve(false);
+    };
+    img.onerror = () => resolve(false);
+    img.crossOrigin = "anonymous";
+    img.src = src;
+  });
+}
+
+/** Checkerboard inline style — shows behind transparent PNGs */
+const checkerStyle: React.CSSProperties = {
+  backgroundImage: `
+    linear-gradient(45deg, #d1d5db 25%, transparent 25%),
+    linear-gradient(-45deg, #d1d5db 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #d1d5db 75%),
+    linear-gradient(-45deg, transparent 75%, #d1d5db 75%)
+  `,
+  backgroundSize: "12px 12px",
+  backgroundPosition: "0 0, 0 6px, 6px -6px, -6px 0px",
+  backgroundColor: "#f9fafb",
+};
+
+const checkerStyleDark: React.CSSProperties = {
+  backgroundImage: `
+    linear-gradient(45deg, #374151 25%, transparent 25%),
+    linear-gradient(-45deg, #374151 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #374151 75%),
+    linear-gradient(-45deg, transparent 75%, #374151 75%)
+  `,
+  backgroundSize: "12px 12px",
+  backgroundPosition: "0 0, 0 6px, 6px -6px, -6px 0px",
+  backgroundColor: "#1f2937",
+};
+
+function defaultCrop(width: number, height: number): CropType {
+  return centerCrop(
+    makeAspectCrop({ unit: "%", width: 80 }, 1, width, height),
+    width,
+    height,
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function UploadProfile({
   className,
   currentImage,
@@ -53,64 +116,165 @@ export function UploadProfile({
 }: UploadProfileProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const cropImgRef = useRef<HTMLImageElement>(null);
+
+  // Raw file before crop
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [rawPreviewUrl, setRawPreviewUrl] = useState<string | null>(null);
+
+  // Cropped result
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [isTransparent, setIsTransparent] = useState(false);
+
+  // UI state
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [crop, setCrop] = useState<CropType | undefined>(undefined);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const remoteImage = resolveImageSource(currentImage);
   const previewImage = localPreview ?? remoteImage;
   const initials = getInitials(displayName);
 
+  // Detect dark mode for checkerboard variant
   useEffect(() => {
-    if (!selectedFile) {
-      setLocalPreview(null);
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // Check transparency whenever localPreview changes and file is PNG
+  useEffect(() => {
+    if (!localPreview || !selectedFile?.type.includes("png")) {
+      setIsTransparent(false);
       return;
     }
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setLocalPreview(objectUrl);
-    return () => { URL.revokeObjectURL(objectUrl); };
-  }, [selectedFile]);
+    void checkTransparency(localPreview).then(setIsTransparent);
+  }, [localPreview, selectedFile]);
+
+  // Revoke raw preview URL
+  useEffect(() => {
+    if (!rawPreviewUrl) return;
+    return () => { URL.revokeObjectURL(rawPreviewUrl); };
+  }, [rawPreviewUrl]);
 
   function openFilePicker() {
     inputRef.current?.click();
   }
 
-  function clearSelection(options?: { clearFeedback?: boolean }) {
+  function clearAll(opts?: { clearFeedback?: boolean }) {
     setSelectedFile(null);
-    if (options?.clearFeedback ?? true) setFeedback(null);
+    setLocalPreview(null);
+    setRawFile(null);
+    setRawPreviewUrl(null);
+    setIsTransparent(false);
+    if (opts?.clearFeedback ?? true) setFeedback(null);
     if (inputRef.current) inputRef.current.value = "";
   }
 
   function closeModal() {
     setModalOpen(false);
-    clearSelection();
+    clearAll();
   }
 
+  function closeCropModal() {
+    setCropModalOpen(false);
+    setRawFile(null);
+    setRawPreviewUrl(null);
+    setCrop(undefined);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  // ── File picked → validate → open crop ─────────────────────────────────────
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
       setFeedback({ type: "error", message: "Please choose an image file." });
-      clearSelection({ clearFeedback: false });
       return;
     }
 
     if (file.size > 1 * 1024 * 1024) {
-      setFeedback({ type: "error", message: "Please choose an image smaller than 1MB." });
-      clearSelection({ clearFeedback: false });
+      setFeedback({
+        type: "error",
+        message: "That image is a bit too large — please keep it under 1 MB 🙏",
+      });
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
 
-    setSelectedFile(file);
     setFeedback(null);
+    const url = URL.createObjectURL(file);
+    setRawFile(file);
+    setRawPreviewUrl(url);
+    setCrop(undefined); // reset; will be set on image load
+    setCropModalOpen(true);
+  }
 
-    // In compact mode, open modal automatically when file is picked
+  // ── Set initial crop once crop-image loads ──────────────────────────────────
+  const onCropImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    setCrop(defaultCrop(naturalWidth, naturalHeight));
+  }, []);
+
+  // ── Apply crop → produce File → show in main modal ─────────────────────────
+  async function applyCrop() {
+    const img = cropImgRef.current;
+    if (!img || !crop || !rawFile) return;
+
+    const canvas = document.createElement("canvas");
+    const scaleX = img.naturalWidth / img.offsetWidth;
+    const scaleY = img.naturalHeight / img.offsetHeight;
+
+    // Convert % crop to pixels if needed
+    let pixelCrop = crop;
+    if (crop.unit === "%") {
+      pixelCrop = {
+        unit: "px",
+        x: (crop.x / 100) * img.offsetWidth,
+        y: (crop.y / 100) * img.offsetHeight,
+        width: (crop.width / 100) * img.offsetWidth,
+        height: (crop.height / 100) * img.offsetHeight,
+      };
+    }
+
+    canvas.width = pixelCrop.width! * scaleX;
+    canvas.height = pixelCrop.height! * scaleY;
+    const ctx = canvas.getContext("2d")!;
+
+    ctx.drawImage(
+      img,
+      pixelCrop.x! * scaleX,
+      pixelCrop.y! * scaleY,
+      pixelCrop.width! * scaleX,
+      pixelCrop.height! * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    const mimeType = rawFile.type === "image/png" ? "image/png" : "image/jpeg";
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, mimeType, 0.92));
+    if (!blob) return;
+
+    const croppedFile = new File([blob], rawFile.name, { type: mimeType });
+    const croppedUrl = URL.createObjectURL(croppedFile);
+
+    setSelectedFile(croppedFile);
+    setLocalPreview(croppedUrl);
+    setCropModalOpen(false);
+
     if (compact) setModalOpen(true);
   }
 
+  // ── Upload ──────────────────────────────────────────────────────────────────
   async function handleUpload() {
     if (!selectedFile) return;
 
@@ -119,7 +283,6 @@ export function UploadProfile({
 
     try {
       setIsUploading(true);
-
       const response = await fetch("/api/backend/users/me/profile-image", {
         method: "PUT",
         body: formData,
@@ -127,7 +290,7 @@ export function UploadProfile({
       });
 
       if (!response.ok) {
-        let message = `Upload failed with status ${response.status}.`;
+        let message = `Upload failed (${response.status}).`;
         const contentType = response.headers.get("content-type") ?? "";
         if (contentType.includes("application/json")) {
           const payload = (await response.json()) as Record<string, unknown>;
@@ -144,11 +307,10 @@ export function UploadProfile({
         throw new Error(message);
       }
 
-      clearSelection({ clearFeedback: false });
+      clearAll({ clearFeedback: false });
       setFeedback({ type: "success", message: "Profile image updated!" });
       onUploaded?.();
 
-      // Auto-close modal after success
       setTimeout(() => {
         setModalOpen(false);
         setFeedback(null);
@@ -157,25 +319,45 @@ export function UploadProfile({
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't upload your image right now. Please try again.";
+          : "Couldn't upload right now — please try again.";
       setFeedback({ type: "error", message });
     } finally {
       setIsUploading(false);
     }
   }
 
-  // Avatar element (shared between compact and full modes)
+  // ── Shared preview box (respects transparency) ─────────────────────────────
+  function PreviewBox({ size = "size-36", src }: { size?: string; src: string | null }) {
+    const bgStyle = isTransparent ? (isDarkMode ? checkerStyleDark : checkerStyle) : {};
+    return (
+      <div
+        className={cn(size, "overflow-hidden rounded-2xl border-2 border-gray-100 shadow-sm dark:border-gray-800")}
+        style={bgStyle}
+      >
+        {src ? (
+          <img src={src} alt="Preview" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-800">
+            <ImagePlus className="size-10 text-gray-300 dark:text-gray-600" />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Avatar button (shared) ─────────────────────────────────────────────────
   const avatarElement = (
     <div className="relative">
       <button
         type="button"
-        onClick={compact ? () => { openFilePicker(); } : openFilePicker}
+        onClick={openFilePicker}
         className={cn(
           "group relative flex items-center justify-center overflow-hidden transition-all focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2",
           compact
             ? "size-32 rounded-2xl border-0"
             : "size-24 rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700",
         )}
+        style={isTransparent && previewImage ? (isDarkMode ? checkerStyleDark : checkerStyle) : {}}
       >
         {previewImage ? (
           <img
@@ -184,7 +366,7 @@ export function UploadProfile({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-teal-500 to-blue-500 text-2xl font-bold text-white">
+          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-teal-500 to-blue-500 text-2xl font-bold text-white">
             {initials || <User className="size-8" />}
           </div>
         )}
@@ -196,13 +378,94 @@ export function UploadProfile({
     </div>
   );
 
-  // Compact mode: avatar + modal popup
+  // ── Crop modal (shared between compact and full) ────────────────────────────
+  const cropModal = (
+    <AnimatePresence>
+      {cropModalOpen && rawPreviewUrl && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-110 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) closeCropModal(); }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-900"
+          >
+            <button
+              type="button"
+              onClick={closeCropModal}
+              className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+            >
+              <X className="size-5" />
+            </button>
+
+            <div className="mb-5 text-center">
+              <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full bg-teal-50 dark:bg-teal-950/50">
+                <Crop className="size-5 text-teal-600 dark:text-teal-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Crop your photo
+              </h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Drag to reposition · Resize the corners
+              </p>
+            </div>
+
+            {/* Crop area */}
+            <div className="mb-5 flex justify-center overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+              <ReactCrop
+                crop={crop}
+                onChange={(_, pct) => setCrop(pct)}
+                aspect={1}
+                circularCrop={false}
+                className="max-h-72"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={cropImgRef}
+                  src={rawPreviewUrl}
+                  alt="Crop preview"
+                  onLoad={onCropImageLoad}
+                  className="max-h-72 w-auto object-contain"
+                />
+              </ReactCrop>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeCropModal}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={applyCrop}
+                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                <Crop className="mr-2 size-4" />
+                Apply Crop
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  // ── Compact mode ───────────────────────────────────────────────────────────
   if (compact) {
     return (
       <div className={cn("flex flex-col items-center", className)}>
         {avatarElement}
 
-        {/* Hidden file input */}
         <input
           id={inputId}
           ref={inputRef}
@@ -212,24 +475,25 @@ export function UploadProfile({
           onChange={handleFileChange}
         />
 
-        {/* Modal overlay */}
+        {cropModal}
+
+        {/* Upload modal */}
         <AnimatePresence>
           {modalOpen && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+              className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
               onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                transition={{ duration: 0.2, ease: "easeOut" as const }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-900"
               >
-                {/* Close button */}
                 <button
                   type="button"
                   onClick={closeModal}
@@ -238,47 +502,33 @@ export function UploadProfile({
                   <X className="size-5" />
                 </button>
 
-                {/* Header */}
                 <div className="mb-5 text-center">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Update Profile Photo
                   </h3>
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    JPG, PNG, or WebP up to 1MB
+                    JPG, PNG, or WebP · max 1 MB
                   </p>
                 </div>
 
-                {/* Preview */}
+                {/* Preview with transparent bg support */}
                 <div className="mb-5 flex justify-center">
-                  <div className="size-36 overflow-hidden rounded-2xl border-2 border-gray-100 shadow-sm dark:border-gray-800">
-                    {localPreview ? (
-                      <img
-                        src={localPreview}
-                        alt="Preview"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : previewImage ? (
-                      <img
-                        src={previewImage}
-                        alt="Current"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-800">
-                        <ImagePlus className="size-10 text-gray-300 dark:text-gray-600" />
-                      </div>
-                    )}
-                  </div>
+                  <PreviewBox src={localPreview ?? remoteImage} />
                 </div>
 
-                {/* File name */}
+                {/* Transparent PNG hint */}
+                {isTransparent && (
+                  <p className="mb-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                    ✦ Transparent background detected — the checkerboard is just a preview aid.
+                  </p>
+                )}
+
                 {selectedFile && (
                   <p className="mb-4 truncate text-center text-sm text-gray-600 dark:text-gray-300">
                     {selectedFile.name}
                   </p>
                 )}
 
-                {/* Feedback */}
                 {feedback && (
                   <p
                     className={cn(
@@ -292,7 +542,6 @@ export function UploadProfile({
                   </p>
                 )}
 
-                {/* Actions */}
                 <div className="flex gap-3">
                   <Button
                     type="button"
@@ -310,15 +559,9 @@ export function UploadProfile({
                     className="flex-1"
                   >
                     {isUploading ? (
-                      <>
-                        <LoaderCircle className="mr-2 size-4 animate-spin" />
-                        Saving...
-                      </>
+                      <><LoaderCircle className="mr-2 size-4 animate-spin" /> Saving...</>
                     ) : (
-                      <>
-                        <Upload className="mr-2 size-4" />
-                        Save
-                      </>
+                      <><Upload className="mr-2 size-4" /> Save</>
                     )}
                   </Button>
                 </div>
@@ -330,7 +573,7 @@ export function UploadProfile({
     );
   }
 
-  // Full (non-compact) mode — original layout
+  // ── Full (non-compact) mode ────────────────────────────────────────────────
   return (
     <div className={cn("flex flex-col items-center gap-3", className)}>
       {avatarElement}
@@ -338,7 +581,7 @@ export function UploadProfile({
       {selectedFile && (
         <button
           type="button"
-          onClick={() => clearSelection()}
+          onClick={() => clearAll()}
           className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-black text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
         >
           <X className="size-4" />
@@ -350,8 +593,13 @@ export function UploadProfile({
           {selectedFile?.name ?? (remoteImage ? "Current profile image" : "Upload a profile image")}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          JPG, PNG, or WebP up to 1MB
+          JPG, PNG, or WebP · max 1 MB
         </p>
+        {isTransparent && (
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            ✦ Transparent PNG detected
+          </p>
+        )}
       </div>
 
       <input
@@ -363,21 +611,17 @@ export function UploadProfile({
         onChange={handleFileChange}
       />
 
+      {cropModal}
+
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button type="button" variant="outline" onClick={openFilePicker} disabled={isUploading}>
           {selectedFile || remoteImage ? "Change image" : "Upload image"}
         </Button>
         <Button type="button" onClick={handleUpload} disabled={!selectedFile || isUploading}>
           {isUploading ? (
-            <>
-              <LoaderCircle className="mr-2 size-4 animate-spin" />
-              Uploading...
-            </>
+            <><LoaderCircle className="mr-2 size-4 animate-spin" /> Uploading...</>
           ) : (
-            <>
-              <Upload className="mr-2 size-4" />
-              Save image
-            </>
+            <><Upload className="mr-2 size-4" /> Save image</>
           )}
         </Button>
       </div>
