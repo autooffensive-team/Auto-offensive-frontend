@@ -12,7 +12,7 @@ import {
   FolderGit2,
   GitBranch,
   LoaderCircle,
-  Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,8 @@ import type {
 import { CodeScanOverview } from "./code-scan-overview";
 import { CodeScanIssues } from "./code-scan-issues";
 import { CodeScanDependencies } from "./code-scan-dependencies";
+
+const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
 
 type ProjectView = "overview" | "issues" | "dependencies";
 type GradeTone = "green" | "lime" | "red" | "muted";
@@ -59,28 +61,14 @@ const sectionMotion = {
 
 // ─── New Project Badge Component ────────────────────────────────────────────
 
-function NewProjectBadge() {
-  return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3, delay: 0.2 }}
-      className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-teal-500/30"
-    >
-      <Sparkles className="size-3.5" />
-      <span>New</span>
-    </motion.div>
-  );
-}
-
 function PreviousPageButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
+      className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-100 sm:px-4 sm:py-2 sm:text-sm dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100 dark:hover:bg-gray-800"
     >
-      <ArrowLeft className="size-4 shrink-0" />
+      <ArrowLeft className="size-3.5 shrink-0 sm:size-4" />
       <span>Back to previous page</span>
     </button>
   );
@@ -186,18 +174,6 @@ function formatRelativeTime(value: string | null | undefined): string {
  * Check if a project is "newly created"
  * Consider a project new if created within the last 24 hours
  */
-function isNewProject(createdAt: string | null | undefined): boolean {
-  if (!createdAt) return false;
-
-  const createdDate = new Date(createdAt);
-  if (Number.isNaN(createdDate.getTime())) return false;
-
-  const oneDayAgoMs = 24 * 60 * 60 * 1000;
-  const diffMs = Date.now() - createdDate.getTime();
-
-  return diffMs < oneDayAgoMs;
-}
-
 function formatPercent(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return "0.0%";
@@ -283,6 +259,30 @@ function formatStatusLabel(value: string | null | undefined): string {
     .join(" ");
 }
 
+function markProjectAsSeen(projectKey: string): void {
+  if (typeof window === "undefined" || !projectKey.trim()) {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_PROJECTS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    const current = new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === "string")
+        : [],
+    );
+
+    current.add(projectKey);
+    window.localStorage.setItem(
+      SEEN_PROJECTS_STORAGE_KEY,
+      JSON.stringify(Array.from(current)),
+    );
+  } catch {
+    // Ignore storage failures and keep navigation working.
+  }
+}
+
 // GitHub SVG Icon
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -341,16 +341,16 @@ function ProjectAvatar({
 
   if (host === "github") {
     return (
-      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-[#e4eaf4] bg-white text-[#24292e] dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-        <GitHubIcon className="size-6" />
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-900 sm:size-12 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+        <GitHubIcon className="size-5 sm:size-6" />
       </div>
     );
   }
 
   if (host === "gitlab") {
     return (
-      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-[#e4eaf4] bg-white text-[#fc6d26] dark:border-gray-700 dark:bg-gray-900">
-        <GitLabIcon className="size-6" />
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#fc6d26] sm:size-12 dark:border-gray-700 dark:bg-gray-900">
+        <GitLabIcon className="size-5 sm:size-6" />
       </div>
     );
   }
@@ -366,7 +366,7 @@ function StatusPill({ status }: { status: string | null | undefined }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
         status === "SUCCESS" &&
           "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
         status === "IN_PROGRESS" &&
@@ -407,7 +407,6 @@ function PageHeader({
   status,
   qualityGate,
   repoUrl,
-  isNew,
 }: {
   projectKey: string;
   repoPath: string;
@@ -416,24 +415,21 @@ function PageHeader({
   status: string | null | undefined;
   qualityGate: QualityGateStatus | null | undefined;
   repoUrl: string;
-  isNew: boolean;
 }) {
   return (
     <motion.section
       {...sectionMotion}
-      className="relative rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="relative rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
-      {isNew && <NewProjectBadge />}
-
-      <div className="flex flex-col gap-5">
-        <div className="flex min-w-0 gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4 md:gap-5">
+        <div className="flex min-w-0 gap-3 sm:gap-4">
           <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
 
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 sm:text-xs dark:text-gray-400">
               <Link
                 href="/userdashboard/code-scanning"
-                className="font-semibold text-teal-600 hover:underline dark:text-teal-300"
+                className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
               >
                 Code scanning
               </Link>
@@ -441,17 +437,17 @@ function PageHeader({
               <span className="truncate">{projectKey}</span>
             </div>
 
-            <h1 className="mt-2 truncate text-2xl font-bold text-[#071120] dark:text-white">
+            <h1 className="mt-1.5 truncate text-lg font-bold text-gray-900 sm:mt-2 sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl dark:text-white">
               {projectKey}
             </h1>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[10px] text-gray-500 sm:mt-3 sm:gap-x-3 sm:gap-y-2 sm:text-xs md:text-sm dark:text-gray-400">
               <span className="inline-flex items-center gap-1.5">
-                <RepoHostIcon repoUrl={repoUrl} className="size-3.5" />
+                <RepoHostIcon repoUrl={repoUrl} className="size-3 sm:size-3.5" />
                 {repoPath}
               </span>
               <span className="inline-flex items-center gap-1">
-                <GitBranch className="size-3.5" />
+                <GitBranch className="size-3 sm:size-3.5" />
                 {branch || "main"}
               </span>
               <span>{relativeTime}</span>
@@ -464,7 +460,7 @@ function PageHeader({
           {qualityGate ? (
             <span
               className={cn(
-                "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
                 getQualityGateTone(qualityGate)
               )}
             >
@@ -476,9 +472,9 @@ function PageHeader({
               href={repoUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-[#e4eaf4] bg-white px-3 py-2 text-sm font-semibold text-[#253554] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"
             >
-              <ExternalLink className="size-4" />
+              <ExternalLink className="size-3.5 sm:size-4" />
               Repository
             </a>
           ) : null}
@@ -500,10 +496,10 @@ function AlertSection({
     return (
       <motion.section
         {...sectionMotion}
-        className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
       >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+        <div className="flex items-start gap-2 sm:gap-3">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
           <span>{warningMessage}</span>
         </div>
       </motion.section>
@@ -514,10 +510,10 @@ function AlertSection({
     return (
       <motion.section
         {...sectionMotion}
-        className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+        className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
       >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+        <div className="flex items-start gap-2 sm:gap-3">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
           <span>{qualityGateMessage}</span>
         </div>
       </motion.section>
@@ -538,7 +534,7 @@ function ProjectNav({
   return (
     <motion.section
       {...sectionMotion}
-      className="flex gap-2 overflow-x-auto rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-2 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="flex gap-1.5 overflow-x-auto rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-1.5 sm:gap-2 sm:rounded-xl sm:p-2 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       {projectNavItems.map((item) => {
         const Icon = item.icon;
@@ -549,13 +545,13 @@ function ProjectNav({
             type="button"
             onClick={() => onViewChange(item.id)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
               active
                 ? "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
-                : "text-[#52648f] hover:bg-[#f0f4fa] hover:text-[#253554] dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-100"
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
             )}
           >
-            <Icon className="size-4" />
+            <Icon className="size-3.5 sm:size-4" />
             {item.label}
           </button>
         );
@@ -590,6 +586,19 @@ export default function CodeScanningDetailPageClient({
     router.push("/userdashboard/code-scanning");
   }
 
+  async function handleRefreshPage() {
+    await Promise.allSettled([
+      refetchScanDetail(),
+      refetchScanStatus(),
+      refetchScanSummary(),
+      refetchDependencySummary(),
+      refetchDependencies(),
+      refetchIssues(),
+      routeProjectScansQuery.refetch(),
+    ]);
+    router.refresh();
+  }
+
   // Check if route identifier is a scan ID
   const routeUsesScanId = /^[a-f0-9-]+$/i.test(routeIdentifier);
 
@@ -615,11 +624,12 @@ export default function CodeScanningDetailPageClient({
     isLoading,
     isError,
     error,
+    refetch: refetchScanDetail,
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
     refetchOnMountOrArgChange: true,
   });
 
-  const { data: liveStatus } = useGetScanStatusQuery(
+  const { data: liveStatus, refetch: refetchScanStatus } = useGetScanStatusQuery(
     resolvedScanId ?? skipToken,
     {
       pollingInterval: 5000,
@@ -627,21 +637,21 @@ export default function CodeScanningDetailPageClient({
     }
   );
 
-  const { data: scanSummary } = useGetScanSummaryQuery(
+  const { data: scanSummary, refetch: refetchScanSummary } = useGetScanSummaryQuery(
     resolvedScanId ?? skipToken,
     {
       refetchOnMountOrArgChange: true,
     }
   );
 
-  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(
+  const { data: dependencySummaryResponse, refetch: refetchDependencySummary } = useGetDependencySummaryQuery(
     resolvedScanId ?? skipToken,
     {
       refetchOnMountOrArgChange: true,
     }
   );
 
-  const { data: dependencyListResponse, isFetching: isDependenciesFetching } =
+  const { data: dependencyListResponse, isFetching: isDependenciesFetching, refetch: refetchDependencies } =
     useListDependenciesQuery(
       {
         scan_id: resolvedScanId ?? "",
@@ -670,7 +680,7 @@ export default function CodeScanningDetailPageClient({
     }
   );
 
-  const { data: issueResponse, isFetching: isIssuesFetching } =
+  const { data: issueResponse, isFetching: isIssuesFetching, refetch: refetchIssues } =
     useListIssuesQuery(
       {
         scan_id: resolvedScanId ?? "",
@@ -745,14 +755,18 @@ export default function CodeScanningDetailPageClient({
     ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())
   ).length;
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
-  const isNew = isNewProject(scanDetail?.created_at);
-
   const qualityGateMessage =
     qualityGate === "WARN"
       ? "The latest analysis passed with warnings."
       : qualityGate === "ERROR"
         ? "The latest analysis failed the quality gate."
         : null;
+
+  useEffect(() => {
+    if (scanDetail?.project_key) {
+      markProjectAsSeen(scanDetail.project_key);
+    }
+  }, [scanDetail?.project_key]);
 
   useEffect(() => {
     const normalizedProgress = Math.max(0, Math.min(100, Math.round(progress)));
@@ -777,9 +791,9 @@ export default function CodeScanningDetailPageClient({
   // Loading state
   if (isResolvingRoute || isLoading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
-        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
-          <LoaderCircle className="size-5 animate-spin text-teal-500" />
+      <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] sm:rounded-xl dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <div className="flex items-center gap-2 text-xs text-gray-500 sm:gap-3 sm:text-sm dark:text-gray-400">
+          <LoaderCircle className="size-4 animate-spin text-teal-500 sm:size-5" />
           Loading project overview...
         </div>
       </div>
@@ -789,13 +803,13 @@ export default function CodeScanningDetailPageClient({
   // Error state
   if (routeResolutionFailed || isError || !scanDetail) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-8 text-center dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
-        <AlertTriangle className="size-10 text-red-500" />
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-6 text-center sm:gap-4 sm:rounded-xl sm:p-8 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <AlertTriangle className="size-8 text-red-500 sm:size-10" />
         <div>
-          <h1 className="text-xl font-bold text-[#17233f] dark:text-white">
+          <h1 className="text-lg font-bold text-gray-900 sm:text-xl dark:text-white">
             Unable to load project overview
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-[#52648f] dark:text-gray-400">
+          <p className="mt-1.5 max-w-xl text-xs text-gray-500 sm:mt-2 sm:text-sm dark:text-gray-400">
             {routeResolutionFailed
               ? "No scan history was found for this project key."
               : readErrorMessage(
@@ -806,7 +820,7 @@ export default function CodeScanningDetailPageClient({
         </div>
         <Link
           href="/userdashboard/code-scanning"
-          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600"
+          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700 sm:px-5 sm:py-2.5 sm:text-sm dark:bg-teal-500 dark:hover:bg-teal-600"
         >
           <svg
             viewBox="0 0 20 20"
@@ -827,9 +841,18 @@ export default function CodeScanningDetailPageClient({
   }
 
   return (
-    <div className="space-y-5 text-[#17233f] dark:text-gray-100">
-      <div className="flex items-center justify-between gap-3">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="flex items-center justify-between gap-2 sm:gap-3">
         <PreviousPageButton onClick={handleGoBack} />
+        <button
+          type="button"
+          onClick={handleRefreshPage}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100 dark:hover:bg-gray-800"
+        >
+          <RefreshCw className="size-3.5 shrink-0 sm:size-4" />
+          <span>Refresh</span>
+        </button>
       </div>
 
       <PageHeader
@@ -844,7 +867,6 @@ export default function CodeScanningDetailPageClient({
         status={status}
         qualityGate={qualityGate}
         repoUrl={scanDetail.repo_url}
-        isNew={isNew}
       />
 
       <AlertSection
@@ -907,6 +929,7 @@ export default function CodeScanningDetailPageClient({
         />
       )}
 
+      </div>
     </div>
   );
 }

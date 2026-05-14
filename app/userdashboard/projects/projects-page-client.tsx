@@ -346,7 +346,7 @@ function AddProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -491,7 +491,7 @@ function UpdateProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -575,35 +575,37 @@ export default function ProjectsPageClient({
   }).length;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-start justify-between gap-4"
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
       >
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <Layers size={13} className="text-teal-500 dark:text-teal-400" />
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+            <span className="text-xs sm:text-sm md:text-sm lg:text-base font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
               Repository Scanner
             </span>
           </div>
-          <h1 className="text-[28px] font-bold text-gray-900 dark:text-white leading-tight">
+          <h1 className="mt-1.5 sm:mt-2 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
             Projects
           </h1>
-          <p className="text-[14px] text-gray-500 dark:text-gray-400 mt-1">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
             Manage repositories connected for code scanning
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 pt-1">
+        <div className="flex items-center gap-2 shrink-0">
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleRefresh}
             disabled={isFetching}
             title="Refresh"
-            className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-40 transition-all"
+            className="p-2 sm:p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-40 transition-all"
           >
             <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
           </motion.button>
@@ -611,22 +613,22 @@ export default function ProjectsPageClient({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2.5 text-[14px] font-semibold rounded-xl shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-[14px] font-semibold rounded-xl shadow-sm transition-colors"
           >
             <Plus size={16} />
-            Add Project
+            Import Repo
           </motion.button>
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
         <StatCard value={projects.length} label="Total Projects" variant="default" index={0} />
         <StatCard value={recentProjects} label="New (7 days)" variant="teal" index={1} />
         <StatCard value={recentlyUpdated} label="Recently Updated" variant="amber" index={2} />
         <StatCard value={0} label="Issues Found" variant="red" index={3} />
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative max-w-full sm:max-w-sm">
         <Search
           size={15}
           className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
@@ -636,7 +638,7 @@ export default function ProjectsPageClient({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search projects..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
         />
         <AnimatePresence>
           {searchTerm && (
@@ -659,7 +661,7 @@ export default function ProjectsPageClient({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between gap-3 rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/6 px-4 py-3 text-[13px] text-red-700 dark:text-red-400"
+            className="flex items-center justify-between gap-3 rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/6 px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-[13px] text-red-700 dark:text-red-400"
           >
             <div className="flex items-center gap-2.5">
               <AlertCircle size={15} />
@@ -675,9 +677,9 @@ export default function ProjectsPageClient({
         )}
       </AnimatePresence>
 
-      <div className="grid md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
         {isLoading && projects.length === 0 ? (
-          <div className="md:col-span-2 flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
+          <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />
             <p className="text-[14px] text-gray-500 dark:text-gray-400">
               Loading projects...
@@ -700,28 +702,28 @@ export default function ProjectsPageClient({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="md:col-span-2 flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 py-16 text-center"
+            className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 py-16 text-center"
           >
             <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
               <FolderGit2 size={22} className="text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm sm:text-[16px] font-semibold text-gray-900 dark:text-white">
               {searchTerm ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="mt-1 text-[13px] text-gray-500 dark:text-gray-400 max-w-xs">
+            <p className="mt-1 text-xs sm:text-[13px] text-gray-500 dark:text-gray-400 max-w-xs">
               {searchTerm
                 ? "Try adjusting your search term"
-                : "Create a project to start scanning for vulnerabilities"}
+                : "Import a repository to start scanning for vulnerabilities"}
             </p>
             {!searchTerm && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowAddModal(true)}
-                className="mt-5 flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 text-[13px] font-semibold rounded-xl transition-colors shadow-sm"
+                className="mt-5 flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-4 py-2 text-[13px] font-semibold rounded-xl transition-colors shadow-sm"
               >
                 <Plus size={14} />
-                Add your first project
+                Import your first repo
               </motion.button>
             )}
           </motion.div>
@@ -746,6 +748,8 @@ export default function ProjectsPageClient({
           />
         )}
       </AnimatePresence>
+
+      </div>
     </div>
   );
 }

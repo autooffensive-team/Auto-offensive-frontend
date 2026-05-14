@@ -233,21 +233,22 @@ export default function ScanPage() {
   const isIdle = activeLogs.length === 0;
 
   return (
-    <div className="space-y-5">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
       <div>
-        <h1 className="text-[28px] font-bold text-foreground">New Scan</h1>
-        <p className="mt-1 text-[16px] text-muted-foreground">
+        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+        <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
           Launch Basic, Medium, or Advanced scans and watch live logs as they run.
         </p>
       </div>
 
       {metaError && (
-        <div className="rounded-lg border border-destructive/25 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
           {metaError}
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-card p-4">
+      <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
         {loadingMeta ? (
           <ProjectSelectorSkeleton />
         ) : (
@@ -261,8 +262,8 @@ export default function ScanPage() {
         )}
       </div>
 
-      <div className={cn("grid gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
-        <div className="space-y-5">
+      <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
+        <div className="space-y-3 sm:space-y-4 md:space-y-5">
           <ScanModeTabs value={activeTab} onChange={setActiveTab} />
 
           <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
@@ -328,36 +329,36 @@ export default function ScanPage() {
 
       {/* BOTTOM SECTION: Full-width stream logs terminal */}
       {activeTab !== "advanced" && (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-            <div className="flex items-center gap-3">
+        <div className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-red-500" />
-                <span className="h-3 w-3 rounded-full bg-yellow-400" />
-                <span className="h-3 w-3 rounded-full bg-green-500" />
+                <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500" />
+                <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400" />
+                <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500" />
               </div>
-              <span className="font-mono text-muted-foreground">
+              <span className="font-mono text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
                 {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               {activeLogs.length > 0 && (
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
                   {activeLogs.length} lines
                 </span>
               )}
               <button
                 type="button"
                 onClick={() => resetRun(activeTab)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               >
                 <RotateCcw size={12} />
                 Reset
               </button>
             </div>
           </div>
-          <div className="p-4">
-            <div className="h-110 overflow-y-auto rounded-lg bg-muted/30 text-xs leading-relaxed font-[Consolas,monospace]">
+          <div className="p-3 sm:p-4">
+            <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[10px] sm:text-xs leading-relaxed font-[Consolas,monospace]">
               {isIdle ? (
                 <div className="flex flex-col items-center h-full">
 
@@ -384,30 +385,30 @@ export default function ScanPage() {
                   </div>
                   {/* ── End responsive ASCII ───────────────────────────────── */}
 
-                  <p className="text-muted-foreground/50 py-3 text-center text-[11px] shrink-0">
+                  <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[10px] sm:text-[11px] shrink-0">
                     Logs will appear here when a scan starts.
                   </p>
                 </div>
               ) : (
-                <div className="p-3">
+                <div className="p-2 sm:p-3">
                   {activeLogs.map((line) => (
-                    <div key={line.id} className="flex gap-2 wrap-break-word py-0.5">
-                      <span className="shrink-0 text-muted-foreground/40">
+                    <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
+                      <span className="shrink-0 text-gray-400 dark:text-gray-500">
                         {new Date(line.timestamp).toLocaleTimeString()}
                       </span>
-                      <span className="shrink-0 text-primary/70">[{line.source}]</span>
+                      <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
                       <span
                         className={cn(
                           "shrink-0 font-semibold",
-                          line.level === "ERROR" && "text-destructive",
+                          line.level === "ERROR" && "text-red-600 dark:text-red-400",
                           line.level === "WARN" && "text-amber-500 dark:text-amber-400",
                           line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                          !["ERROR", "WARN", "INFO"].includes(line.level) && "text-muted-foreground/60"
+                          !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
                         )}
                       >
                         {line.level}
                       </span>
-                      <span className="text-foreground/75">{line.text}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{line.text}</span>
                     </div>
                   ))}
                 </div>
@@ -416,6 +417,7 @@ export default function ScanPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

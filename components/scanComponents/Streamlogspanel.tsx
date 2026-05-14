@@ -24,9 +24,9 @@ export function StreamLogsPanel({
   }, [logs]);
 
   return (
-    <div className="flex h-96 flex-col overflow-hidden rounded-xl border border-border bg-card">
+    <div className="flex h-96 flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5 shrink-0">
+      <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-red-500" />
@@ -34,13 +34,13 @@ export function StreamLogsPanel({
             <span className="h-3 w-3 rounded-full bg-green-500" />
           </div>
           <div className="flex items-center gap-2">
-            <Bot size={13} className="text-muted-foreground/60" />
-            <span className="font-mono text-muted-foreground">{title}</span>
+            <Bot size={13} className="text-gray-400 dark:text-gray-500" />
+            <span className="font-mono text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{title}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {logs.length > 0 && (
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+            <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
               {logs.length} lines
             </span>
           )}
@@ -48,7 +48,7 @@ export function StreamLogsPanel({
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
             >
               <RotateCcw size={12} />
               Reset
@@ -58,31 +58,31 @@ export function StreamLogsPanel({
       </div>
 
       {/* Logs Container */}
-      <div className="m-4 flex-1 overflow-y-auto rounded-lg bg-muted/30 p-3 text-xs leading-relaxed font-[Consolas,monospace]">
+      <div className="m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2 sm:p-3 text-[10px] sm:text-xs leading-relaxed font-[Consolas,monospace]">
         {!logs.length ? (
-          <p className="text-muted-foreground/50 py-2 text-center text-[11px]">
+          <p className="text-gray-400 dark:text-gray-500 py-2 text-center text-[11px]">
             Logs will appear here when a scan starts.
           </p>
         ) : (
           <>
             {logs.map((line) => (
               <div key={line.id} className="flex gap-2 wrap-break-word py-0.5">
-                <span className="shrink-0 text-muted-foreground/40">
+                <span className="shrink-0 text-gray-400 dark:text-gray-500">
                   {new Date(line.timestamp).toLocaleTimeString()}
                 </span>
-                <span className="shrink-0 text-primary/70">[{line.source}]</span>
+                <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
                 <span
                   className={cn(
                     "shrink-0 font-semibold",
-                    line.level === "ERROR" && "text-destructive",
+                    line.level === "ERROR" && "text-red-600 dark:text-red-400",
                     line.level === "WARN" && "text-amber-500 dark:text-amber-400",
                     line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                    !["ERROR", "WARN", "INFO"].includes(line.level) && "text-muted-foreground/60"
+                    !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
                   )}
                 >
                   {line.level}
                 </span>
-                <span className="text-foreground/75">{line.text}</span>
+                <span className="text-gray-900/75 dark:text-white/75">{line.text}</span>
               </div>
             ))}
             <div ref={logEndRef} />

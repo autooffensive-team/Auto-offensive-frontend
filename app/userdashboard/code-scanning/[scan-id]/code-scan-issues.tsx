@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import type { IssueResponse } from "@/types/scanner";
+import { SeverityDonutChart } from "@/components/charts/SeverityDonutChart";
 import { buildCodeScanningIssueHref } from "@/lib/scanner-route";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ const severityOptions: FilterOption[] = [
   { label: "Critical", value: "CRITICAL" },
   { label: "Major", value: "MAJOR" },
   { label: "Minor", value: "MINOR" },
-  { label: "Info", value: "INFO" },
+  
 ];
 
 function getIssueSeverityColor(severity: string): { bg: string; border: string; text: string; dot: string } {
@@ -62,10 +63,10 @@ function getIssueSeverityColor(severity: string): { bg: string; border: string; 
       };
     default:
       return {
-        bg: "bg-slate-50 dark:bg-slate-950",
-        border: "border-slate-200 dark:border-slate-800",
-        text: "text-slate-700 dark:text-slate-300",
-        dot: "bg-slate-500",
+        bg: "bg-gray-50 dark:bg-gray-950",
+        border: "border-gray-200 dark:border-gray-800",
+        text: "text-gray-700 dark:text-gray-300",
+        dot: "bg-gray-500",
       };
   }
 }
@@ -117,11 +118,11 @@ function FilterChips({
 }) {
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+      <label className="flex items-center gap-2 text-xs font-semibold text-gray-700 sm:text-sm dark:text-gray-300">
         <Filter className="size-4" />
         {label}
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {options.map((option) => {
           const active = selected === option.value;
           return (
@@ -132,10 +133,10 @@ function FilterChips({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm",
                 active
                   ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                  : "border border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
+                  : "border border-gray-200 bg-white text-gray-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
               )}
             >
               {option.label}
@@ -154,7 +155,6 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
       CRITICAL: 0,
       MAJOR: 0,
       MINOR: 0,
-      INFO: 0,
     };
     issues.forEach((issue) => {
       const severity = issue.severity.toUpperCase() as keyof typeof dist;
@@ -164,40 +164,23 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
   }, [issues]);
 
   const total = issues.length;
-  const severities = [
-    { key: "BLOCKER", label: "Blocker", color: "bg-red-500" },
-    { key: "CRITICAL", label: "Critical", color: "bg-orange-500" },
-    { key: "MAJOR", label: "Major", color: "bg-amber-500" },
-    { key: "MINOR", label: "Minor", color: "bg-blue-500" },
+
+  const severityItems = [
+    { key: "BLOCKER", label: "Blocker", count: counts.BLOCKER, color: "bg-red-500", strokeColor: "#ef4444" },
+    { key: "CRITICAL", label: "Critical", count: counts.CRITICAL, color: "bg-orange-500", strokeColor: "#f97316" },
+    { key: "MAJOR", label: "Major", count: counts.MAJOR, color: "bg-amber-500", strokeColor: "#f59e0b" },
+    { key: "MINOR", label: "Minor", count: counts.MINOR, color: "bg-blue-500", strokeColor: "#3b82f6" },
+    
   ];
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Severity distribution</h3>
-      <div className="space-y-2">
-        {severities.map(({ key, label, color }) => {
-          const count = counts[key as keyof typeof counts];
-          const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-          return (
-            <div key={key} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-600 dark:text-slate-400">{label}</span>
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {count} ({percentage}%)
-                </span>
-              </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className={cn("h-full rounded-full", color)}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    <div className="space-y-3 sm:space-y-4">
+      <h3 className="text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">Severity distribution</h3>
+      <SeverityDonutChart
+        items={severityItems}
+        total={total}
+        centerLabel="Issues"
+      />
     </div>
   );
 }
@@ -221,25 +204,25 @@ function IssueCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          "block p-4 rounded-lg border transition-all duration-200 cursor-pointer",
-          "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
+          "block p-3 rounded-lg border transition-all duration-200 cursor-pointer sm:p-4",
+          "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800",
           "hover:border-teal-200 dark:hover:border-teal-500/20 hover:bg-teal-50/40 dark:hover:bg-teal-500/5",
         )}
       >
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {/* Header with severity and type */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 flex-1 min-w-0 sm:gap-2">
               <div
                 className={cn(
-                  "shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white",
+                  "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white sm:w-6 sm:h-6",
                   severityColors.dot,
                 )}
               >
-                <span className="text-xs font-bold">{issue.severity.charAt(0)}</span>
+                <span className="text-[9px] font-bold sm:text-xs">{issue.severity.charAt(0)}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                <h4 className="text-xs font-semibold text-gray-900 truncate sm:text-sm dark:text-white">
                   {issue.message}
                 </h4>
               </div>
@@ -250,21 +233,21 @@ function IssueCard({
           </div>
 
           {/* File path and location */}
-          <div className="text-xs text-slate-600 dark:text-slate-400 font-mono truncate">
+          <div className="text-[10px] text-gray-500 font-mono truncate sm:text-xs dark:text-gray-400">
             {issue.file_path}
             {issue.line > 0 ? `:${issue.line}` : ""}
           </div>
 
           {/* Tags and metadata */}
-          <div className="flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center rounded px-2 py-1 text-xs font-medium bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
+            <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-teal-50 text-teal-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-teal-500/10 dark:text-teal-300">
               {formatStatusLabel(issue.type)}
             </span>
-            <span className="inline-flex items-center rounded px-2 py-1 text-xs font-medium bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
+            <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-sky-50 text-sky-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-sky-500/10 dark:text-sky-300">
               {getCweTag(issue)}
             </span>
             {issue.tags.slice(0, 1).map((tag) => (
-              <span key={tag} className="inline-flex items-center rounded px-2 py-1 text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <span key={tag} className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-gray-800 dark:text-gray-300">
                 {tag}
               </span>
             ))}
@@ -312,32 +295,32 @@ export function CodeScanIssues({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6"
+      className="space-y-4 sm:space-y-5 md:space-y-6"
     >
       {/* Stats Header */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 md:gap-4">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f6fbfb] p-4 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950"
+          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
         >
-          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-2">Total issues</div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">{total}</div>
+          <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Total issues</div>
+          <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-red-50/40 p-4 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950"
+          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-red-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-2">Bugs</div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.BUG}</div>
+              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Bugs</div>
+              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.BUG}</div>
             </div>
-            <Bug className="size-5 text-red-500 dark:text-red-400" />
+            <Bug className="size-4 text-red-500 sm:size-5 dark:text-red-400" />
           </div>
         </motion.div>
 
@@ -345,14 +328,14 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-orange-50/40 p-4 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950"
+          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-orange-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-2">Vulnerabilities</div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.VULNERABILITY}</div>
+              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Vulnerabilities</div>
+              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.VULNERABILITY}</div>
             </div>
-            <Lock className="size-5 text-orange-500 dark:text-orange-400" />
+            <Lock className="size-4 text-orange-500 sm:size-5 dark:text-orange-400" />
           </div>
         </motion.div>
 
@@ -360,55 +343,55 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-blue-50/40 p-4 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950"
+          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-blue-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-2">Code smells</div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.CODE_SMELL}</div>
+              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Code smells</div>
+              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.CODE_SMELL}</div>
             </div>
-            <Zap className="size-5 text-blue-500 dark:text-blue-400" />
+            <Zap className="size-4 text-blue-500 sm:size-5 dark:text-blue-400" />
           </div>
         </motion.div>
       </div>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 md:gap-6 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
         {/* Issues list */}
         <motion.div
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="space-y-4"
+          className="space-y-3 sm:space-y-4"
         >
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="size-5 text-slate-600 dark:text-slate-400" />
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+              <BarChart3 className="size-4 text-gray-600 sm:size-5 dark:text-gray-400" />
+              <h2 className="text-sm font-semibold text-gray-900 sm:text-base md:text-lg dark:text-white">
                 Issues
               </h2>
             </div>
-            <span className="text-sm text-slate-600 dark:text-slate-400">
+            <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
               {issues.length} of {total}
             </span>
           </div>
 
           {/* Loading state */}
           {isLoading ? (
-            <div className="p-8 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-3">
-              <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-pulse" />
-              <span className="text-sm text-slate-600 dark:text-slate-400">Loading issues...</span>
+            <div className="p-6 rounded-lg bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 flex items-center justify-center gap-2 sm:gap-3 sm:p-8">
+              <div className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full animate-pulse" />
+              <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">Loading issues...</span>
             </div>
           ) : issues.length === 0 ? (
-            <div className="p-8 rounded-lg bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 text-center">
-              <FileCode2 className="size-8 mx-auto mb-2 text-slate-400 dark:text-slate-600" />
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+            <div className="p-6 rounded-lg bg-gray-50 dark:bg-gray-900 border border-dashed border-gray-200 dark:border-gray-800 text-center sm:p-8">
+              <FileCode2 className="size-6 mx-auto mb-2 text-gray-400 sm:size-8 dark:text-gray-600" />
+              <p className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
                 No issues matched the current filters.
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {issues.map((issue) => (
                 <IssueCard key={issue.key} issue={issue} projectKey={projectKey} allIssues={allIssues} />
               ))}
@@ -421,30 +404,30 @@ export function CodeScanIssues({
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="space-y-6 lg:sticky lg:top-5 lg:self-start"
+          className="space-y-4 sm:space-y-5 md:space-y-6 lg:sticky lg:top-5 lg:self-start"
         >
           {/* Filters */}
-          <div className="rounded-xl border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-5 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950">
-            <div className="mb-5 flex items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
+            <div className="mb-3 flex items-center justify-between gap-3 border-b border-gray-200 pb-3 sm:mb-4 sm:mb-5 sm:pb-4 dark:border-gray-800">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 sm:text-[11px] dark:text-gray-400">
                   Filters
                 </p>
-                <h3 className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
+                <h3 className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">
                   Refine issue results
                 </h3>
               </div>
-              <Filter className="size-4 text-slate-400 dark:text-slate-500" />
+              <Filter className="size-3.5 text-gray-400 sm:size-4 dark:text-gray-500" />
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
               <FilterChips
                 label="Issue type"
                 options={issueTypeOptions}
                 selected={typeFilter}
                 onChange={onTypeFilterChange}
               />
-              <div className="border-t border-slate-200 pt-6 dark:border-slate-800">
+              <div className="border-t border-gray-200 pt-4 sm:pt-5 md:pt-6 dark:border-gray-800">
                 <FilterChips
                   label="Severity"
                   options={severityOptions}
@@ -456,7 +439,7 @@ export function CodeScanIssues({
           </div>
 
           {/* Distribution chart */}
-          <div className="rounded-xl border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-5 dark:border-slate-800 dark:from-slate-950 dark:to-slate-950">
+          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
             <SeverityDistribution issues={issues} />
           </div>
         </motion.aside>
