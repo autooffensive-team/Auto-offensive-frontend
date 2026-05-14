@@ -41,7 +41,7 @@ export const reportsApi = baseApi.injectEndpoints({
                     body,
                     // Return the full Response object so we can read headers before
                     // consuming the body as a Blob.
-                    responseHandler: (response) => Promise.resolve(response),
+                    responseHandler: (response: Response) => Promise.resolve(response),
                 });
 
                 if (result.error) {
@@ -49,6 +49,24 @@ export const reportsApi = baseApi.injectEndpoints({
                 }
 
                 const response = result.data as Response;
+
+                // fetchBaseQuery with a custom responseHandler won't auto-reject
+                // non-2xx responses — check manually.
+                if (!response.ok) {
+                    let detail: string | undefined;
+                    try {
+                        const json = await response.json() as { detail?: string; message?: string };
+                        detail = json?.detail ?? json?.message;
+                    } catch {
+                        // body wasn't JSON — ignore
+                    }
+                    return {
+                        error: {
+                            status: response.status as number,
+                            data: detail ?? response.statusText ?? "Export failed",
+                        } as import("@reduxjs/toolkit/query").FetchBaseQueryError,
+                    };
+                }
 
                 // Extract filename from Content-Disposition header, fall back to a
                 // format-derived default if the header is absent or unparseable.
@@ -74,7 +92,7 @@ export const reportsApi = baseApi.injectEndpoints({
                     URL.revokeObjectURL(url);
                     url = null;
 
-                    return { data: undefined };
+                    return { data: null as unknown as void };
                 } catch (err) {
                     // Ensure the object URL is revoked even if blob reading or anchor
                     // manipulation throws, to prevent memory leaks.
@@ -85,7 +103,7 @@ export const reportsApi = baseApi.injectEndpoints({
                         error: {
                             status: "CUSTOM_ERROR",
                             error: err instanceof Error ? err.message : "Unknown error",
-                        },
+                        } as import("@reduxjs/toolkit/query").FetchBaseQueryError,
                     };
                 }
             },
