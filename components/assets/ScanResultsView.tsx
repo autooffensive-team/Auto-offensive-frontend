@@ -10,6 +10,7 @@ import {
 import type { ParsedStepData } from "@/types/assets";
 import PaginationControls from "./PaginationControls";
 import ScanResultsViewSkeleton from "./ScanResultsViewSkeleton";
+import GenerateReportButton from "@/components/report/GenerateReportButton";
 
 type ScanResultsViewProps = {
   jobId: string;
@@ -204,51 +205,60 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
     >
       {/* Header metadata */}
       {jobDetails && (
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-            Status:{" "}
-            <span className="ml-1 capitalize">{jobDetails.status}</span>
-          </span>
-          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-            Target:{" "}
-            <span className="ml-1">{jobDetails.target_name}</span>
-          </span>
-          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-[14px] font-medium text-teal-700 dark:text-teal-300">
-            Findings:{" "}
-            <span className="ml-1">{jobDetails.total_findings}</span>
-          </span>
-          {jobDetails.execution_mode && jobDetails.execution_mode !== "unknown" && (
+        <div className="flex flex-wrap items-center gap-3 justify-between">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-              Mode:{" "}
-              <span className="ml-1 capitalize">{jobDetails.execution_mode}</span>
+              Status:{" "}
+              <span className="ml-1 capitalize">{jobDetails.status}</span>
             </span>
-          )}
-          {jobDetails.finished_at && (
             <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-              Finished:{" "}
-              <span className="ml-1">
-                {new Date(jobDetails.finished_at).toLocaleString()}
+              Target:{" "}
+              <span className="ml-1">{jobDetails.target_name}</span>
+            </span>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-[14px] font-medium text-teal-700 dark:text-teal-300">
+              Findings:{" "}
+              <span className="ml-1">{jobDetails.total_findings}</span>
+            </span>
+            {jobDetails.execution_mode && jobDetails.execution_mode !== "unknown" && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+                Mode:{" "}
+                <span className="ml-1 capitalize">{jobDetails.execution_mode}</span>
               </span>
-            </span>
-          )}
-          {jobDetails.started_at && jobDetails.finished_at && (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-              Duration:{" "}
-              <span className="ml-1">
-                {formatDuration(
-                  new Date(jobDetails.started_at),
-                  new Date(jobDetails.finished_at),
-                )}
+            )}
+            {jobDetails.finished_at && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+                Finished:{" "}
+                <span className="ml-1">
+                  {new Date(jobDetails.finished_at).toLocaleString()}
+                </span>
               </span>
-            </span>
-          )}
-          {jobDetails.steps.length > 0 && (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
-              Tools:{" "}
-              <span className="ml-1">
-                {[...new Set(jobDetails.steps.map((s) => s.tool_name))].join(", ")}
+            )}
+            {jobDetails.started_at && jobDetails.finished_at && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+                Duration:{" "}
+                <span className="ml-1">
+                  {formatDuration(
+                    new Date(jobDetails.started_at),
+                    new Date(jobDetails.finished_at),
+                  )}
+                </span>
               </span>
-            </span>
+            )}
+            {jobDetails.steps.length > 0 && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+                Tools:{" "}
+                <span className="ml-1">
+                  {[...new Set(jobDetails.steps.map((s) => s.tool_name))].join(", ")}
+                </span>
+              </span>
+            )}
+          </div>
+          {parsedData && (
+            <GenerateReportButton
+              jobId={jobId}
+              steps={jobDetails.steps}
+              parsedSteps={parsedData.steps}
+            />
           )}
         </div>
       )}

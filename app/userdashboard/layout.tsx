@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import UserDashboardShell from "@/components/layout/UserDashboardShell";
 import { readOptionalEnv, readRequiredEnv } from "@/lib/server-env";
 import type { AuthMeResponse } from "@/types/auth";
+import { Toaster } from "sonner";
 
 const gatewayBaseUrl =
   readOptionalEnv("BACKEND_URL", "") || readRequiredEnv("FASTAPI_GATEWAY_URL");
@@ -54,8 +55,11 @@ export default async function UserDashboardLayout({
   const initialAuthMe = await getInitialAuthMe(requestHeaders);
 
   return (
-    <UserDashboardShell initialAuthMe={initialAuthMe}>
-      {children}
-    </UserDashboardShell>
+    <>
+      <UserDashboardShell initialAuthMe={initialAuthMe}>
+        {children}
+      </UserDashboardShell>
+      <Toaster duration={5000} />
+    </>
   );
 }
