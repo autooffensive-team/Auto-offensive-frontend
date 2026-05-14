@@ -367,15 +367,15 @@ function IssueSidebar({
   allIssues: IssueResponse[];
 }) {
   return (
-    <aside className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
-      <div className="border-b border-gray-200 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-gray-800">
-        <p className="text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">{total} issues in this scan</p>
+    <aside className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+      <div className="border-b border-slate-200 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-slate-800">
+        <p className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">{total} issues in this scan</p>
       </div>
 
       <div className="max-h-[calc(100vh-14rem)] overflow-y-auto">
         {groups.map((group) => (
-          <div key={group.filePath} className="border-b border-gray-200 px-3 py-3 last:border-b-0 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-gray-800">
-            <p className="mb-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wide sm:mb-3 sm:text-xs dark:text-gray-400">
+          <div key={group.filePath} className="border-b border-slate-200 px-3 py-3 last:border-b-0 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-slate-800">
+            <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wide sm:mb-3 sm:text-xs dark:text-slate-400">
               {group.filePath}
             </p>
             <div className="space-y-1 sm:space-y-1.5">
@@ -389,7 +389,7 @@ function IssueSidebar({
                       "block rounded px-2.5 py-1.5 text-[10px] font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-xs",
                       active
                         ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
                     )}
                   >
                     {issue.message}
@@ -687,8 +687,8 @@ export default function CodeScanningIssueDetailPageClient({
 
   if (isResolvingRoute || isResolvingIssueRoute || isScanDetailLoading || isLoading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-gray-200 dark:border-gray-800">
-        <div className="flex items-center gap-2 text-xs text-gray-500 sm:gap-3 sm:text-sm dark:text-gray-400">
+      <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2 text-xs text-slate-500 sm:gap-3 sm:text-sm dark:text-slate-400">
           <LoaderCircle className="size-4 animate-spin text-teal-500 sm:size-5" />
           Loading issue detail...
         </div>
@@ -698,11 +698,11 @@ export default function CodeScanningIssueDetailPageClient({
 
   if (routeResolutionFailed || issueRouteResolutionFailed || isError || !issueDetail) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-6 text-center sm:gap-4 sm:p-8 dark:border-gray-800 dark:bg-gray-900">
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-6 text-center sm:gap-4 sm:p-8 dark:border-slate-800 dark:bg-slate-900">
         <AlertTriangle className="size-8 text-red-500 sm:size-10" />
         <div>
-          <h1 className="text-lg font-bold text-gray-900 sm:text-xl dark:text-white">Unable to load issue detail</h1>
-          <p className="mt-1.5 max-w-xl text-xs text-gray-500 sm:mt-2 sm:text-sm dark:text-gray-400">
+          <h1 className="text-lg font-bold text-slate-900 sm:text-xl dark:text-white">Unable to load issue detail</h1>
+          <p className="mt-1.5 max-w-xl text-xs text-slate-500 sm:mt-2 sm:text-sm dark:text-slate-400">
             {routeResolutionFailed
               ? "No scan history was found for this project key."
               : issueRouteResolutionFailed
@@ -712,7 +712,7 @@ export default function CodeScanningIssueDetailPageClient({
         </div>
         <Link
           href={buildCodeScanningProjectHref(routeIdentifier)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-gray-800 dark:text-gray-100 dark:hover:bg-gray-800"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:text-slate-100 dark:hover:bg-slate-800"
         >
           <ArrowLeft className="size-3.5 sm:size-4" />
           Back to project issues
@@ -860,9 +860,9 @@ export default function CodeScanningIssueDetailPageClient({
       <div className="min-h-screen">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
         {/* Header */}
-        <motion.section {...sectionMotion} className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
+        <motion.section {...sectionMotion} className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
           <div className="flex flex-col gap-3 sm:gap-4">
-            <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 sm:text-xs dark:text-gray-400">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">
               <Link href="/userdashboard/code-scanning" className="font-semibold text-teal-600 hover:underline dark:text-teal-400">
                 Code scanning
               </Link>
@@ -879,10 +879,10 @@ export default function CodeScanningIssueDetailPageClient({
 
             <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3">
               <div className="min-w-0 flex-1">
-                <h1 className="truncate text-lg font-bold text-gray-900 sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
+                <h1 className="truncate text-lg font-bold text-slate-900 sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
                   {issueDetail.why_is_issue.issue_message}
                 </h1>
-                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-gray-500 sm:mt-3 sm:gap-x-4 sm:gap-y-2 sm:text-xs dark:text-gray-400">
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-slate-500 sm:mt-3 sm:gap-x-4 sm:gap-y-2 sm:text-xs dark:text-slate-400">
                   <span className="inline-flex items-center gap-1">
                     <FolderGit2 className="size-3 sm:size-3.5" />
                     {repoPath}
@@ -897,7 +897,7 @@ export default function CodeScanningIssueDetailPageClient({
 
               <Link
                 href={buildCodeScanningProjectHref(scanDetail?.project_key || routeIdentifier)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-gray-800 dark:text-gray-100 dark:hover:bg-gray-800"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:text-slate-100 dark:hover:bg-slate-800"
               >
                 <ArrowLeft className="size-3.5 sm:size-4" />
                 Back to project
@@ -922,7 +922,7 @@ export default function CodeScanningIssueDetailPageClient({
           {/* Main issue view */}
           <motion.section {...sectionMotion} className="space-y-3 sm:space-y-4 md:space-y-5">
             {/* Issue summary */}
-            <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
               <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -934,16 +934,16 @@ export default function CodeScanningIssueDetailPageClient({
                         {formatLabel(currentIssueSummary.type)}
                       </span>
                     ) : null}
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-gray-800 dark:text-gray-300">
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-slate-800 dark:text-slate-300">
                       {formatLabel(issueDetail.why_is_issue.status)}
                     </span>
                   </div>
 
                   <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4">
-                    <span className="text-sm font-semibold text-gray-900 sm:text-base md:text-lg dark:text-white">
+                    <span className="text-sm font-semibold text-slate-900 sm:text-base md:text-lg dark:text-white">
                       {issueDetail.why_is_issue.rule_name}
                     </span>
-                    <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">{issueDetail.why_is_issue.rule_key}</span>
+                    <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">{issueDetail.why_is_issue.rule_key}</span>
                     {issueDetail.more_info.documentation_url ? (
                       <a
                         href={issueDetail.more_info.documentation_url}
@@ -957,7 +957,7 @@ export default function CodeScanningIssueDetailPageClient({
                     ) : null}
                   </div>
 
-                  <p className="mt-1.5 text-[10px] text-gray-500 sm:mt-2 sm:text-xs dark:text-gray-400">
+                  <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs dark:text-slate-400">
                     {issueDetail.where_is_issue.file_path}:{issueDetail.where_is_issue.line || issueDetail.where_is_issue.text_range.start_line}
                   </p>
                 </div>
@@ -976,7 +976,7 @@ export default function CodeScanningIssueDetailPageClient({
                         "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all duration-200 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
                         active
                           ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
                       )}
                     >
                       <Icon className="size-3.5 sm:size-4" />
@@ -994,8 +994,8 @@ export default function CodeScanningIssueDetailPageClient({
 
           {/* Right sidebar */}
           <motion.aside {...sectionMotion} className="space-y-3 sm:space-y-4">
-            <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 sm:text-xs dark:text-gray-400">Software quality impacted</p>
+            <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Software quality impacted</p>
               <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
                 <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-teal-950 dark:text-teal-300">
                   {softwareQuality}
@@ -1006,33 +1006,33 @@ export default function CodeScanningIssueDetailPageClient({
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 sm:text-xs dark:text-gray-400">Code attributes</p>
+            <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Code attributes</p>
               <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
                 {issueDetail.why_is_issue.tags.length > 0 ? (
                   issueDetail.why_is_issue.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-gray-800 dark:text-gray-300">
+                    <span key={tag} className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-slate-800 dark:text-slate-300">
                       {tag}
                     </span>
                   ))
                 ) : (
-                  <span className="text-[10px] text-gray-500 sm:text-xs dark:text-gray-400">No tags returned.</span>
+                  <span className="text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">No tags returned.</span>
                 )}
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 sm:text-xs dark:text-gray-400">Location</p>
-              <div className="mt-3 space-y-1 text-[10px] text-gray-900 sm:mt-4 sm:text-xs dark:text-gray-100">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Location</p>
+              <div className="mt-3 space-y-1 text-[10px] text-slate-900 sm:mt-4 sm:text-xs dark:text-slate-100">
                 <p className="break-all font-mono">{issueDetail.where_is_issue.component_key}</p>
                 <p className="break-all font-mono">{issueDetail.where_is_issue.file_path}</p>
                 <p className="font-mono">L{issueDetail.where_is_issue.line || issueDetail.where_is_issue.text_range.start_line}</p>
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 sm:text-xs dark:text-gray-400">Current scan</p>
-              <div className="mt-3 space-y-1 text-[10px] text-gray-900 sm:mt-4 sm:text-xs dark:text-gray-100">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Current scan</p>
+              <div className="mt-3 space-y-1 text-[10px] text-slate-900 sm:mt-4 sm:text-xs dark:text-slate-100">
                 <p className="font-mono">{projectKey}</p>
                 <p className="font-mono">{scanDetail?.branch || "main"}</p>
                 <p>{formatDate(scanDetail?.finished_at || scanDetail?.started_at || scanDetail?.created_at)}</p>
