@@ -90,7 +90,7 @@ export default function TargetsTable({
     isLoading: projectsLoading,
     isError: projectsError,
     refetch: refetchProjects,
-  } = useGetProjectsQuery();
+  } = useGetProjectsQuery(undefined, { pollingInterval: 30000 });
 
   // Fetch targets for each project
   const projectIds = useMemo(
@@ -98,8 +98,8 @@ export default function TargetsTable({
     [projects],
   );
 
-  // We use skip to avoid calling with empty project IDs
-  const targetQueries = useTargetQueries(projectIds);
+  // Fetch targets for each project, re-fetching every 10s for real-time updates
+  const targetQueries = useTargetQueries(projectIds, 10000);
 
   // Fetch all jobs to compute status and last scan
   const {
@@ -107,7 +107,7 @@ export default function TargetsTable({
     isLoading: jobsLoading,
     isError: jobsError,
     refetch: refetchJobs,
-  } = useListJobsQuery({ limit: 100 });
+  } = useListJobsQuery({ limit: 100 }, { pollingInterval: 10000 });
 
   // Determine loading/error states
   const isLoading =
@@ -131,7 +131,7 @@ export default function TargetsTable({
           if (
             !latest ||
             new Date(job.created_at).getTime() >
-              new Date(latest.created_at).getTime()
+            new Date(latest.created_at).getTime()
           ) {
             return job;
           }
@@ -362,7 +362,7 @@ export default function TargetsTable({
 // --- Custom hook to fetch targets for multiple projects ---
 // Uses RTK Query's dispatch-based approach to avoid hook-in-loop violations.
 
-function useTargetQueries(projectIds: string[]) {
+function useTargetQueries(projectIds: string[], pollingInterval = 0) {
   const dispatch = useAppDispatch();
   const [targets, setTargets] = useState<Target[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -381,34 +381,47 @@ function useTargetQueries(projectIds: string[]) {
     }
 
     let cancelled = false;
-    setIsLoading(true);
-    setIsError(false);
 
-    Promise.all(
-      ids.map((id) =>
-        dispatch(assetsApi.endpoints.listTargets.initiate(id)).unwrap(),
-      ),
-    )
-      .then((results) => {
-        if (!cancelled) {
-          setTargets(results.flat());
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setIsError(true);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      });
+    const fetchAll = () => {
+      setIsLoading(true);
+      setIsError(false);
+
+      Promise.all(
+        ids.map((id) =>
+          dispatch(assetsApi.endpoints.listTargets.initiate(id, { forceRefetch: true })).unwrap(),
+        ),
+      )
+        .then((results) => {
+          if (!cancelled) {
+            setTargets(results.flat());
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setIsError(true);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsLoading(false);
+          }
+        });
+    };
+
+    fetchAll();
+
+    if (pollingInterval > 0) {
+      const timer = setInterval(fetchAll, pollingInterval);
+      return () => {
+        cancelled = true;
+        clearInterval(timer);
+      };
+    }
 
     return () => {
       cancelled = true;
     };
-  }, [dispatch, projectIdsKey]);
+  }, [dispatch, projectIdsKey, pollingInterval]);
 
   return { targets, isLoading, isError };
 }
