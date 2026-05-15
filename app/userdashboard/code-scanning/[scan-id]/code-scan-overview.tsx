@@ -17,15 +17,17 @@ import {
   ShieldAlert,
   Wrench,
 } from "lucide-react";
-import type { ComponentType } from "react";
+import type { ComponentType, RefObject } from "react";
 import { useRef, useEffect, useState } from "react";
 
 import type {
   DependencySummaryResponse,
   QualityGateStatus,
+  ScanSummaryResponse,
 } from "@/types/scanner";
 import { cn } from "@/lib/utils";
 import { CodeScanOperationalMetrics } from "./code-scan-operational-metrics";
+import { ScanLogTerminal } from "./scan-log-terminal";
 
 type GradeTone = "green" | "lime" | "red" | "muted";
 type MetricTone = "teal" | "emerald" | "amber" | "red" | "blue" | "slate";
@@ -418,7 +420,7 @@ function GaugeSVGInner({
   size?: number;
 }) {
   const ref = useRef<SVGGElement>(null);
-  const inView = useInView(ref as any, { once: true });
+  const inView = useInView(ref as RefObject<Element | null>, { once: true });
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
@@ -1204,7 +1206,8 @@ function RadarChartCard({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export interface CodeScanOverviewProps {
-  scanSummary: any;
+  initialScanId: string;
+  scanSummary: ScanSummaryResponse | null | undefined;
   dependencySummary: DependencySummaryResponse | null;
   qualityGate: QualityGateStatus | null | undefined;
   acceptedIssues: number;
@@ -1225,6 +1228,7 @@ export interface CodeScanOverviewProps {
 }
 
 export function CodeScanOverview({
+  initialScanId,
   scanSummary,
   dependencySummary,
   qualityGate,
@@ -1356,41 +1360,50 @@ export function CodeScanOverview({
         />
       </div>
 
-      {/* ── Row 2a: Dependency Risk Line Chart ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.05 }}
-        className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
-      >
-        {/* FIX: header wraps on mobile */}
-        <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Dependency Risk</p>
-            <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">
-              Packages by severity — {formatCount(depTotal)} total at risk
-            </p>
+      {/* ── Row 2a: Dependency Risk Line Chart and Terminal SSE Logs ── */}
+      <div className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.08 }}
+        >
+          <ScanLogTerminal initialScanId={initialScanId} isLive={isScanRunning} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+          className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+        >
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">Dependency Risk</p>
+              <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">
+                Packages by severity — {formatCount(depTotal)} total at risk
+              </p>
+            </div>
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+                depCritical > 0
+                  ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                  : depHigh > 0
+                    ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
+                    : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+              )}
+            >
+              {riskLabel} risk
+            </span>
           </div>
-          <span
-            className={cn(
-              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
-              depCritical > 0
-                ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
-                : depHigh > 0
-                  ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
-                  : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
-            )}
-          >
-            {riskLabel} risk
-          </span>
-        </div>
-        <DependencyRiskChart
-          critical={depCritical}
-          high={depHigh}
-          medium={depMedium}
-          low={depLow}
-        />
-      </motion.div>
+          <DependencyRiskChart
+            critical={depCritical}
+            high={depHigh}
+            medium={depMedium}
+            low={depLow}
+          />
+        </motion.div>
+      </div>
 
       {/* ── Row 2b: 3 Radar Charts — 1 col on mobile, 2 on sm, 3 on xl ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
