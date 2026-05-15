@@ -22,7 +22,7 @@ function dotClass(status: TargetStatus): string {
     case "Active":
       return "bg-green-500";
     case "Idle":
-      return "bg-gray-400 dark:bg-gray-500";
+      return "bg-slate-400 dark:bg-slate-500";
   }
 }
 
@@ -33,6 +33,6 @@ function textClass(status: TargetStatus): string {
     case "Active":
       return "text-green-600 dark:text-green-400";
     case "Idle":
-      return "text-gray-500 dark:text-gray-400";
+      return "text-slate-500 dark:text-slate-400";
   }
 }

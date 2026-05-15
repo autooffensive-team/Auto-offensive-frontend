@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/components/theme-provider";
+import webAutomationImage from "../../../public/document/card_icon_web_automation_dark.webp";
 
 import {
   GitBranch,
@@ -870,7 +871,7 @@ export default function PlatformCapabilities() {
             <div className="order-1 flex flex-1 items-center justify-center bg-[#F7F5F0] dark:bg-[#09090B] p-4 md:p-8 md:order-0 transition-colors duration-300">
               <div className="relative w-full h-full flex items-center justify-center">
                 <Image
-                  src="/document/card_icon_web_automation_dark.webp"
+                  src={webAutomationImage}
                   alt="Web-Based Pentesting Automation"
                   width={720}
                   height={520}

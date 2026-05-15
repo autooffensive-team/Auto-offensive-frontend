@@ -21,17 +21,17 @@ export default function Breadcrumb({ segments }: BreadcrumbProps) {
         return (
           <span key={index} className="flex items-center gap-1">
             {index > 0 && (
-              <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500" />
             )}
             {segment.href && !isLast ? (
               <Link
                 href={segment.href}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
               >
                 {segment.label}
               </Link>
             ) : (
-              <span className="text-gray-900 dark:text-gray-100 font-medium">
+              <span className="text-slate-900 dark:text-slate-100 font-medium">
                 {segment.label}
               </span>
             )}

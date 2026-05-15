@@ -49,10 +49,10 @@ type RunSetter = React.Dispatch<React.SetStateAction<ActiveRun>>;
 type LogsSetter = React.Dispatch<React.SetStateAction<LogLine[]>>;
 type ErrorsSetter = React.Dispatch<React.SetStateAction<string[]>>;
 
-export function useScanController() {
+export function useScanController(initialProjectId?: string) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(initialProjectId || "");
   const [loadingMeta, setLoadingMeta] = useState(true);
   const [metaError, setMetaError] = useState("");
 
@@ -187,7 +187,7 @@ export function useScanController() {
 
         setProjects(projectData);
         setTools(toolData);
-        setProjectId((current) => current || projectData[0]?.project_id || "");
+        setProjectId((current) => current || initialProjectId || projectData[0]?.project_id || "");
 
         const firstBasicTool = toolData.find(
           (tool) => (tool.scan_config?.basic?.presets?.length ?? 0) > 0,

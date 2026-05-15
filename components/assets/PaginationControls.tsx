@@ -35,16 +35,16 @@ export default function PaginationControls({
   const isLastPage = currentPage === totalPages;
 
   return (
-    <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-4">
-        <p className="text-[14px] text-gray-500 dark:text-gray-400 font-medium">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
           Showing {startItem} to {endItem} of {totalItems}
         </p>
         {onPageSizeChange && (
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="px-3 py-1.5 text-[14px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
             aria-label="Page size"
           >
             {pageSizeOptions.map((option) => (
@@ -60,39 +60,39 @@ export default function PaginationControls({
         <button
           onClick={() => onPageChange(1)}
           disabled={isFirstPage}
-          className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="First page"
         >
-          <ChevronsLeft size={16} className="text-gray-600 dark:text-gray-400" />
+          <ChevronsLeft size={16} className="text-slate-600 dark:text-slate-400" />
         </button>
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
-          className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Previous page"
         >
-          <ChevronLeft size={16} className="text-gray-600 dark:text-gray-400" />
+          <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
         </button>
 
-        <span className="px-3 py-1.5 text-[14px] font-medium text-gray-700 dark:text-gray-300">
+        <span className="px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
           {currentPage} / {totalPages}
         </span>
 
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
-          className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Next page"
         >
-          <ChevronRight size={16} className="text-gray-600 dark:text-gray-400" />
+          <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
         </button>
         <button
           onClick={() => onPageChange(totalPages)}
           disabled={isLastPage}
-          className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label="Last page"
         >
-          <ChevronsRight size={16} className="text-gray-600 dark:text-gray-400" />
+          <ChevronsRight size={16} className="text-slate-600 dark:text-slate-400" />
         </button>
       </div>
     </div>

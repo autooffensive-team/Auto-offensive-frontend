@@ -2,6 +2,7 @@
 
 import { RotateCcw, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -181,8 +182,92 @@ function useStableAsciiScale() {
   return { ref, fontSize };
 }
 
+// ─── Log text colorizer ───────────────────────────────────────────────────────
+// Highlights meaningful parts of scan output so users can quickly parse results.
+function colorizeLogText(text: string): React.ReactNode {
+  const patterns: { regex: RegExp; className: string }[] = [
+    // URLs
+    { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400 dark:text-blue-400" },
+    // IP addresses
+    { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-500 dark:text-violet-400" },
+    // Port entries like "80/tcp"
+    { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-500 dark:text-cyan-400" },
+    // "open" state
+    { regex: /\bopen\b/g, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
+    // "closed" or "filtered" state
+    { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400 dark:text-rose-400" },
+    // Service names (http, nginx, ssl, ssh, etc.)
+    { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-500 dark:text-amber-400" },
+    // Timing/duration like "41.92 seconds"
+    { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400 dark:text-sky-400" },
+    // Key success words
+    { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
+    // Key failure words
+    { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-500 dark:text-red-400 font-semibold" },
+    // Scan action keywords
+    { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-500 dark:text-teal-400" },
+    // File paths
+    { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400 dark:text-orange-400" },
+  ];
+
+  type Match = { start: number; end: number; className: string };
+  const matches: Match[] = [];
+
+  for (const { regex, className } of patterns) {
+    const re = new RegExp(regex.source, regex.flags);
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+      const start = m.index;
+      const end = m.index + m[0].length;
+      const overlaps = matches.some(
+        (existing) => start < existing.end && end > existing.start
+      );
+      if (!overlaps) {
+        matches.push({ start, end, className });
+      }
+    }
+  }
+
+  if (matches.length === 0) {
+    return <span className="text-gray-700 dark:text-gray-300">{text}</span>;
+  }
+
+  matches.sort((a, b) => a.start - b.start);
+
+  const fragments: React.ReactNode[] = [];
+  let cursor = 0;
+
+  matches.forEach((match, i) => {
+    if (cursor < match.start) {
+      fragments.push(
+        <span key={`t-${i}`} className="text-gray-700 dark:text-gray-300">
+          {text.slice(cursor, match.start)}
+        </span>
+      );
+    }
+    fragments.push(
+      <span key={`m-${i}`} className={match.className}>
+        {text.slice(match.start, match.end)}
+      </span>
+    );
+    cursor = match.end;
+  });
+
+  if (cursor < text.length) {
+    fragments.push(
+      <span key="tail" className="text-gray-700 dark:text-gray-300">
+        {text.slice(cursor)}
+      </span>
+    );
+  }
+
+  return <>{fragments}</>;
+}
+
 export default function ScanPage() {
   const [activeTab, setActiveTab] = useState<ScanMode>("basic");
+  const searchParams = useSearchParams();
+  const initialProjectId = searchParams.get("project") || undefined;
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
@@ -224,7 +309,7 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController();
+  } = useScanController(initialProjectId);
 
   const activeRun = activeTab === "basic" ? basicRun : mediumRun;
   const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
@@ -358,7 +443,7 @@ export default function ScanPage() {
             </div>
           </div>
           <div className="p-3 sm:p-4">
-            <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[10px] sm:text-xs leading-relaxed font-[Consolas,monospace]">
+            <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
               {isIdle ? (
                 <div className="flex flex-col items-center h-full">
 
@@ -385,7 +470,7 @@ export default function ScanPage() {
                   </div>
                   {/* ── End responsive ASCII ───────────────────────────────── */}
 
-                  <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[10px] sm:text-[11px] shrink-0">
+                  <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[14px] sm:text-[17px] shrink-0">
                     Logs will appear here when a scan starts.
                   </p>
                 </div>
@@ -408,7 +493,7 @@ export default function ScanPage() {
                       >
                         {line.level}
                       </span>
-                      <span className="text-gray-700 dark:text-gray-300">{line.text}</span>
+                      {colorizeLogText(line.text)}
                     </div>
                   ))}
                 </div>

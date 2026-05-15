@@ -172,10 +172,10 @@ function GitLabIcon({ size = 16, className = "" }: { size?: number; className?: 
 function ProviderIcon({ projectKey, size = 15 }: { projectKey: string; size?: number }) {
   const provider = getProviderFromKey(projectKey);
   if (provider === "github")
-    return <GitHubIcon size={size} className="text-gray-600 dark:text-gray-300" />;
+    return <GitHubIcon size={size} className="text-slate-600 dark:text-slate-300" />;
   if (provider === "gitlab")
     return <GitLabIcon size={size} className="text-orange-500 dark:text-orange-400" />;
-  return <FolderGit2 size={size} className="text-gray-500 dark:text-gray-400" />;
+  return <FolderGit2 size={size} className="text-slate-500 dark:text-slate-400" />;
 }
 
 // ─── Hexagonal Stat Chart ────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ function HexStatCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-xl border border-gray-200 bg-white px-3.5 py-3.5 sm:gap-3.5 sm:px-4.5 sm:py-4 md:gap-4.5 md:px-5.5 md:py-4.5 dark:border-gray-800 dark:bg-[#0a0a0a]"
+      className="relative flex items-center gap-3 overflow-hidden rounded-xl border border-slate-200 bg-white px-3.5 py-3.5 sm:gap-3.5 sm:px-4.5 sm:py-4 md:gap-4.5 md:px-5.5 md:py-4.5 dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Subtle corner gradient */}
       <span
@@ -256,11 +256,11 @@ function HexStatCard({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest sm:text-[12px] md:text-[13px]" style={{ color: labelColor }}>
+        <p className="text-xs font-semibold uppercase tracking-widest sm:text-sm md:text-base" style={{ color: labelColor }}>
           {label}
         </p>
         <span
-          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2.5 sm:text-[10px] md:text-[11px]"
+          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2.5 sm:text-xs md:text-sm"
           style={{
             background: fill,
             color: stroke,
@@ -293,12 +293,6 @@ function ScanProjectCard({
   const isNew = isNewListProject(project, seenProjects);
 
   const providerLabel = provider === "github" ? "GitHub" : provider === "gitlab" ? "GitLab" : "Repository";
-  const providerColor =
-    provider === "github"
-      ? "text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-      : provider === "gitlab"
-      ? "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20"
-      : "text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700";
 
   return (
     <motion.div
@@ -306,88 +300,136 @@ function ScanProjectCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ delay: index * 0.055, ease: "easeOut" }}
-      className="group relative flex flex-col rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-teal-400/70 hover:shadow-[0_0_0_1px_rgba(20,184,166,0.15)] dark:border-gray-800 dark:bg-[#0a0a0a] dark:hover:border-teal-500/40"
+      className="group relative w-full overflow-hidden rounded-3xl border border-black/[0.08] bg-[#ffffff] dark:border-white/5 dark:bg-[#111113]"
     >
-      {/* Full-card clickable overlay — entire card is now clickable */}
+      {/* New badge */}
       {isNew ? (
         <div className="pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
           New
         </div>
       ) : null}
+
+      {/* Full-card clickable overlay */}
       <Link
         href={href}
         onClick={() => onOpen(project.projectKey)}
-        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+        className="absolute inset-0 z-10 rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
         aria-label={`Open ${project.projectKey} project overview`}
         tabIndex={0}
       />
 
-      {/* Hover glow */}
-      <span className="pointer-events-none absolute inset-0 rounded-xl bg-teal-500/3 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      {/* ── Blob header ── */}
+      <div className="relative h-[88px] overflow-hidden">
+        {/* background base */}
+        <div className="absolute inset-0 bg-[#ffffff] dark:bg-[#111113]" />
+        {/* blob 1 – far left blue, pushed further out */}
+        <div className="pointer-events-none absolute -left-32 -top-6 h-44 w-44 rounded-full bg-[#01509e] opacity-85 blur-3xl dark:opacity-40" />
+        {/* blob 2 – far right teal, pushed further out */}
+        <div className="pointer-events-none absolute -right-28 -top-4 h-40 w-40 rounded-full bg-[#00d0b2] opacity-55 blur-3xl dark:opacity-25" />
+        {/* blob 3 – right edge cyan, pushed further out */}
+        <div className="pointer-events-none absolute -bottom-12 -right-24 h-36 w-40 rounded-full bg-[#0194c7] opacity-55 blur-3xl dark:opacity-30" />
+        {/* blob 4 – left edge accent, pushed further out */}
+        <div className="pointer-events-none absolute -bottom-10 -left-24 h-32 w-32 rounded-full bg-[#00d0b2] opacity-25 blur-3xl dark:opacity-15" />
 
-      {/* Header */}
-      <div className="relative z-0 flex items-start gap-2.5 p-3 pb-2.5 sm:gap-3 sm:p-4 sm:pb-3 md:p-5 md:pb-3">
-        <div
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors sm:h-9 sm:w-9 md:h-10 md:w-10 ${providerColor}`}
-        >
-          <ProviderIcon projectKey={project.projectKey} size={14} />
+        {/* header content */}
+        <div className="relative z-10 flex h-full items-center justify-between px-[18px]">
+          {/* left: icon + meta */}
+          <div className="flex items-center gap-[10px]">
+            <div className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px] border border-black/10 bg-white/60 dark:border-white/20 dark:bg-white/10">
+              {provider === "github" ? (
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#181717" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              ) : provider === "gitlab" ? (
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 01-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 014.93 2a.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.49h8.86l2.44-7.51a.42.42 0 01.12-.18.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.51L23 13.45a.84.84 0 01-.35.94z" fill="#E24329" />
+                  <path d="M12 22.13L16.93 9.67H7.07L12 22.13z" fill="#FC6D26" />
+                  <path d="M12 22.13L7.07 9.67H1.35L12 22.13z" fill="#FCA326" />
+                  <path d="M12 22.13l4.93-12.46h5.72L12 22.13z" fill="#FCA326" />
+                </svg>
+              ) : (
+                <FolderGit2 size={26} className="text-slate-700 dark:text-white" />
+              )}
+            </div>
+            <div>
+              <p className="text-[12px] font-medium leading-none text-black/70 mb-[3px] dark:text-white/90">
+                {providerLabel} · Repository
+              </p>
+              <p className="text-[11px] leading-none text-black/45 dark:text-white/60">
+                {project.scanCount} recorded scan{project.scanCount !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </div>
+
+          {/* right: status + external link */}
+          <div className="flex items-center gap-[6px]">
+            <span className="inline-flex items-center gap-[5px] rounded-full bg-black/10 px-[10px] py-[3px] text-[11px] font-medium text-black/70 dark:bg-white/20 dark:text-white/90">
+              <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00d0b2]" />
+              Active
+            </span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(href, "_blank");
+              }}
+              aria-label="Open externally"
+              className="relative z-20 flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] border-none bg-black/10 text-black/60 transition-colors hover:bg-black/20 dark:bg-white/20 dark:text-white/80 dark:hover:bg-white/30"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <div className="min-w-0 flex-1 pt-0.5">
-          <h3 className="truncate text-[12px] font-semibold leading-snug text-gray-900 sm:text-[13px] md:text-[14px] dark:text-white">
-            {project.projectKey}
-          </h3>
-          <p className="mt-0.5 text-[10px] text-gray-400 sm:text-[11px] md:text-[12px] dark:text-gray-500">
-            {project.scanCount === 1 ? "1 recorded scan" : `${project.scanCount} recorded scans`}
-          </p>
-        </div>
-        {/* Arrow indicator */}
-        <ExternalLink
-          size={12}
-          className="mt-0.5 shrink-0 text-gray-300 transition-colors group-hover:text-teal-400 sm:size-3.25 dark:text-gray-600 dark:group-hover:text-teal-500"
-        />
       </div>
 
-      {/* Tags */}
-      <div className="relative z-0 flex flex-wrap items-center gap-1.5 px-3 pb-2.5 sm:gap-2 sm:px-4 sm:pb-3 md:px-5 md:pb-4">
-        <span
-          className={`flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] font-medium sm:gap-1.5 sm:px-2 sm:text-[10px] md:text-[11px] ${providerColor}`}
-        >
-          {provider === "github" ? (
-            <GitHubIcon size={8} />
-          ) : provider === "gitlab" ? (
-            <GitLabIcon size={8} />
-          ) : (
-            <GitBranch size={8} />
-          )}
-          {providerLabel}
-        </span>
-        <span className="flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[9px] font-medium text-gray-500 sm:gap-1.5 sm:px-2 sm:text-[10px] md:text-[11px] dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-400">
-          <GitBranch size={8} />
-          Project key
-        </span>
-      </div>
+      {/* ── Card body ── */}
+      <div className="px-[18px] pb-4 pt-[14px]">
+        <p className="mb-[3px] truncate text-[15px] font-medium leading-snug text-black/85 dark:text-white/90">
+          {project.projectKey}
+        </p>
+        <p className="text-[12px] text-black/45 dark:text-white/40">
+          {providerLabel} · Code scanning project
+        </p>
 
-      {/* Footer */}
-      <div className="relative z-0 mt-auto flex items-center justify-between border-t border-gray-100 px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 dark:border-gray-800/80">
-        <span className="flex items-center gap-1.5 text-[10px] text-gray-400 sm:text-[11px] md:text-[12px] dark:text-gray-500">
-          <FolderGit2 size={10} className="sm:size-2.75" />
-          Project overview
-        </span>
-        {/* Secondary button with higher z-index */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onOpen(project.projectKey);
-            window.location.href = href;
-          }}
-          className="relative z-20 flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[9px] font-medium text-gray-600 transition-all hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 sm:gap-1.5 sm:px-2.5 sm:py-1.5 sm:text-[10px] md:text-[11px] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-teal-500/40 dark:hover:bg-teal-500/10 dark:hover:text-teal-400"
-          title="Open project overview"
-        >
-          <ExternalLink size={10} className="sm:size-2.75" />
-          <span className="hidden sm:inline">Open</span>
-        </button>
+        {/* footer row */}
+        <div className="mt-[10px] flex items-center gap-[8px] border-t border-black/[0.08] pt-[10px] dark:border-white/[0.07]">
+          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="7.5" cy="15.5" r="5.5" />
+              <path d="m21 2-9.6 9.6" />
+              <path d="m15.5 7.5 3 3L22 7l-3-3" />
+            </svg>
+            Project key
+          </span>
+          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Overview
+          </span>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onOpen(project.projectKey);
+              window.location.href = href;
+            }}
+            className="relative z-20 ml-auto inline-flex cursor-pointer items-center gap-[5px] rounded-[8px] border-none bg-[#00d0b2] px-[16px] py-[6px] text-[12px] font-medium text-white transition-colors hover:bg-[#00b89c] active:scale-[0.98]"
+          >
+            Open
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -547,7 +589,7 @@ export default function CodeScanningPageClient() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
 
       {/* ── Header ── */}
@@ -558,15 +600,15 @@ export default function CodeScanningPageClient() {
       >
         <div>
           <div className="mb-1 flex items-center gap-2">
-            <Layers size={11} className="text-teal-500 sm:size-3 dark:text-teal-400" />
-            <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-600 sm:text-[10px] dark:text-teal-400">
+            <Layers size={14} className="text-teal-500 dark:text-teal-400" />
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-teal-600 sm:text-sm dark:text-teal-400">
               Repository Scanner
             </span>
           </div>
-          <h1 className="text-[20px] font-bold leading-tight tracking-tight text-gray-900 sm:text-[22px] md:text-[26px] dark:text-white">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
             Code Scanning
           </h1>
-          <p className="mt-1 text-[11px] text-gray-500 sm:text-[12px] md:text-[13px] dark:text-gray-400">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
             Review code scanning projects and continue repository onboarding
           </p>
         </div>
@@ -578,15 +620,15 @@ export default function CodeScanningPageClient() {
             onClick={handleRefresh}
             disabled={isFetching}
             title="Refresh"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-all hover:border-gray-300 hover:text-gray-800 disabled:opacity-40 dark:border-gray-700 dark:bg-[#0a0a0a] dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
           >
-            <RefreshCw size={13} className={isFetching ? "animate-spin" : ""} />
+            <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
           </motion.button>
           <Link
             href="/userdashboard/code-scanning/new"
-            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#00d0b2] px-3 text-[12px] font-semibold text-gray-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-[13px]"
+            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#00d0b2] px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-base"
           >
-            <Plus size={13} />
+            <Plus size={14} />
             Import Repo
           </Link>
         </div>
@@ -595,20 +637,20 @@ export default function CodeScanningPageClient() {
       {/* ── Banner ── */}
       {banner ? (
         <div
-          className={`flex flex-col gap-2 rounded-xl border px-3 py-2.5 text-[12px] sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3 sm:text-[13px] ${
+          className={`flex flex-col gap-2 rounded-lg sm:rounded-xl border px-3 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3 sm:text-base ${
             banner.type === "success"
               ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
               : "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
           }`}
         >
           <div className="flex items-start gap-2 sm:items-center sm:gap-2.5">
-            <AlertCircle size={13} className="mt-0.5 shrink-0 sm:mt-0 sm:size-3.5" />
+            <AlertCircle size={15} className="mt-0.5 shrink-0 sm:mt-0" />
             {banner.message}
           </div>
           {banner.actionHref && banner.actionLabel ? (
             <Link
               href={banner.actionHref}
-              className="shrink-0 self-start rounded-lg border border-current/20 px-2.5 py-1.5 text-[11px] font-semibold transition-colors hover:bg-white/40 sm:self-auto sm:px-3 sm:text-[12px] dark:hover:bg-black/10"
+              className="shrink-0 self-start rounded-lg border border-current/20 px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-white/40 sm:self-auto sm:px-3 sm:text-sm dark:hover:bg-black/10"
             >
               {banner.actionLabel}
             </Link>
@@ -632,13 +674,13 @@ export default function CodeScanningPageClient() {
 
       {/* ── Search ── */}
       <div className="relative w-full sm:max-w-sm md:max-w-md">
-        <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 sm:left-3.5 sm:size-3.5 dark:text-gray-500" />
+        <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 sm:left-3.5 dark:text-slate-500" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search project keys..."
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-8 text-[12px] text-gray-900 placeholder-gray-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-[13px] dark:border-gray-700 dark:bg-[#0a0a0a] dark:text-white dark:placeholder-gray-500 dark:focus:border-teal-500"
+          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-base dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
         />
         <AnimatePresence>
           {searchTerm ? (
@@ -647,9 +689,9 @@ export default function CodeScanningPageClient() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setSearchTerm("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 transition-colors hover:text-gray-600 sm:right-3 dark:hover:text-gray-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-slate-400 transition-colors hover:text-slate-600 sm:right-3 dark:hover:text-slate-200"
             >
-              <X size={12} className="sm:size-3.25" />
+              <X size={14} />
             </motion.button>
           ) : null}
         </AnimatePresence>
@@ -662,15 +704,15 @@ export default function CodeScanningPageClient() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3 sm:text-[13px] dark:border-red-500/20 dark:bg-red-500/6 dark:text-red-400"
+            className="flex flex-col gap-2 rounded-lg sm:rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3 sm:text-base dark:border-red-500/20 dark:bg-red-500/6 dark:text-red-400"
           >
             <div className="flex items-start gap-2 sm:items-center sm:gap-2.5">
-              <AlertCircle size={13} className="mt-0.5 shrink-0 sm:mt-0 sm:size-3.5" />
+              <AlertCircle size={15} className="mt-0.5 shrink-0 sm:mt-0" />
               Live refresh failed. Showing the last cached projects.
             </div>
             <button
               onClick={() => refetch()}
-              className="shrink-0 self-start rounded-lg border border-red-300 px-2.5 py-1.5 text-[11px] font-semibold transition-colors hover:bg-red-100 sm:self-auto sm:px-3 sm:text-[12px] dark:border-red-500/30 dark:hover:bg-red-500/10"
+              className="shrink-0 self-start rounded-lg border border-red-300 px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-red-100 sm:self-auto sm:px-3 sm:text-sm dark:border-red-500/30 dark:hover:bg-red-500/10"
             >
               Retry
             </button>
@@ -681,9 +723,9 @@ export default function CodeScanningPageClient() {
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop ── */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {isLoading && scanProjects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 dark:border-gray-800 dark:bg-[#0a0a0a]">
-            <LoaderCircle size={18} className="animate-spin text-teal-500 sm:size-5 dark:text-teal-400" />
-            <p className="text-[12px] text-gray-500 sm:text-[13px] dark:text-gray-400">Loading projects…</p>
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 dark:border-slate-800 dark:bg-slate-900">
+            <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />
+            <p className="text-sm text-slate-500 sm:text-base dark:text-slate-400">Loading projects…</p>
           </div>
         ) : filtered.length > 0 ? (
           <AnimatePresence>
@@ -701,15 +743,15 @@ export default function CodeScanningPageClient() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 dark:border-gray-700 dark:bg-[#0a0a0a]"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl md:rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 dark:border-slate-700 dark:bg-slate-900"
           >
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-gray-100 sm:mb-4 sm:h-12 sm:w-12 dark:border-gray-700 dark:bg-gray-800">
-              <FolderGit2 size={18} className="text-gray-400 sm:size-5 dark:text-gray-500" />
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 sm:mb-4 sm:h-12 sm:w-12 dark:border-slate-700 dark:bg-slate-800">
+              <FolderGit2 size={20} className="text-slate-400 dark:text-slate-500" />
             </div>
-            <h3 className="text-[14px] font-semibold text-gray-900 sm:text-[15px] dark:text-white">
+            <h3 className="text-base font-semibold text-slate-900 sm:text-lg dark:text-white">
               {searchTerm ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="mt-1 max-w-60 text-[11px] text-gray-500 sm:max-w-xs sm:text-[12px] md:text-[13px] dark:text-gray-400">
+            <p className="mt-1 max-w-60 text-xs text-slate-500 sm:max-w-xs sm:text-sm md:text-base dark:text-slate-400">
               {searchTerm
                 ? "Try adjusting your project-key search"
                 : "Import a repository to start scanning your code"}
@@ -717,9 +759,9 @@ export default function CodeScanningPageClient() {
             {!searchTerm ? (
               <Link
                 href="/userdashboard/code-scanning/new"
-                className="mt-4 flex items-center gap-1.5 rounded-lg bg-[#00d0b2] px-3.5 py-2 text-[12px] font-semibold text-gray-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:mt-5 sm:gap-2 sm:px-4 sm:text-[13px]"
+                className="mt-4 flex items-center gap-1.5 rounded-lg bg-[#00d0b2] px-3.5 py-2 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:mt-5 sm:gap-2 sm:px-4 sm:text-base"
               >
-                <Plus size={13} />
+                <Plus size={14} />
                 Import your first repo
               </Link>
             ) : null}

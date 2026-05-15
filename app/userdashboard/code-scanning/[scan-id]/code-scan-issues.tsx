@@ -63,10 +63,10 @@ function getIssueSeverityColor(severity: string): { bg: string; border: string; 
       };
     default:
       return {
-        bg: "bg-gray-50 dark:bg-gray-950",
-        border: "border-gray-200 dark:border-gray-800",
-        text: "text-gray-700 dark:text-gray-300",
-        dot: "bg-gray-500",
+        bg: "bg-slate-50 dark:bg-slate-950",
+        border: "border-slate-200 dark:border-slate-800",
+        text: "text-slate-700 dark:text-slate-300",
+        dot: "bg-slate-500",
       };
   }
 }
@@ -118,7 +118,7 @@ function FilterChips({
 }) {
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-xs font-semibold text-gray-700 sm:text-sm dark:text-gray-300">
+      <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 sm:text-sm dark:text-slate-300">
         <Filter className="size-4" />
         {label}
       </label>
@@ -136,7 +136,7 @@ function FilterChips({
                 "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm",
                 active
                   ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                  : "border border-gray-200 bg-white text-gray-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
+                  : "border border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
               )}
             >
               {option.label}
@@ -175,7 +175,7 @@ function SeverityDistribution({ issues }: { issues: IssueResponse[] }) {
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <h3 className="text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">Severity distribution</h3>
+      <h3 className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">Severity distribution</h3>
       <SeverityDonutChart
         items={severityItems}
         total={total}
@@ -205,7 +205,7 @@ function IssueCard({
         transition={{ duration: 0.3 }}
         className={cn(
           "block p-3 rounded-lg border transition-all duration-200 cursor-pointer sm:p-4",
-          "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800",
+          "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
           "hover:border-teal-200 dark:hover:border-teal-500/20 hover:bg-teal-50/40 dark:hover:bg-teal-500/5",
         )}
       >
@@ -222,7 +222,7 @@ function IssueCard({
                 <span className="text-[9px] font-bold sm:text-xs">{issue.severity.charAt(0)}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-xs font-semibold text-gray-900 truncate sm:text-sm dark:text-white">
+                <h4 className="text-xs font-semibold text-slate-900 truncate sm:text-sm dark:text-white">
                   {issue.message}
                 </h4>
               </div>
@@ -233,7 +233,7 @@ function IssueCard({
           </div>
 
           {/* File path and location */}
-          <div className="text-[10px] text-gray-500 font-mono truncate sm:text-xs dark:text-gray-400">
+          <div className="text-[10px] text-slate-500 font-mono truncate sm:text-xs dark:text-slate-400">
             {issue.file_path}
             {issue.line > 0 ? `:${issue.line}` : ""}
           </div>
@@ -247,7 +247,7 @@ function IssueCard({
               {getCweTag(issue)}
             </span>
             {issue.tags.slice(0, 1).map((tag) => (
-              <span key={tag} className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-gray-800 dark:text-gray-300">
+              <span key={tag} className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-slate-800 dark:text-slate-300">
                 {tag}
               </span>
             ))}
@@ -303,22 +303,22 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0 }}
-          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
+          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
         >
-          <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Total issues</div>
-          <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
+          <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Total issues</div>
+          <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-red-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
+          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-red-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Bugs</div>
-              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.BUG}</div>
+              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Bugs</div>
+              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.BUG}</div>
             </div>
             <Bug className="size-4 text-red-500 sm:size-5 dark:text-red-400" />
           </div>
@@ -328,12 +328,12 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-orange-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
+          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-orange-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Vulnerabilities</div>
-              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.VULNERABILITY}</div>
+              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Vulnerabilities</div>
+              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.VULNERABILITY}</div>
             </div>
             <Lock className="size-4 text-orange-500 sm:size-5 dark:text-orange-400" />
           </div>
@@ -343,12 +343,12 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-blue-50/40 p-3 sm:p-4 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
+          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-blue-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] text-gray-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-gray-400">Code smells</div>
-              <div className="text-lg font-bold text-gray-900 sm:text-xl md:text-2xl dark:text-white">{stats.CODE_SMELL}</div>
+              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Code smells</div>
+              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.CODE_SMELL}</div>
             </div>
             <Zap className="size-4 text-blue-500 sm:size-5 dark:text-blue-400" />
           </div>
@@ -367,26 +367,26 @@ export function CodeScanIssues({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="size-4 text-gray-600 sm:size-5 dark:text-gray-400" />
-              <h2 className="text-sm font-semibold text-gray-900 sm:text-base md:text-lg dark:text-white">
+              <BarChart3 className="size-4 text-slate-600 sm:size-5 dark:text-slate-400" />
+              <h2 className="text-sm font-semibold text-slate-900 sm:text-base md:text-lg dark:text-white">
                 Issues
               </h2>
             </div>
-            <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
+            <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
               {issues.length} of {total}
             </span>
           </div>
 
           {/* Loading state */}
           {isLoading ? (
-            <div className="p-6 rounded-lg bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 flex items-center justify-center gap-2 sm:gap-3 sm:p-8">
-              <div className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full animate-pulse" />
-              <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">Loading issues...</span>
+            <div className="p-6 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-2 sm:gap-3 sm:p-8">
+              <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-pulse" />
+              <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">Loading issues...</span>
             </div>
           ) : issues.length === 0 ? (
-            <div className="p-6 rounded-lg bg-gray-50 dark:bg-gray-900 border border-dashed border-gray-200 dark:border-gray-800 text-center sm:p-8">
-              <FileCode2 className="size-6 mx-auto mb-2 text-gray-400 sm:size-8 dark:text-gray-600" />
-              <p className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
+            <div className="p-6 rounded-lg bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 text-center sm:p-8">
+              <FileCode2 className="size-6 mx-auto mb-2 text-slate-400 sm:size-8 dark:text-slate-600" />
+              <p className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
                 No issues matched the current filters.
               </p>
             </div>
@@ -407,17 +407,17 @@ export function CodeScanIssues({
           className="space-y-4 sm:space-y-5 md:space-y-6 lg:sticky lg:top-5 lg:self-start"
         >
           {/* Filters */}
-          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
-            <div className="mb-3 flex items-center justify-between gap-3 border-b border-gray-200 pb-3 sm:mb-4 sm:mb-5 sm:pb-4 dark:border-gray-800">
+          <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
+            <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-200 pb-3 sm:mb-5 sm:pb-4 dark:border-slate-800">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 sm:text-[11px] dark:text-gray-400">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px] dark:text-slate-400">
                   Filters
                 </p>
-                <h3 className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">
+                <h3 className="mt-1 text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
                   Refine issue results
                 </h3>
               </div>
-              <Filter className="size-3.5 text-gray-400 sm:size-4 dark:text-gray-500" />
+              <Filter className="size-3.5 text-slate-400 sm:size-4 dark:text-slate-500" />
             </div>
 
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
@@ -427,7 +427,7 @@ export function CodeScanIssues({
                 selected={typeFilter}
                 onChange={onTypeFilterChange}
               />
-              <div className="border-t border-gray-200 pt-4 sm:pt-5 md:pt-6 dark:border-gray-800">
+              <div className="border-t border-slate-200 pt-4 sm:pt-5 md:pt-6 dark:border-slate-800">
                 <FilterChips
                   label="Severity"
                   options={severityOptions}
@@ -439,7 +439,7 @@ export function CodeScanIssues({
           </div>
 
           {/* Distribution chart */}
-          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
+          <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
             <SeverityDistribution issues={issues} />
           </div>
         </motion.aside>

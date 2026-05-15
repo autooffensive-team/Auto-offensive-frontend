@@ -50,7 +50,7 @@ function getDependencySeverityTone(severity: string): string {
     case "LOW":
       return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
     default:
-      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
+      return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300";
   }
 }
 
@@ -80,7 +80,7 @@ function FilterChips({
 }) {
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-xs font-semibold text-gray-700 sm:text-sm dark:text-gray-300">
+      <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 sm:text-sm dark:text-slate-300">
         <Filter className="size-4" />
         {label}
       </label>
@@ -98,7 +98,7 @@ function FilterChips({
                 "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm",
                 active
                   ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                  : "border border-gray-200 bg-white text-gray-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
+                  : "border border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
               )}
             >
               {option.label}
@@ -129,7 +129,7 @@ function DependencyFlag({
         "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm",
         active
           ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-          : "border border-gray-200 bg-white text-gray-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
+          : "border border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
       )}
     >
       {label}
@@ -149,17 +149,17 @@ function TopStatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950"
+      className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500 sm:text-xs dark:text-gray-400">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-400">
             {label}
           </p>
-          <p className="mt-2 text-xl font-bold text-gray-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
+          <p className="mt-2 text-xl font-bold text-slate-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
             {value}
           </p>
-          <p className="mt-1.5 text-[10px] text-gray-500 sm:mt-2 sm:text-xs md:text-sm dark:text-gray-400">
+          <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
             {helper}
           </p>
         </div>
@@ -173,7 +173,7 @@ function TopStatCard({
             accent === "amber" &&
               "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
             accent === "slate" &&
-              "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+              "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
           )}
         >
           <Icon className="size-4 sm:size-5" />
@@ -217,7 +217,7 @@ function DependencySeverityDistribution({
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <h3 className="text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">
+      <h3 className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
         Severity distribution
       </h3>
       <SeverityDonutChart
@@ -243,7 +243,7 @@ function collectDependencyToolOptions(
 
 function EmptyPanel({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border-2 border-dashed border-[#d7e0ef] bg-linear-to-br from-[#f8fafd] to-white p-8 text-center text-sm text-[#52648f] dark:border-gray-800 dark:from-gray-950 dark:to-gray-900 dark:text-gray-400">
+    <div className="rounded-xl border-2 border-dashed border-[#d7e0ef] bg-linear-to-br from-[#f8fafd] to-white p-8 text-center text-sm text-[#52648f] dark:border-slate-800 dark:from-gray-950 dark:to-gray-900 dark:text-slate-400">
       <FolderGit2 className="mx-auto size-8 mb-3 opacity-50" />
       {message}
     </div>
@@ -261,8 +261,8 @@ function DependencyList({
 }) {
   if (isLoading) {
     return (
-      <div className="flex min-h-56 items-center justify-center rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
-        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
+      <div className="flex min-h-56 items-center justify-center rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-slate-400">
           <LoaderCircle className="size-4 animate-spin text-teal-500" />
           Loading dependencies...
         </div>
@@ -278,7 +278,7 @@ function DependencyList({
 
   return (
     <div className="space-y-2 sm:space-y-3">
-      <div className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
+      <div className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
         Showing {dependencies.length} of {total} dependenc
         {total === 1 ? "y" : "ies"} from dependency checkers.
       </div>
@@ -290,7 +290,7 @@ function DependencyList({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18, delay: idx * 0.05, ease: "easeOut" }}
-            className="rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-teal-200 hover:bg-teal-50/40 sm:rounded-xl sm:p-4 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/5"
+            className="rounded-lg border border-slate-200 bg-white p-3 transition-all duration-200 hover:border-teal-200 hover:bg-teal-50/40 sm:rounded-xl sm:p-4 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/5"
           >
             <div className="flex flex-col gap-2 xl:flex-row xl:items-start xl:justify-between sm:gap-3">
               <div className="min-w-0 space-y-2 flex-1 sm:space-y-3">
@@ -328,16 +328,16 @@ function DependencyList({
 
                 <div>
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <h3 className="text-xs font-semibold text-gray-900 sm:text-sm md:text-base dark:text-white">
+                    <h3 className="text-xs font-semibold text-slate-900 sm:text-sm md:text-base dark:text-white">
                       {dependency.package_name}
                     </h3>
                     {dependency.cve_id ? (
-                      <span className="rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-gray-900 dark:text-gray-300">
+                      <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-slate-900 dark:text-slate-300">
                         {dependency.cve_id}
                       </span>
                     ) : null}
                   </div>
-                  <div className="mt-2 grid gap-2 text-[10px] text-gray-500 sm:grid-cols-2 sm:text-xs md:text-sm xl:grid-cols-4 dark:text-gray-400">
+                  <div className="mt-2 grid gap-2 text-[10px] text-slate-500 sm:grid-cols-2 sm:text-xs md:text-sm xl:grid-cols-4 dark:text-slate-400">
                     <span>
                       Installed:{" "}
                       <code className="font-mono text-xs">
@@ -365,7 +365,7 @@ function DependencyList({
                 </div>
 
                 {dependency.description ? (
-                  <p className="line-clamp-2 text-[10px] leading-5 text-gray-500 sm:text-xs sm:leading-6 md:text-sm dark:text-gray-400">
+                  <p className="line-clamp-2 text-[10px] leading-5 text-slate-500 sm:text-xs sm:leading-6 md:text-sm dark:text-slate-400">
                     {dependency.description}
                   </p>
                 ) : null}
@@ -466,12 +466,12 @@ export function CodeScanDependencies({
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="size-4 text-gray-600 sm:size-5 dark:text-gray-400" />
-              <h2 className="text-sm font-semibold text-gray-900 sm:text-base md:text-lg dark:text-white">
+              <BarChart3 className="size-4 text-slate-600 sm:size-5 dark:text-slate-400" />
+              <h2 className="text-sm font-semibold text-slate-900 sm:text-base md:text-lg dark:text-white">
                 Dependencies
               </h2>
             </div>
-            <span className="text-[10px] text-gray-500 sm:text-xs md:text-sm dark:text-gray-400">
+            <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
               {dependencies.length} of {total}
             </span>
           </div>
@@ -489,17 +489,17 @@ export function CodeScanDependencies({
           transition={{ duration: 0.3, delay: 0.2 }}
           className="space-y-4 sm:space-y-5 md:space-y-6 lg:sticky lg:top-5 lg:self-start"
         >
-          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
-            <div className="mb-3 flex items-center justify-between gap-3 border-b border-gray-200 pb-3 sm:mb-4 sm:mb-5 sm:pb-4 dark:border-gray-800">
+          <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
+            <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-200 pb-3 sm:mb-5 sm:pb-4 dark:border-slate-800">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 sm:text-[11px] dark:text-gray-400">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px] dark:text-slate-400">
                   Filters
                 </p>
-                <h3 className="mt-1 text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">
+                <h3 className="mt-1 text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
                   Refine dependency results
                 </h3>
               </div>
-              <Filter className="size-3.5 text-gray-400 sm:size-4 dark:text-gray-500" />
+              <Filter className="size-3.5 text-slate-400 sm:size-4 dark:text-slate-500" />
             </div>
 
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
@@ -509,7 +509,7 @@ export function CodeScanDependencies({
                 selected={toolFilter}
                 onChange={onToolFilterChange}
               />
-              <div className="border-t border-gray-200 pt-4 sm:pt-5 md:pt-6 dark:border-gray-800">
+              <div className="border-t border-slate-200 pt-4 sm:pt-5 md:pt-6 dark:border-slate-800">
                 <FilterChips
                   label="Severity"
                   options={dependencySeverityOptions}
@@ -517,8 +517,8 @@ export function CodeScanDependencies({
                   onChange={onSeverityFilterChange}
                 />
               </div>
-              <div className="border-t border-gray-200 pt-4 sm:pt-5 md:pt-6 dark:border-gray-800">
-                <p className="mb-2 text-xs font-semibold text-gray-700 sm:mb-3 sm:text-sm dark:text-gray-300">
+              <div className="border-t border-slate-200 pt-4 sm:pt-5 md:pt-6 dark:border-slate-800">
+                <p className="mb-2 text-xs font-semibold text-slate-700 sm:mb-3 sm:text-sm dark:text-slate-300">
                   Quick flags
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -537,18 +537,18 @@ export function CodeScanDependencies({
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
+          <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
             <DependencySeverityDistribution dependencies={dependencies} />
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:to-gray-950">
+          <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
             <div className="flex items-start gap-2 sm:gap-3">
               <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-500 sm:size-4" />
               <div>
-                <h3 className="text-xs font-semibold text-gray-900 sm:text-sm dark:text-white">
+                <h3 className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
                   Review focus
                 </h3>
-                <p className="mt-1 text-[10px] leading-5 text-gray-500 sm:text-xs sm:leading-6 md:text-sm dark:text-gray-400">
+                <p className="mt-1 text-[10px] leading-5 text-slate-500 sm:text-xs sm:leading-6 md:text-sm dark:text-slate-400">
                   Prioritize critical and high findings first, then review outdated packages and license exceptions.
                 </p>
               </div>

@@ -58,9 +58,9 @@ export function StreamLogsPanel({
       </div>
 
       {/* Logs Container */}
-      <div className="m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2 sm:p-3 text-[10px] sm:text-xs leading-relaxed font-[Consolas,monospace]">
+      <div className="m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2 sm:p-3 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
         {!logs.length ? (
-          <p className="text-gray-400 dark:text-gray-500 py-2 text-center text-[11px]">
+          <p className="text-gray-400 dark:text-gray-500 py-2 text-center text-[14px] sm:text-[17px]">
             Logs will appear here when a scan starts.
           </p>
         ) : (

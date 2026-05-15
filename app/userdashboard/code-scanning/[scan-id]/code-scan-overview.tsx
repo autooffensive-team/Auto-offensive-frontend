@@ -67,7 +67,7 @@ function GradeBadge({ grade }: { grade: { label: string; tone: GradeTone } }) {
         grade.tone === "red" &&
           "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
         grade.tone === "muted" &&
-          "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+          "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
       )}
     >
       {grade.label}
@@ -83,7 +83,7 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
         "inline-flex size-10 items-center justify-center rounded-full border-4",
         tone === "ok" && "border-emerald-100 dark:border-emerald-500/20",
         tone === "bad" && "border-red-700 dark:border-red-500",
-        tone === "neutral" && "border-gray-200 dark:border-gray-700",
+        tone === "neutral" && "border-slate-200 dark:border-slate-700",
       )}
     >
       {tone === "ok" && (
@@ -91,7 +91,7 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
       )}
       {tone === "neutral" && (
         <svg
-          className="size-4 text-gray-500 dark:text-gray-400"
+          className="size-4 text-slate-500 dark:text-slate-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -165,7 +165,7 @@ function GaugeSVG({
         stroke="currentColor"
         strokeWidth={8}
         strokeLinecap="round"
-        className="text-[#e4eaf4] dark:text-gray-800"
+        className="text-[#e4eaf4] dark:text-slate-800"
         style={{ transition: "stroke-dasharray 0.9s cubic-bezier(0.16,1,0.3,1)" }}
       />
       {clamped > 0 && (
@@ -297,7 +297,7 @@ function OverviewMetricCell({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-xl border border-gray-200 bg-white p-3 sm:rounded-2xl sm:p-4 dark:border-gray-800 dark:bg-gray-950",
+        "flex flex-col rounded-xl border border-slate-200 bg-white p-3 sm:rounded-2xl sm:p-4 dark:border-slate-800 dark:bg-slate-950",
         className,
       )}
     >
@@ -312,10 +312,10 @@ function OverviewMetricCell({
             <Icon className={cn("size-3.5 sm:size-4", iconStyle.icon)} />
           </div>
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 sm:text-[10px] dark:text-gray-500">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[10px] dark:text-slate-500">
               Metric
             </p>
-            <h3 className="mt-0.5 text-xs font-medium text-gray-900 sm:text-[13px] md:text-sm dark:text-gray-100">
+            <h3 className="mt-0.5 text-xs font-medium text-slate-900 sm:text-[13px] md:text-sm dark:text-slate-100">
               {title}
             </h3>
           </div>
@@ -334,7 +334,7 @@ function OverviewMetricCell({
 
       {graphSegments && graphSegments.length > 0 ? (
         <div className="my-3 space-y-2">
-          <div className="flex h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-gray-800">
+          <div className="flex h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-slate-800">
             {segTotal > 0 ? (
               graphSegments.map((seg, i) => (
                 <div
@@ -347,14 +347,14 @@ function OverviewMetricCell({
                 />
               ))
             ) : (
-              <div className="h-full w-full bg-[#d9e2f0] dark:bg-gray-700" />
+              <div className="h-full w-full bg-[#d9e2f0] dark:bg-slate-700" />
             )}
           </div>
           <div className="flex flex-wrap gap-1.5">
             {graphSegments.map((seg, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-[#52648f] dark:bg-gray-900/80 dark:text-gray-300"
+                className="inline-flex items-center gap-1 rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-[#52648f] dark:bg-slate-900/80 dark:text-slate-300"
               >
                 <span
                   className="inline-block size-1.5 rounded-full"
@@ -387,21 +387,21 @@ function OverviewMetricCell({
       )}
 
       {primaryDetail && (
-        <p className="text-[10px] text-gray-500 sm:text-[11px] dark:text-gray-400">
+        <p className="text-[10px] text-slate-500 sm:text-[11px] dark:text-slate-400">
           {primaryDetail}
         </p>
       )}
       {secondaryDetail && (
-        <p className="mt-1 text-[10px] leading-5 text-gray-500 sm:text-[11px] dark:text-gray-400">
+        <p className="mt-1 text-[10px] leading-5 text-slate-500 sm:text-[11px] dark:text-slate-400">
           {secondaryDetail}
         </p>
       )}
 
-      <div className="mt-auto flex items-center justify-between border-t border-gray-200 pt-2 dark:border-gray-800">
-        <span className="text-[9px] text-gray-400 sm:text-[10px] dark:text-gray-500">
+      <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-2 dark:border-slate-800">
+        <span className="text-[9px] text-slate-400 sm:text-[10px] dark:text-slate-500">
           Latest scan snapshot
         </span>
-        <span className="text-[9px] text-gray-500 sm:text-[10px] dark:text-gray-400">
+        <span className="text-[9px] text-slate-500 sm:text-[10px] dark:text-slate-400">
           {title}
         </span>
       </div>
@@ -505,18 +505,18 @@ function TopStatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 dark:hover:border-gray-700"
+      className="group rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 backdrop-blur-sm transition-all duration-300 hover:border-slate-300 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 dark:hover:border-slate-700"
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500 sm:text-xs dark:text-gray-500">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-500">
             {label}
           </p>
           {/* FIX: truncate long values gracefully on small screens */}
-          <p className="mt-2 truncate text-xl font-bold text-gray-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
+          <p className="mt-2 truncate text-xl font-bold text-slate-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
             {value}
           </p>
-          <p className="mt-1.5 text-[10px] text-gray-500 sm:mt-2 sm:text-xs md:text-sm dark:text-gray-400">
+          <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
             {helper}
           </p>
         </div>
@@ -530,7 +530,7 @@ function TopStatCard({
             accent === "amber" &&
               "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
             accent === "slate" &&
-              "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+              "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
           )}
         >
           <Icon className="size-4 sm:size-5" />
@@ -607,7 +607,7 @@ function DonutChart({
           fill="none"
           stroke="currentColor"
           strokeWidth={thickness}
-          className="text-[#e4eaf4] dark:text-gray-800"
+          className="text-[#e4eaf4] dark:text-slate-800"
         />
         {total > 0 &&
           arcs.map((a, i) => (
@@ -634,7 +634,7 @@ function DonutChart({
             <span className="font-mono text-lg font-bold leading-none text-[#17233f] dark:text-white">
               {hovered.count}
             </span>
-            <span className="mt-0.5 max-w-15 text-[8px] font-semibold leading-tight text-[#52648f] dark:text-gray-400">
+            <span className="mt-0.5 max-w-15 text-[8px] font-semibold leading-tight text-[#52648f] dark:text-slate-400">
               {hovered.label}
             </span>
           </>
@@ -643,7 +643,7 @@ function DonutChart({
             <span className="font-mono text-xl font-bold leading-none text-[#17233f] dark:text-white">
               {total}
             </span>
-            <span className="mt-0.5 text-[9px] font-semibold text-[#52648f] dark:text-gray-400">
+            <span className="mt-0.5 text-[9px] font-semibold text-[#52648f] dark:text-slate-400">
               total
             </span>
           </>
@@ -782,11 +782,11 @@ function RadialRingCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: delay ?? 0 }}
-      className="rounded-lg border border-gray-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       <div className="mb-3 sm:mb-4">
-        <p className="text-xs font-bold text-gray-900 sm:text-sm dark:text-gray-100">{title}</p>
-        <p className="mt-0.5 text-[10px] text-gray-500 sm:text-xs dark:text-gray-400">{subtitle}</p>
+        <p className="text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">{title}</p>
+        <p className="mt-0.5 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">{subtitle}</p>
       </div>
 
       {/* FIX: limit chart width so it doesn't stretch on mobile, center it */}
@@ -804,12 +804,12 @@ function RadialRingCard({
                 className="inline-block size-2 rounded-full sm:size-2.5"
                 style={{ backgroundColor: ring.color }}
               />
-              <span className="text-[10px] font-medium text-gray-500 sm:text-[11px] dark:text-gray-400">
+              <span className="text-[10px] font-medium text-slate-500 sm:text-[11px] dark:text-slate-400">
                 {ring.label}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] font-bold text-gray-900 sm:text-[11px] dark:text-white">
+              <span className="font-mono text-[10px] font-bold text-slate-900 sm:text-[11px] dark:text-white">
                 {ring.count}
               </span>
               <span
@@ -823,8 +823,8 @@ function RadialRingCard({
         ))}
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-2.5 sm:mt-4 sm:pt-3 dark:border-gray-800">
-        <span className="text-[10px] text-gray-500 sm:text-[11px] dark:text-gray-400">{totalLabel}</span>
+      <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-2.5 sm:mt-4 sm:pt-3 dark:border-slate-800">
+        <span className="text-[10px] text-slate-500 sm:text-[11px] dark:text-slate-400">{totalLabel}</span>
         <span
           className={cn(
             "inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold sm:px-2.5 sm:text-[10px]",
@@ -1015,9 +1015,9 @@ function DependencyRiskChart({
             return (
               <div key={cat.label} className="flex items-center gap-2">
                 <span className="inline-block size-3 rounded" style={{ backgroundColor: cat.color }} />
-                <span className="text-xs font-medium text-[#17233f] dark:text-gray-200">{cat.label}</span>
+                <span className="text-xs font-medium text-[#17233f] dark:text-slate-200">{cat.label}</span>
                 <span className="font-mono text-xs font-bold text-[#17233f] dark:text-white">{cat.value}</span>
-                <span className="text-[10px] text-[#8fa0bf] dark:text-gray-500">{pct}%</span>
+                <span className="text-[10px] text-[#8fa0bf] dark:text-slate-500">{pct}%</span>
               </div>
             );
           })}
@@ -1048,7 +1048,7 @@ function DependencyRiskChart({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
             <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{total}</span>
-            <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-gray-400">total</span>
+            <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-slate-400">total</span>
           </div>
         </div>
       </div>
@@ -1114,11 +1114,11 @@ function RadarChartCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: delay ?? 0 }}
-      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       <div className="mb-2">
-        <p className="text-sm font-bold text-[#17233f] dark:text-gray-100">{title}</p>
-        <p className="mt-0.5 text-xs text-[#52648f] dark:text-gray-400">{subtitle}</p>
+        <p className="text-sm font-bold text-[#17233f] dark:text-slate-100">{title}</p>
+        <p className="mt-0.5 text-xs text-[#52648f] dark:text-slate-400">{subtitle}</p>
       </div>
 
       {/* FIX: stack chart above legend on mobile, side-by-side on sm+ */}
@@ -1181,7 +1181,7 @@ function RadarChartCard({
                 className="inline-block size-3 rounded-full"
                 style={{ backgroundColor: SLICE_COLORS[i % SLICE_COLORS.length] }}
               />
-              <span className="text-xs font-medium text-[#17233f] dark:text-gray-200">
+              <span className="text-xs font-medium text-[#17233f] dark:text-slate-200">
                 {a.label}: <span className="font-bold">{a.value}</span>
               </span>
             </div>
@@ -1189,8 +1189,8 @@ function RadarChartCard({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-[#e4eaf4] pt-3 dark:border-gray-800">
-        <span className="text-[11px] text-[#52648f] dark:text-gray-400">{totalLabel}</span>
+      <div className="mt-3 flex items-center justify-between border-t border-[#e4eaf4] pt-3 dark:border-slate-800">
+        <span className="text-[11px] text-[#52648f] dark:text-slate-400">{totalLabel}</span>
         <span
           className={cn(
             "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
