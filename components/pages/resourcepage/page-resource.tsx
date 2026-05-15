@@ -576,7 +576,7 @@ export default function ResourceComponent() {
   const sectionLabels = isKhmer
     ? {
         heroBadge: '',
-        heroTitleLine1: 'សិក្សា។ ឯកសារយោង។',
+        heroTitleLine1: 'ឯកសារ និង Resources',
         heroTitleLine2: '',
         heroSubtitle:
           'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
@@ -598,7 +598,7 @@ export default function ResourceComponent() {
         degraded: 'ដំណើរការខ្សោយ',
         maintenance: 'កំពុងថែទាំ',
         mobileTableHint: 'អាចអូសឆ្វេង ឬស្ដាំ ដើម្បីមើលតារាងទាំងមូល។',
-        featureCards: 'ឯកសារ & ការភ្ជាប់',
+        featureCards: 'ឯកសារ និង Resources',
       }
     : {
         heroBadge: '',
