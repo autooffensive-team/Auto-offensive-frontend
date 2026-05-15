@@ -2,12 +2,18 @@
 
 import type { ComponentType } from 'react'
 import Image from 'next/image'
+import type { StaticImageData } from 'next/image'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { motion } from 'framer-motion'
 import { useTheme } from '@/components/theme-provider'
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import AnimatedCta from '@/components/pages/homepage/animated-cta'
+import resourceCenterImage from '../../../public/images/ddoc.png'
+import darkIconApi from '../../../public/document/dark_icon_api.webp'
+import darkIconCicd from '../../../public/document/dark_icon_cicd.webp'
+import darkIconCli from '../../../public/document/dark_icon_cli.webp'
+import darkIconTools from '../../../public/document/dark_icon_tools.webp'
 import {
   ArrowRight,
   Cpu,
@@ -487,7 +493,7 @@ type FeatureCard = {
   tags?: string[]
   icon: ComponentType<{ className?: string; size?: number; strokeWidth?: number }>
   imageSide: 'left' | 'right'
-  imageSrc: string
+  imageSrc: string | StaticImageData
   imageAlt: string
 }
 
@@ -569,9 +575,9 @@ export default function ResourceComponent() {
 
   const sectionLabels = isKhmer
     ? {
-        heroBadge: 'រៀន · មើលឯកសារ · អនុវត្ត',
-        heroTitleLine1: 'រៀន · មើលឯកសារ ·',
-        heroTitleLine2: 'Resource Center',
+        heroBadge: '',
+        heroTitleLine1: 'សិក្សា។ ឯកសារយោង។',
+        heroTitleLine2: '',
         heroSubtitle:
           'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
         quickStart: 'ផ្លូវចាប់ផ្តើមរហ័ស (Quick Start Paths)',
@@ -595,9 +601,9 @@ export default function ResourceComponent() {
         featureCards: 'ឯកសារ & ការភ្ជាប់',
       }
     : {
-        heroBadge: 'Learn. Reference.',
-        heroTitleLine1: 'Learn. Reference.',
-        heroTitleLine2: 'Resource Center',
+        heroBadge: '',
+        heroTitleLine1: 'Docs & Resources',
+        heroTitleLine2: '',
         heroSubtitle:
           'Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.',
         quickStart: 'Quick Start Paths',
@@ -899,11 +905,14 @@ export default function ResourceComponent() {
   }
 
   function resolveFeatureImageSrc(card: FeatureCard) {
-    const assetMap: Record<string, string> = {
-      '/images/cli-illustration.png': '/document/dark_icon_cli.webp',
-      '/images/api-illustration.png': '/document/dark_icon_api.webp',
-      '/images/tools-illustration.png': '/document/dark_icon_tools.webp',
-      '/images/cicd-illustration.png': '/document/dark_icon_cicd.webp',
+    const assetMap: Record<string, StaticImageData> = {
+      '/images/cli-illustration.png': darkIconCli,
+      '/images/api-illustration.png': darkIconApi,
+      '/images/tools-illustration.png': darkIconTools,
+      '/images/cicd-illustration.png': darkIconCicd,
+    }
+    if (typeof card.imageSrc !== 'string') {
+      return card.imageSrc
     }
     return assetMap[card.imageSrc] ?? card.imageSrc
   }
@@ -1045,26 +1054,32 @@ export default function ResourceComponent() {
         </div>
 
         {/* ── Hero Content (unchanged) ── */}
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-20 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-18 md:pt-28" style={{ position: 'relative', zIndex: 10 }}>
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-12 pt-18 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-16 md:pt-24" style={{ position: 'relative', zIndex: 10 }}>
           <motion.div
             initial="hidden"
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
             className="order-2 text-center md:order-1 md:text-left"
           >
-            <motion.div variants={fadeUp} className="mb-5 inline-flex rounded-full bg-[#BDEEF0]/40 px-3 py-1">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0B7C83]">
-                {sectionLabels.heroBadge}
-              </span>
-            </motion.div>
+            {sectionLabels.heroBadge ? (
+              <motion.div variants={fadeUp} className="mb-5 inline-flex rounded-full bg-[#BDEEF0]/40 px-3 py-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0B7C83]">
+                  {sectionLabels.heroBadge}
+                </span>
+              </motion.div>
+            ) : null}
             <motion.h1
               variants={fadeUp}
               className="mx-auto max-w-[12ch] text-[clamp(2.65rem,7vw,5.25rem)] font-bold leading-[0.95] text-[#18181B] dark:text-white md:mx-0"
               style={{ fontFamily: displayFontFamily }}
             >
               {sectionLabels.heroTitleLine1}
-              <br />
-              <span className="text-[#00BCA1]">{sectionLabels.heroTitleLine2}</span>
+              {sectionLabels.heroTitleLine2 ? (
+                <>
+                  <br />
+                  <span className="text-[#00BCA1]">{sectionLabels.heroTitleLine2}</span>
+                </>
+              ) : null}
             </motion.h1>
             <motion.p variants={fadeUp} className="resource-page-copy mx-auto mt-6 max-w-3xl text-[#52525B] dark:text-[#A1A1AA] md:mx-0">
               {sectionLabels.heroSubtitle}
@@ -1075,17 +1090,17 @@ export default function ResourceComponent() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="order-1 flex justify-center md:order-2 md:justify-end"
+            className="order-1 flex justify-center md:order-2 md:-mt-4 md:justify-end"
           >
             <div className="relative flex h-75 w-full max-w-125 items-center justify-center md:h-115 md:max-w-135">
               <div className="absolute right-4 top-2 h-36 w-36 rounded-full bg-[#86EFAC]/20 blur-[50px]" />
               <Image
-                src="/images/ddoc.png"
+                src={resourceCenterImage}
                 alt="Resource Center"
                 width={520}
                 height={520}
                 className="relative z-10 h-full w-auto object-contain"
-                priority
+                preload
               />
             </div>
           </motion.div>
