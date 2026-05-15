@@ -325,30 +325,31 @@ export default function TargetsTable({
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table — desktop/tablet */}
       <div className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        {/* Desktop table view */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 dark:bg-slate-800/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th className="px-4 py-3 text-left text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Target
                 </th>
-                <th className="px-4 py-3 text-left text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Project
                 </th>
-                <th className="px-4 py-3 text-left text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
+                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Last Scan
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {paginatedTargets.map((target, index) => (
                 <motion.tr
                   key={target.target_id}
@@ -356,31 +357,59 @@ export default function TargetsTable({
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.03 }}
                   onClick={() => onRowClick?.(target.target_id, target.project_id)}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
+                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors group"
                 >
-                  <td className="px-4 py-3">
-                    <span className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">
+                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
+                    <span className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                       {target.name}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium">
+                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4 text-sm text-slate-600 dark:text-slate-400">
                     {target.project_name}
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
+                    <span className="inline-flex px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400">
                       {target.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
                     <StatusBadge status={target.status} />
                   </td>
-                  <td className="px-4 py-3 text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">
+                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4 text-sm text-slate-500 dark:text-slate-400">
                     {formatRelativeTime(target.last_scan)}
                   </td>
                 </motion.tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile card view */}
+        <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
+          {paginatedTargets.map((target, index) => (
+            <motion.div
+              key={target.target_id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.03 }}
+              onClick={() => onRowClick?.(target.target_id, target.project_id)}
+              className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors active:bg-slate-100 dark:active:bg-slate-800"
+            >
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-sm font-semibold text-slate-900 dark:text-white leading-snug">
+                  {target.name}
+                </span>
+                <StatusBadge status={target.status} />
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                <span>{target.project_name}</span>
+                <span className="inline-flex px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">
+                  {target.type}
+                </span>
+                <span>{formatRelativeTime(target.last_scan)}</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* No results after filtering */}

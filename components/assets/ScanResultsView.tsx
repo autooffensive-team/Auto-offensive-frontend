@@ -205,8 +205,20 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
     >
       {/* Header metadata */}
       {jobDetails && (
-        <div className="flex flex-wrap items-center gap-3 justify-between">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="space-y-3">
+          {/* Top row: Generate Report button aligned right */}
+          {parsedData && (
+            <div className="flex justify-end">
+              <GenerateReportButton
+                jobId={jobId}
+                steps={jobDetails.steps}
+                parsedSteps={parsedData.steps}
+              />
+            </div>
+          )}
+
+          {/* Metadata badges */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
               Status:{" "}
               <span className="ml-1 capitalize">{jobDetails.status}</span>
@@ -253,13 +265,6 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
               </span>
             )}
           </div>
-          {parsedData && (
-            <GenerateReportButton
-              jobId={jobId}
-              steps={jobDetails.steps}
-              parsedSteps={parsedData.steps}
-            />
-          )}
         </div>
       )}
 

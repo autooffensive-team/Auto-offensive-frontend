@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { useGetProjectsQuery } from "@/lib/redux/services/userdashboard/project/project-api";
 import { assetsApi } from "@/lib/redux/services/userdashboard/assets/assets-api";
 import { useAppDispatch } from "@/lib/redux/hooks";
@@ -125,34 +126,45 @@ export default function TargetScanJobsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
-      {/* Breadcrumb */}
-      <Breadcrumb
-        segments={[
-          { label: "Assets", href: "/userdashboard/assets" },
-          { label: target.name },
-        ]}
-      />
+      <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 lg:px-7 lg:py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6"
+        >
+          {/* Breadcrumb */}
+          <Breadcrumb
+            segments={[
+              { label: "Assets", href: "/userdashboard/assets" },
+              { label: target.name },
+            ]}
+          />
 
-      {/* Page Header */}
-      <div>
-        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-900 dark:text-white leading-tight">
-          {target.name}
-        </h1>
-        <p className="text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 mt-2">
-          Project: {projectName}
-        </p>
-      </div>
+          {/* Header row: title left + back button right */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-900 dark:text-white leading-tight">
+                {target.name}
+              </h1>
+              <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+                Project: <span className="font-medium text-slate-700 dark:text-slate-300">{projectName}</span>
+              </p>
+            </div>
 
-      {/* Scan Jobs Table */}
-      <ScanJobsTable targetId={targetId} targetName={target.name} />
-    </motion.div>
+            <Link
+              href="/userdashboard/assets"
+              className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm self-end sm:self-auto shrink-0 group"
+            >
+              <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline">Back to Assets</span>
+              <span className="sm:hidden">Back</span>
+            </Link>
+          </div>
+
+          {/* Scan Jobs Table */}
+          <ScanJobsTable targetId={targetId} targetName={target.name} />
+        </motion.div>
       </div>
     </div>
   );

@@ -62,7 +62,10 @@ export default function GenerateReportButton({
         <div className="relative">
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                    <Button disabled={isLoading}>
+                    <Button
+                        disabled={isLoading}
+                        className="rounded-xl bg-[#00d0b2] text-slate-900 font-semibold hover:bg-[#00b89e] border-0 shadow-sm"
+                    >
                         {isLoading && (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                         )}
