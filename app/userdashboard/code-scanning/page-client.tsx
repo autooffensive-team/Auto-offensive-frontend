@@ -293,12 +293,6 @@ function ScanProjectCard({
   const isNew = isNewListProject(project, seenProjects);
 
   const providerLabel = provider === "github" ? "GitHub" : provider === "gitlab" ? "GitLab" : "Repository";
-  const providerColor =
-    provider === "github"
-      ? "text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
-      : provider === "gitlab"
-      ? "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20"
-      : "text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700";
 
   return (
     <motion.div
@@ -306,88 +300,136 @@ function ScanProjectCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ delay: index * 0.055, ease: "easeOut" }}
-      className="group relative flex flex-col rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-teal-400/70 hover:shadow-[0_0_0_1px_rgba(20,184,166,0.15)] dark:border-slate-800 dark:bg-slate-900 dark:hover:border-teal-500/40"
+      className="group relative w-full overflow-hidden rounded-3xl border border-black/[0.08] bg-[#ffffff] dark:border-white/5 dark:bg-[#111113]"
     >
-      {/* Full-card clickable overlay — entire card is now clickable */}
+      {/* New badge */}
       {isNew ? (
         <div className="pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
           New
         </div>
       ) : null}
+
+      {/* Full-card clickable overlay */}
       <Link
         href={href}
         onClick={() => onOpen(project.projectKey)}
-        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+        className="absolute inset-0 z-10 rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
         aria-label={`Open ${project.projectKey} project overview`}
         tabIndex={0}
       />
 
-      {/* Hover glow */}
-      <span className="pointer-events-none absolute inset-0 rounded-xl bg-teal-500/3 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      {/* ── Blob header ── */}
+      <div className="relative h-[88px] overflow-hidden">
+        {/* background base */}
+        <div className="absolute inset-0 bg-[#ffffff] dark:bg-[#111113]" />
+        {/* blob 1 – far left blue, pushed further out */}
+        <div className="pointer-events-none absolute -left-32 -top-6 h-44 w-44 rounded-full bg-[#01509e] opacity-85 blur-3xl dark:opacity-40" />
+        {/* blob 2 – far right teal, pushed further out */}
+        <div className="pointer-events-none absolute -right-28 -top-4 h-40 w-40 rounded-full bg-[#00d0b2] opacity-55 blur-3xl dark:opacity-25" />
+        {/* blob 3 – right edge cyan, pushed further out */}
+        <div className="pointer-events-none absolute -bottom-12 -right-24 h-36 w-40 rounded-full bg-[#0194c7] opacity-55 blur-3xl dark:opacity-30" />
+        {/* blob 4 – left edge accent, pushed further out */}
+        <div className="pointer-events-none absolute -bottom-10 -left-24 h-32 w-32 rounded-full bg-[#00d0b2] opacity-25 blur-3xl dark:opacity-15" />
 
-      {/* Header */}
-      <div className="relative z-0 flex items-start gap-2.5 p-3 pb-2.5 sm:gap-3 sm:p-4 sm:pb-3 md:p-5 md:pb-3">
-        <div
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors sm:h-9 sm:w-9 md:h-10 md:w-10 ${providerColor}`}
-        >
-          <ProviderIcon projectKey={project.projectKey} size={14} />
+        {/* header content */}
+        <div className="relative z-10 flex h-full items-center justify-between px-[18px]">
+          {/* left: icon + meta */}
+          <div className="flex items-center gap-[10px]">
+            <div className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px] border border-black/10 bg-white/60 dark:border-white/20 dark:bg-white/10">
+              {provider === "github" ? (
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#181717" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              ) : provider === "gitlab" ? (
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 01-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 014.93 2a.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.49h8.86l2.44-7.51a.42.42 0 01.12-.18.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.51L23 13.45a.84.84 0 01-.35.94z" fill="#E24329" />
+                  <path d="M12 22.13L16.93 9.67H7.07L12 22.13z" fill="#FC6D26" />
+                  <path d="M12 22.13L7.07 9.67H1.35L12 22.13z" fill="#FCA326" />
+                  <path d="M12 22.13l4.93-12.46h5.72L12 22.13z" fill="#FCA326" />
+                </svg>
+              ) : (
+                <FolderGit2 size={26} className="text-slate-700 dark:text-white" />
+              )}
+            </div>
+            <div>
+              <p className="text-[12px] font-medium leading-none text-black/70 mb-[3px] dark:text-white/90">
+                {providerLabel} · Repository
+              </p>
+              <p className="text-[11px] leading-none text-black/45 dark:text-white/60">
+                {project.scanCount} recorded scan{project.scanCount !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </div>
+
+          {/* right: status + external link */}
+          <div className="flex items-center gap-[6px]">
+            <span className="inline-flex items-center gap-[5px] rounded-full bg-black/10 px-[10px] py-[3px] text-[11px] font-medium text-black/70 dark:bg-white/20 dark:text-white/90">
+              <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00d0b2]" />
+              Active
+            </span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(href, "_blank");
+              }}
+              aria-label="Open externally"
+              className="relative z-20 flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] border-none bg-black/10 text-black/60 transition-colors hover:bg-black/20 dark:bg-white/20 dark:text-white/80 dark:hover:bg-white/30"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <div className="min-w-0 flex-1 pt-0.5">
-          <h3 className="truncate text-sm font-semibold leading-snug text-slate-900 sm:text-base md:text-lg dark:text-white">
-            {project.projectKey}
-          </h3>
-          <p className="mt-0.5 text-xs text-slate-400 sm:text-sm dark:text-slate-500">
-            {project.scanCount === 1 ? "1 recorded scan" : `${project.scanCount} recorded scans`}
-          </p>
-        </div>
-        {/* Arrow indicator */}
-        <ExternalLink
-          size={14}
-          className="mt-0.5 shrink-0 text-slate-300 transition-colors group-hover:text-teal-400 dark:text-slate-600 dark:group-hover:text-teal-500"
-        />
       </div>
 
-      {/* Tags */}
-      <div className="relative z-0 flex flex-wrap items-center gap-1.5 px-3 pb-2.5 sm:gap-2 sm:px-4 sm:pb-3 md:px-5 md:pb-4">
-        <span
-          className={`flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium sm:gap-1.5 sm:px-2 sm:text-xs md:text-sm ${providerColor}`}
-        >
-          {provider === "github" ? (
-            <GitHubIcon size={10} />
-          ) : provider === "gitlab" ? (
-            <GitLabIcon size={10} />
-          ) : (
-            <GitBranch size={10} />
-          )}
-          {providerLabel}
-        </span>
-        <span className="flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 sm:gap-1.5 sm:px-2 sm:text-xs md:text-sm dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
-          <GitBranch size={10} />
-          Project key
-        </span>
-      </div>
+      {/* ── Card body ── */}
+      <div className="px-[18px] pb-4 pt-[14px]">
+        <p className="mb-[3px] truncate text-[15px] font-medium leading-snug text-black/85 dark:text-white/90">
+          {project.projectKey}
+        </p>
+        <p className="text-[12px] text-black/45 dark:text-white/40">
+          {providerLabel} · Code scanning project
+        </p>
 
-      {/* Footer */}
-      <div className="relative z-0 mt-auto flex items-center justify-between border-t border-slate-100 px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 dark:border-slate-800">
-        <span className="flex items-center gap-1.5 text-xs text-slate-400 sm:text-sm dark:text-slate-500">
-          <FolderGit2 size={12} />
-          Project overview
-        </span>
-        {/* Secondary button with higher z-index */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onOpen(project.projectKey);
-            window.location.href = href;
-          }}
-          className="relative z-20 flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 transition-all hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 sm:gap-1.5 sm:px-2.5 sm:py-1.5 sm:text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-teal-500/40 dark:hover:bg-teal-500/10 dark:hover:text-teal-400"
-          title="Open project overview"
-        >
-          <ExternalLink size={12} />
-          <span className="hidden sm:inline">Open</span>
-        </button>
+        {/* footer row */}
+        <div className="mt-[10px] flex items-center gap-[8px] border-t border-black/[0.08] pt-[10px] dark:border-white/[0.07]">
+          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="7.5" cy="15.5" r="5.5" />
+              <path d="m21 2-9.6 9.6" />
+              <path d="m15.5 7.5 3 3L22 7l-3-3" />
+            </svg>
+            Project key
+          </span>
+          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Overview
+          </span>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onOpen(project.projectKey);
+              window.location.href = href;
+            }}
+            className="relative z-20 ml-auto inline-flex cursor-pointer items-center gap-[5px] rounded-[8px] border-none bg-[#00d0b2] px-[16px] py-[6px] text-[12px] font-medium text-white transition-colors hover:bg-[#00b89c] active:scale-[0.98]"
+          >
+            Open
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
+        </div>
       </div>
     </motion.div>
   );

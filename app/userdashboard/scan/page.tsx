@@ -2,6 +2,7 @@
 
 import { RotateCcw, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -265,6 +266,8 @@ function colorizeLogText(text: string): React.ReactNode {
 
 export default function ScanPage() {
   const [activeTab, setActiveTab] = useState<ScanMode>("basic");
+  const searchParams = useSearchParams();
+  const initialProjectId = searchParams.get("project") || undefined;
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
@@ -306,7 +309,7 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController();
+  } = useScanController(initialProjectId);
 
   const activeRun = activeTab === "basic" ? basicRun : mediumRun;
   const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
