@@ -963,7 +963,7 @@ export default function CodeScanningIssueDetailPageClient({
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:mt-5 sm:gap-2">
+              <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
                 {tabItems.map((item) => {
                   const Icon = item.icon;
                   const active = activeTab === item.id;

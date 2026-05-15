@@ -4,32 +4,32 @@ import Skeleton from "@/components/ui/skeleton";
 
 export default function ScanJobsTableSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-800/50">
+          <thead className="bg-slate-50 dark:bg-slate-800/50">
             <tr>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Execution Mode
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Created At
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Finished At
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Duration
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Tools Used
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {Array.from({ length: 5 }).map((_, i) => (
               <tr key={i}>
                 <td className="px-4 py-3">

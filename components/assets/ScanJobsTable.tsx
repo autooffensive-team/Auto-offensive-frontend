@@ -66,7 +66,7 @@ function getStatusColor(status: string): string {
     case "pending":
       return "text-amber-600 dark:text-amber-400";
     default:
-      return "text-gray-600 dark:text-gray-400";
+      return "text-slate-600 dark:text-slate-400";
   }
 }
 
@@ -101,9 +101,9 @@ export default function ScanJobsTable({
 
   if (isError) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-8 text-center shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
         <AlertCircle className="mx-auto h-10 w-10 text-red-400 mb-3" />
-        <p className="text-gray-700 dark:text-gray-300 font-medium mb-4">
+        <p className="text-slate-700 dark:text-slate-300 font-medium mb-4">
           Failed to load scan jobs
         </p>
         <button
@@ -119,9 +119,9 @@ export default function ScanJobsTable({
 
   if (jobs.length === 0 && !isFetching) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-8 text-center shadow-sm">
-        <Inbox className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-        <p className="text-gray-700 dark:text-gray-300 font-medium">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
+        <Inbox className="mx-auto h-10 w-10 text-slate-400 mb-3" />
+        <p className="text-slate-700 dark:text-slate-300 font-medium">
           No scan jobs have been run against this target
         </p>
       </div>
@@ -129,32 +129,32 @@ export default function ScanJobsTable({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-800/50">
+          <thead className="bg-slate-50 dark:bg-slate-800/50">
             <tr>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Execution Mode
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Created At
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Finished At
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Duration
               </th>
-              <th className="px-4 py-3 text-left text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Tools Used
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {jobs.map((job, index) => (
               <motion.tr
                 key={job.job_id}
@@ -166,11 +166,11 @@ export default function ScanJobsTable({
                     `/userdashboard/assets/${targetId}/jobs/${job.job_id}`
                   )
                 }
-                className="hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
               >
                 <td className="px-4 py-3">
                   <span
-                    className={`text-[14px] font-medium capitalize ${getStatusColor(job.status)}`}
+                    className={`text-xs sm:text-sm font-medium capitalize ${getStatusColor(job.status)}`}
                   >
                     {job.status}
                   </span>
@@ -186,28 +186,28 @@ export default function ScanJobsTable({
                     }
                   />
                 </td>
-                <td className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium">
+                <td className="px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                   {formatDateTime(job.created_at)}
                 </td>
-                <td className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium">
+                <td className="px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                   {job.status === "running" || job.status === "pending"
                     ? "—"
                     : formatDateTime(job.finished_at)}
                 </td>
-                <td className="px-4 py-3 text-[14px] text-gray-600 dark:text-gray-400 font-medium">
+                <td className="px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                   {formatDuration(job.status, job.created_at, job.finished_at)}
                 </td>
                 <td className="px-4 py-3">
                   {job.tools_used ? (
-                    <span className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-[13px] text-gray-600 dark:text-gray-400 font-medium">
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                       {job.tools_used}
                     </span>
                   ) : job.tool_name ? (
-                    <span className="px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-[13px] text-gray-600 dark:text-gray-400 font-medium">
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                       {job.tool_name}
                     </span>
                   ) : (
-                    <span className="text-[14px] text-gray-400">—</span>
+                    <span className="text-xs sm:text-sm text-slate-400">—</span>
                   )}
                 </td>
               </motion.tr>
