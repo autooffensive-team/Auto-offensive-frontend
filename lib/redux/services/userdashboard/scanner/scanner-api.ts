@@ -121,12 +121,12 @@ export const scannerApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map((project) => ({
-                type: "Scan" as const,
-                id: project.project_id,
-              })),
-              { type: "Scan" as const, id: "LIST" },
-            ]
+            ...result.map((project) => ({
+              type: "Scan" as const,
+              id: project.project_id,
+            })),
+            { type: "Scan" as const, id: "LIST" },
+          ]
           : [{ type: "Scan" as const, id: "LIST" }],
     }),
     updateProject: builder.mutation<UserProject, UpdateProjectRequest>({
@@ -162,6 +162,7 @@ export const scannerApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { project_key }) => [
         { type: "Scan" as const, id: "LIST" },
         { type: "Scan" as const, id: `PROJECT:${project_key}` },
+        { type: "Gateway" as const, id: "JOBS_LIST" },
       ],
     }),
     getScanDetail: builder.query<ScanDetailResponse, string>({
