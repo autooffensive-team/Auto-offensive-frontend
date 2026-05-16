@@ -93,7 +93,7 @@ export default function ScanResultsPage({ params }: PageProps) {
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 sm:p-2.5 rounded-xl bg-teal-50 dark:bg-teal-500/10 flex-shrink-0">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-teal-50 dark:bg-teal-500/10 shrink-0">
                   <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div className="min-w-0">

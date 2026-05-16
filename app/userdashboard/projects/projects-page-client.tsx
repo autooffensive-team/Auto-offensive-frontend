@@ -158,98 +158,88 @@ function ProjectCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ delay: index * 0.06, ease: "easeOut" }}
-      className="group relative w-full overflow-hidden rounded-3xl border border-black/[0.08] bg-[#ffffff] dark:border-white/5 dark:bg-[#111113]"
+      className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white dark:border-white/10 dark:bg-[#101828]"
     >
-      {/* ── Blob header ── */}
-      <div className="relative h-[88px] overflow-hidden">
-        {/* background base */}
-        <div className="absolute inset-0 bg-[#ffffff] dark:bg-[#111113]" />
-        {/* blob 1 – far left blue */}
-        <div className="pointer-events-none absolute -left-32 -top-6 h-44 w-44 rounded-full bg-[#01509e] opacity-85 blur-3xl dark:opacity-40" />
-        {/* blob 2 – far right teal */}
-        <div className="pointer-events-none absolute -right-28 -top-4 h-40 w-40 rounded-full bg-[#00d0b2] opacity-55 blur-3xl dark:opacity-25" />
-        {/* blob 3 – right edge cyan */}
-        <div className="pointer-events-none absolute -bottom-12 -right-24 h-36 w-40 rounded-full bg-[#0194c7] opacity-55 blur-3xl dark:opacity-30" />
-        {/* blob 4 – left edge accent */}
-        <div className="pointer-events-none absolute -bottom-10 -left-24 h-32 w-32 rounded-full bg-[#00d0b2] opacity-25 blur-3xl dark:opacity-15" />
-
-        {/* header content */}
-        <div className="relative z-10 flex h-full items-center justify-between px-[18px]">
-          {/* left: icon + meta */}
+      {/* ── Card body ── */}
+      <div className="px-5 py-[18px]">
+        {/* Row 1: avatar + meta + badge + edit */}
+        <div className="mb-[14px] flex items-center justify-between">
           <div className="flex items-center gap-[10px]">
-            <div className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px] border border-black/10 bg-white/60 dark:border-white/20 dark:bg-white/10">
-              <FolderGit2 size={26} className="text-slate-700 dark:text-white" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#1a1a1a] dark:bg-white/10">
+              <FolderGit2 size={22} className="text-white" />
             </div>
             <div>
-              <p className="text-[12px] font-medium leading-none text-black/70 mb-[3px] dark:text-white/90">
+              <p className="text-[12px] font-medium text-[#555] dark:text-white/70">
                 Project · Repository
               </p>
-              <p className="text-[11px] leading-none text-black/45 dark:text-white/60">
+              <p className="mt-[2px] text-[11px] text-[#999] dark:text-white/40">
                 Created {formatProjectDate(project.created_at)}
               </p>
             </div>
           </div>
 
-          {/* right: status + external link */}
-          <div className="flex items-center gap-[6px]">
-            <span className="inline-flex items-center gap-[5px] rounded-full bg-black/10 px-[10px] py-[3px] text-[11px] font-medium text-black/70 dark:bg-white/20 dark:text-white/90">
+          <div className="flex items-center gap-[7px]">
+            <span className="inline-flex items-center gap-[5px] rounded-full border border-[#00d0b2] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:text-[#00d0b2]">
               <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00d0b2]" />
               Active
             </span>
             <button
               onClick={() => onEdit(project)}
               aria-label="Edit project"
-              className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] border-none bg-black/10 text-black/60 transition-colors hover:bg-black/20 dark:bg-white/20 dark:text-white/80 dark:hover:bg-white/30"
+              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-[7px] border border-[#ccc] bg-transparent text-[#999] transition-colors hover:bg-[#f0f0f0] dark:border-white/20 dark:text-white/50 dark:hover:bg-white/10"
             >
               <Pencil size={13} />
             </button>
           </div>
         </div>
-      </div>
 
-      {/* ── Card body ── */}
-      <div className="px-[18px] pb-4 pt-[14px]">
-        <p className="mb-[3px] truncate text-[15px] font-medium leading-snug text-black/85 dark:text-white/90">
+        {/* Project name */}
+        <p className="mb-1 truncate text-[17px] font-medium text-[#111] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
           {project.name}
         </p>
-        <p className="text-[12px] text-black/45 dark:text-white/40 truncate">
+        <p className="mb-4 text-[12px] text-[#888] dark:text-white/40 truncate">
           {project.description || "No description provided"}
         </p>
 
-        {/* footer row */}
-        <div className="mt-[10px] flex items-center gap-[8px] border-t border-black/[0.08] pt-[10px] dark:border-white/[0.07]">
-          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="7.5" cy="15.5" r="5.5" />
-              <path d="m21 2-9.6 9.6" />
-              <path d="m15.5 7.5 3 3L22 7l-3-3" />
-            </svg>
-            Project key
-          </span>
-          <span className="inline-flex items-center gap-[4px] rounded-full border border-black/10 bg-black/[0.04] px-[9px] py-[3px] text-[11px] text-black/50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/45">
-            <Clock size={12} />
-            {formatProjectDate(project.last_modified)}
-          </span>
-          <button
-            onClick={() => onDelete(project.project_id)}
-            disabled={isDeleting}
-            className="ml-auto inline-flex cursor-pointer items-center gap-[5px] rounded-[8px] border-none bg-red-500/10 px-[12px] py-[6px] text-[12px] font-medium text-red-600 transition-colors hover:bg-red-500/20 disabled:opacity-40 dark:text-red-400"
-          >
-            {isDeleting ? (
-              <LoaderCircle size={13} className="animate-spin" />
-            ) : (
-              <Trash2 size={13} />
-            )}
-          </button>
-          <button
-            onClick={() => onOpen(project)}
-            className="inline-flex cursor-pointer items-center gap-[5px] rounded-[8px] border-none bg-[#00d0b2] px-[16px] py-[6px] text-[12px] font-medium text-white transition-colors hover:bg-[#00b89c] active:scale-[0.98]"
-          >
-            Open
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
-            </svg>
-          </button>
+        {/* Footer: tags + actions */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-[6px]">
+            <span className="inline-flex items-center gap-[4px] rounded-[6px] bg-[#e6faf8] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="7.5" cy="15.5" r="5.5" />
+                <path d="m21 2-9.6 9.6" />
+                <path d="m15.5 7.5 3 3L22 7l-3-3" />
+              </svg>
+              Project key
+            </span>
+            <span className="inline-flex items-center gap-[4px] rounded-[6px] bg-[#e6faf8] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
+              <Clock size={13} />
+              {formatProjectDate(project.last_modified)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-[6px]">
+            <button
+              onClick={() => onDelete(project.project_id)}
+              disabled={isDeleting}
+              className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-[#ccc] bg-transparent text-[#999] transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:border-white/20 dark:text-white/50 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+            >
+              {isDeleting ? (
+                <LoaderCircle size={13} className="animate-spin" />
+              ) : (
+                <Trash2 size={13} />
+              )}
+            </button>
+            <button
+              onClick={() => onOpen(project)}
+              className="inline-flex cursor-pointer items-center gap-[6px] rounded-lg border-none bg-[#01509e] px-4 py-[7px] text-[13px] font-medium text-white transition-colors hover:bg-[#00d0b2] active:scale-[0.98]"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
+              </svg>
+              Open
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

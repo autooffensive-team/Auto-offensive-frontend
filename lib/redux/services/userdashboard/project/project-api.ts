@@ -43,6 +43,7 @@ async function parseProjectResponse(response: Response): Promise<RawProject> {
 }
 
 export const projectApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getProjects: builder.query<UserProject[], void>({
       query: () => "projects",
