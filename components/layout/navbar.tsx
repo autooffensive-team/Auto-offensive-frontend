@@ -63,7 +63,7 @@ const navbarToolLinks = toolLinks;
 
 const featureLinks: FeatureItem[] = [
   { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd',   icon: '/icons/feature-cicd.webp'       },
-  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai',     icon: '/icons/feature-aipentest.webp'  },
+  { title: 'AI Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai',     icon: '/icons/feature-aipentest.webp'  },
   { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli',    icon: '/icons/feature-cli.webp'        },
   { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui',  icon: '/icons/feature-automation.webp' },
 ];
@@ -643,7 +643,7 @@ export function Header() {
 
         {/* Bottom CTA */}
         <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.07] dark:border-white/6">
-          {session?.session.token ? (
+          {isSessionPending ? (
             <div
               aria-hidden="true"
               className="h-10 w-full rounded-md border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
