@@ -571,6 +571,7 @@ export default function CodeScanningDetailPageClient({
   const [activeView, setActiveView] = useState<ProjectView>("overview");
   const [typeFilter, setTypeFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
+  const [issuesPage, setIssuesPage] = useState(1);
   const [dependencyToolFilter, setDependencyToolFilter] = useState("");
   const [dependencySeverityFilter, setDependencySeverityFilter] = useState("");
   const [dependencyVulnerableOnly, setDependencyVulnerableOnly] =
@@ -684,7 +685,7 @@ export default function CodeScanningDetailPageClient({
     useListIssuesQuery(
       {
         scan_id: resolvedScanId ?? "",
-        page: 1,
+        page: issuesPage,
         page_size: 25,
         type_filter: typeFilter || undefined,
         severity_filter: severityFilter || undefined,
@@ -902,8 +903,11 @@ export default function CodeScanningDetailPageClient({
           isLoading={isIssuesFetching}
           typeFilter={typeFilter}
           severityFilter={severityFilter}
-          onTypeFilterChange={setTypeFilter}
-          onSeverityFilterChange={setSeverityFilter}
+          onTypeFilterChange={(v) => { setTypeFilter(v); setIssuesPage(1); }}
+          onSeverityFilterChange={(v) => { setSeverityFilter(v); setIssuesPage(1); }}
+          page={issuesPage}
+          pageSize={25}
+          onPageChange={setIssuesPage}
         />
       )}
 

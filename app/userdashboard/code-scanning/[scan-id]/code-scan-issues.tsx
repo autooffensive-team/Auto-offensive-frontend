@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { BarChart3, Bug, Lock, Zap, FileCode2, Filter, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, Bug, Lock, Zap, FileCode2, Filter, AlertCircle, Search, X } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { IssueResponse } from "@/types/scanner";
 import { SeverityDonutChart } from "@/components/charts/SeverityDonutChart";
@@ -268,6 +268,9 @@ export interface CodeScanIssuesProps {
   severityFilter: string;
   onTypeFilterChange: (value: string) => void;
   onSeverityFilterChange: (value: string) => void;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
 }
 
 export function CodeScanIssues({
@@ -280,7 +283,24 @@ export function CodeScanIssues({
   severityFilter,
   onTypeFilterChange,
   onSeverityFilterChange,
+  page,
+  pageSize,
+  onPageChange,
 }: CodeScanIssuesProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredIssues = useMemo(() => {
+    if (!searchTerm.trim()) return issues;
+    const term = searchTerm.toLowerCase();
+    return issues.filter(
+      (issue) =>
+        issue.message.toLowerCase().includes(term) ||
+        issue.file_path.toLowerCase().includes(term) ||
+        issue.rule_key.toLowerCase().includes(term) ||
+        issue.tags.some((tag) => tag.toLowerCase().includes(term))
+    );
+  }, [issues, searchTerm]);
+
   const stats = useMemo(() => {
     const byType = { BUG: 0, VULNERABILITY: 0, CODE_SMELL: 0 };
     issues.forEach((issue) => {
@@ -373,8 +393,33 @@ export function CodeScanIssues({
               </h2>
             </div>
             <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
-              {issues.length} of {total}
+              {filteredIssues.length} of {total}
             </span>
+          </div>
+
+          {/* Search */}
+          <div className="relative">
+            <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search issues by message, file, rule..."
+              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
+            />
+            <AnimatePresence>
+              {searchTerm && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X size={14} />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Loading state */}
@@ -383,18 +428,70 @@ export function CodeScanIssues({
               <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-pulse" />
               <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">Loading issues...</span>
             </div>
-          ) : issues.length === 0 ? (
+          ) : filteredIssues.length === 0 ? (
             <div className="p-6 rounded-lg bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 text-center sm:p-8">
               <FileCode2 className="size-6 mx-auto mb-2 text-slate-400 sm:size-8 dark:text-slate-600" />
               <p className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
-                No issues matched the current filters.
+                {searchTerm ? "No issues matched your search." : "No issues matched the current filters."}
               </p>
             </div>
           ) : (
             <div className="space-y-2 sm:space-y-3">
-              {issues.map((issue) => (
+              {filteredIssues.map((issue) => (
                 <IssueCard key={issue.key} issue={issue} projectKey={projectKey} allIssues={allIssues} />
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {total > pageSize && (
+            <div className="flex items-center justify-center gap-2 pt-3 sm:pt-4">
+              <button
+                onClick={() => onPageChange(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+              </button>
+              {Array.from({ length: Math.ceil(total / pageSize) }, (_, i) => i + 1)
+                .filter((p) => {
+                  const totalPages = Math.ceil(total / pageSize);
+                  if (totalPages <= 7) return true;
+                  if (p === 1 || p === totalPages) return true;
+                  if (Math.abs(p - page) <= 1) return true;
+                  return false;
+                })
+                .reduce<(number | "ellipsis")[]>((acc, p, idx, arr) => {
+                  if (idx > 0 && p - (arr[idx - 1] as number) > 1) {
+                    acc.push("ellipsis");
+                  }
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((item, idx) =>
+                  item === "ellipsis" ? (
+                    <span key={`ellipsis-${idx}`} className="px-1 text-slate-400 dark:text-slate-500">…</span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => onPageChange(item as number)}
+                      className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[13px] font-medium transition-colors ${
+                        item === page
+                          ? "bg-[#01509e] text-white"
+                          : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+              <button
+                onClick={() => onPageChange(Math.min(Math.ceil(total / pageSize), page + 1))}
+                disabled={page >= Math.ceil(total / pageSize)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+              </button>
             </div>
           )}
         </motion.div>
