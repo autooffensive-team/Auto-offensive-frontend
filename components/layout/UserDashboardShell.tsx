@@ -30,6 +30,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import GoToTop from "@/components/ui/go-to-top";
+import { MobileScreenWarning } from "@/components/shared/MobileScreenWarning";
 import type { AuthMeResponse } from "@/types/auth";
 
 /**
@@ -191,6 +192,7 @@ export default function UserDashboardShell({
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
+      <MobileScreenWarning />
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.button

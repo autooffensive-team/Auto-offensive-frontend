@@ -4,7 +4,6 @@ import { RotateCcw, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
-import { MobileScreenWarning } from "@/components/scanComponents/MobileScreenWarning";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
 import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
@@ -320,7 +319,6 @@ export default function ScanPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <MobileScreenWarning />
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
       <div>
         <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
