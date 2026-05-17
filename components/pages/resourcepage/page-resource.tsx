@@ -544,9 +544,11 @@ export default function ResourceComponent() {
         viewport={{ once: true }}
         className={[
           'relative flex min-h-95 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]',
+          index > 0 ? '-mt-px' : '',
           isImageLeft
-            ? 'ml-4 rounded-r-[28px] border-y border-r border-[#737373]/60 md:ml-6'
-            : 'mr-4 rounded-l-[28px] border-y border-l border-[#737373]/60 md:ml-0 md:mr-6 md:rounded-r-none md:rounded-l-[28px] md:border-r-0 md:border-l',
+            ? 'ml-4 rounded-r-[28px] border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:ml-6'
+            : 'mr-4 rounded-l-[28px] border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:ml-0 md:mr-6 md:rounded-r-none md:rounded-l-[28px] md:border-r-0 md:border-l',
+          'transition-colors duration-300',
           'flex-col md:flex-row',
         ].join(' ')}
       >
@@ -731,11 +733,9 @@ export default function ResourceComponent() {
               {sectionLabels.featureCards}
             </h2>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-0">
             {featureCards.map((card, index) => (
-              <div key={card.title}>
-                <FeatureRow card={card} index={index} />
-              </div>
+              <FeatureRow key={card.title} card={card} index={index} />
             ))}
           </div>
         </div>
