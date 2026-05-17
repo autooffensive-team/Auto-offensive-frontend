@@ -123,9 +123,9 @@ export default function PlatformCapabilities() {
   const sectionDescriptionClass =
     "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.7]";
   const primaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "group inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 text-[14px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
   const secondaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-lg border px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "group inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-[14px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
   const ctaArrowIcon = (
     <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path
