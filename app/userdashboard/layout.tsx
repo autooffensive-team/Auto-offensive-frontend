@@ -100,7 +100,7 @@ export default async function UserDashboardLayout({
       <UserDashboardShell initialAuthMe={sessionData.authMe}>
         {children}
       </UserDashboardShell>
-      <Toaster duration={5000} />
+      <Toaster duration={5000} position="top-center" />
     </>
   );
 }

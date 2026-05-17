@@ -879,6 +879,7 @@ export default function CodeScanningDetailPageClient({
 
       {activeView === "overview" && (
         <CodeScanOverview
+          initialScanId={resolvedScanId ?? scanDetail.scan_id ?? ""}
           scanSummary={scanSummary}
           dependencySummary={dependencySummary}
           qualityGate={qualityGate}
