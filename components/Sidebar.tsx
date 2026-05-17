@@ -3,12 +3,13 @@
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  LayoutGrid,
   Activity,
-  Shield,
-  Settings,
+  LayoutGrid,
   LifeBuoy,
   Plus,
+  Settings,
+  Shield,
+  Sparkles,
   User,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export default function Sidebar() {
     { label: "Overview", path: "/guestdashboard", icon: LayoutGrid },
     { label: "Live Scans", path: "/live-scans", icon: Activity },
     { label: "Vulnerabilities", path: "/vulnerabilities", icon: Shield },
+    { label: "AI Suggestion", path: "/ai-suggestion", icon: Sparkles },
   ];
 
   return (
