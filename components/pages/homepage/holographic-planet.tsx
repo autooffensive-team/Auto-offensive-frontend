@@ -1,42 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
-
-// ─── Helper: convert lat/lng to 3D position on sphere ────────
-function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lng + 180) * (Math.PI / 180);
-  return new THREE.Vector3(
-    -radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
-}
-
-// ─── Helper: create arc curve between two surface points ──────
-function createArcCurve(
-  start: THREE.Vector3,
-  end: THREE.Vector3,
-  radius: number
-): THREE.QuadraticBezierCurve3 {
-  const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
-  const arcHeight = start.distanceTo(end) * 0.45;
-  mid.normalize().multiplyScalar(radius + arcHeight);
-  return new THREE.QuadraticBezierCurve3(start, mid, end);
-}
-
-// ─── Arc connection data ──────────────────────────────────────
-const ARC_CONNECTIONS = [
-  { from: { lat: 40.7, lng: -74.0 }, to: { lat: 51.5, lng: -0.12 } },
-  { from: { lat: 35.7, lng: 139.7 }, to: { lat: -33.9, lng: 151.2 } },
-  { from: { lat: 37.8, lng: -122.4 }, to: { lat: 1.35, lng: 103.8 } },
-  { from: { lat: 25.2, lng: 55.3 }, to: { lat: 19.1, lng: 72.9 } },
-  { from: { lat: 52.5, lng: 13.4 }, to: { lat: -33.9, lng: 18.4 } },
-  { from: { lat: -23.5, lng: -46.6 }, to: { lat: 6.5, lng: 3.4 } },
-];
-
-const TAIL_LENGTH = 8; // number of trailing spheres behind comet
+import * as d3 from "d3";
 
 export default function HolographicPlanet() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,334 +10,257 @@ export default function HolographicPlanet() {
     const container = containerRef.current;
     if (!container) return;
 
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    if (width === 0 || height === 0) return;
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
+    if (containerWidth === 0 || containerHeight === 0) return;
 
-    // ─── Scene ─────────────────────────────────────────────────
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    camera.position.set(0, 0, 4.8);
+    // ─── Canvas setup ──────────────────────────────────────────
+    const canvas = document.createElement("canvas");
+    const dpr = Math.min(window.devicePixelRatio, 2);
+    canvas.width = containerWidth * dpr;
+    canvas.height = containerHeight * dpr;
+    canvas.style.width = `${containerWidth}px`;
+    canvas.style.height = `${containerHeight}px`;
+    canvas.style.position = "absolute";
+    canvas.style.inset = "0";
+    container.appendChild(canvas);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "low-power",
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(width, height);
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.scale(dpr, dpr);
 
-    // ─── Colors ────────────────────────────────────────────────
-    const isDark = document.documentElement.classList.contains("dark");
-    const shellColor = isDark ? 0x00ffdd : 0x0180ce;
-    const ringColor = isDark ? 0x00d0b2 : 0x01509e;
-    const primaryArc = isDark ? 0x00ffdd : 0x38bdf8;
-    const cometHead = 0xffffff;
+    const radius = Math.min(containerWidth, containerHeight) / 2.5;
 
-    // ─── Holographic shell ─────────────────────────────────────
-    const shellGeo = new THREE.IcosahedronGeometry(1.6, 3);
-    const shellMat = new THREE.MeshBasicMaterial({
-      color: shellColor,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.14,
-      depthWrite: false,
-    });
-    const shell = new THREE.Mesh(shellGeo, shellMat);
-    scene.add(shell);
+    // ─── D3 projection ─────────────────────────────────────────
+    const projection = d3
+      .geoOrthographic()
+      .scale(radius)
+      .translate([containerWidth / 2, containerHeight / 2])
+      .clipAngle(90);
 
-    // ─── Orbit ring ────────────────────────────────────────────
-    const ringGeo = new THREE.RingGeometry(1.85, 1.87, 64);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: ringColor,
-      transparent: true,
-      opacity: 0.12,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI / 2.2;
-    scene.add(ring);
+    const path = d3.geoPath().projection(projection).context(ctx);
+    const graticule = d3.geoGraticule();
 
-    // ─── Arcs group ────────────────────────────────────────────
-    const arcsGroup = new THREE.Group();
-    shell.add(arcsGroup);
+    // ─── State ─────────────────────────────────────────────────
+    let landFeatures: any = null;
+    let landDots: [number, number][] = [];
+    const rotation: [number, number] = [0, 0];
+    let autoRotate = true;
+    let destroyed = false;
+    let planetVisible = false;
+    let planetOpacity = 0;
 
-    const SPHERE_RADIUS = 1.6;
-    const disposables: (THREE.BufferGeometry | THREE.Material)[] = [];
+    // Delay planet appearance until after sweep comet finishes (~2.1s)
+    const PLANET_DELAY = 1400;
+    const PLANET_FADE_DURATION = 500; // ms to fade in
+    let planetFadeStart = 0;
 
-    // ─── Materials ─────────────────────────────────────────────
+    const planetDelayTimer = setTimeout(() => {
+      planetVisible = true;
+      planetFadeStart = performance.now();
+    }, PLANET_DELAY);
 
-    // Endpoint dot
-    const dotMat = new THREE.MeshBasicMaterial({
-      color: primaryArc,
-      transparent: true,
-      opacity: 1.0,
-      depthWrite: false,
-    });
-    disposables.push(dotMat);
+    // ─── Theme detection ───────────────────────────────────────
+    const isDark = () => document.documentElement.classList.contains("dark");
 
-    // Pulse ring material (expanding ring around dots)
-    const pulseRingMat = new THREE.MeshBasicMaterial({
-      color: primaryArc,
-      transparent: true,
-      opacity: 0.4,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    });
-    disposables.push(pulseRingMat);
-
-    // Comet head material
-    const cometHeadMat = new THREE.MeshBasicMaterial({
-      color: cometHead,
-      transparent: true,
-      opacity: 1.0,
-      depthWrite: false,
-    });
-    disposables.push(cometHeadMat);
-
-    // Comet tail materials (progressively fading)
-    const tailMats: THREE.MeshBasicMaterial[] = [];
-    for (let i = 0; i < TAIL_LENGTH; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        color: primaryArc,
-        transparent: true,
-        opacity: 0.7 * (1 - i / TAIL_LENGTH),
-        depthWrite: false,
-      });
-      tailMats.push(mat);
-      disposables.push(mat);
-    }
-
-    // ─── Geometries ────────────────────────────────────────────
-    const dotGeo = new THREE.SphereGeometry(0.01, 8, 8);
-    const pulseRingGeo = new THREE.RingGeometry(0.015, 0.028, 24);
-    const cometHeadGeo = new THREE.SphereGeometry(0.018, 10, 10);
-    const tailGeos: THREE.SphereGeometry[] = [];
-    for (let i = 0; i < TAIL_LENGTH; i++) {
-      const size = 0.014 * (1 - i * 0.08);
-      tailGeos.push(new THREE.SphereGeometry(Math.max(size, 0.004), 8, 8));
-    }
-    disposables.push(dotGeo, pulseRingGeo, cometHeadGeo, ...tailGeos);
-
-    // ─── Arc data structures ───────────────────────────────────
-    interface ArcData {
-      curve: THREE.QuadraticBezierCurve3;
-      // Progressive draw
-      lineGeo: THREE.BufferGeometry;
-      drawCount: number;
-      maxCount: number;
-      drawSpeed: number;
-      drawDirection: number;
-      // Comet
-      cometHead: THREE.Mesh;
-      tail: THREE.Mesh[];
-      progress: number;
-      speed: number;
-      // Pulse rings
-      pulseRings: THREE.Mesh[];
-    }
-    const arcs: ArcData[] = [];
-
-    // ─── Build arcs ────────────────────────────────────────────
-    for (let i = 0; i < ARC_CONNECTIONS.length; i++) {
-      const conn = ARC_CONNECTIONS[i];
-      const startPos = latLngToVector3(conn.from.lat, conn.from.lng, SPHERE_RADIUS);
-      const endPos = latLngToVector3(conn.to.lat, conn.to.lng, SPHERE_RADIUS);
-      const curve = createArcCurve(startPos, endPos, SPHERE_RADIUS);
-
-      // ── Progressive arc line (dashed effect via drawRange) ──
-      const SEGMENTS = 128;
-      const curvePoints = curve.getPoints(SEGMENTS);
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
-      disposables.push(lineGeo);
-
-      // Use a custom shader-like approach: vertex colors for gradient
-      const colors = new Float32Array((SEGMENTS + 1) * 3);
-      const startColor = new THREE.Color(primaryArc);
-      const endColor = new THREE.Color(primaryArc).multiplyScalar(0.3);
-      for (let j = 0; j <= SEGMENTS; j++) {
-        const t = j / SEGMENTS;
-        const c = new THREE.Color().lerpColors(startColor, endColor, t);
-        colors[j * 3] = c.r;
-        colors[j * 3 + 1] = c.g;
-        colors[j * 3 + 2] = c.b;
+    // ─── Point in polygon (for halftone dots) ──────────────────
+    const pointInPolygon = (point: [number, number], polygon: number[][]): boolean => {
+      const [x, y] = point;
+      let inside = false;
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const [xi, yi] = polygon[i];
+        const [xj, yj] = polygon[j];
+        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+          inside = !inside;
+        }
       }
-      lineGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-
-      const lineMat = new THREE.LineBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.7,
-        depthWrite: false,
-      });
-      disposables.push(lineMat);
-
-      const line = new THREE.Line(lineGeo, lineMat);
-      lineGeo.setDrawRange(0, 0); // start hidden
-      arcsGroup.add(line);
-
-      // ── Endpoint dots ──
-      const startDot = new THREE.Mesh(dotGeo, dotMat);
-      startDot.position.copy(startPos);
-      arcsGroup.add(startDot);
-
-      const endDot = new THREE.Mesh(dotGeo, dotMat);
-      endDot.position.copy(endPos);
-      arcsGroup.add(endDot);
-
-      // ── Pulse rings at endpoints ──
-      const pulseRings: THREE.Mesh[] = [];
-      for (let p = 0; p < 2; p++) {
-        const pr = new THREE.Mesh(pulseRingGeo, pulseRingMat.clone());
-        pr.position.copy(p === 0 ? startPos : endPos);
-        // Orient ring to face outward from sphere center
-        pr.lookAt(new THREE.Vector3(0, 0, 0));
-        arcsGroup.add(pr);
-        pulseRings.push(pr);
-        disposables.push(pr.material as THREE.Material);
-      }
-
-      // ── Comet head ──
-      const head = new THREE.Mesh(cometHeadGeo, cometHeadMat);
-      head.position.copy(startPos);
-      head.visible = false;
-      arcsGroup.add(head);
-
-      // ── Comet tail (multiple fading spheres) ──
-      const tail: THREE.Mesh[] = [];
-      for (let t = 0; t < TAIL_LENGTH; t++) {
-        const sphere = new THREE.Mesh(tailGeos[t], tailMats[t]);
-        sphere.position.copy(startPos);
-        sphere.visible = false;
-        arcsGroup.add(sphere);
-        tail.push(sphere);
-      }
-
-      arcs.push({
-        curve,
-        lineGeo,
-        drawCount: 0,
-        maxCount: SEGMENTS + 1,
-        drawSpeed: 1.5 + Math.random() * 1.0, // points per frame
-        drawDirection: 1,
-        cometHead: head,
-        tail,
-        progress: 0,
-        speed: 0.006 + Math.random() * 0.004,
-        pulseRings,
-      });
-    }
-
-    // Stagger arc animations with delays
-    const arcDelays = ARC_CONNECTIONS.map((_, i) => i * 40); // frames delay
-
-    // ─── Theme observer ────────────────────────────────────────
-    const themeObserver = new MutationObserver(() => {
-      const dark = document.documentElement.classList.contains("dark");
-      shellMat.color.setHex(dark ? 0x00ffdd : 0x0180ce);
-      ringMat.color.setHex(dark ? 0x00d0b2 : 0x01509e);
-      dotMat.color.setHex(dark ? 0x00ffdd : 0x38bdf8);
-      pulseRingMat.color.setHex(dark ? 0x00ffdd : 0x38bdf8);
-      // Update tail mats
-      const newColor = dark ? 0x00ffdd : 0x38bdf8;
-      for (const mat of tailMats) mat.color.setHex(newColor);
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    // ─── Mouse tracking ────────────────────────────────────────
-    let targetRotX = 0;
-    let targetRotY = 0;
-    const handleMouseMove = (e: MouseEvent) => {
-      targetRotY = (e.clientX / window.innerWidth - 0.5) * 0.4;
-      targetRotX = (e.clientY / window.innerHeight - 0.5) * 0.25;
+      return inside;
     };
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // ─── Animation ─────────────────────────────────────────────
+    const pointInFeature = (point: [number, number], feature: any): boolean => {
+      const geometry = feature.geometry;
+      if (geometry.type === "Polygon") {
+        if (!pointInPolygon(point, geometry.coordinates[0])) return false;
+        for (let i = 1; i < geometry.coordinates.length; i++) {
+          if (pointInPolygon(point, geometry.coordinates[i])) return false;
+        }
+        return true;
+      } else if (geometry.type === "MultiPolygon") {
+        for (const polygon of geometry.coordinates) {
+          if (pointInPolygon(point, polygon[0])) {
+            let inHole = false;
+            for (let i = 1; i < polygon.length; i++) {
+              if (pointInPolygon(point, polygon[i])) {
+                inHole = true;
+                break;
+              }
+            }
+            if (!inHole) return true;
+          }
+        }
+        return false;
+      }
+      return false;
+    };
+
+    const generateDots = (features: any) => {
+      const dots: [number, number][] = [];
+      const dotSpacing = 2.0;
+      features.features.forEach((feature: any) => {
+        const bounds = d3.geoBounds(feature);
+        const [[minLng, minLat], [maxLng, maxLat]] = bounds;
+        for (let lng = minLng; lng <= maxLng; lng += dotSpacing) {
+          for (let lat = minLat; lat <= maxLat; lat += dotSpacing) {
+            const point: [number, number] = [lng, lat];
+            if (pointInFeature(point, feature)) {
+              dots.push(point);
+            }
+          }
+        }
+      });
+      return dots;
+    };
+
+    // ─── Render frame ──────────────────────────────────────────
+    const render = () => {
+      ctx.clearRect(0, 0, containerWidth, containerHeight);
+
+      // Don't render until planet is visible
+      if (!planetVisible) return;
+
+      const dark = isDark();
+      const lineColor = dark ? "#00ffdd" : "#01509e";
+      const gridColor = dark ? "rgba(0, 255, 221, 0.08)" : "rgba(1, 80, 158, 0.2)";
+      const dotFill = dark ? "rgba(0, 255, 221, 0.35)" : "rgba(1, 80, 158, 0.5)";
+      const outlineColor = dark ? "rgba(0, 255, 221, 0.3)" : "rgba(1, 80, 158, 0.6)";
+
+      // Apply fade-in opacity
+      ctx.globalAlpha = planetOpacity;
+
+      const currentScale = projection.scale()!;
+      const scaleFactor = currentScale / radius;
+
+      // Globe background
+      ctx.beginPath();
+      ctx.arc(containerWidth / 2, containerHeight / 2, currentScale, 0, 2 * Math.PI);
+      if (!dark) {
+        ctx.fillStyle = "rgba(0, 20, 50, 0.06)";
+        ctx.fill();
+      }
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = dark ? 0.8 * scaleFactor : 1.2 * scaleFactor;
+      ctx.globalAlpha = (dark ? 0.15 : 0.35) * planetOpacity;
+      ctx.stroke();
+      ctx.globalAlpha = planetOpacity;
+
+      if (landFeatures) {
+        // Graticule
+        ctx.beginPath();
+        path(graticule());
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = (dark ? 0.5 : 0.7) * scaleFactor;
+        ctx.stroke();
+
+        // Land outlines
+        ctx.beginPath();
+        landFeatures.features.forEach((feature: any) => {
+          path(feature);
+        });
+        ctx.strokeStyle = outlineColor;
+        ctx.lineWidth = (dark ? 0.8 : 1.2) * scaleFactor;
+        ctx.stroke();
+
+        // Halftone dots on land
+        landDots.forEach((dot) => {
+          const projected = projection(dot);
+          if (projected) {
+            ctx.beginPath();
+            ctx.arc(projected[0], projected[1], (dark ? 0.8 : 1.0) * scaleFactor, 0, 2 * Math.PI);
+            ctx.fillStyle = dotFill;
+            ctx.fill();
+          }
+        });
+      }
+
+      ctx.globalAlpha = 1;
+    };
+
+    // ─── Animation loop ────────────────────────────────────────
     let animId: number;
     let lastFrame = 0;
-    let frameCount = 0;
     const FRAME_INTERVAL = 1000 / 30;
 
-    function animate(timestamp: number) {
+    const animate = (timestamp: number) => {
+      if (destroyed) return;
       animId = requestAnimationFrame(animate);
 
       const delta = timestamp - lastFrame;
       if (delta < FRAME_INTERVAL) return;
       lastFrame = timestamp - (delta % FRAME_INTERVAL);
-      frameCount++;
 
-      // Globe rotation
-      shell.rotation.y += (targetRotY - shell.rotation.y) * 0.03;
-      shell.rotation.x += (targetRotX - shell.rotation.x) * 0.03;
-      shell.rotation.y += 0.001;
-      shell.rotation.x += 0.0005;
-      ring.rotation.z += 0.0003;
-
-      // ── Animate each arc ──
-      for (let i = 0; i < arcs.length; i++) {
-        const arc = arcs[i];
-        const delay = arcDelays[i];
-
-        // Phase 1: Progressive draw
-        if (frameCount > delay) {
-          if (arc.drawDirection === 1 && arc.drawCount < arc.maxCount) {
-            arc.drawCount = Math.min(arc.drawCount + arc.drawSpeed, arc.maxCount);
-            arc.lineGeo.setDrawRange(0, Math.floor(arc.drawCount));
-          }
-
-          // Phase 2: Comet travels once line is partially drawn
-          if (arc.drawCount > arc.maxCount * 0.3) {
-            arc.cometHead.visible = true;
-            for (const t of arc.tail) t.visible = true;
-
-            arc.progress += arc.speed;
-
-            // Loop: when comet reaches end, reset
-            if (arc.progress > 1) {
-              arc.progress = 0;
-              // Also reset draw for re-animation cycle
-              arc.drawCount = 0;
-              arc.lineGeo.setDrawRange(0, 0);
-            }
-
-            // Position comet head
-            const headPos = arc.curve.getPoint(arc.progress);
-            arc.cometHead.position.copy(headPos);
-
-            // Position tail spheres behind the head
-            for (let t = 0; t < TAIL_LENGTH; t++) {
-              const tailProgress = arc.progress - (t + 1) * 0.02;
-              if (tailProgress >= 0) {
-                const tailPos = arc.curve.getPoint(tailProgress);
-                arc.tail[t].position.copy(tailPos);
-                arc.tail[t].visible = true;
-              } else {
-                arc.tail[t].visible = false;
-              }
-            }
-          }
-        }
-
-        // ── Pulse rings animation ──
-        for (const pr of arc.pulseRings) {
-          const mat = pr.material as THREE.MeshBasicMaterial;
-          const cycle = ((timestamp * 0.001) + i * 0.5) % 2.0; // 2s cycle
-          const scale = 1.0 + cycle * 1.5;
-          pr.scale.set(scale, scale, scale);
-          mat.opacity = Math.max(0, 0.5 * (1 - cycle / 2.0));
-        }
+      // Update planet fade-in opacity
+      if (planetVisible && planetOpacity < 1) {
+        const elapsed = timestamp - planetFadeStart;
+        planetOpacity = Math.min(1, elapsed / PLANET_FADE_DURATION);
       }
 
-      renderer.render(scene, camera);
-    }
+      // Auto-rotate
+      if (autoRotate) {
+        rotation[0] += 0.3;
+        projection.rotate(rotation);
+      }
 
+      render();
+    };
+
+    // ─── Mouse interaction ─────────────────────────────────────
+    const handleMouseDown = (event: MouseEvent) => {
+      autoRotate = false;
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startRotation: [number, number] = [...rotation];
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const sensitivity = 0.4;
+        const dx = moveEvent.clientX - startX;
+        const dy = moveEvent.clientY - startY;
+        rotation[0] = startRotation[0] + dx * sensitivity;
+        rotation[1] = Math.max(-90, Math.min(90, startRotation[1] - dy * sensitivity));
+        projection.rotate(rotation);
+        render();
+      };
+
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+        setTimeout(() => {
+          autoRotate = true;
+        }, 50);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    };
+
+    canvas.addEventListener("mousedown", handleMouseDown);
+
+    // ─── Load world data ───────────────────────────────────────
+    const loadData = async () => {
+      try {
+        const response = await fetch(
+          "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/physical/ne_110m_land.json"
+        );
+        if (!response.ok) throw new Error("Failed to load");
+        landFeatures = await response.json();
+        landDots = generateDots(landFeatures);
+        render();
+      } catch {
+        // Silently fail — globe still renders without land
+        render();
+      }
+    };
+
+    loadData();
     animId = requestAnimationFrame(animate);
 
     // ─── Resize ────────────────────────────────────────────────
@@ -381,25 +269,28 @@ export default function HolographicPlanet() {
         const w = entry.contentRect.width;
         const h = entry.contentRect.height;
         if (w === 0 || h === 0) return;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+        const newDpr = Math.min(window.devicePixelRatio, 2);
+        canvas.width = w * newDpr;
+        canvas.height = h * newDpr;
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(newDpr, 0, 0, newDpr, 0, 0);
+        const newRadius = Math.min(w, h) / 2.5;
+        projection.scale(newRadius).translate([w / 2, h / 2]);
+        render();
       }
     });
     resizeObserver.observe(container);
 
     // ─── Cleanup ───────────────────────────────────────────────
     return () => {
+      destroyed = true;
       cancelAnimationFrame(animId);
-      window.removeEventListener("mousemove", handleMouseMove);
+      clearTimeout(planetDelayTimer);
+      canvas.removeEventListener("mousedown", handleMouseDown);
       resizeObserver.disconnect();
-      themeObserver.disconnect();
-      renderer.dispose();
-      shellGeo.dispose(); shellMat.dispose();
-      ringGeo.dispose(); ringMat.dispose();
-      for (const d of disposables) d.dispose();
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
+      if (container.contains(canvas)) {
+        container.removeChild(canvas);
       }
     };
   }, []);
@@ -407,7 +298,7 @@ export default function HolographicPlanet() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-2"
+      className="absolute inset-0 w-full h-full pointer-events-auto z-2"
       style={{
         isolation: "isolate",
         willChange: "transform",
