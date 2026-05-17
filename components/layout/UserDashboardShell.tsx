@@ -6,11 +6,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import {
-  Bell,
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  LifeBuoy,
   LayoutDashboard,
   Globe,
   FolderGit2,
@@ -65,32 +63,9 @@ const mainNavItems = [
 const accountNavItems = [
   { label: "Profile", path: "/userdashboard/profile", icon: User },
   { label: "Settings", path: "/userdashboard/settings", icon: Settings },
-  { label: "Support", path: "/userdashboard/support", icon: LifeBuoy },
 ];
 
-const notifications = [
-  {
-    id: 1,
-    title: "Critical issue triaged",
-    message: "The SQL injection finding for api.example.com was escalated.",
-    time: "5 min ago",
-    unread: true,
-  },
-  {
-    id: 2,
-    title: "Scan finished",
-    message: "External perimeter scan completed with 18 findings.",
-    time: "42 min ago",
-    unread: true,
-  },
-  {
-    id: 3,
-    title: "Weekly report ready",
-    message: "Your executive summary for this week is available.",
-    time: "Today",
-    unread: false,
-  },
-];
+
 
 function isItemActive(pathname: string, path: string) {
   if (path === "/userdashboard") {
@@ -122,12 +97,10 @@ export default function UserDashboardShell({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
-  const notificationsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const pageLabel = useMemo(() => {
@@ -151,7 +124,6 @@ export default function UserDashboardShell({
 
   const closeOverlays = () => {
     setMobileMenuOpen(false);
-    setNotificationsOpen(false);
     setProfileOpen(false);
   };
 
@@ -165,9 +137,6 @@ export default function UserDashboardShell({
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
-      if (notificationsRef.current && !notificationsRef.current.contains(target)) {
-        setNotificationsOpen(false);
-      }
       if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
       }
@@ -175,7 +144,6 @@ export default function UserDashboardShell({
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setMobileMenuOpen(false);
-        setNotificationsOpen(false);
         setProfileOpen(false);
       }
     }
@@ -187,8 +155,8 @@ export default function UserDashboardShell({
     };
   }, []);
 
-  const desktopSidebarWidth = collapsed ? "md:w-24" : "md:w-72";
-  const desktopContentOffset = collapsed ? "md:pl-24" : "md:pl-72";
+  const desktopSidebarWidth = collapsed ? "md:w-[72px]" : "md:w-72";
+  const desktopContentOffset = collapsed ? "md:pl-[72px]" : "md:pl-72";
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
@@ -208,12 +176,12 @@ export default function UserDashboardShell({
       </AnimatePresence>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-transform duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${
           mobileMenuOpen ? "translate-x-0" : ""
         }`}
       >
-        <div className="border-b border-black/10 px-4 py-5 dark:border-white/10">
-          <div className="flex items-center justify-between ">
+        <div className={`relative border-b border-black/10 px-4 py-5 dark:border-white/10 ${collapsed ? "md:px-2 md:py-4" : ""}`}>
+          <div className={`flex items-center ${collapsed ? "md:flex-col md:gap-2" : "justify-between"}`}>
             <Link
               href="/"
               onClick={closeOverlays}
@@ -265,18 +233,19 @@ export default function UserDashboardShell({
           </div>
         </div>
 
-        <div className="px-4 py-3">
+        <div className={`px-4 py-3 ${collapsed ? "md:px-1.5" : ""}`}>
           <Link
             href="/userdashboard/scan"
             onClick={closeOverlays}
-            className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-slate-950 transition hover:brightness-105"
+            title={collapsed ? "New Scan" : undefined}
+            className={`flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-slate-950 transition hover:brightness-105 ${collapsed ? "md:h-10 md:w-10 md:mx-auto md:rounded-lg md:px-0 md:py-0" : ""}`}
           >
             <Scan size={16} />
             <span className={collapsed ? "md:hidden" : ""}>New Scan</span>
           </Link>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+        <nav className={`flex-1 overflow-y-auto px-3 pb-4 ${collapsed ? "md:px-1.5" : ""}`}>
           <div className={`mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
             Workspace
           </div>
@@ -288,7 +257,8 @@ export default function UserDashboardShell({
                   <Link
                     href={item.path}
                     onClick={closeOverlays}
-                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${
+                    title={collapsed ? item.label : undefined}
+                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${
                       active
                         ? "bg-black/10 text-slate-950 shadow-inner shadow-black/5 dark:bg-white/10 dark:text-white dark:shadow-white/5"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
@@ -338,7 +308,8 @@ export default function UserDashboardShell({
                   <Link
                     href={item.path}
                     onClick={closeOverlays}
-                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${
+                    title={collapsed ? item.label : undefined}
+                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${
                       active
                         ? "bg-black/10 text-slate-950 dark:bg-white/10 dark:text-white"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
@@ -357,13 +328,14 @@ export default function UserDashboardShell({
           </ul>
         </nav>
 
-        <div className="border-t border-black/10 p-3 dark:border-white/10">
+        <div className={`border-t border-black/10 p-3 dark:border-white/10 ${collapsed ? "md:p-1.5" : ""}`}>
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm text-slate-600 transition hover:bg-black/6 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/6 dark:hover:text-white"
+            title={collapsed ? (theme === "dark" ? "Light mode" : "Dark mode") : undefined}
+            className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm text-slate-600 transition hover:bg-black/6 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/6 dark:hover:text-white ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""}`}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 dark:border-white/10 dark:text-slate-400">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 dark:border-white/10 dark:text-slate-400">
               {mounted && theme === "dark" ? <Sun size={16} strokeWidth={1.8} /> : <Moon size={16} strokeWidth={1.8} />}
             </div>
             <span className={collapsed ? "md:hidden" : ""}>
@@ -404,72 +376,11 @@ export default function UserDashboardShell({
                 Docs
               </Link>
 
-              <div ref={notificationsRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNotificationsOpen((value) => !value);
-                    setProfileOpen(false);
-                  }}
-                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-black/8 bg-white/80 text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-                  aria-label="Open notifications"
-                >
-                  <Bell size={18} />
-                  <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500" />
-                </button>
-
-                <AnimatePresence>
-                  {notificationsOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-88 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
-                    >
-                      <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
-                        <p className="text-sm font-semibold text-slate-950 dark:text-white">
-                          Notification Center
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Live updates from your latest assessments
-                        </p>
-                      </div>
-                      <div className="max-h-96 overflow-y-auto">
-                        {notifications.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex gap-3 border-b border-black/5 px-5 py-4 last:border-b-0 dark:border-white/8"
-                          >
-                            <div
-                              className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
-                                item.unread ? "bg-teal-400" : "bg-slate-300"
-                              }`}
-                            />
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-slate-900 dark:text-white">
-                                {item.title}
-                              </p>
-                              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                                {item.message}
-                              </p>
-                              <p className="mt-2 text-xs text-slate-400">
-                                {item.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
               <div ref={profileRef} className="relative">
                 <button
                   type="button"
                   onClick={() => {
                     setProfileOpen((value) => !value);
-                    setNotificationsOpen(false);
                   }}
                   className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
