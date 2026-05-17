@@ -13,7 +13,8 @@ import {
   Clock,
   AtSign,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 import { UploadProfile } from "@/components/ui/upload-profile";
 import {
@@ -60,9 +61,13 @@ export default function ProfilePage() {
   const user = data?.user;
   const displayName = user ? getDisplayName(user.alias_name, user.username) : "";
 
+  useEffect(() => {
+    if (isError) {
+      toast.error("Unable to load your profile information right now.");
+    }
+  }, [isError]);
+
   const [isEditing, setIsEditing] = useState(false);
-  const [saveError, setSaveError] = useState("");
-  const [saveSuccess, setSaveSuccess] = useState("");
   const [formData, setFormData] = useState({
     aliasName: "",
     email: "",
@@ -79,19 +84,15 @@ export default function ProfilePage() {
     const nextAliasName = formData.aliasName.trim() || user.username.trim();
 
     try {
-      setSaveError("");
       await updateMyUser({ alias_name: nextAliasName }).unwrap();
-      setSaveSuccess("Profile updated successfully.");
+      toast.success("Profile updated successfully.");
       setIsEditing(false);
     } catch {
-      setSaveSuccess("");
-      setSaveError("Unable to update your profile right now.");
+      toast.error("Unable to update your profile right now.");
     }
   };
 
   const handleEdit = () => {
-    setSaveError("");
-    setSaveSuccess("");
     setFormData((current) => ({
       ...current,
       aliasName: normalizeAliasName(user?.alias_name) || (user?.username ?? ""),
@@ -112,40 +113,6 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        {/* Error Banner */}
-        {isError && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
-          >
-            <AlertCircle size={16} />
-            Unable to load your profile information right now.
-          </motion.div>
-        )}
-
-        {saveError && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
-          >
-            <AlertCircle size={16} />
-            {saveError}
-          </motion.div>
-        )}
-
-        {saveSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300"
-          >
-            <CheckCircle size={16} />
-            {saveSuccess}
-          </motion.div>
-        )}
-
         {/* Profile Header Row */}
         <div className="relative -mt-14 mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           {/* Avatar + Name */}
@@ -288,11 +255,7 @@ export default function ProfilePage() {
                   />
                 </FieldWrapper>
               </div>
-              <div className="px-6 pb-6">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  If the backend sends the placeholder value <code>string</code>, this page now falls back to your username until you save a real display name.
-                </p>
-              </div>
+              
             </motion.div>
 
             {/* Change Password */}
