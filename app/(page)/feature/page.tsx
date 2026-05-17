@@ -6,6 +6,7 @@ import { useRef, useEffect, useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/components/theme-provider";
 import { HeroBackground } from "@/components/shared/HeroBackground";
+import AnimatedCta from "@/components/pages/homepage/animated-cta";
 import webAutomationImage from "../../../public/document/card_icon_web_automation_dark.webp";
 
 import {
@@ -18,7 +19,6 @@ import {
   ClipboardList,
   ArrowRight,
   ExternalLink,
-  ChevronRight,
   Shield,
   Sparkles,
 } from "lucide-react";
@@ -126,10 +126,17 @@ export default function PlatformCapabilities() {
     "group inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
   const secondaryButtonClass =
     "group inline-flex items-center justify-center gap-2 rounded-lg border px-3.5 py-2.5 text-[13px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
-  const docsButtonClass =
-    "group relative inline-flex h-[2.55em] w-fit items-center justify-start overflow-hidden rounded-xl border border-[#E2DDD5] bg-white px-[0.95em] pr-[2.2em] text-[13px] font-semibold text-[#01509E] transition-[transform,background-color,color,border-color] duration-300 hover:-translate-y-px hover:border-[#01509E] hover:bg-[#01509E] hover:text-white dark:border-white/10 dark:bg-[#111113] dark:text-[#7AAEF7] dark:hover:border-[#00BCA1] dark:hover:bg-[#00BCA1] dark:hover:text-[#09090B] sm:h-[2.8em] sm:px-[1.2em] sm:pr-[3.3em]";
-  const docsButtonIconClass =
-    "pointer-events-none absolute right-[0.25em] top-1/2 z-0 flex h-[1.75em] w-[1.75em] -translate-y-1/2 items-center justify-center overflow-hidden rounded-[0.55em] bg-[#01509E] text-white transition-[width,transform,background-color,color] duration-300 group-hover:w-[calc(100%-0.45em)] group-hover:bg-[#01509E] group-hover:text-white dark:bg-[#7AAEF7] dark:text-[#09090B] dark:group-hover:w-[calc(100%-0.45em)] dark:group-hover:bg-[#00BCA1] dark:group-hover:text-[#09090B] sm:right-[0.3em] sm:h-[2.2em] sm:w-[2.2em] sm:rounded-[0.7em] sm:group-hover:w-[calc(100%-0.6em)]";
+  const ctaArrowIcon = (
+    <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path
+        d="M6 1L11 6L6 11M11 6H1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 
   const heroRef = useRef(null);
   const gridRef = useRef(null);
@@ -286,7 +293,7 @@ export default function PlatformCapabilities() {
             custom={0}
             className={[
               "relative flex min-h-96 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]",
-              "ml-4 rounded-r-[28px] border-y border-r border-[#E2DDD5] dark:border-white/10 md:ml-6",
+              "ml-4 rounded-r-[28px] border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:ml-6",
               "transition-colors duration-300",
               "flex-col md:flex-row",
             ].join(" ")}
@@ -310,14 +317,15 @@ export default function PlatformCapabilities() {
               <p className={`${descriptionTextClass} text-[#52525B] dark:text-[#A1A1AA] leading-relaxed mb-8 max-w-md transition-colors duration-300`}>
                 {t("grid.web.desc")}
               </p>
-              <a href="#" className={docsButtonClass}>
-                <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
-                  {t("common.viewDocumentation")}
-                </span>
-                <span className={docsButtonIconClass} aria-hidden="true">
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </a>
+              <AnimatedCta
+                as="a"
+                href="#"
+                className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
+                iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+                icon={ctaArrowIcon}
+              >
+                {t("common.viewDocumentation")}
+              </AnimatedCta>
             </div>
           </motion.div>
 
@@ -329,7 +337,7 @@ export default function PlatformCapabilities() {
             custom={1}
             className={[
               "relative flex min-h-96 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B] -mt-px",
-              "mr-4 rounded-l-[28px] border-y border-l border-[#E2DDD5] dark:border-white/10 md:mr-6",
+              "mr-4 rounded-l-[28px] border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:mr-6",
               "transition-colors duration-300",
               "flex-col md:flex-row",
             ].join(" ")}
@@ -362,14 +370,15 @@ export default function PlatformCapabilities() {
                 ))}
               </div>
 
-              <a href="#" className={docsButtonClass}>
-                <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
-                  {t("common.viewDocumentation")}
-                </span>
-                <span className={docsButtonIconClass} aria-hidden="true">
-                  <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </a>
+              <AnimatedCta
+                as="a"
+                href="#"
+                className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
+                iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+                icon={ctaArrowIcon}
+              >
+                {t("common.viewDocumentation")}
+              </AnimatedCta>
             </div>
 
             <div className="order-1 flex flex-1 items-center justify-center bg-[#F7F5F0] dark:bg-[#09090B] p-4 md:p-8 md:order-0 transition-colors duration-300">
@@ -394,7 +403,7 @@ export default function PlatformCapabilities() {
             custom={2}
             className={[
               "relative flex min-h-80 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B] -mt-px",
-              "ml-4 rounded-r-[28px] border-y border-r border-[#E2DDD5] dark:border-white/10 md:ml-6",
+              "ml-4 rounded-r-[28px] border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:ml-6",
               "transition-colors duration-300",
               "flex-col md:flex-row",
             ].join(" ")}
@@ -419,14 +428,15 @@ export default function PlatformCapabilities() {
               <div className="text-xs font-medium text-[#71717A] dark:text-[#A1A1AA] mb-6 transition-colors duration-300">
                 {moduleCards[0].badge}
               </div>
-              <a href="#" className={docsButtonClass}>
-                <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
-                  {moduleCards[0].link}
-                </span>
-                <span className={docsButtonIconClass} aria-hidden="true">
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </a>
+              <AnimatedCta
+                as="a"
+                href="#"
+                className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
+                iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+                icon={ctaArrowIcon}
+              >
+                {moduleCards[0].link}
+              </AnimatedCta>
             </div>
           </motion.div>
 
@@ -438,7 +448,7 @@ export default function PlatformCapabilities() {
             custom={3}
             className={[
               "relative flex min-h-80 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B] -mt-px",
-              "mr-4 rounded-l-[28px] border-y border-l border-[#E2DDD5] dark:border-white/10 md:mr-6",
+              "mr-4 rounded-l-[28px] border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35 md:mr-6",
               "transition-colors duration-300",
               "flex-col md:flex-row",
             ].join(" ")}
@@ -453,14 +463,15 @@ export default function PlatformCapabilities() {
               <div className="text-xs font-medium text-[#71717A] dark:text-[#A1A1AA] mb-6 transition-colors duration-300">
                 {moduleCards[1].badge}
               </div>
-              <a href="#" className={docsButtonClass}>
-                <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
-                  {moduleCards[1].link}
-                </span>
-                <span className={docsButtonIconClass} aria-hidden="true">
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </a>
+              <AnimatedCta
+                as="a"
+                href="#"
+                className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
+                iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
+                icon={ctaArrowIcon}
+              >
+                {moduleCards[1].link}
+              </AnimatedCta>
             </div>
 
             <div className="order-1 flex flex-1 items-center justify-center bg-[#F7F5F0] dark:bg-[#09090B] p-4 md:p-8 md:order-0 transition-colors duration-300">
