@@ -51,12 +51,12 @@ type ResourceItem = {
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '/tools', icon: '/icons/subfinder.webp'    },
-  { title: 'Naabu',        href: '/tools', icon: '/icons/nabuu.webp'        },
-  { title: 'Nmap',         href: '/tools', icon: '/icons/nmap.webp'         },
-  { title: 'Httpx',        href: '/tools', icon: '/icons/httpx.webp'        },
-  { title: 'Katana',       href: '/tools', icon: '/icons/katana.webp'       },
-  { title: 'Gobuster',     href: '/tools', icon: '/icons/gobuster.webp'     },
+  { title: 'Subfinder',    href: '/tools#tool-subfinder',    icon: '/icons/subfinder.webp'    },
+  { title: 'Naabu',        href: '/tools#tool-naabu',        icon: '/icons/nabuu.webp'        },
+  { title: 'Nmap',         href: '/tools#tool-nmap',         icon: '/icons/nmap.webp'         },
+  { title: 'Httpx',        href: '/tools#tool-httpx',        icon: '/icons/httpx.webp'        },
+  { title: 'Katana',       href: '/tools#tool-katana',       icon: '/icons/katana.webp'       },
+  { title: 'Gobuster',     href: '/tools#tool-gobuster',     icon: '/icons/gobuster.webp'     },
 ];
 
 const navbarToolLinks = toolLinks;
@@ -84,7 +84,7 @@ const resourceMiscLinks: ResourceItem[] = [
 // ── Shared icon box class ────────────────────────────────────────────────────
 const iconBoxCls =
   'flex shrink-0 items-center justify-center rounded-[8px] ' +
-  'bg-[#F7F5F0] dark:bg-[#1C1C1A] ' +
+  'bg-white dark:bg-[#1C1C1A] ' +
   'border border-black/[0.045] dark:border-white/[0.09] ' +
   'shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)]';
 
@@ -179,7 +179,7 @@ function LanguageToggle() {
       disabled={isPending}
       aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
       aria-pressed={!isEnglish}
-      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-[#F7F5F0]/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
+      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-white/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
     >
       <span
         className={cn(
@@ -367,7 +367,7 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
     <div
       id="mobile-menu"
       className={cn(
-        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70',
+        'bg-white/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-white/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70',
         'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y md:hidden',
       )}
     >
@@ -434,7 +434,7 @@ export function Header() {
   return (
     <header
       className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200', {
-        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70 border-black/[0.07] dark:border-white/[0.07]': scrolled,
+        'bg-white/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-white/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
       <nav

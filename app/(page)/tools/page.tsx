@@ -474,9 +474,11 @@ function ToolCard({
   const presets = tool.scan_config?.basic?.presets ?? [];
   const mediumCount = tool.scan_config?.medium?.options?.length ?? 0;
   const examples = Array.isArray(tool.examples) ? tool.examples : [];
+  const toolAnchorId = `tool-${tool.tool_name.toLowerCase().replace(/\s+/g, '-')}`;
 
   return (
     <motion.div
+      id={toolAnchorId}
       variants={cardMotion}
       className={`group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden ${p.cardHover} transition-all duration-200 cursor-pointer`}
     >
@@ -755,6 +757,21 @@ export default function ToolsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Scroll to tool card when navigating with a hash anchor (e.g. /tools#tool-subfinder)
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    // Small delay to let DOM render after data loads
+    const timer = setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const isKhmer = locale === 'kh';
   const bodyFontFamily = isKhmer
