@@ -333,34 +333,15 @@ export default function CICDFeature() {
                 initial="hidden"
                 animate={pipelineInView ? "visible" : "hidden"}
                 custom={i + 1}
-                whileHover={{ y: -4 }}
-                className={`rounded-xl p-5 sm:p-6 border transition-all duration-300 ${
-                  step.active
-                    ? "border-[#00BCA1] bg-linear-to-br from-[#00BCA1]/5 to-[#0AAE98]/5 dark:from-[#00BCA1]/10 dark:to-[#0AAE98]/10"
-                    : "border-[#E2DDD5] dark:border-white/10 bg-white dark:bg-[#111113]"
-                }`}
+                className="rounded-xl p-5 sm:p-6 border border-[#E2DDD5] dark:border-white/10 bg-transparent transition-all duration-300 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)]"
               >
-                <div
-                  className={`mb-4 flex h-10 w-10 items-center justify-center rounded-lg ${
-                    step.active 
-                      ? "bg-[#00BCA1]/20 text-[#00BCA1]" 
-                      : "bg-[#F0F0F0] dark:bg-[#1A1A1A] text-[#52525B] dark:text-[#A1A1AA]"
-                  }`}
-                >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#00BCA1]/10 text-[#00BCA1]">
                   {step.icon}
                 </div>
-                <h3
-                  className={`mb-2 text-[15px] sm:text-base font-bold ${
-                    step.active ? "text-[#00BCA1]" : "text-[#18181B] dark:text-white"
-                  }`}
-                >
+                <h3 className="mb-2 text-[15px] sm:text-base font-bold text-[#18181B] dark:text-white">
                   {step.num}. {step.title}
                 </h3>
-                <p
-                  className={`text-xs sm:text-sm leading-relaxed ${
-                    step.active ? "text-[#00BCA1]/70" : "text-[#52525B] dark:text-[#A1A1AA]"
-                  }`}
-                >
+                <p className="text-xs sm:text-sm leading-relaxed text-[#52525B] dark:text-[#A1A1AA]">
                   {step.desc}
                 </p>
               </motion.div>
