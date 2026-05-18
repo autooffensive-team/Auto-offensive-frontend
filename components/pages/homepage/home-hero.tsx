@@ -656,7 +656,7 @@ export default function HomeHero() {
 
         {/* ── Holographic Planet ── */}
         <div aria-hidden="true"
-          className="absolute left-1/2 -translate-x-1/2 top-[62%] md:top-[35%] h-[80%] w-full max-w-7xl pointer-events-none z-2 overflow-visible"
+          className="absolute left-1/2 -translate-x-1/2 top-[15%] md:top-[-5%] h-[80%] w-full max-w-7xl pointer-events-none z-2 overflow-visible"
         >
           {/* Three.js holographic planet */}
           <div

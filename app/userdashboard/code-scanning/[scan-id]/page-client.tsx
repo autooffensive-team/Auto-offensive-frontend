@@ -13,6 +13,7 @@ import {
   GitBranch,
   LoaderCircle,
   RefreshCw,
+  ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ import {
   useGetScanSummaryQuery,
   useListCurrentUserScansQuery,
   useListDependenciesQuery,
+  useListHotspotsQuery,
   useListIssuesQuery,
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import { cn } from "@/lib/utils";
@@ -35,10 +37,11 @@ import type {
 import { CodeScanOverview } from "./code-scan-overview";
 import { CodeScanIssues } from "./code-scan-issues";
 import { CodeScanDependencies } from "./code-scan-dependencies";
+import { CodeScanHotspots } from "./code-scan-hotspots";
 
 const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
 
-type ProjectView = "overview" | "issues" | "dependencies";
+type ProjectView = "overview" | "issues" | "dependencies" | "hotspots";
 type GradeTone = "green" | "lime" | "red" | "muted";
 
 type NavItem = {
@@ -51,6 +54,7 @@ const projectNavItems: NavItem[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "issues", label: "Issues", icon: FileCode2 },
   { id: "dependencies", label: "Dependencies", icon: FolderGit2 },
+  { id: "hotspots", label: "Security Hotspots", icon: ShieldAlert },
 ];
 
 const sectionMotion = {
@@ -577,6 +581,8 @@ export default function CodeScanningDetailPageClient({
   const [dependencyVulnerableOnly, setDependencyVulnerableOnly] =
     useState(false);
   const [dependencyOutdatedOnly, setDependencyOutdatedOnly] = useState(false);
+  const [hotspotStatusFilter, setHotspotStatusFilter] = useState("");
+  const [hotspotsPage, setHotspotsPage] = useState(1);
 
   function handleGoBack() {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -595,6 +601,7 @@ export default function CodeScanningDetailPageClient({
       refetchDependencySummary(),
       refetchDependencies(),
       refetchIssues(),
+      refetchHotspots(),
       routeProjectScansQuery.refetch(),
     ]);
     router.refresh();
@@ -708,6 +715,20 @@ export default function CodeScanningDetailPageClient({
     }
   );
 
+  const { data: hotspotsResponse, isFetching: isHotspotsFetching, refetch: refetchHotspots } =
+    useListHotspotsQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: hotspotsPage,
+        page_size: 25,
+        status_filter: hotspotStatusFilter || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
   const { data: projectHistory } = useListCurrentUserScansQuery(
     scanDetail?.project_key
       ? {
@@ -738,6 +759,12 @@ export default function CodeScanningDetailPageClient({
     () => allDependenciesResponse?.dependencies ?? [],
     [allDependenciesResponse?.dependencies]
   );
+
+  const hotspots = useMemo(
+    () => hotspotsResponse?.hotspots ?? [],
+    [hotspotsResponse?.hotspots]
+  );
+  const totalHotspots = hotspotsResponse?.total ?? 0;
 
   const totalIssues = issueResponse?.total ?? 0;
   const totalDependencies = dependencyListResponse?.total ?? 0;
@@ -931,6 +958,22 @@ export default function CodeScanningDetailPageClient({
             setDependencyOutdatedOnly((prev) => !prev)
           }
           formatCount={formatCount}
+        />
+      )}
+
+      {activeView === "hotspots" && (
+        <CodeScanHotspots
+          hotspots={hotspots}
+          total={totalHotspots}
+          isLoading={isHotspotsFetching}
+          statusFilter={hotspotStatusFilter}
+          onStatusFilterChange={(v) => { setHotspotStatusFilter(v); setHotspotsPage(1); }}
+          page={hotspotsPage}
+          pageSize={25}
+          onPageChange={setHotspotsPage}
+          onHotspotClick={(hotspotKey) => {
+            router.push(`/userdashboard/code-scanning/${encodeURIComponent(resolvedScanId ?? routeIdentifier)}/hotspots/${encodeURIComponent(hotspotKey)}`);
+          }}
         />
       )}
 

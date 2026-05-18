@@ -3,13 +3,17 @@ import type {
   DependencyListResponse,
   DependencySummaryResponse,
   GetFileIssuesRequest,
+  GetHotspotDetailRequest,
   GetIssueDetailRequest,
   GetScanLogsRequest,
+  HotspotDetailResponse,
+  HotspotListResponse,
   IssueDetailResponse,
   IssueListResponse,
   ListCurrentUserScanIdsRequest,
   ListCurrentUserScansRequest,
   ListDependenciesRequest,
+  ListHotspotsRequest,
   ListIssuesRequest,
   ListProjectScansRequest,
   ScanDetailResponse,
@@ -210,6 +214,26 @@ export const scannerApi = baseApi.injectEndpoints({
         ...(result?.scans.map((scan) => ({ type: "Scan" as const, id: scan.scan_id })) ?? []),
       ],
     }),
+    listHotspots: builder.query<HotspotListResponse, ListHotspotsRequest>({
+      query: ({ scan_id, status_filter, page, page_size }) =>
+        buildScannerUrl(["scans", scan_id, "hotspots"], {
+          status_filter,
+          page,
+          page_size,
+        }),
+      providesTags: (_result, _error, { scan_id }) => [
+        { type: "Scan" as const, id: scan_id },
+        { type: "Report" as const, id: `HOTSPOTS:${scan_id}` },
+      ],
+    }),
+    getHotspotDetail: builder.query<HotspotDetailResponse, GetHotspotDetailRequest>({
+      query: ({ scan_id, hotspot_key }) =>
+        buildScannerUrl(["scans", scan_id, "hotspots", hotspot_key]),
+      providesTags: (_result, _error, { scan_id, hotspot_key }) => [
+        { type: "Scan" as const, id: scan_id },
+        { type: "Report" as const, id: `HOTSPOT:${hotspot_key}` },
+      ],
+    }),
   }),
 });
 
@@ -244,4 +268,6 @@ export const {
   useListCurrentUserScansQuery,
   useListCurrentUserScanIdsQuery,
   useListProjectScansQuery,
+  useListHotspotsQuery,
+  useGetHotspotDetailQuery,
 } = scannerApi;
