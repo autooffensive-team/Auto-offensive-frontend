@@ -129,8 +129,8 @@ function FeatureCard({ card, index }: { card: FeatureCardItem; index: number }) 
     <motion.div
       variants={fadeUp}
       custom={index}
-      whileHover={{ y: -4 }}
-      className="bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:border-[#00BCA1]/40 transition-all duration-300"
+      whileHover={{ }}
+      className="bg-transparent border border-[#E2DDD5] dark:border-white/10 rounded-2xl p-6 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300"
     >
       <div 
         className="w-10 h-10 rounded-xl border flex items-center justify-center mb-4"
@@ -487,7 +487,7 @@ export default function CLIFeature() {
                   key={i}
                   variants={fadeUp}
                   custom={i + 1}
-                  className="flex flex-col items-start p-5 sm:p-6 bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 rounded-xl hover:border-[#00BCA1]/40 hover:shadow-lg transition-all duration-300"
+                  className="flex flex-col items-start p-5 sm:p-6 bg-transparent border border-[#E2DDD5] dark:border-white/10 rounded-xl hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300"
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-[#00BCA1]/10 text-[#00BCA1] border border-[#00BCA1]/20">
                     <Icon className="w-5 h-5" />
