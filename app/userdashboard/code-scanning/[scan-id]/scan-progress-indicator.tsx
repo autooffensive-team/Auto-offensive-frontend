@@ -62,71 +62,104 @@ export function ScanProgressIndicator({
       </div>
 
       {/* 3-Step Progress */}
-      <div className="mb-6 flex items-start">
-        {STEPS.map((step, idx) => {
-          const isCompleted = currentStep > idx;
-          const isActive = currentStep === idx;
-          const isNext = currentStep < idx;
+      <div className="mb-6 w-full">
+        {/* Circles row */}
+        <div className="flex w-full items-center">
+          {STEPS.map((step, idx) => {
+            const isCompleted = currentStep > idx;
+            const isActive = currentStep === idx;
+            const isNext = currentStep < idx;
 
-          return (
-            <div key={step.label} className="flex flex-1 items-start">
-              {/* Step Circle + Label */}
-              <motion.div
-                animate={{ scale: isActive ? 1.05 : 1 }}
-                transition={{ duration: 0.3 }}
-                className="relative flex flex-col items-center"
-              >
+            return (
+              <div key={step.label} className="flex flex-1 items-center">
+                {/* Step Circle */}
                 <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className={cn(
-                    "relative flex h-[38px] w-[38px] items-center justify-center rounded-full border-[1.5px] text-sm font-medium transition-all duration-300",
-                    isCompleted
-                      ? "border-[#00D0B2] bg-[rgba(0,208,178,0.1)] text-[#00897B] dark:bg-[rgba(0,208,178,0.12)] dark:text-[#00D0B2]"
-                      : isActive
-                        ? "border-[#1675B1] bg-[rgba(22,117,177,0.08)] text-[#1675B1] dark:border-[#28CCE7] dark:bg-[rgba(40,204,231,0.1)] dark:text-[#28CCE7]"
-                        : "border-slate-200 bg-slate-50 text-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/20"
-                  )}
+                  animate={{ scale: isActive ? 1.05 : 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative flex flex-col items-center"
                 >
-                  {isCompleted ? (
-                    <motion.svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </motion.svg>
-                  ) : (
-                    <span>{idx + 1}</span>
-                  )}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className={cn(
+                      "relative flex h-[38px] w-[38px] items-center justify-center rounded-full border-[1.5px] text-sm font-medium transition-all duration-300",
+                      isCompleted
+                        ? "border-[#00D0B2] bg-[rgba(0,208,178,0.1)] text-[#00897B] dark:bg-[rgba(0,208,178,0.12)] dark:text-[#00D0B2]"
+                        : isActive
+                          ? "border-[#1675B1] bg-[rgba(22,117,177,0.08)] text-[#1675B1] dark:border-[#28CCE7] dark:bg-[rgba(40,204,231,0.1)] dark:text-[#28CCE7]"
+                          : "border-slate-200 bg-slate-50 text-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/20"
+                    )}
+                  >
+                    {isCompleted ? (
+                      <motion.svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </motion.svg>
+                    ) : (
+                      <span>{idx + 1}</span>
+                    )}
 
-                  {/* Pulse ring for active step */}
-                  {isActive && (
-                    <motion.div
-                      animate={{ scale: [1, 1.5], opacity: [1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-                      className="absolute inset-[-5px] rounded-full border border-[#1675B1] dark:border-[#28CCE7]"
-                    />
-                  )}
+                    {/* Pulse ring for active step */}
+                    {isActive && (
+                      <motion.div
+                        animate={{ scale: [1, 1.5], opacity: [1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                        className="absolute inset-[-5px] rounded-full border border-[#1675B1] dark:border-[#28CCE7]"
+                      />
+                    )}
+                  </motion.div>
                 </motion.div>
 
-                {/* Step Label */}
+                {/* Connector Line — stretches to fill space between circles */}
+                {idx < STEPS.length - 1 && (
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.8, delay: idx * 0.15 + 0.2 }}
+                    className="mx-3 flex-1 origin-left"
+                  >
+                    <div
+                      className={cn(
+                        "h-[1.5px] rounded-full transition-all duration-500",
+                        isCompleted || (isActive && !isNext)
+                          ? "bg-[#00D0B2]"
+                          : "bg-slate-200 dark:bg-white/[0.07]"
+                      )}
+                    />
+                  </motion.div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Labels row — aligned under each circle */}
+        <div className="mt-2 flex w-full">
+          {STEPS.map((step, idx) => {
+            const isCompleted = currentStep > idx;
+            const isActive = currentStep === idx;
+
+            return (
+              <div key={step.label} className="flex flex-1 items-start">
                 <motion.p
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: idx * 0.1 + 0.1 }}
                   className={cn(
-                    "mt-1.5 text-[11px] font-medium transition-colors duration-300",
+                    "text-[11px] font-medium transition-colors duration-300",
                     isActive || isCompleted
                       ? "text-slate-900 dark:text-slate-100"
                       : "text-slate-300 dark:text-white/20"
@@ -134,29 +167,10 @@ export function ScanProgressIndicator({
                 >
                   {step.label}
                 </motion.p>
-              </motion.div>
-
-              {/* Connector Line */}
-              {idx < STEPS.length - 1 && (
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: idx * 0.15 + 0.2 }}
-                  className="mx-2 mt-[18px] flex-1 origin-left"
-                >
-                  <div
-                    className={cn(
-                      "h-[1.5px] rounded-full transition-all duration-500",
-                      isCompleted || (isActive && !isNext)
-                        ? "bg-[#00D0B2]"
-                        : "bg-slate-200 dark:bg-white/[0.07]"
-                    )}
-                  />
-                </motion.div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Progress Bar */}
