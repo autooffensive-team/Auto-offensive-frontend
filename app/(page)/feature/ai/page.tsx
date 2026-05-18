@@ -4,6 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { Brain, ArrowRight, ExternalLink, Zap, Wrench, RefreshCw, Map, BarChart, Link2, FileText } from "lucide-react";
 import { useRef } from "react";
+import { GridBackground } from "@/components/shared/GridBackground";
 
 const severityData = [
   { label: "Critical", count: 38, color: "#ef4444", pct: 31 },
@@ -128,24 +129,17 @@ export default function AIFeature() {
         ref={heroRef}
         className="relative w-full bg-white dark:bg-[#111113] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 transition-colors duration-300"
       >
-        {/* Subtle dot grid background */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.05]"
-          style={{
-            backgroundImage: "radial-gradient(rgba(0,188,161,0.07) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
-          }}
+        {/* Dashed grid background */}
+        <GridBackground
+          variant="dashed"
+          gridSize={22}
         />
-        
-        {/* Glow blobs */}
-        <div className="pointer-events-none absolute -top-40 right-0 w-96 h-96 bg-[#00BCA1]/8 rounded-full blur-3xl dark:bg-[#00BCA1]/4" />
-        <div className="pointer-events-none absolute -bottom-40 -left-40 w-80 h-80 bg-[#01509E]/8 rounded-full blur-3xl dark:bg-[#01509E]/4" />
 
         <div className="relative w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
-            {/* Left — Content */}
+          <div className="flex flex-col items-center justify-center text-center">
+            {/* Content */}
             <motion.div 
-              className="flex flex-col items-center justify-center text-center lg:items-start lg:text-left"
+              className="flex flex-col items-center justify-center text-center"
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
             >
@@ -175,62 +169,19 @@ export default function AIFeature() {
               <motion.div
                 variants={fadeUp}
                 custom={2}
-                className="flex w-full max-w-md flex-row gap-3 sm:gap-4 lg:justify-start"
+                className="flex flex-row gap-3 sm:gap-4 justify-center"
               >
-                <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#00BCA1] text-white hover:bg-[#0AAE98] transition-all duration-300 hover:-translate-y-0.5">
-                  <ArrowRight className="w-4 h-4" />
-                  {t("hero.primaryCta")}
+                <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-6 sm:px-8 py-3 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
+                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                    <ArrowRight className="w-4 h-4" />
+                    <span className="whitespace-nowrap">{t("hero.primaryCta")}</span>
+                  </span>
                 </button>
-                <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#F7F5F0] text-[#18181B] border border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] transition-all duration-300 hover:-translate-y-0.5">
+                <button className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-6 sm:px-8 py-3 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <ExternalLink className="w-4 h-4" />
-                  {t("hero.secondaryCta")}
+                  <span className="whitespace-nowrap">{t("hero.secondaryCta")}</span>
                 </button>
               </motion.div>
-            </motion.div>
-
-            {/* Right — Hero Visual Card */}
-            <motion.div
-              variants={fadeInScale}
-              initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
-            >
-              <div className="rounded-2xl border border-[#E2DDD5] dark:border-white/10 bg-white dark:bg-[#111113] p-6 sm:p-8">
-                <div className="flex items-center justify-between mb-6 pb-6 border-b border-[#E2DDD5] dark:border-white/10">
-                  <h3 className="text-[16px] sm:text-[18px] font-bold text-[#18181B] dark:text-white">
-                    {t("hero.previewTitle")}
-                  </h3>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-[#0F6E56] dark:text-emerald-400 font-semibold border border-emerald-200 dark:border-emerald-800">
-                    {t("hero.previewBadge")}
-                  </span>
-                </div>
-                
-                {/* Severity Donut Chart */}
-                <div className="flex items-center justify-center mb-6">
-                  <div className="relative w-32 h-32">
-                    <svg width="128" height="128" viewBox="0 0 128 128" style={{ transform: "rotate(-90deg)" }}>
-                      <circle cx="64" cy="64" r="48" fill="none" stroke="#ef4444" strokeWidth="16" strokeDasharray="94.2 301.4" />
-                      <circle cx="64" cy="64" r="48" fill="none" stroke="#f97316" strokeWidth="16" strokeDasharray="126.6 301.4" strokeDashoffset="-94.2" />
-                      <circle cx="64" cy="64" r="48" fill="none" stroke="#3b82f6" strokeWidth="16" strokeDasharray="80.8 301.4" strokeDashoffset="-220.8" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-2xl font-bold text-[#18181B] dark:text-white">124</span>
-                      <span className="text-xs text-[#71717A] dark:text-[#A1A1AA]">{t("hero.findingsLabel")}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-lg p-4">
-                    <div className="text-xs text-[#71717A] dark:text-[#A1A1AA] mb-1.5 font-semibold">{t("severity.critical")}</div>
-                    <div className="text-xl font-bold text-red-500">38</div>
-                  </div>
-                  <div className="bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-lg p-4">
-                    <div className="text-xs text-[#71717A] dark:text-[#A1A1AA] mb-1.5 font-semibold">{t("severity.high")}</div>
-                    <div className="text-xl font-bold text-orange-500">52</div>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>
