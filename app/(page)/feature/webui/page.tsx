@@ -824,7 +824,7 @@ export default function WebUIFeature() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Nexus */}
-            <div className="rounded-2xl bg-white dark:bg-[#111113] border-2 border-[#00BCA1] p-6">
+            <div className="rounded-2xl bg-transparent border-2 border-[#00BCA1] p-6 hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-[#0F6E56] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 mb-4">
                 {compareSection.recommendedBadge}
               </div>
@@ -838,7 +838,7 @@ export default function WebUIFeature() {
             </div>
 
             {/* Local setup */}
-            <div className="rounded-2xl bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 p-6">
+            <div className="rounded-2xl bg-transparent border border-[#E2DDD5] dark:border-white/10 p-6 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[#F7F5F0] dark:bg-[#09090B] text-[#71717A] border border-[#E2DDD5] dark:border-white/10 mb-4">
                 {compareSection.localInstall}
               </div>
@@ -852,7 +852,7 @@ export default function WebUIFeature() {
             </div>
 
             {/* Docker */}
-            <div className="rounded-2xl bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 p-6">
+            <div className="rounded-2xl bg-transparent border border-[#E2DDD5] dark:border-white/10 p-6 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300">
               <div className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[#F7F5F0] dark:bg-[#09090B] text-[#71717A] border border-[#E2DDD5] dark:border-white/10 mb-4">
                 {compareSection.dockerTitle}
               </div>
@@ -908,7 +908,7 @@ export default function WebUIFeature() {
                 initial="hidden"
                 animate={benefitsInView ? "visible" : "hidden"}
                 custom={i}
-                className="rounded-2xl bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 p-6 transition-colors duration-300"
+                className="rounded-2xl bg-transparent border border-[#E2DDD5] dark:border-white/10 p-6 transition-all duration-300 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)]"
               >
                 <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-5 ${b.bgLight} ${b.bgDark} ${b.color}`}>
                   {b.icon}
