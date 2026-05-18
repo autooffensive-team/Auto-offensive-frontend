@@ -144,7 +144,7 @@ export default function HolographicPlanet() {
       ctx.beginPath();
       ctx.arc(containerWidth / 2, containerHeight / 2, currentScale, 0, 2 * Math.PI);
       if (!dark) {
-        ctx.fillStyle = "rgba(0, 20, 50, 0.06)";
+        ctx.fillStyle = "rgba(255, 255, 255, 1)";
         ctx.fill();
       }
       ctx.strokeStyle = lineColor;
