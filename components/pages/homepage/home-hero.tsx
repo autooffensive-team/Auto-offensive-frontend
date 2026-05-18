@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import HolographicPlanet from "./holographic-planet";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
@@ -769,28 +770,31 @@ export default function HomeHero() {
             {...fadeUp(0.70)}
           >
             {/* Primary */}
-            <button className="
-              group relative inline-flex w-full min-w-0 items-center justify-center
-              overflow-hidden rounded-xl border-2 border-primary bg-primary
-              px-3 py-3 sm:px-7.5 sm:py-3.5
-              text-[14px] sm:text-[15px] font-black leading-none text-white
-              transition-transform duration-200 hover:-translate-y-px
-              before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
-              before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
-              before:transition-transform before:duration-200 before:content-['']
-              after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
-              after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
-              after:transition-transform after:duration-200 after:content-['']
-              hover:before:translate-y-0 hover:after:translate-y-0
-              sm:w-auto
-            ">
+            <Link
+              href="/userdashboard"
+              className="
+                group relative inline-flex w-full min-w-0 items-center justify-center
+                overflow-hidden rounded-xl border-2 border-primary bg-primary
+                px-3 py-3 sm:px-7.5 sm:py-3.5
+                text-[14px] sm:text-[15px] font-black leading-none text-black
+                transition-transform duration-200 hover:-translate-y-px
+                before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
+                before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
+                before:transition-transform before:duration-200 before:content-['']
+                after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
+                after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
+                after:transition-transform after:duration-200 after:content-['']
+                hover:before:translate-y-0 hover:after:translate-y-0
+                sm:w-auto
+              "
+            >
               <span className="relative z-10 inline-flex items-center justify-center gap-2">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                 </svg>
                 <span className="min-w-0 whitespace-nowrap text-center">{t("primaryCta")}</span>
               </span>
-            </button>
+            </Link>
 
             {/* Secondary */}
             <button className="
