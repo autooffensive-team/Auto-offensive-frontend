@@ -448,7 +448,7 @@ function DualSpine({
       {sides.map((s, i) => (
         <div
           key={i}
-          className="fixed top-0 h-screen w-px z-90 pointer-events-none"
+          className="fixed top-0 h-screen w-px z-40 pointer-events-none"
           style={{ ...s.style, clipPath }}
         >
           <div
@@ -474,7 +474,7 @@ function DualSpine({
 function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) {
   return (
     <div
-      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-200 pointer-events-none"
+      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none"
       style={{
         opacity: visible ? 1 : 0,
         transition: "opacity 0.4s ease",
@@ -530,7 +530,7 @@ function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) 
 function ProgressBar({ widthPct }: { widthPct: number }) {
   return (
     <div
-      className="fixed top-0 left-0 h-0.5 z-200 transition-[width] duration-100"
+      className="fixed top-0 left-0 h-0.5 z-40 transition-[width] duration-100"
       style={{
         width: `${widthPct}%`,
         background: "linear-gradient(90deg, #01509e, #00d0b2)",
