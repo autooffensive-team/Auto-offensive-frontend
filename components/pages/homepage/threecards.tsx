@@ -6,153 +6,288 @@ import { useLocale, useTranslations } from "next-intl";
 import img1 from "@/public/home-image/code1.webp";
 import img2 from "@/public/home-image/code2.webp";
 import img3 from "@/public/home-image/code3.webp";
-import AnimatedCta from "./animated-cta";
 
 interface CardData {
+  id: string;
   title: string;
   subtitle: string;
   description: string;
+  features: string[];
   image: StaticImageData;
   accentColor: string;
-  blobLeft: string;
-  blobRight: string;
+  checkColor: string;
+  bgGradient: string;
   borderColor: string;
   titleColor: string;
+  ctaColor: string;
+  ctaTextColor: string;
 }
 
-function getCards(t: (key: string) => string): CardData[] {
+function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
   return [
     {
+      id: "basic-scan",
       title: t("cards.consultants.title"),
       subtitle: t("cards.consultants.subtitle"),
       description: t("cards.consultants.description"),
+      features: t.raw("cards.consultants.features") as string[],
       image: img1,
-      accentColor: "#01509e",
-      blobLeft: "radial-gradient(ellipse at 20% 80%, rgba(0,208,178,0.28) 0%, transparent 65%)",
-      blobRight: "radial-gradient(ellipse at 85% 15%, rgba(1,80,158,0.22) 0%, transparent 60%)",
-      borderColor: "rgba(1,80,158,0.18)",
-      titleColor: "#01509e",
+      accentColor: "#e05a5a",
+      checkColor: "#e07070",
+      bgGradient:
+        "radial-gradient(ellipse at 30% 0%, rgba(90,20,20,0.95) 0%, rgba(30,10,40,0.98) 50%, rgba(15,10,30,1) 100%)",
+      borderColor: "rgba(200,80,80,0.25)",
+      titleColor: "#e07a7a",
+      ctaColor: "#d4a017",
+      ctaTextColor: "#1a1000",
     },
     {
+      id: "medium-scan",
       title: t("cards.internalTeams.title"),
       subtitle: t("cards.internalTeams.subtitle"),
       description: t("cards.internalTeams.description"),
+      features: t.raw("cards.internalTeams.features") as string[],
       image: img2,
-      accentColor: "#00D0B2",
-      blobLeft: "radial-gradient(ellipse at 15% 75%, rgba(0,208,178,0.32) 0%, transparent 65%)",
-      blobRight: "radial-gradient(ellipse at 90% 10%, rgba(0,208,178,0.18) 0%, transparent 60%)",
-      borderColor: "rgba(0,208,178,0.3)",
-      titleColor: "#00a896",
+      accentColor: "#4a8fd4",
+      checkColor: "#5a9fe4",
+      bgGradient:
+        "radial-gradient(ellipse at 50% 0%, rgba(15,40,80,0.98) 0%, rgba(10,25,55,0.99) 50%, rgba(8,15,40,1) 100%)",
+      borderColor: "rgba(74,143,212,0.3)",
+      titleColor: "#6aaae8",
+      ctaColor: "#d4a017",
+      ctaTextColor: "#1a1000",
     },
     {
+      id: "advanced-scan",
       title: t("cards.msps.title"),
       subtitle: t("cards.msps.subtitle"),
       description: t("cards.msps.description"),
+      features: t.raw("cards.msps.features") as string[],
       image: img3,
-      accentColor: "#01509e",
-      blobLeft: "radial-gradient(ellipse at 20% 80%, rgba(1,80,158,0.2) 0%, transparent 65%)",
-      blobRight: "radial-gradient(ellipse at 85% 15%, rgba(0,208,178,0.25) 0%, transparent 60%)",
-      borderColor: "rgba(1,80,158,0.18)",
-      titleColor: "#01509e",
+      accentColor: "#7a8a9a",
+      checkColor: "#8a9aaa",
+      bgGradient:
+        "radial-gradient(ellipse at 70% 0%, rgba(30,35,45,0.98) 0%, rgba(20,25,35,0.99) 50%, rgba(12,15,22,1) 100%)",
+      borderColor: "rgba(120,140,160,0.2)",
+      titleColor: "#c8d4e0",
+      ctaColor: "#d4a017",
+      ctaTextColor: "#1a1000",
     },
   ];
 }
 
+function getDesktopColumns(activeCardId: string | null) {
+  switch (activeCardId) {
+    case "basic-scan":
+      return "1.85fr 0.72fr 0.72fr";
+    case "medium-scan":
+      return "0.72fr 1.85fr 0.72fr";
+    case "advanced-scan":
+      return "0.72fr 0.72fr 1.85fr";
+    default:
+      return "1fr 1fr 1fr";
+  }
+}
+
+const CheckIcon: React.FC<{ color: string }> = ({ color }) => (
+  <svg
+    className="mt-0.75 h-4 w-4 flex-none"
+    viewBox="0 0 16 16"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M3 8.5L6.5 12L13 5"
+      stroke={color}
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const Card: React.FC<{
   card: CardData;
   seeMore: string;
+  seeLess: string;
   bodyFontFamily: string;
   displayFontFamily: string;
-}> = ({ card, seeMore, bodyFontFamily, displayFontFamily }) => {
+  expanded: boolean;
+  hasActiveCard: boolean;
+  onToggle: () => void;
+}> = ({
+  card,
+  seeMore,
+  seeLess,
+  bodyFontFamily,
+  displayFontFamily,
+  expanded,
+  hasActiveCard,
+  onToggle,
+}) => {
   const [hovered, setHovered] = useState(false);
-  const isTeal = card.accentColor.toLowerCase() === "#00d0b2";
+  const keepLargeSideImage = hasActiveCard && !expanded;
 
   return (
     <div
-      className="relative flex min-w-0 flex-1 cursor-pointer flex-col overflow-hidden rounded-2xl transition-[border-color] duration-300 [--card-bg:#F7F5F0] dark:[--card-bg:#111114]"
+      className="group relative flex min-w-0 cursor-pointer flex-col overflow-hidden rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:h-180"
       style={{
-        background: "var(--card-bg)",
-        border: `1.5px solid ${hovered ? `${card.accentColor}55` : card.borderColor}`,
-        minHeight: "clamp(380px, 55vw, 480px)",
+        background: card.bgGradient,
+        border: `1px solid ${hovered || expanded ? card.borderColor.replace("0.2", "0.5").replace("0.25", "0.5").replace("0.3", "0.55") : card.borderColor}`,
+        minHeight: "clamp(440px, 60vw, 760px)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Subtle top shimmer */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-400"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
-          background: `${card.blobLeft}, ${card.blobRight}`,
-          opacity: hovered ? 1 : 0.75,
+          background: `linear-gradient(90deg, transparent, ${card.accentColor}55, transparent)`,
+          opacity: hovered || expanded ? 1 : 0.4,
+          transition: "opacity 0.4s",
         }}
       />
 
+      {/* Noise grain overlay for depth */}
       <div
-        className="pointer-events-none absolute inset-0 z-1 [--glass-overlay:linear-gradient(160deg,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0.1)_100%)] dark:[--glass-overlay:linear-gradient(160deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.02)_100%)]"
-        style={{ background: "var(--glass-overlay)" }}
+        className="pointer-events-none absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
       />
 
-      <div className="relative z-2 px-5 pb-4 pt-7 md:px-6 md:pt-8">
+      {/* Content */}
+      <div className="relative z-10 flex flex-1 flex-col px-6 pb-4 pt-8 md:px-7 md:pt-9 lg:px-8 lg:pb-3 lg:pt-10">
+        {/* Title */}
         <h3
-          className="mb-3 text-[1.75rem] font-bold leading-tight tracking-[-0.01em] md:text-[1.9rem] lg:text-2xl"
+          className="mb-3 text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] md:text-[1.85rem] lg:text-[1.95rem]"
           style={{
             color: card.titleColor,
             fontFamily: displayFontFamily,
+            textShadow: `0 0 40px ${card.accentColor}40`,
           }}
         >
-          {card.title}
-          <br />
-          {card.subtitle}
+          <span className="whitespace-nowrap">
+            {card.title} {card.subtitle}
+          </span>
         </h3>
 
         <p
-          className="mb-6 min-h-[3.6em] text-[16px] leading-relaxed text-slate-500 dark:text-slate-300 md:text-[18px] lg:text-[20px]"
+          className="mb-5 min-h-[4.8em] text-[15px] leading-relaxed text-white/50 md:text-[16px] lg:text-[17px]"
           style={{ fontFamily: bodyFontFamily }}
         >
           {card.description}
         </p>
 
-        <AnimatedCta
-          className={`w-auto min-w-24 h-10.5! rounded-xl border-2 pl-4! pr-8.5! text-[15px] font-semibold font-[inherit] md:min-w-36 md:pl-4.5! md:pr-10! ${
-            isTeal
-              ? "border-primary bg-primary text-white hover:bg-[#00b89c]"
-              : "border-[#01509e] bg-[#01509e] text-white hover:bg-[#004b92]"
-          }`}
-          iconClassName={
-            isTeal
-              ? "bg-white text-[#00D0B2] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(0,149,126,0.22)]"
-              : "bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)]"
-          }
-          labelClassName="whitespace-nowrap"
-          icon={
-            <svg
-              className="h-3 w-3 flex-none"
-              viewBox="0 0 12 12"
-              fill="none"
-            >
-              <path
-                d="M6 1L11 6L6 11M11 6H1"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          }
+        {/* Toggle button */}
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={`${card.id}-details`}
+          onClick={onToggle}
+          className="inline-flex h-11 w-fit items-center gap-3 rounded-xl border px-5 text-[14px] font-semibold text-white/80 backdrop-blur-sm transition-all duration-300 hover:text-white"
+          style={{
+            borderColor: `${card.accentColor}40`,
+            background: `rgba(255,255,255,0.05)`,
+          }}
         >
-          {seeMore}
-        </AnimatedCta>
+          <span>{expanded ? seeLess : seeMore}</span>
+          <svg
+            className={`h-3.5 w-3.5 flex-none transition-transform duration-300 ${expanded ? "rotate-90" : "-rotate-90"}`}
+            viewBox="0 0 12 12"
+            fill="none"
+          >
+            <path
+              d="M4 2L8 6L4 10"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <div className="h-1 lg:h-2" />
+
+        {/* Expandable features */}
+        <div
+          id={`${card.id}-details`}
+          className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            expanded
+              ? "mt-2 grid-rows-[1fr] opacity-100"
+              : "mt-0 grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <ul
+              className="space-y-3.5 border-t pb-1 pt-5 text-[13.5px] leading-[1.65] text-white/65 md:text-[14.5px]"
+              style={{
+                borderColor: `${card.accentColor}25`,
+                fontFamily: bodyFontFamily,
+              }}
+            >
+              {card.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-3">
+                  <CheckIcon color={card.checkColor} />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA at bottom of expanded content */}
+            <button
+              type="button"
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-[#00BCA1] px-6 text-[14px] font-bold tracking-wide text-black transition-all duration-200 hover:bg-[#0AAE98] active:scale-[0.97]"
+            >
+              Start now
+              <svg className="h-3.5 w-3.5" viewBox="0 0 12 12" fill="none">
+                <path
+                  d="M2 6h8M6 2l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-2 mt-auto w-full px-3 md:px-4 lg:px-5">
+      {/* Card bottom image — fades out on expand */}
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-1 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          expanded ? "translate-y-8 opacity-0" : "translate-y-0 opacity-100"
+        }`}
+      >
         <Image
           src={card.image}
           alt={`${card.title} ${card.subtitle}`}
           className="block w-full object-contain object-bottom"
           sizes="(max-width: 1023px) 100vw, 33vw"
-          style={{ maxHeight: "min(460px, 42vh)" }}
+          style={{
+            width: keepLargeSideImage ? "164%" : "108%",
+            maxWidth: keepLargeSideImage ? "164%" : "108%",
+            maxHeight: keepLargeSideImage ? "min(470px, 62vh)" : "min(470px, 62vh)",
+            transform: keepLargeSideImage
+              ? "scale(1.03) translateY(8px)"
+              : "scale(1.06) translateY(6px)",
+            transformOrigin: "bottom center",
+          }}
           draggable={false}
         />
       </div>
+
+      {/* Bottom vignette to blend image into card */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-11 h-24"
+        style={{
+          background: `linear-gradient(to top, ${card.bgGradient.split(",")[0].replace("radial-gradient(ellipse at 30% 0%,", "").replace("radial-gradient(ellipse at 50% 0%,", "").replace("radial-gradient(ellipse at 70% 0%,", "").trim().split(" ")[0].replace("rgba(90,20,20,0.95)", "rgba(30,5,10,1)").replace("rgba(15,40,80,0.98)", "rgba(8,15,35,1)").replace("rgba(30,35,45,0.98)", "rgba(12,15,22,1)")} 0%, transparent 100%)`,
+          opacity: expanded ? 0 : 1,
+          transition: "opacity 0.5s",
+        }}
+      />
     </div>
   );
 };
@@ -160,6 +295,8 @@ const Card: React.FC<{
 const ThreeCards: React.FC = () => {
   const t = useTranslations("homepage.audience");
   const locale = useLocale();
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+
   const bodyFontFamily =
     locale === "kh"
       ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
@@ -168,36 +305,53 @@ const ThreeCards: React.FC = () => {
     locale === "kh"
       ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
       : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+
   const cards = getCards(t);
 
   return (
     <section
-      className="flex w-full flex-col items-center bg-[#F7F5F0] px-4 py-12 dark:bg-[#09090B] sm:px-5 md:px-8 md:py-14 lg:px-16 lg:py-16 xl:px-30"
+      className="flex w-full flex-col items-center bg-[#F7F5F0] dark:bg-[#09090B] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 transition-colors duration-300"
       style={{ fontFamily: bodyFontFamily }}
     >
       <div className="flex w-full max-w-7xl flex-col items-start">
+        {/* Eyebrow label */}
         <p
-          className="mb-6 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 md:mb-8 md:text-sm"
+          className="mb-8 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#52525B] dark:text-white/30 md:mb-10 md:text-[12px]"
           style={{ fontFamily: bodyFontFamily }}
         >
           {t("eyebrow")}
         </p>
 
+        {/* Outer border wrapper */}
         <div
-          className="w-full rounded-[26px] p-[1.5px] md:rounded-3xl"
+          className="w-full rounded-[28px] border border-[#E2DDD5] dark:border-white/10 p-px dark:p-px"
           style={{
             background:
-              "linear-gradient(135deg, rgba(0,208,178,0.4) 0%, rgba(1,80,158,0.25) 50%, rgba(0,208,178,0.35) 100%)",
+              "linear-gradient(135deg, rgba(200,100,100,0.3) 0%, rgba(74,143,212,0.2) 40%, rgba(120,140,160,0.25) 100%)",
           }}
         >
-          <div className="flex w-full flex-col gap-3 rounded-[20px] bg-[#F7F5F0] p-2 dark:bg-[#09090B] md:rounded-[22px] lg:flex-row">
+          {/* Grid container */}
+          <div
+            className="flex w-full flex-col gap-3 rounded-[27px] bg-[#F7F5F0] dark:bg-[#09090B] p-2 transition-[grid-template-columns] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid lg:items-stretch"
+            style={{
+              gridTemplateColumns: getDesktopColumns(activeCardId),
+            }}
+          >
             {cards.map((card, i) => (
               <Card
                 key={i}
                 card={card}
                 seeMore={t("seeMore")}
+                seeLess={t("seeLess")}
                 bodyFontFamily={bodyFontFamily}
                 displayFontFamily={displayFontFamily}
+                expanded={activeCardId === card.id}
+                hasActiveCard={activeCardId !== null}
+                onToggle={() =>
+                  setActiveCardId((current) =>
+                    current === card.id ? null : card.id
+                  )
+                }
               />
             ))}
           </div>

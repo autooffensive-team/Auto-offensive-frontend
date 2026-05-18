@@ -129,23 +129,45 @@
       "established": "Est."
     },
     "audience": {
-      "eyebrow": "Auto Offensive is for",
+      "eyebrow": "Choose your scan level",
       "seeMore": "See more",
+      "seeLess": "See less",
       "cards": {
         "consultants": {
-          "title": "Security",
-          "subtitle": "consultants",
-          "description": "Work faster, prove more, grow your practice."
+          "title": "Basic",
+          "subtitle": "Scan",
+          "description": "A friendly starting point for quick checks, simple targets, and everyday visibility.",
+          "features": [
+            "Run lightweight recon and first-pass checks without a complicated setup",
+            "Cover simple targets quickly when you need a fast security snapshot",
+            "Review clear results that help new users understand what needs attention first",
+            "Use it as an easy baseline before moving into deeper testing",
+            "Stay efficient for small websites, demos, student projects, or internal practice"
+          ]
         },
         "internalTeams": {
-          "title": "Internal security",
-          "subtitle": "teams",
-          "description": "Maintain visibility, reduce risk, earn trust."
+          "title": "Medium",
+          "subtitle": "Scan",
+          "description": "Balanced coverage when you want deeper validation and clearer findings without extra complexity.",
+          "features": [
+            "Expand beyond basic discovery with broader checks across the target surface",
+            "Validate more findings so teams can focus on issues that matter most",
+            "Keep testing practical for regular security reviews and internal assessments",
+            "Get stronger evidence and more context for triage, discussion, and follow-up",
+            "Fit well for growing teams that want better depth without heavy overhead"
+          ]
         },
         "msps": {
-          "title": "Managed Security",
-          "subtitle": "Providers (MSPs)",
-          "description": "Deliver more value with less overhead."
+          "title": "Advanced",
+          "subtitle": "Scan",
+          "description": "Our most complete option for broader discovery, richer evidence, and more serious security testing.",
+          "features": [
+            "Unlock broader discovery for larger environments and more demanding assessments",
+            "Collect richer evidence to support higher-confidence reporting and review",
+            "Handle more serious testing workflows where detail and coverage both matter",
+            "Support experienced users who need stronger visibility across complex targets",
+            "Best for mature engagements that need deeper analysis from Auto Offensive"
+          ]
         }
       }
     },

@@ -1202,56 +1202,47 @@
       "established": "បង្កើតឡើង"
     },
     "audience": {
-      "eyebrow": "Auto Offensive សមស្របសម្រាប់",
+      "eyebrow": "Choose your scan level",
       "seeMore": "មើលបន្ថែម",
+      "seeLess": "មើលតិច",
       "cards": {
         "consultants": {
-          "title": "អ្នកប្រឹក្សា",
-          "subtitle": "សុវត្ថិភាព",
-          "description": "ធ្វើការលឿនជាងមុន បង្ហាញលទ្ធផលបានច្បាស់ និងពង្រីកសេវាកម្មរបស់អ្នក។",
-          "cta": "See more",
+          "title": "Basic",
+          "subtitle": "Scan",
+          "description": "A friendly starting point for quick checks, simple targets, and everyday visibility.",
           "features": [
-            "Launch web and network security scans instantly for new client engagements - zero setup required",
-            "Confirm CVEs with real-world exploit data to prioritize them in vulnerability management workflows",
-            "Scope engagements accurately and choose the right plan for your type of clients",
-            "Generate branded, client-ready reports with reusable findings and DOCX templates",
-            "Automate high-volume testing flows with Pentest Robots to reduce manual overhead",
-            "Export data in CSV, JSON, or Markdown to integrate with your reporting workflow",
-            "Maintain high quality and consistency across fast-paced, high-stakes projects"
+            "Run lightweight recon and first-pass checks without a complicated setup",
+            "Cover simple targets quickly when you need a fast security snapshot",
+            "Review clear results that help new users understand what needs attention first",
+            "Use it as an easy baseline before moving into deeper testing",
+            "Stay efficient for small websites, demos, student projects, or internal practice"
           ]
         },
         "internalTeams": {
-          "title": "ក្រុមសុវត្ថិភាព",
-          "subtitle": "ក្នុងស្ថាប័ន",
-          "description": "រក្សាភាពមើលឃើញ កាត់បន្ថយហានិភ័យ និងបង្កើនទំនុកចិត្ត។",
-          "cta": "See more",
+          "title": "Medium",
+          "subtitle": "Scan",
+          "description": "Balanced coverage when you want deeper validation and clearer findings without extra complexity.",
           "features": [
-            "Monitor thousands of assets across infrastructures with scheduled, recurring scans",
-            "Automatically confirm and prioritize risks with validated findings and exploit-level proof",
-            "Run authenticated scans for internal apps and continuously detect shadow IT",
-            "Export results into ticketing, compliance, and reporting systems via API or integrations",
-            "Create reports that clearly communicate risk to leadership and support budget asks",
-            "Minimize false positives and triage for red-team workflows with built-in Machine Learning",
-            "Scale testing without inflating tool complexity or resource demands"
+            "Expand beyond basic discovery with broader checks across the target surface",
+            "Validate more findings so teams can focus on issues that matter most",
+            "Keep testing practical for regular security reviews and internal assessments",
+            "Get stronger evidence and more context for triage, discussion, and follow-up",
+            "Fit well for growing teams that want better depth without heavy overhead"
           ]
         },
         "msps": {
-          "title": "អ្នកផ្តល់សេវា",
-          "subtitle": "សុវត្ថិភាពគ្រប់គ្រង",
-          "description": "ផ្តល់តម្លៃបានច្រើនជាងមុន ដោយចំណាយធនធានតិចជាងមុន។",
-          "cta": "See more",
+          "title": "Advanced",
+          "subtitle": "Scan",
+          "description": "Our most complete option for broader discovery, richer evidence, and more serious security testing.",
           "features": [
-            "Scan across all client assets from a single dashboard - web, network, cloud, and API",
-            "Dynamically scale scan quotas to match changing client environments",
-            "Validate security vulnerabilities with built-in PoCs and exploit evidence to demonstrate risk",
-            "Create professional, customizable DOCX reports clients understand and trust",
-            "Automate recurring testing with Pentest Robots and streamline delivery at scale",
-            "Integrate findings from security assessments into client systems via API, email, Slack, Webhooks, and more",
-            "Manage teams and clients in dedicated workspaces with role-based access"
+            "Unlock broader discovery for larger environments and more demanding assessments",
+            "Collect richer evidence to support higher-confidence reporting and review",
+            "Handle more serious testing workflows where detail and coverage both matter",
+            "Support experienced users who need stronger visibility across complex targets",
+            "Best for mature engagements that need deeper analysis from Auto Offensive"
           ]
         }
-      },
-      "seeLess": "មើលតិច"
+      }
     },
     "features": {
       "sectionEyebrow": "សមត្ថភាពរបស់វេទិកា",
