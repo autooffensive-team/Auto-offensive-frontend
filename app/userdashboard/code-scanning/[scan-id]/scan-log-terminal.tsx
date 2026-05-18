@@ -1,7 +1,6 @@
 "use client";
 
 import { skipToken } from "@reduxjs/toolkit/query";
-import { Copy } from "lucide-react";
 import { JetBrains_Mono } from "next/font/google";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 
@@ -346,11 +345,8 @@ export function ScanLogTerminal({
   );
 
   const trimmedScanId = initialScanId.trim();
-  const [copied, setCopied] = useState(false);
-  const viewportRef = useRef<HTMLDivElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const expectedCloseRef = useRef(false);
-  const shouldStickToBottomRef = useRef(true);
   const hydratedSnapshotRef = useRef("");
   const previousScanIdRef = useRef("");
   const latestStateRef = useRef<{
@@ -393,7 +389,6 @@ export function ScanLogTerminal({
 
     previousScanIdRef.current = trimmedScanId;
     hydratedSnapshotRef.current = "";
-    shouldStickToBottomRef.current = true;
     expectedCloseRef.current = true;
     eventSourceRef.current?.close();
     eventSourceRef.current = null;
@@ -429,15 +424,6 @@ export function ScanLogTerminal({
     );
     hydratedSnapshotRef.current = snapshotKey;
   }, [dispatch, historyData, isStreaming, trimmedScanId]);
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport || !shouldStickToBottomRef.current) {
-      return;
-    }
-
-    viewport.scrollTop = viewport.scrollHeight;
-  }, [logs, finalChunk, terminalStatus]);
 
   useEffect(() => {
     return () => {
@@ -516,7 +502,6 @@ export function ScanLogTerminal({
     }
 
     expectedCloseRef.current = false;
-    shouldStickToBottomRef.current = true;
     dispatch(startScan(trimmedScanId));
 
     const source = new EventSource(
@@ -637,34 +622,6 @@ export function ScanLogTerminal({
   );
   const showResultBanner = Boolean(completionStatus) || historyData?.is_terminal === true;
 
-  const handleCopy = async () => {
-    if (!visibleLogs.length) {
-      return;
-    }
-
-    const text = visibleLogs
-      .map(
-        (chunk) =>
-          `[${formatTime(chunk.timestamp)}] [${chunk.level}] [${chunk.phase}] #${chunk.sequence_num} ${chunk.line}`,
-      )
-      .join("\n");
-
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  const handleScroll = () => {
-    const viewport = viewportRef.current;
-    if (!viewport) {
-      return;
-    }
-
-    const distanceFromBottom =
-      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
-    shouldStickToBottomRef.current = distanceFromBottom <= 24;
-  };
-
   const progressBarClass =
     resultTone === "warning"
       ? "bg-amber-400"
@@ -674,251 +631,130 @@ export function ScanLogTerminal({
           ? "bg-red-400"
           : "bg-blue-400";
 
-  const phaseBadgeClass =
-    resultTone === "warning"
-      ? "border-amber-500/20 bg-amber-500/12 text-amber-300"
-      : completionStatus === "SUCCESS"
-        ? "border-emerald-500/20 bg-emerald-500/12 text-emerald-300"
-        : isFailureStatus(completionStatus)
-          ? "border-red-500/20 bg-red-500/12 text-red-300"
-          : "border-blue-500/20 bg-blue-500/12 text-blue-300";
+  const getProgressStep = (): number => {
+    if (completionStatus === "SUCCESS") return 3;
+    if (isStreaming || (isLive && completionStatus === "IN_PROGRESS")) return 2;
+    return 1;
+  };
 
-  const finalizedRows = finalizedResult
-    ? [
-        { label: "Detected language", value: formatLabel(finalizedResult.detected_language) },
-        { label: "Selected profile", value: formatLabel(finalizedResult.selected_profile) },
-        { label: "SonarQube status", value: finalizedResult.sonarqube_status, badge: true },
-        { label: "Quality gate", value: finalizedResult.quality_gate_status, badge: true },
-        { label: "Final status", value: finalizedResult.final_status, badge: true },
-        { label: "Env file policy", value: finalizedResult.env_file_policy, badge: true },
-        {
-          label: "Env files",
-          value:
-            finalizedResult.env_files.length > 0
-              ? finalizedResult.env_files.join(", ")
-              : "None detected",
-        },
-        { label: "Gitleaks status", value: finalizedResult.gitleaks_status, badge: true },
-        {
-          label: "Gitleaks findings",
-          value: String(finalizedResult.gitleaks_findings),
-        },
-      ]
-    : [];
+  const currentStep = getProgressStep();
 
-  const emptyStateLabel =
-    historyIsLoading && visibleLogs.length === 0
-      ? "Loading persisted scan logs..."
-      : isStreaming
-        ? "Waiting for the first scan event..."
-        : trimmedScanId
-          ? "No persisted logs were recorded for this scan."
-          : "Waiting for a scan to start.";
+  const steps = [
+    { label: "Clone", number: 1 },
+    { label: "Scanning", number: 2 },
+    { label: "Complete", number: 3 },
+  ];
 
   return (
-    <section
-      className={cn(
-        jetBrainsMono.className,
-        "overflow-hidden rounded-[20px] border border-[#1c232d] bg-linear-to-br from-[#0c0e11] via-[#0c0e11] to-[#11151b] text-[#d7e0ea] shadow-[0_18px_60px_rgba(12,14,17,0.28)]",
-      )}
-    >
-      <div className="relative flex items-center justify-between border-b border-white/6 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="size-3 rounded-full bg-[#ff5f57]" />
-          <span className="size-3 rounded-full bg-[#febc2e]" />
-          <span className="size-3 rounded-full bg-[#28c840]" />
-        </div>
-
-        <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
-          <span className="text-[11px] font-medium tracking-[0.18em] text-white/65 uppercase">
-            Scan Logs
-          </span>
-          <span
-            className={cn(
-              "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em]",
-              phaseBadgeClass,
-            )}
-          >
-            {phaseLabel}
-          </span>
+    <section className="w-full">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-lg font-semibold text-white">Scan Progress</h3>
           {isStreaming ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.14em] text-emerald-300 uppercase">
-              <span className="size-1.5 rounded-full bg-emerald-300 animate-pulse" />
-              Live
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300">
+              <span className="size-2 rounded-full bg-emerald-300 animate-pulse" />
+              Live Scanning
             </span>
           ) : null}
         </div>
 
-        <button
-          type="button"
-          onClick={handleCopy}
-          disabled={!visibleLogs.length}
-          aria-label="Copy logs"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-medium text-white/72 transition hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
-        >
-          <Copy className="size-3.5" />
-          <span>{copied ? "Copied" : "Copy logs"}</span>
-        </button>
-      </div>
+        {/* 3-Step Progress Indicator */}
+        <div className="flex items-center justify-between">
+          {steps.map((step, idx) => {
+            const isActive = currentStep >= step.number;
+            const isCompleted = currentStep > step.number;
+            const isCurrent = currentStep === step.number;
 
-      <div className="grid grid-cols-5 border-b border-white/6 bg-white/[0.02]">
-        {[
-          { label: "total", value: visibleLogs.length, valueClass: "text-white" },
-          { label: "info", value: infoCount, valueClass: "text-blue-300" },
-          { label: "warn", value: warnCount, valueClass: "text-amber-300" },
-          { label: "error", value: errorCount, valueClass: "text-red-300" },
-          { label: "seq #", value: sequenceNum, valueClass: "text-emerald-300" },
-        ].map((item) => (
-          <div
-            key={item.label}
-            className="border-r border-white/6 px-3 py-2.5 last:border-r-0"
-          >
-            <p className="text-[10px] uppercase tracking-[0.16em] text-white/38">
-              {item.label}
-            </p>
-            <p className={cn("mt-1 text-sm font-semibold", item.valueClass)}>
-              {item.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="h-0.5 w-full bg-white/6">
-        <div
-          className={cn("h-full transition-[width,background-color] duration-300", progressBarClass)}
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-
-      <div
-        ref={viewportRef}
-        onScroll={handleScroll}
-        aria-live="polite"
-        className="h-[280px] overflow-y-auto px-4 py-3 text-[12px] leading-6"
-      >
-        {visibleLogs.length === 0 ? (
-          <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-6 text-center text-[12px] text-white/42">
-            {emptyStateLabel}
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {visibleLogs.map((chunk) => {
-              const level = normalizeLevel(chunk.level);
-              return (
-                <div
-                  key={`${chunk.sequence_num}-${chunk.timestamp}-${chunk.line}`}
-                  className="flex flex-wrap items-start gap-x-2 gap-y-1 rounded-lg px-1.5 py-1 text-white/86"
-                >
-                  <span className="text-white/36">[{formatTime(chunk.timestamp)}]</span>
-                  <span className="text-emerald-300/85">[#{chunk.sequence_num}]</span>
-                  <span
+            return (
+              <div key={step.number} className="flex items-center flex-1">
+                <div className="flex flex-col items-center flex-shrink-0">
+                  <div
                     className={cn(
-                      "inline-flex items-center rounded-md border px-1.5 py-0 text-[10px] font-semibold tracking-[0.14em]",
-                      LOG_LEVEL_STYLES[level],
+                      "w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-500",
+                      isCompleted
+                        ? "bg-emerald-500/30 text-emerald-300 border-2 border-emerald-400"
+                        : isActive
+                          ? "bg-blue-500/30 text-blue-300 border-2 border-blue-400"
+                          : "bg-white/[0.05] text-white/40 border-2 border-white/10",
                     )}
                   >
-                    {level}
+                    {isCompleted ? "✓" : step.number}
+                  </div>
+                  <span
+                    className={cn(
+                      "mt-3 text-sm font-medium transition-colors duration-300",
+                      isActive ? "text-white" : "text-white/50",
+                    )}
+                  >
+                    {step.label}
                   </span>
-                  <span className="min-w-0 flex-1 whitespace-pre-wrap break-words text-white/82">
-                    {chunk.line}
-                  </span>
                 </div>
-              );
-            })}
-            {isStreaming ? (
-              <div className="flex items-center gap-2 px-1.5 py-1 text-emerald-300/90">
-                <span className="text-white/36">[{formatTime(new Date().toISOString())}]</span>
-                <span className="inline-block h-4 w-2 animate-pulse rounded-xs bg-emerald-300" />
-              </div>
-            ) : null}
-          </div>
-        )}
-      </div>
 
-      {showResultBanner ? (
-        <div className="border-t border-white/6 px-4 pb-4">
-          <div
-            className={cn(
-              "mt-4 rounded-2xl border px-4 py-3",
-              resultTone === "success" &&
-                "border-emerald-500/25 bg-emerald-500/10 text-emerald-100",
-              resultTone === "warning" &&
-                "border-amber-500/25 bg-amber-500/10 text-amber-100",
-              resultTone === "failure" && "border-red-500/25 bg-red-500/12 text-red-100",
-            )}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-semibold tracking-[0.18em] uppercase">
-                  {resultHeadline}
-                </p>
-                <p className="mt-2 text-[12px] text-white/82">{resultDetail}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] tracking-[0.14em] text-white/52 uppercase">
-                  <span>Stream finished at seq #{sequenceNum}</span>
-                  {hasComputeTaskNotice ? <span>Compute task submitted</span> : null}
-                  {hasHiddenSonarLinks ? <span>Sonar links hidden</span> : null}
-                </div>
+                {idx < steps.length - 1 && (
+                  <div className="flex-1 h-1 mx-3 relative">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        isCompleted || (isCurrent && isStreaming)
+                          ? "bg-gradient-to-r from-emerald-400 to-blue-400"
+                          : isActive
+                            ? "bg-gradient-to-r from-blue-400 to-blue-300"
+                            : "bg-white/10",
+                      )}
+                    />
+                    {isCurrent && isStreaming && (
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-300 to-emerald-300 animate-pulse" />
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="text-right text-[12px] text-white/76">
-                <p>Total {visibleLogs.length}</p>
-                <p>Errors {errorCount}</p>
-                <p>Warnings {warnCount}</p>
-                <p>Final seq #{sequenceNum}</p>
-              </div>
-            </div>
-          </div>
-
-          {finalizedResult ? (
-            <div className="mt-4 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[0.18em] text-white/76 uppercase">
-                    SonarQube Finalized Result
-                  </p>
-                  <p className="mt-1 text-[12px] text-white/48">
-                    Internal file paths stay hidden. Only user-facing result signals are shown here.
-                  </p>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-white/8">
-                <table className="w-full table-fixed text-left text-[12px]">
-                  <thead className="bg-white/[0.03] text-white/44">
-                    <tr>
-                      <th className="w-[34%] px-3 py-2 font-medium">Signal</th>
-                      <th className="px-3 py-2 font-medium">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {finalizedRows.map((row) => (
-                      <tr
-                        key={row.label}
-                        className="border-t border-white/8 align-top text-white/82"
-                      >
-                        <td className="px-3 py-2.5 text-white/52">{row.label}</td>
-                        <td className="px-3 py-2.5">
-                          {row.badge ? (
-                            <span
-                              className={cn(
-                                "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em]",
-                                getStatusBadgeClass(row.value),
-                              )}
-                            >
-                              {formatLabel(row.value)}
-                            </span>
-                          ) : (
-                            <span className="break-words">{row.value}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : null}
+            );
+          })}
         </div>
-      ) : null}
+
+        {/* Progress Details */}
+        <div className="mt-8 pt-6 border-t border-white/6">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+              <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Total Logs</p>
+              <p className="text-2xl font-semibold text-white">{visibleLogs.length}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+              <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Sequence</p>
+              <p className="text-2xl font-semibold text-emerald-300">#{sequenceNum}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+              <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Status</p>
+              <p className={cn("text-sm font-semibold uppercase tracking-wider",
+                completionStatus === "SUCCESS" ? "text-emerald-300" :
+                isFailureStatus(completionStatus) ? "text-red-300" :
+                "text-blue-300"
+              )}>
+                {completionStatus || (isStreaming ? "Scanning" : "Idle")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Completion Message */}
+        {showResultBanner ? (
+          <div className="mt-6 pt-6 border-t border-white/6">
+            <div
+              className={cn(
+                "rounded-xl border px-4 py-3",
+                resultTone === "success" &&
+                  "border-emerald-500/25 bg-emerald-500/10 text-emerald-100",
+                resultTone === "warning" &&
+                  "border-amber-500/25 bg-amber-500/10 text-amber-100",
+                resultTone === "failure" && "border-red-500/25 bg-red-500/12 text-red-100",
+              )}
+            >
+              <p className="text-sm font-semibold">{resultHeadline}</p>
+              <p className="mt-1 text-xs text-white/72">{resultDetail}</p>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
