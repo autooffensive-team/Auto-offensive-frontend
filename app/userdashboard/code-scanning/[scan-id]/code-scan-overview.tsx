@@ -27,6 +27,7 @@ import type {
 } from "@/types/scanner";
 import { cn } from "@/lib/utils";
 import { CodeScanOperationalMetrics } from "./code-scan-operational-metrics";
+import { ScanProgressIndicator } from "./scan-progress-indicator";
 
 type GradeTone = "green" | "lime" | "red" | "muted";
 type MetricTone = "teal" | "emerald" | "amber" | "red" | "blue" | "slate";
@@ -1327,6 +1328,13 @@ export function CodeScanOverview({
       transition={{ duration: 0.24, ease: "easeOut" }}
       className="space-y-5"
     >
+      {/* ── Scan Progress Indicator ── */}
+      <ScanProgressIndicator
+        progress={normalizedScanProgress}
+        status={scanStatusLabel}
+        isScanRunning={isScanRunning}
+      />
+
       {/* ── Row 1: Top Stat Cards — 1 col on mobile, 2 on md, 4 on xl ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <TopStatCard
@@ -1392,6 +1400,7 @@ export function CodeScanOverview({
           icon={RefreshCw}
         />
       </div>
+
 
       {/* ── Row 2a: Dependency Risk Line Chart ── */}
       <div className="space-y-4">
