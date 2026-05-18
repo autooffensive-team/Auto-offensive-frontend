@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import img1 from "@/public/home-image/code1.webp";
 import img2 from "@/public/home-image/code2.webp";
 import img3 from "@/public/home-image/code3.webp";
@@ -21,6 +23,7 @@ interface CardData {
   titleColor: string;
   ctaColor: string;
   ctaTextColor: string;
+  scanMode: "basic" | "medium" | "advanced";
 }
 
 function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
@@ -40,6 +43,7 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       titleColor: "#e07a7a",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
+      scanMode: "basic",
     },
     {
       id: "medium-scan",
@@ -56,6 +60,7 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       titleColor: "#6aaae8",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
+      scanMode: "medium",
     },
     {
       id: "advanced-scan",
@@ -72,6 +77,7 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       titleColor: "#c8d4e0",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
+      scanMode: "advanced",
     },
   ];
 }
@@ -115,6 +121,7 @@ const Card: React.FC<{
   expanded: boolean;
   hasActiveCard: boolean;
   onToggle: () => void;
+  onStartNow: () => void;
 }> = ({
   card,
   seeMore,
@@ -124,6 +131,7 @@ const Card: React.FC<{
   expanded,
   hasActiveCard,
   onToggle,
+  onStartNow,
 }) => {
   const [hovered, setHovered] = useState(false);
   const keepLargeSideImage = hasActiveCard && !expanded;
@@ -134,7 +142,8 @@ const Card: React.FC<{
       style={{
         background: card.bgGradient,
         border: `1px solid ${hovered || expanded ? card.borderColor.replace("0.2", "0.5").replace("0.25", "0.5").replace("0.3", "0.55") : card.borderColor}`,
-        minHeight: "clamp(440px, 60vw, 760px)",
+        // On mobile: auto height so content fits naturally. On desktop: fixed height via lg:h-180.
+        minHeight: "auto",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -157,8 +166,8 @@ const Card: React.FC<{
         }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-1 flex-col px-6 pb-4 pt-8 md:px-7 md:pt-9 lg:px-8 lg:pb-3 lg:pt-10">
+      {/* Content — on mobile pb-8 is enough since there's no image; on desktop keep original pb-3 */}
+      <div className="relative z-10 flex flex-1 flex-col px-6 pb-8 pt-8 md:px-7 md:pt-9 lg:px-8 lg:pb-3 lg:pt-10">
         {/* Title */}
         <h3
           className="mb-3 text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] md:text-[1.85rem] lg:text-[1.95rem]"
@@ -174,7 +183,7 @@ const Card: React.FC<{
         </h3>
 
         <p
-          className="mb-5 min-h-[4.8em] text-[15px] leading-relaxed text-white/50 md:text-[16px] lg:text-[17px]"
+          className="mb-5 text-[15px] leading-relaxed text-white/50 md:text-[16px] lg:min-h-[4.8em] lg:text-[17px]"
           style={{ fontFamily: bodyFontFamily }}
         >
           {card.description}
@@ -238,6 +247,7 @@ const Card: React.FC<{
             {/* CTA at bottom of expanded content */}
             <button
               type="button"
+              onClick={onStartNow}
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-[#00BCA1] px-6 text-[14px] font-bold tracking-wide text-black transition-all duration-200 hover:bg-[#0AAE98] active:scale-[0.97]"
             >
               Start now
@@ -255,9 +265,12 @@ const Card: React.FC<{
         </div>
       </div>
 
-      {/* Card bottom image — fades out on expand */}
+      {/*
+        Card bottom image — HIDDEN on mobile/tablet, only shown on lg+ (desktop).
+        On desktop it's absolutely positioned as before; on mobile it's simply not rendered.
+      */}
       <div
-        className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center px-1 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden justify-center px-1 lg:flex transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           expanded ? "translate-y-8 opacity-0" : "translate-y-0 opacity-100"
         }`}
       >
@@ -265,11 +278,11 @@ const Card: React.FC<{
           src={card.image}
           alt={`${card.title} ${card.subtitle}`}
           className="block w-full object-contain object-bottom"
-          sizes="(max-width: 1023px) 100vw, 33vw"
+          sizes="33vw"
           style={{
             width: keepLargeSideImage ? "164%" : "108%",
             maxWidth: keepLargeSideImage ? "164%" : "108%",
-            maxHeight: keepLargeSideImage ? "min(470px, 62vh)" : "min(470px, 62vh)",
+            maxHeight: "min(470px, 62vh)",
             transform: keepLargeSideImage
               ? "scale(1.03) translateY(8px)"
               : "scale(1.06) translateY(6px)",
@@ -279,9 +292,9 @@ const Card: React.FC<{
         />
       </div>
 
-      {/* Bottom vignette to blend image into card */}
+      {/* Bottom vignette — only relevant on desktop where image is visible */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-11 h-24"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-11 hidden h-24 lg:block"
         style={{
           background: `linear-gradient(to top, ${card.bgGradient.split(",")[0].replace("radial-gradient(ellipse at 30% 0%,", "").replace("radial-gradient(ellipse at 50% 0%,", "").replace("radial-gradient(ellipse at 70% 0%,", "").trim().split(" ")[0].replace("rgba(90,20,20,0.95)", "rgba(30,5,10,1)").replace("rgba(15,40,80,0.98)", "rgba(8,15,35,1)").replace("rgba(30,35,45,0.98)", "rgba(12,15,22,1)")} 0%, transparent 100%)`,
           opacity: expanded ? 0 : 1,
@@ -295,6 +308,8 @@ const Card: React.FC<{
 const ThreeCards: React.FC = () => {
   const t = useTranslations("homepage.audience");
   const locale = useLocale();
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   const bodyFontFamily =
@@ -307,6 +322,14 @@ const ThreeCards: React.FC = () => {
       : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
 
   const cards = getCards(t);
+
+  const handleStartNow = (scanMode: "basic" | "medium" | "advanced") => {
+    if (session) {
+      router.push(`/userdashboard/scan?mode=${scanMode}`);
+    } else {
+      router.push(`/login?callbackUrl=${encodeURIComponent(`/userdashboard/scan?mode=${scanMode}`)}`);
+    }
+  };
 
   return (
     <section
@@ -352,6 +375,7 @@ const ThreeCards: React.FC = () => {
                     current === card.id ? null : card.id
                   )
                 }
+                onStartNow={() => handleStartNow(card.scanMode)}
               />
             ))}
           </div>

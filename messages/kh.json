@@ -1209,37 +1209,37 @@
         "consultants": {
           "title": "Basic",
           "subtitle": "Scan",
-          "description": "A friendly starting point for quick checks, simple targets, and everyday visibility.",
+          "description": "ចំណុចចាប់ផ្តើមដ៏ងាយស្រួល សម្រាប់ការត្រួតពិនិត្យរហ័ស targets សាមញ្ញ និងការមើលឃើញសុវត្ថិភាពប្រចាំថ្ងៃ។",
           "features": [
-            "Run lightweight recon and first-pass checks without a complicated setup",
-            "Cover simple targets quickly when you need a fast security snapshot",
-            "Review clear results that help new users understand what needs attention first",
-            "Use it as an easy baseline before moving into deeper testing",
-            "Stay efficient for small websites, demos, student projects, or internal practice"
+            "ដំណើរការ lightweight recon និង first-pass checks ដោយមិនចាំបាច់ setup ស្មុគស្មាញ",
+            "ស្កេន targets សាមញ្ញបានលឿន នៅពេលអ្នកត្រូវការមើលស្ថានភាពសុវត្ថិភាពភ្លាមៗ",
+            "មើលលទ្ធផលដែលច្បាស់ និងងាយយល់ សម្រាប់អ្នកប្រើថ្មី",
+            "ប្រើជា baseline មុនពេលចូលទៅកាន់ការធ្វើតេស្តកម្រិតជ្រៅ",
+            "សាកសមសម្រាប់ website តូចៗ demos student projects ឬការអនុវត្តផ្ទៃក្នុង"
           ]
         },
         "internalTeams": {
           "title": "Medium",
           "subtitle": "Scan",
-          "description": "Balanced coverage when you want deeper validation and clearer findings without extra complexity.",
+          "description": "តុល្យភាពល្អសម្រាប់ការស្កេនដែលត្រូវការការផ្ទៀងផ្ទាត់កាន់តែជ្រៅ និង findings ច្បាស់លាស់ ដោយមិនបន្ថែមភាពស្មុគស្មាញច្រើន។",
           "features": [
-            "Expand beyond basic discovery with broader checks across the target surface",
-            "Validate more findings so teams can focus on issues that matter most",
-            "Keep testing practical for regular security reviews and internal assessments",
-            "Get stronger evidence and more context for triage, discussion, and follow-up",
-            "Fit well for growing teams that want better depth without heavy overhead"
+            "ពង្រីកការស្វែងរកលើ target surface លើសពី basic discovery",
+            "ផ្ទៀងផ្ទាត់ findings បានច្រើនជាងមុន ដើម្បីផ្តោតលើបញ្ហាសំខាន់ៗ",
+            "សាកសមសម្រាប់ regular security reviews និង internal assessments",
+            "ផ្តល់ evidence និង context កាន់តែច្បាស់ សម្រាប់ triage និង follow-up",
+            "សមស្របសម្រាប់ក្រុមដែលកំពុងរីកចម្រើន និងត្រូវការការស្កេនជ្រៅជាងមុនដោយមិនមាន overhead ខ្ពស់"
           ]
         },
         "msps": {
           "title": "Advanced",
           "subtitle": "Scan",
-          "description": "Our most complete option for broader discovery, richer evidence, and more serious security testing.",
+          "description": "ជម្រើសពេញលេញបំផុត សម្រាប់ការស្វែងរកទូលំទូលាយ ភស្តុតាងសម្បូរបែប និងការធ្វើតេស្តសុវត្ថិភាពកម្រិតខ្ពស់។",
           "features": [
-            "Unlock broader discovery for larger environments and more demanding assessments",
-            "Collect richer evidence to support higher-confidence reporting and review",
-            "Handle more serious testing workflows where detail and coverage both matter",
-            "Support experienced users who need stronger visibility across complex targets",
-            "Best for mature engagements that need deeper analysis from Auto Offensive"
+            "បើកការស្វែងរកទូលំទូលាយសម្រាប់ environments ធំៗ និង assessments កម្រិតខ្ពស់",
+            "ប្រមូល evidence លម្អិត ដើម្បីគាំទ្រការវាយតម្លៃដែលមានទំនុកចិត្តខ្ពស់",
+            "សាកសមសម្រាប់ workflows សុវត្ថិភាពដែលត្រូវការទាំង depth និង coverage",
+            "ជួយអ្នកប្រើកម្រិតខ្ពស់ឲ្យមើលឃើញ targets ស្មុគស្មាញបានកាន់តែច្បាស់",
+            "ល្អបំផុតសម្រាប់ engagements កម្រិតជំនាញ ដែលត្រូវការការវិភាគជ្រៅពី Auto Offensive"
           ]
         }
       }
