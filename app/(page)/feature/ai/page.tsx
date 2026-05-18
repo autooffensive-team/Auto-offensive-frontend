@@ -236,8 +236,7 @@ export default function AIFeature() {
                   key={i}
                   variants={fadeUp}
                   custom={i + 1}
-                  whileHover={{ y: -4 }}
-                  className="bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 rounded-xl p-6 hover:shadow-lg hover:border-[#00BCA1]/40 transition-all duration-300"
+                  className="bg-transparent border border-[#E2DDD5] dark:border-white/10 rounded-xl p-6 transition-all duration-300 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)]"
                 >
                   <div className="w-10 h-10 rounded-lg bg-[#00BCA1]/10 flex items-center justify-center mb-4">
                     <IconComponent className="w-5 h-5 text-[#00BCA1]" />
@@ -446,20 +445,15 @@ export default function AIFeature() {
                   key={i}
                   variants={fadeUp}
                   custom={i + 1}
-                  whileHover={{ y: -4 }}
-                  className={`rounded-xl p-5 sm:p-6 border transition-all duration-300 ${
-                    item.dark
-                      ? "bg-[#0D1117] border-white/10 hover:border-[#00BCA1]/40"
-                      : "bg-white dark:bg-[#111113] border-[#E2DDD5] dark:border-white/10 hover:border-[#00BCA1]/40"
-                  }`}
+                  className={`rounded-xl p-5 sm:p-6 border transition-all duration-300 bg-transparent border-[#E2DDD5] dark:border-white/10 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)]`}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <IconComp className={`w-5 h-5 ${item.dark ? "text-[#00BCA1]" : "text-[#00BCA1]"}`} />
-                    <h3 className={`text-[15px] sm:text-base font-bold ${item.dark ? "text-white" : "text-[#18181B] dark:text-white"}`}>
+                    <IconComp className="w-5 h-5 text-[#00BCA1]" />
+                    <h3 className="text-[15px] sm:text-base font-bold text-[#18181B] dark:text-white">
                       {item.title}
                     </h3>
                   </div>
-                  <p className={`${smallText} leading-[1.6] ${item.dark ? "text-slate-400" : "text-[#52525B] dark:text-[#A1A1AA]"}`}>
+                  <p className={`${smallText} leading-[1.6] text-[#52525B] dark:text-[#A1A1AA]`}>
                     {item.desc}
                   </p>
                 </motion.div>
