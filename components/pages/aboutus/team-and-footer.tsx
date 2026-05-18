@@ -35,7 +35,7 @@ const MENTORS = [
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
     slogan: "Your future self is always\n watching you.",
-    img: "/images/teacher_chipor.png",
+    img: "/images/teacher_chipor.webp",
     social: {
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
