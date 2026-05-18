@@ -108,27 +108,15 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
   );
 }
 
-// ─── Loading Circle ───────────────────────────────────────────────────────────
-function LoadingCircle({ className }: { className?: string }) {
+// ─── Loading Icon ────────────────────────────────────────────────────────────
+function LoadingIcon({ className }: { className?: string }) {
   return (
-    <motion.svg
-      className={cn("size-6 text-teal-500", className)}
-      fill="none"
-      viewBox="0 0 24 24"
+    <motion.div
       animate={{ rotate: 360 }}
       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeDasharray="62.8"
-        strokeDashoffset="15.7"
-        strokeLinecap="round"
-      />
-    </motion.svg>
+      <RefreshCw className={cn("size-6 text-teal-500", className)} />
+    </motion.div>
   );
 }
 
@@ -1384,7 +1372,7 @@ export function CodeScanOverview({
                 : "Waiting for scan results"
           }
           accent={isScanRunning ? "teal" : scanSummary ? "emerald" : "slate"}
-          icon={normalizedScanProgress < 100 ? LoadingCircle : scanSummary ? CheckCircle2 : RefreshCw}
+          icon={normalizedScanProgress < 100 ? LoadingIcon : scanSummary ? CheckCircle2 : RefreshCw}
         />
         <TopStatCard
           label="Issues"

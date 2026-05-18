@@ -63,6 +63,29 @@ const sectionMotion = {
   transition: { duration: 0.24, ease: "easeOut" as const },
 };
 
+// ─── Play notification sound ──────────────────────────────────────────────────
+function playScanCompleteSound(): void {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = "sine";
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  } catch {
+    // Fallback: silent if AudioContext not available
+  }
+}
+
 // ─── New Project Badge Component ────────────────────────────────────────────
 
 function PreviousPageButton({ onClick }: { onClick: () => void }) {
@@ -808,9 +831,18 @@ export default function CodeScanningDetailPageClient({
 
     if (isComplete && !hasTriggeredCompletionRefresh.current) {
       hasTriggeredCompletionRefresh.current = true;
-      router.refresh();
+      playScanCompleteSound();
+      // Fast refetch all data when scan completes
+      Promise.all([
+        refetchScanStatus(),
+        refetchScanDetail(),
+        refetchScanSummary(),
+        refetchDependencySummary(),
+      ]).finally(() => {
+        router.refresh();
+      });
     }
-  }, [isRunning, progress, router, status]);
+  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary]);
 
   const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
   const routeResolutionFailed =
