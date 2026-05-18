@@ -27,7 +27,6 @@ import type {
 } from "@/types/scanner";
 import { cn } from "@/lib/utils";
 import { CodeScanOperationalMetrics } from "./code-scan-operational-metrics";
-import { ScanLogTerminal } from "./scan-log-terminal";
 
 type GradeTone = "green" | "lime" | "red" | "muted";
 type MetricTone = "teal" | "emerald" | "amber" | "red" | "blue" | "slate";
@@ -1394,16 +1393,8 @@ export function CodeScanOverview({
         />
       </div>
 
-      {/* ── Row 2a: Dependency Risk Line Chart and Terminal SSE Logs ── */}
+      {/* ── Row 2a: Dependency Risk Line Chart ── */}
       <div className="space-y-4">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.08 }}
-        >
-          <ScanLogTerminal initialScanId={initialScanId} isLive={isScanRunning} />
-        </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
