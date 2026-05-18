@@ -607,7 +607,7 @@ export default function WebUIFeature() {
           animate={liveInView ? "visible" : "hidden"}
           className="relative flex min-h-105 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             ml-4 md:ml-6 rounded-r-[28px]
-            border-y border-r border-[#E2DDD5] dark:border-white/10
+            border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             flex-col md:flex-row"
         >
@@ -700,7 +700,7 @@ export default function WebUIFeature() {
           animate={howInView ? "visible" : "hidden"}
           className="relative flex min-h-95 overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             mr-4 md:mr-6 rounded-l-[28px]
-            border-y border-l border-[#E2DDD5] dark:border-white/10
+            border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             flex-col md:flex-row"
         >
@@ -827,7 +827,7 @@ export default function WebUIFeature() {
           animate={compareInView ? "visible" : "hidden"}
           className="relative overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             ml-4 md:ml-6 rounded-r-[28px]
-            border-y border-r border-[#E2DDD5] dark:border-white/10
+            border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             p-6 md:p-10"
         >
@@ -905,7 +905,7 @@ export default function WebUIFeature() {
           animate={benefitsInView ? "visible" : "hidden"}
           className="relative overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             mr-4 md:mr-6 rounded-l-[28px]
-            border-y border-l border-[#E2DDD5] dark:border-white/10
+            border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             p-6 md:p-10"
         >
