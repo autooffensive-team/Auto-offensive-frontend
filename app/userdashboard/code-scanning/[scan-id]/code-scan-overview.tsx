@@ -108,6 +108,30 @@ function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
   );
 }
 
+// ─── Loading Circle ───────────────────────────────────────────────────────────
+function LoadingCircle({ className }: { className?: string }) {
+  return (
+    <motion.svg
+      className={cn("size-6 text-teal-500", className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      animate={{ rotate: 360 }}
+      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeDasharray="62.8"
+        strokeDashoffset="15.7"
+        strokeLinecap="round"
+      />
+    </motion.svg>
+  );
+}
+
 // ─── Gauge SVG ────────────────────────────────────────────────────────────────
 function GaugeSVG({
   pct,
@@ -1320,12 +1344,34 @@ export function CodeScanOverview({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <TopStatCard
           label="Quality Gate"
-          value={getQualityGateLabel(qualityGate)}
-          helper={scanSummary ? "Latest scan summary" : "Waiting for summary"}
-          accent={
-            qualityGate === "OK" ? "emerald" : qualityGate ? "amber" : "slate"
+          value={
+            !qualityGate && isScanRunning
+              ? "In Progress"
+              : getQualityGateLabel(qualityGate)
           }
-          icon={qualityGate === "OK" ? ShieldCheck : ShieldAlert}
+          helper={
+            !qualityGate && isScanRunning
+              ? "Evaluating gate status"
+              : scanSummary
+                ? "Latest scan summary"
+                : "Waiting for summary"
+          }
+          accent={
+            !qualityGate && isScanRunning
+              ? "teal"
+              : qualityGate === "OK"
+                ? "emerald"
+                : qualityGate
+                  ? "amber"
+                  : "slate"
+          }
+          icon={
+            !qualityGate && isScanRunning
+              ? RefreshCw
+              : qualityGate === "OK"
+                ? ShieldCheck
+                : ShieldAlert
+          }
         />
         <TopStatCard
           label="Scan Status"
@@ -1338,7 +1384,7 @@ export function CodeScanOverview({
                 : "Waiting for scan results"
           }
           accent={isScanRunning ? "teal" : scanSummary ? "emerald" : "slate"}
-          icon={isScanRunning ? RefreshCw : scanSummary ? CheckCircle2 : RefreshCw}
+          icon={normalizedScanProgress < 100 ? LoadingCircle : scanSummary ? CheckCircle2 : RefreshCw}
         />
         <TopStatCard
           label="Issues"
