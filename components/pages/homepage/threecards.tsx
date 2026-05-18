@@ -5,6 +5,7 @@ import Image, { StaticImageData } from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { useTheme } from "@/components/theme-provider";
 import img1 from "@/public/home-image/code1.webp";
 import img2 from "@/public/home-image/code2.webp";
 import img3 from "@/public/home-image/code3.webp";
@@ -19,8 +20,11 @@ interface CardData {
   accentColor: string;
   checkColor: string;
   bgGradient: string;
+  bgGradientLight: string;
   borderColor: string;
+  borderColorLight: string;
   titleColor: string;
+  titleColorLight: string;
   ctaColor: string;
   ctaTextColor: string;
   scanMode: "basic" | "medium" | "advanced";
@@ -39,8 +43,12 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       checkColor: "#e07070",
       bgGradient:
         "radial-gradient(ellipse at 30% 0%, rgba(90,20,20,0.95) 0%, rgba(30,10,40,0.98) 50%, rgba(15,10,30,1) 100%)",
+      bgGradientLight:
+        "radial-gradient(ellipse at 30% 0%, rgba(255,220,215,0.9) 0%, rgba(250,235,232,0.7) 40%, rgba(247,245,240,1) 100%)",
       borderColor: "rgba(200,80,80,0.25)",
+      borderColorLight: "rgba(200,80,80,0.35)",
       titleColor: "#e07a7a",
+      titleColorLight: "#b83a3a",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
       scanMode: "basic",
@@ -56,8 +64,12 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       checkColor: "#5a9fe4",
       bgGradient:
         "radial-gradient(ellipse at 50% 0%, rgba(15,40,80,0.98) 0%, rgba(10,25,55,0.99) 50%, rgba(8,15,40,1) 100%)",
+      bgGradientLight:
+        "radial-gradient(ellipse at 50% 0%, rgba(210,230,255,0.85) 0%, rgba(230,240,252,0.6) 40%, rgba(247,245,240,1) 100%)",
       borderColor: "rgba(74,143,212,0.3)",
+      borderColorLight: "rgba(74,143,212,0.35)",
       titleColor: "#6aaae8",
+      titleColorLight: "#2a6ab8",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
       scanMode: "medium",
@@ -73,8 +85,12 @@ function getCards(t: ReturnType<typeof useTranslations>): CardData[] {
       checkColor: "#8a9aaa",
       bgGradient:
         "radial-gradient(ellipse at 70% 0%, rgba(30,35,45,0.98) 0%, rgba(20,25,35,0.99) 50%, rgba(12,15,22,1) 100%)",
+      bgGradientLight:
+        "radial-gradient(ellipse at 70% 0%, rgba(220,225,235,0.85) 0%, rgba(232,235,240,0.6) 40%, rgba(247,245,240,1) 100%)",
       borderColor: "rgba(120,140,160,0.2)",
+      borderColorLight: "rgba(100,120,150,0.3)",
       titleColor: "#c8d4e0",
+      titleColorLight: "#3a4a5a",
       ctaColor: "#d4a017",
       ctaTextColor: "#1a1000",
       scanMode: "advanced",
@@ -120,6 +136,7 @@ const Card: React.FC<{
   displayFontFamily: string;
   expanded: boolean;
   hasActiveCard: boolean;
+  isDark: boolean;
   onToggle: () => void;
   onStartNow: () => void;
 }> = ({
@@ -130,18 +147,29 @@ const Card: React.FC<{
   displayFontFamily,
   expanded,
   hasActiveCard,
+  isDark,
   onToggle,
   onStartNow,
 }) => {
   const [hovered, setHovered] = useState(false);
   const keepLargeSideImage = hasActiveCard && !expanded;
 
+  const bgGradient = isDark ? card.bgGradient : card.bgGradientLight;
+  const borderColor = isDark ? card.borderColor : card.borderColorLight;
+  const titleColor = isDark ? card.titleColor : card.titleColorLight;
+
+  // Light mode glow shadow for that "aura" feel
+  const lightBoxShadow = !isDark
+    ? `0 4px 24px -4px ${card.accentColor}20, 0 0 48px -12px ${card.accentColor}15, inset 0 1px 0 0 rgba(255,255,255,0.8)`
+    : undefined;
+
   return (
     <div
       className="group relative flex min-w-0 cursor-pointer flex-col overflow-hidden rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:h-180"
       style={{
-        background: card.bgGradient,
-        border: `1px solid ${hovered || expanded ? card.borderColor.replace("0.2", "0.5").replace("0.25", "0.5").replace("0.3", "0.55") : card.borderColor}`,
+        background: bgGradient,
+        border: `1px solid ${hovered || expanded ? borderColor.replace("0.2", "0.5").replace("0.25", "0.5").replace("0.3", "0.55").replace("0.35", "0.6") : borderColor}`,
+        boxShadow: lightBoxShadow,
         // On mobile: auto height so content fits naturally. On desktop: fixed height via lg:h-180.
         minHeight: "auto",
       }}
@@ -152,11 +180,31 @@ const Card: React.FC<{
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
-          background: `linear-gradient(90deg, transparent, ${card.accentColor}55, transparent)`,
-          opacity: hovered || expanded ? 1 : 0.4,
+          background: `linear-gradient(90deg, transparent, ${card.accentColor}${isDark ? "55" : "60"}, transparent)`,
+          opacity: hovered || expanded ? 1 : isDark ? 0.4 : 0.7,
           transition: "opacity 0.4s",
         }}
       />
+
+      {/* Light mode: colored aura glow at top */}
+      {!isDark && (
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 opacity-60"
+          style={{
+            background: `radial-gradient(ellipse at 50% 0%, ${card.accentColor}18 0%, transparent 70%)`,
+          }}
+        />
+      )}
+
+      {/* Light mode: subtle inner border glow */}
+      {!isDark && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{
+            boxShadow: `inset 0 0 30px -10px ${card.accentColor}12`,
+          }}
+        />
+      )}
 
       {/* Noise grain overlay for depth */}
       <div
@@ -172,9 +220,9 @@ const Card: React.FC<{
         <h3
           className="mb-3 text-[1.7rem] font-bold leading-[1.1] tracking-[-0.02em] md:text-[1.85rem] lg:text-[1.95rem]"
           style={{
-            color: card.titleColor,
+            color: titleColor,
             fontFamily: displayFontFamily,
-            textShadow: `0 0 40px ${card.accentColor}40`,
+            textShadow: isDark ? `0 0 40px ${card.accentColor}40` : `0 0 20px ${card.accentColor}25`,
           }}
         >
           <span className="whitespace-nowrap">
@@ -184,7 +232,7 @@ const Card: React.FC<{
 
         <p
           className="mb-5 text-[15px] leading-relaxed text-white/50 md:text-[16px] lg:min-h-[4.8em] lg:text-[17px]"
-          style={{ fontFamily: bodyFontFamily }}
+          style={{ fontFamily: bodyFontFamily, color: isDark ? undefined : "rgba(60,60,70,0.7)" }}
         >
           {card.description}
         </p>
@@ -195,10 +243,12 @@ const Card: React.FC<{
           aria-expanded={expanded}
           aria-controls={`${card.id}-details`}
           onClick={onToggle}
-          className="inline-flex h-11 w-fit items-center gap-3 rounded-xl border px-5 text-[14px] font-semibold text-white/80 backdrop-blur-sm transition-all duration-300 hover:text-white"
+          className="inline-flex h-11 w-fit items-center gap-3 rounded-xl border px-5 text-[14px] font-semibold backdrop-blur-sm transition-all duration-300"
           style={{
             borderColor: `${card.accentColor}40`,
-            background: `rgba(255,255,255,0.05)`,
+            background: isDark ? `rgba(255,255,255,0.05)` : `linear-gradient(135deg, ${card.accentColor}08, rgba(255,255,255,0.6))`,
+            color: isDark ? "rgba(255,255,255,0.8)" : "rgba(60,60,70,0.85)",
+            boxShadow: isDark ? undefined : `0 2px 8px -2px ${card.accentColor}15`,
           }}
         >
           <span>{expanded ? seeLess : seeMore}</span>
@@ -230,10 +280,11 @@ const Card: React.FC<{
         >
           <div className="overflow-hidden">
             <ul
-              className="space-y-3.5 border-t pb-1 pt-5 text-[13.5px] leading-[1.65] text-white/65 md:text-[14.5px]"
+              className="space-y-3.5 border-t pb-1 pt-5 text-[13.5px] leading-[1.65] md:text-[14.5px]"
               style={{
                 borderColor: `${card.accentColor}25`,
                 fontFamily: bodyFontFamily,
+                color: isDark ? "rgba(255,255,255,0.65)" : "rgba(60,60,70,0.7)",
               }}
             >
               {card.features.map((feature) => (
@@ -310,7 +361,14 @@ const ThreeCards: React.FC = () => {
   const locale = useLocale();
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const { resolvedTheme } = useTheme();
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => setMounted(true), []);
+
+  // Default to dark during SSR to avoid hydration mismatch
+  const isDark = !mounted || resolvedTheme === "dark";
 
   const bodyFontFamily =
     locale === "kh"
@@ -370,6 +428,7 @@ const ThreeCards: React.FC = () => {
                 displayFontFamily={displayFontFamily}
                 expanded={activeCardId === card.id}
                 hasActiveCard={activeCardId !== null}
+                isDark={isDark}
                 onToggle={() =>
                   setActiveCardId((current) =>
                     current === card.id ? null : card.id
