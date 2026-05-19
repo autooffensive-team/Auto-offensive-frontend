@@ -32,7 +32,16 @@ const terminalStatuses = new Set([
   "STEP_STATUS_COMPLETED",
   "STEP_STATUS_FAILED",
   "STEP_STATUS_CANCELLED",
+  // lowercase variants sent by the backend
+  "completed",
+  "failed",
+  "cancelled",
+  "partial",
 ]);
+
+function isTerminalStatus(status: string): boolean {
+  return terminalStatuses.has(status) || terminalStatuses.has(status.toUpperCase());
+}
 
 function createInitialRun(mode: ScanMode): ActiveRun {
   return {
@@ -310,10 +319,10 @@ export function useScanController(initialProjectId?: string) {
   // ---------------------------------------------------------------------------
   const transformSummaryToJobStatus = useCallback((summary: any): JobStatus => {
     const steps = Array.isArray(summary?.steps) ? summary.steps : [];
-    const completed = steps.filter((s: ScanStep) => s.status?.includes("COMPLETED")).length;
-    const failed = steps.filter((s: ScanStep) => s.status?.includes("FAILED")).length;
+    const completed = steps.filter((s: ScanStep) => /completed/i.test(s.status)).length;
+    const failed = steps.filter((s: ScanStep) => /failed/i.test(s.status)).length;
     const pending = steps.filter(
-      (s: ScanStep) => s.status?.includes("PENDING") || s.status?.includes("QUEUED"),
+      (s: ScanStep) => /pending/i.test(s.status) || /queued/i.test(s.status),
     ).length;
     return {
       job_id: summary.job_id || summary.scope_id || "",
@@ -416,7 +425,7 @@ export function useScanController(initialProjectId?: string) {
           consecutivePollFailures = 0;
           const job = transformSummaryToJobStatus(summaryData);
           const activeStep =
-            job.steps?.find((step) => !terminalStatuses.has(step.status)) ??
+            job.steps?.find((step) => !isTerminalStatus(step.status)) ??
             job.steps?.[job.steps.length - 1];
 
           setRunForMode(mode, (current) => ({
