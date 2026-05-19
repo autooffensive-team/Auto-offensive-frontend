@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import type {
   ActiveRun,
   JobParsedData,
@@ -20,6 +22,7 @@ import {
   logFromPayload,
   parseJsonMaybe,
 } from "@/utils/scan";
+import { playScanCompleteSound } from "@/utils/scan-sound";
 
 const terminalStatuses = new Set([
   "JOB_STATUS_COMPLETED",
@@ -49,10 +52,10 @@ type RunSetter = React.Dispatch<React.SetStateAction<ActiveRun>>;
 type LogsSetter = React.Dispatch<React.SetStateAction<LogLine[]>>;
 type ErrorsSetter = React.Dispatch<React.SetStateAction<string[]>>;
 
-export function useScanController() {
+export function useScanController(initialProjectId?: string) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(initialProjectId || "");
   const [loadingMeta, setLoadingMeta] = useState(true);
   const [metaError, setMetaError] = useState("");
 
@@ -106,6 +109,11 @@ export function useScanController() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamStepRef = useRef("");
+  // Tracks job ids that have already triggered a completion toast so we don't
+  // double-fire if polling produces another terminal-status response.
+  const notifiedJobsRef = useRef<Set<string>>(new Set());
+
+  const router = useRouter();
 
   // ---------------------------------------------------------------------------
   // Derived data
@@ -168,6 +176,80 @@ export function useScanController() {
   useEffect(() => stopWatchingJob, [stopWatchingJob]);
 
   // ---------------------------------------------------------------------------
+  // Completion toast
+  // ---------------------------------------------------------------------------
+  // Resolve the asset/job route used by the "View report" action. The submit
+  // response does not include target_id, so look it up via the unified
+  // /scans/jobs/{jobId} endpoint (returns target_name) plus the per-project
+  // targets list. Falls back to the assets index if anything fails.
+  const resolveJobReportRoute = useCallback(async (jobId: string): Promise<string> => {
+    try {
+      const job = await fetchJson<{ target_name?: string; project_name?: string }>(
+        `/scans/jobs/${jobId}`,
+      );
+      const project = projects.find((p) => p.name === job.project_name);
+      if (project && job.target_name) {
+        const targets = await fetchJson<Array<{ target_id: string; name: string }>>(
+          `/projects/${project.project_id}/targets`,
+        );
+        const target = targets.find((t) => t.name === job.target_name);
+        if (target) {
+          return `/userdashboard/assets/${target.target_id}/jobs/${jobId}`;
+        }
+      }
+    } catch {
+      // ignore — fall through to default
+    }
+    return "/userdashboard/assets";
+  }, [projects]);
+
+  const modeLabel = (mode: ScanMode) =>
+    mode === "basic" ? "Basic" : mode === "medium" ? "Medium" : "Advanced";
+
+  const notifyScanComplete = useCallback(
+    (mode: ScanMode, status: string, jobId: string, target: string, findings: number) => {
+      if (!jobId || notifiedJobsRef.current.has(jobId)) return;
+      notifiedJobsRef.current.add(jobId);
+
+      const label = modeLabel(mode);
+      const targetSuffix = target ? ` for ${target}` : "";
+      const findingsSuffix = ` — ${findings} finding${findings === 1 ? "" : "s"}`;
+      const action = {
+        label: "View report",
+        onClick: () => {
+          void resolveJobReportRoute(jobId).then((path) => router.push(path));
+        },
+      };
+
+      // Status strings come either uppercased from the per-mode summary
+      // endpoints (e.g. "JOB_STATUS_COMPLETED") or lowercased from the
+      // unified /scans/jobs/{id} endpoint (e.g. "completed"). Match both.
+      const isCompleted = /completed/i.test(status);
+      const isPartial = /partial/i.test(status);
+      const isCancelled = /cancelled/i.test(status);
+      const isFailed = /failed/i.test(status);
+
+      if (isCompleted) {
+        toast.success(`${label} scan completed${targetSuffix}${findingsSuffix}`, { action });
+        void playScanCompleteSound("success");
+      } else if (isPartial) {
+        toast.warning(
+          `${label} scan finished with partial results${targetSuffix}${findingsSuffix}`,
+          { action },
+        );
+        void playScanCompleteSound("warning");
+      } else if (isCancelled) {
+        toast.error(`${label} scan was cancelled${targetSuffix}`, { action });
+        void playScanCompleteSound("error");
+      } else if (isFailed) {
+        toast.error(`${label} scan failed${targetSuffix}`, { action });
+        void playScanCompleteSound("error");
+      }
+    },
+    [resolveJobReportRoute, router],
+  );
+
+  // ---------------------------------------------------------------------------
   // Metadata loading
   // ---------------------------------------------------------------------------
   useEffect(() => {
@@ -187,7 +269,7 @@ export function useScanController() {
 
         setProjects(projectData);
         setTools(toolData);
-        setProjectId((current) => current || projectData[0]?.project_id || "");
+        setProjectId((current) => current || initialProjectId || projectData[0]?.project_id || "");
 
         const firstBasicTool = toolData.find(
           (tool) => (tool.scan_config?.basic?.presets?.length ?? 0) > 0,
@@ -317,13 +399,21 @@ export function useScanController() {
   // Job polling
   // ---------------------------------------------------------------------------
   const watchJob = useCallback(
-    (mode: ScanMode, jobId: string, initialStepId: string) => {
+    (mode: ScanMode, jobId: string, initialStepId: string, target: string) => {
       openStepStream(mode, initialStepId);
       if (pollRef.current) clearInterval(pollRef.current);
 
+      // Tolerate transient summary-fetch failures: only report after a few
+      // consecutive misses, and don't spam the error panel on every tick.
+      let consecutivePollFailures = 0;
+
       pollRef.current = setInterval(async () => {
         try {
-          const summaryData = await fetchJson<any>(`/scans/${mode}/jobs/${jobId}/summary`);
+          // Use the unified /scans/jobs/{jobId} endpoint which works for all
+          // modes. The per-mode /scans/{mode}/jobs/{jobId}/summary endpoint
+          // exists only for basic and advanced — medium would 404.
+          const summaryData = await fetchJson<any>(`/scans/jobs/${jobId}`);
+          consecutivePollFailures = 0;
           const job = transformSummaryToJobStatus(summaryData);
           const activeStep =
             job.steps?.find((step) => !terminalStatuses.has(step.status)) ??
@@ -343,23 +433,38 @@ export function useScanController() {
           }
 
           if (
-            job.status.includes("COMPLETED") ||
-            job.status.includes("FAILED") ||
-            job.status.includes("CANCELLED") ||
-            job.status.includes("PARTIAL")
+            /completed/i.test(job.status) ||
+            /failed/i.test(job.status) ||
+            /cancelled/i.test(job.status) ||
+            /partial/i.test(job.status)
           ) {
             stopWatchingJob();
+            notifyScanComplete(mode, job.status, jobId, target, job.total_findings ?? 0);
             void fetchParsedData(mode, jobId);
           }
         } catch (error) {
-          appendErrorForMode(
-            mode,
-            error instanceof Error ? error.message : "Failed to refresh job status.",
-          );
+          consecutivePollFailures += 1;
+          // Single transient blip → swallow. Sustained failure (≥ 3 ticks ≈
+          // 7.5s) → surface once so the user knows the status pane is stale,
+          // without piling identical lines onto the errors panel.
+          if (consecutivePollFailures === 3) {
+            appendErrorForMode(
+              mode,
+              error instanceof Error ? error.message : "Failed to refresh job status.",
+            );
+          }
         }
       }, 2500);
     },
-    [appendErrorForMode, fetchParsedData, openStepStream, setRunForMode, stopWatchingJob, transformSummaryToJobStatus],
+    [
+      appendErrorForMode,
+      fetchParsedData,
+      notifyScanComplete,
+      openStepStream,
+      setRunForMode,
+      stopWatchingJob,
+      transformSummaryToJobStatus,
+    ],
   );
 
   // ---------------------------------------------------------------------------
@@ -367,7 +472,18 @@ export function useScanController() {
   // ---------------------------------------------------------------------------
 
   const submitBasic = useCallback(async () => {
-    if (!projectId || !selectedBasicTool || !basicTarget.trim()) return;
+    if (!projectId) {
+      toast.error("Select a project before starting a scan.");
+      return;
+    }
+    if (!selectedBasicTool) {
+      toast.error("Pick a tool to run.");
+      return;
+    }
+    if (!basicTarget.trim()) {
+      toast.error("Enter a target before starting the scan.");
+      return;
+    }
 
     resetRun("basic");
     setIsSubmitting(true);
@@ -401,7 +517,7 @@ export function useScanController() {
           message: `Basic scan submitted for ${basicTarget.trim()}`,
         }),
       );
-      watchJob("basic", submit.job_id, submit.step_id);
+      watchJob("basic", submit.job_id, submit.step_id, basicTarget.trim());
     } catch (error) {
       appendErrorForMode("basic", error instanceof Error ? error.message : "Basic scan failed.");
       setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
@@ -441,7 +557,12 @@ export function useScanController() {
       })
       .filter((step) => step.tool_id || step.tool_name);
 
-    if (!projectId || !mediumTarget.trim() || !steps.length) return;
+    if (!projectId || !mediumTarget.trim() || !steps.length) {
+      if (!projectId) toast.error("Select a project before starting a scan.");
+      else if (!mediumTarget.trim()) toast.error("Enter a target before starting the scan.");
+      else toast.error("Add at least one pipeline step.");
+      return;
+    }
 
     resetRun("medium");
     setIsSubmitting(true);
@@ -473,7 +594,7 @@ export function useScanController() {
           message: `Medium scan submitted for ${mediumTarget.trim()}`,
         }),
       );
-      watchJob("medium", submit.job_id, submit.step_id);
+      watchJob("medium", submit.job_id, submit.step_id, mediumTarget.trim());
     } catch (error) {
       appendErrorForMode("medium", error instanceof Error ? error.message : "Medium scan failed.");
       setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
@@ -499,7 +620,11 @@ export function useScanController() {
     async (command: string) => {
       const finalCommand = command.trim();
       setAdvancedCommand(finalCommand);
-      if (!projectId || !finalCommand) return;
+      if (!projectId || !finalCommand) {
+        if (!projectId) toast.error("Select a project before starting a scan.");
+        else toast.error("Enter a command to run.");
+        return;
+      }
 
       resetRun("advanced");
       setIsSubmitting(true);
@@ -533,7 +658,7 @@ export function useScanController() {
             message: `Advanced command submitted: ${finalCommand}`,
           }),
         );
-        watchJob("advanced", submit.job_id, submit.step_id);
+        watchJob("advanced", submit.job_id, submit.step_id, finalCommand);
       } catch (error) {
         appendErrorForMode("advanced", error instanceof Error ? error.message : "Advanced scan failed.");
         setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));

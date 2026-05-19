@@ -22,6 +22,8 @@ function resolveProxyUrl(url: string): string {
   if (
     normalized === "backend" ||
     normalized.startsWith("backend/") ||
+    normalized === "dashboard" ||
+    normalized.startsWith("dashboard/") ||
     normalized === "scanner" ||
     normalized.startsWith("scanner/") ||
     normalized === "git" ||
@@ -33,28 +35,40 @@ function resolveProxyUrl(url: string): string {
   return `/api/backend/${normalized}`;
 }
 
-const proxyBaseQuery: BaseQueryFn<
+/**
+ * Wraps the proxy base query with a 401 interceptor.
+ * When any API call returns 401 (expired/invalid token), the user is
+ * redirected through the logout flow to clear stale session state,
+ * then back to login for a fresh authentication.
+ */
+const proxyBaseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
-> = (args, api, extraOptions) => {
-  if (typeof args === "string") {
-    return rawBaseQuery(resolveProxyUrl(args), api, extraOptions);
+> = async (args, api, extraOptions) => {
+  const resolvedArgs =
+    typeof args === "string"
+      ? resolveProxyUrl(args)
+      : { ...args, url: resolveProxyUrl(args.url) };
+
+  const result = await rawBaseQuery(resolvedArgs, api, extraOptions);
+
+  if (result.error && result.error.status === 401) {
+    // Token is expired/invalid — go through /logout to properly clear
+    // the session cookie + Keycloak tokens, then land on /login.
+    // This avoids a redirect loop where /login sees a stale session
+    // and sends the user back to /userdashboard.
+    if (typeof window !== "undefined") {
+      window.location.replace("/logout");
+    }
   }
 
-  return rawBaseQuery(
-    {
-      ...args,
-      url: resolveProxyUrl(args.url),
-    },
-    api,
-    extraOptions,
-  );
+  return result;
 };
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
-  baseQuery: proxyBaseQuery,
+  baseQuery: proxyBaseQueryWithReauth,
   tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git"],
   endpoints: () => ({}),
 });

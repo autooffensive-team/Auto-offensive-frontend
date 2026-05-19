@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import HolographicPlanet from "./holographic-planet";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -487,6 +489,35 @@ export default function HomeHero() {
           filter: drop-shadow(0 0 6px #00D0B2) drop-shadow(0 0 14px rgba(0,208,178,0.6));
         }
 
+        /* ── Planet sweep comets ── */
+        @keyframes sweepLeft {
+          0%   { stroke-dashoffset: 348.88; opacity: 0; }
+          12%  { opacity: 1; }
+          55%  { stroke-dashoffset: 87.08;  opacity: 1; }
+          72%  { stroke-dashoffset: 87.08;  opacity: 0; }
+          100% { stroke-dashoffset: 87.08;  opacity: 0; }
+        }
+        @keyframes sweepRight {
+          0%   { stroke-dashoffset: 348.88; opacity: 0; }
+          12%  { opacity: 1; }
+          55%  { stroke-dashoffset: 87.08;  opacity: 1; }
+          72%  { stroke-dashoffset: 87.08;  opacity: 0; }
+          100% { stroke-dashoffset: 87.08;  opacity: 0; }
+        }
+        @keyframes convergePulse {
+          0%,52%  { opacity: 0; r: 0; }
+          58%     { opacity: 0; }
+          64%     { opacity: 1; r: 6px; filter: drop-shadow(0 0 8px #00D0B2); }
+          76%     { opacity: 0; r: 0; }
+          100%    { opacity: 0; r: 0; }
+        }
+        .sweep-left  { animation: sweepLeft  1.8s cubic-bezier(0.25,0.1,0.25,1) 0.3s 1 forwards; }
+        .sweep-right { animation: sweepRight 1.8s cubic-bezier(0.25,0.1,0.25,1) 0.3s 1 forwards; }
+        .converge    {
+          animation: convergePulse 1.8s ease-out 0.3s 1 forwards;
+          filter: drop-shadow(0 0 6px #00D0B2) drop-shadow(0 0 14px rgba(0,208,178,0.6));
+        }
+
         /* ── Ripple button ── */
         .ripple-button { position: relative; overflow: hidden; }
         .ripple-button:before {
@@ -623,74 +654,23 @@ export default function HomeHero() {
         <div ref={s3Ref} aria-hidden="true"
           className="ao-s3 absolute top-0 left-0 pointer-events-none z-0 w-0.5 h-0.5 bg-primary" />
 
-        {/* ── Planet arc ── */}
+        {/* ── Holographic Planet ── */}
         <div aria-hidden="true"
-          className="absolute left-0 right-0 top-[62%] h-[80%] pointer-events-none z-2 overflow-visible"
+          className="absolute left-1/2 -translate-x-1/2 top-[15%] md:top-[-5%] h-[80%] w-full max-w-7xl pointer-events-none z-2 overflow-visible"
         >
-          {/* Sphere */}
-          <motion.div
-            className="
-              absolute top-[-2.5%] left-1/2 -translate-x-1/2
-              w-[150%] rounded-full overflow-hidden
-              bg-[#F7F5F0] dark:bg-[#09090B]
-            "
-            style={{ paddingTop:"150%" }}
-            initial={{ opacity:0 }}
-            animate={{ opacity:1 }}
-            transition={{ duration:0.9, delay:2.0 }}
+          {/* Three.js holographic planet */}
+          <div
+            className="absolute top-[-2.5%] left-1/2 -translate-x-1/2 w-[180%] sm:w-[180%] md:w-[200%] lg:w-[220%] max-w-500"
+            style={{ aspectRatio: "1 / 1" }}
           >
-            <div className="absolute rounded-full w-[46%] h-[42%] top-[-8%] left-[-6%]
-              bg-[#01509e] dark:bg-[#0a3a7a] opacity-[0.95] blur-[80px]" />
-            <div className="absolute rounded-full w-[38%] h-[34%] top-[-5%] right-[-4%]
-              bg-[#00d0b2] opacity-50 dark:opacity-70 blur-[70px]" />
-            <div className="absolute rounded-full w-[72%] h-[66%] top-[-55%] left-1/2 -translate-x-1/2
-              bg-[#F7F5F0] dark:bg-[#09090B] blur-[75px] dark:blur-[60px]" />
-            <div className="absolute rounded-full w-[42%] h-[38%] bottom-[-8%] left-[-4%]
-              bg-[#0194c7] dark:bg-[#00a8e8] opacity-75 dark:opacity-85 blur-[72px] dark:blur-[65px]" />
-            <div className="absolute rounded-full w-[30%] h-[26%] bottom-[-6%] right-[-2%]
-              bg-[#0194c7] dark:bg-[#00c4b4] opacity-50 dark:opacity-65 blur-[60px] dark:blur-[55px]" />
-            <div className="absolute rounded-full w-[30%] h-[26%] top-[22%] left-[35%]
-              bg-[#00d0b2] opacity-[0.18] dark:opacity-[0.28] blur-[55px] dark:blur-[50px]" />
-            {/* Radial overlay */}
-            <div className="absolute inset-0 rounded-full pointer-events-none
-              [background:radial-gradient(ellipse_at_50%_50%,transparent_0%,transparent_38%,rgba(240,248,255,0.25)_55%,rgba(220,235,245,0.55)_72%,rgba(200,220,240,0.80)_88%,rgba(185,210,235,0.92)_100%)]
-              dark:[background:radial-gradient(ellipse_at_50%_50%,transparent_0%,transparent_35%,rgba(9,9,11,0.20)_52%,rgba(9,9,11,0.55)_70%,rgba(9,9,11,0.82)_86%,rgba(9,9,11,0.95)_100%)]" />
-            {/* Top shine */}
-            <div className="absolute inset-0 rounded-full pointer-events-none
-              [background:radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.55)_0%,transparent_48%)]
-              dark:[background:radial-gradient(ellipse_at_50%_0%,rgba(0,208,178,0.18)_0%,rgba(0,168,232,0.08)_30%,transparent_55%)]" />
-          </motion.div>
-
-          {/* Outer glow ring */}
-          <motion.div
-            className="
-              absolute top-[-3%] left-1/2 -translate-x-1/2 w-[155%] rounded-full z-3
-              [box-shadow:0_0_0_2px_rgba(1,80,158,0.5),0_0_20px_8px_rgba(1,80,158,0.4),0_0_55px_22px_rgba(1,80,158,0.2),0_0_110px_45px_rgba(1,80,158,0.1),0_0_180px_80px_rgba(1,80,158,0.06)]
-              dark:[box-shadow:0_0_0_2px_rgba(0,208,178,0.6),0_0_20px_8px_rgba(0,168,232,0.5),0_0_55px_22px_rgba(0,208,178,0.28),0_0_110px_45px_rgba(1,80,158,0.18),0_0_180px_80px_rgba(0,208,178,0.1)]
-            "
-            style={{ paddingTop:"155%" }}
-            initial={{ opacity:0 }}
-            animate={{ opacity:1 }}
-            transition={{ duration:0.9, delay:1.0 }}
-          />
-
-          {/* Rim border */}
-          <motion.div
-            className="
-              absolute top-[-1%] left-1/2 -translate-x-1/2 w-[152%] rounded-full z-4
-              border-2 border-[rgba(0,208,178,0.7)] dark:border-[rgba(0,208,178,0.9)]
-              
-              
-            "
-            style={{ paddingTop:"152%" }}
-            initial={{ opacity:0 }}
-            animate={{ opacity:1 }}
-            transition={{ duration:0.9, delay:2.0 }}
-          />
+            <div className="absolute inset-0">
+              <HolographicPlanet />
+            </div>
+          </div>
 
           {/* Sweep comet SVG */}
           <div
-            className="absolute top-[-3%] left-1/2 -translate-x-1/2 w-[152%] rounded-full pointer-events-none z-6 overflow-visible"
+            className="absolute top-[1%] left-1/2 -translate-x-1/2 w-[120%] rounded-full pointer-events-none z-6 overflow-visible"
             style={{ paddingTop:"152%" }}
           >
             <svg
@@ -729,7 +709,7 @@ export default function HomeHero() {
           {/* Bottom fade veil */}
           <div className="
             absolute bottom-0 left-0 right-0 h-[35%] z-5
-            [background:linear-gradient(to_bottom,transparent,rgba(238,247,245,0.92))]
+            [background:linear-gradient(to_bottom,transparent,rgba(255,255,255,1))]
             dark:[background:linear-gradient(to_bottom,transparent,rgba(9,9,11,0.96))]
           " />
         </div>
@@ -747,7 +727,7 @@ export default function HomeHero() {
               text-[clamp(2.8rem,6vw,5rem)] font-bold
               leading-[1.08] tracking-[-0.02em] font-display
               text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
-              mb-[1.4rem]
+              mb-6
             "
             {...fadeUp(0.30)}
           >
@@ -776,7 +756,7 @@ export default function HomeHero() {
             className="
               text-base md:text-lg lg:text-xl
               text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]
-              max-w-124 mx-auto mb-[2.6rem]
+              max-w-124 mx-auto mb-8
               leading-[1.7] font-normal
             "
             {...fadeUp(0.50)}
@@ -790,28 +770,31 @@ export default function HomeHero() {
             {...fadeUp(0.70)}
           >
             {/* Primary */}
-            <button className="
-              group relative inline-flex w-full min-w-0 items-center justify-center
-              overflow-hidden rounded-xl border-2 border-primary bg-primary
-              px-3 py-3 sm:px-7.5 sm:py-3.5
-              text-[14px] sm:text-[15px] font-black leading-none text-white
-              transition-transform duration-200 hover:-translate-y-px
-              before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
-              before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
-              before:transition-transform before:duration-200 before:content-['']
-              after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
-              after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
-              after:transition-transform after:duration-200 after:content-['']
-              hover:before:translate-y-0 hover:after:translate-y-0
-              sm:w-auto
-            ">
+            <Link
+              href="/userdashboard"
+              className="
+                group relative inline-flex w-full min-w-0 items-center justify-center
+                overflow-hidden rounded-xl border-2 border-primary bg-primary
+                px-3 py-3 sm:px-7.5 sm:py-3.5
+                text-[14px] sm:text-[15px] font-black leading-none text-black
+                transition-transform duration-200 hover:-translate-y-px
+                before:pointer-events-none before:absolute before:inset-0 before:translate-y-full
+                before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)]
+                before:transition-transform before:duration-200 before:content-['']
+                after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full
+                after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)]
+                after:transition-transform after:duration-200 after:content-['']
+                hover:before:translate-y-0 hover:after:translate-y-0
+                sm:w-auto
+              "
+            >
               <span className="relative z-10 inline-flex items-center justify-center gap-2">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                 </svg>
                 <span className="min-w-0 whitespace-nowrap text-center">{t("primaryCta")}</span>
               </span>
-            </button>
+            </Link>
 
             {/* Secondary */}
             <button className="
@@ -836,7 +819,7 @@ export default function HomeHero() {
           {/* Stats */}
           <motion.div
             className="
-              flex justify-center gap-12 mt-16 pt-8
+              flex justify-center gap-12 mt-8 pt-8
               border-t border-[rgba(0,208,178,0.14)] dark:border-[rgba(0,208,178,0.1)]
               w-full
             "

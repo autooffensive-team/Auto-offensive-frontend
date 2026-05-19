@@ -35,8 +35,13 @@ import {
   useGetProviderRepositoryBranchesQuery,
   useLazyGetProviderConnectUrlQuery,
 } from "@/lib/redux/services/userdashboard/git/git-api";
+import { useGetIntegrationAccountsQuery } from "@/lib/redux/services/userdashboard/integrations/integrations-api";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import { useTriggerScanMutation } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import {
+  areProviderAccountQueriesReady,
+  buildConnectedProviderMap,
+} from "../../../../lib/redux/services/userdashboard/integrations/provider-account-gate";
 import type {
   GitProvider,
   ProviderAccount,
@@ -45,7 +50,6 @@ import type {
 import { FaGithub, FaGitlab } from "react-icons/fa";
 
 const providers: GitProvider[] = ["github", "gitlab"];
-const FIRST_TIME_CONNECT_NOTICE_KEY = "auto-offensive:first-connect-notice";
 
 const providerMeta: Record<
   GitProvider,
@@ -242,10 +246,6 @@ function resolveRequestedStep(searchParams: ReturnType<typeof useSearchParams>):
   return rawStep;
 }
 
-function buildFirstTimeConnectNoticeKey(userId: string): string {
-  return `${FIRST_TIME_CONNECT_NOTICE_KEY}:${userId}`;
-}
-
 // ─── Stepper config ───────────────────────────────────────────────────────────
 
 const STEPS = [
@@ -287,8 +287,8 @@ function OnboardingModal({
             relative w-full sm:max-w-120 md:max-w-130
             overflow-hidden
             rounded-t-3xl sm:rounded-3xl
-            border border-gray-200/70 dark:border-gray-700/60
-            bg-white dark:bg-gray-950
+            border border-slate-200/70 dark:border-slate-700/60
+            bg-white dark:bg-slate-950
             shadow-xl shadow-black/10
             max-h-[92dvh] sm:max-h-[88dvh]
             flex flex-col
@@ -297,7 +297,7 @@ function OnboardingModal({
         >
           {/* ── Drag handle (mobile only) ── */}
           <div className="flex justify-center pt-3 pb-1 sm:hidden">
-            <div className="h-1 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div className="h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-700" />
           </div>
 
           {/* Scrollable body */}
@@ -315,10 +315,10 @@ function OnboardingModal({
                   <Shield size={18} className="text-teal-600 dark:text-teal-400" strokeWidth={1.75} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[16px] sm:text-[17px] font-bold text-gray-900 dark:text-white leading-snug">
+                  <p className="text-[16px] sm:text-[17px] font-bold text-slate-900 dark:text-white leading-snug">
                     Before you connect
                   </p>
-                  <p className="mt-0.5 text-[12px] sm:text-[13px] text-gray-400 dark:text-gray-500">
+                  <p className="mt-0.5 text-[12px] sm:text-[13px] text-slate-400 dark:text-slate-500">
                     How Auto Offensive accesses your code
                   </p>
                 </div>
@@ -327,7 +327,7 @@ function OnboardingModal({
                   type="button"
                   onClick={onClose}
                   aria-label="Close"
-                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-400 transition-all duration-150 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-500 dark:hover:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-500 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
                 >
                   <X size={14} strokeWidth={2} />
                 </button>
@@ -335,22 +335,22 @@ function OnboardingModal({
             </div>
 
             {/* ── Divider ── */}
-            <div className="h-px mx-5 sm:mx-7 bg-gray-100 dark:bg-gray-800/80" />
+            <div className="h-px mx-5 sm:mx-7 bg-slate-100 dark:bg-slate-800/80" />
 
             {/* ── Access info rows ── */}
             <div className="px-5 sm:px-7 pt-4 pb-3 space-y-2.5">
               {/* Read-only */}
-              <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-gray-800 dark:bg-gray-900/60">
+              <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3.5 dark:border-slate-800 dark:bg-slate-900/60">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-500/15">
                   <Eye size={13} className="text-teal-600 dark:text-teal-400" strokeWidth={2} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 dark:text-white">
+                  <p className="text-[13px] font-semibold text-slate-900 dark:text-white">
                     Read-only access
                   </p>
-                  <p className="mt-1 text-[12px] leading-[1.6] text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-[12px] leading-[1.6] text-slate-500 dark:text-slate-400">
                     After connecting GitHub or GitLab, we can read your authorized repos — public and private.{" "}
-                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
                       We never edit, delete, create, or push
                     </span>{" "}
                     anything.
@@ -359,15 +359,15 @@ function OnboardingModal({
               </div>
 
               {/* Scan only */}
-              <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3.5 dark:border-gray-800 dark:bg-gray-900/60">
+              <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3.5 dark:border-slate-800 dark:bg-slate-900/60">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-500/15">
                   <Code2 size={13} className="text-indigo-600 dark:text-indigo-400" strokeWidth={2} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 dark:text-white">
+                  <p className="text-[13px] font-semibold text-slate-900 dark:text-white">
                     Used for scanning only
                   </p>
-                  <p className="mt-1 text-[12px] leading-[1.6] text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-[12px] leading-[1.6] text-slate-500 dark:text-slate-400">
                     Access is exclusively used to run security and code analysis scans. Your code is never stored or shared with third parties.
                   </p>
                 </div>
@@ -376,22 +376,22 @@ function OnboardingModal({
 
             {/* ── Supported languages ── */}
             <div className="px-5 sm:px-7 pb-5">
-              <p className="mb-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+              <p className="mb-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
                 Supported languages & package managers
               </p>
               <div className="grid grid-cols-2 gap-1.5">
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <div
                     key={lang.name}
-                    className="flex items-center gap-2.5 rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800/80 dark:bg-gray-900/50"
+                    className="flex items-center gap-2.5 rounded-lg border border-slate-100 bg-white px-3 py-2.5 dark:border-slate-800/80 dark:bg-slate-900/50"
                   >
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md overflow-hidden">
                       <lang.Icon size={18} />
                     </span>
-                    <span className="text-[12px] font-semibold text-gray-800 dark:text-gray-200 truncate">
+                    <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 truncate">
                       {lang.name}
                     </span>
-                    <span className="ml-auto text-[11px] text-gray-400 dark:text-gray-500 shrink-0 hidden sm:inline">
+                    <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-500 shrink-0 hidden sm:inline">
                       {lang.detail}
                     </span>
                   </div>
@@ -403,24 +403,24 @@ function OnboardingModal({
           {/* ── Footer: pinned to bottom ── */}
           <div className="
             shrink-0
-            border-t border-gray-100 dark:border-gray-800/80
-            bg-gray-50/80 dark:bg-gray-900/60
+            border-t border-slate-100 dark:border-slate-800/80
+            bg-slate-50/80 dark:bg-slate-900/60
             px-5 sm:px-7 pt-4 pb-5 sm:pb-6
           ">
             {/* Checkbox */}
             <label className="
               flex cursor-pointer items-start gap-3
-              rounded-xl border border-gray-200 bg-white px-4 py-3
-              transition-colors hover:border-gray-300 hover:bg-gray-50/80
-              dark:border-gray-700/80 dark:bg-gray-900/60 dark:hover:border-gray-600
+              rounded-xl border border-slate-200 bg-white px-4 py-3
+              transition-colors hover:border-slate-300 hover:bg-slate-50/80
+              dark:border-slate-700/80 dark:bg-slate-900/60 dark:hover:border-slate-600
             ">
               <input
                 type="checkbox"
                 checked={accepted}
                 onChange={(e) => setAccepted(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-teal-500 focus:ring-teal-500 dark:border-gray-600"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-teal-500 focus:ring-teal-500 dark:border-slate-600"
               />
-              <span className="text-[12.5px] sm:text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
+              <span className="text-[12.5px] sm:text-[13px] leading-relaxed text-slate-600 dark:text-slate-400">
                 I understand Auto Offensive has read-only access to my repositories and agree to the{" "}
                 <Link
                   href="/terms-of-service"
@@ -453,8 +453,8 @@ function OnboardingModal({
               Got it — connect my account
             </button>
 
-            <p className="mt-2.5 text-center text-[11px] text-gray-400 dark:text-gray-600">
-              Shown only once · per account
+            <p className="mt-2.5 text-center text-[11px] text-slate-400 dark:text-slate-600">
+              Hidden after a GitHub or GitLab account is connected
             </p>
           </div>
         </motion.div>
@@ -489,7 +489,7 @@ function StepIndicator({
                     ? "w-9 h-9 bg-teal-500 text-white shadow-md shadow-teal-500/30"
                     : isActive
                       ? "w-9 h-9 bg-teal-500 text-white ring-4 ring-teal-500/20 shadow-md shadow-teal-500/30"
-                      : "w-9 h-9 bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                      : "w-9 h-9 bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
                   }
                 `}
               >
@@ -505,7 +505,7 @@ function StepIndicator({
               <span
                 className={`
                   hidden sm:block text-[11px] font-semibold tracking-wide whitespace-nowrap transition-colors
-                  ${isActive ? "text-teal-600 dark:text-teal-400" : isCompleted ? "text-gray-600 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}
+                  ${isActive ? "text-teal-600 dark:text-teal-400" : isCompleted ? "text-slate-600 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}
                 `}
               >
                 {step.shortLabel}
@@ -513,7 +513,7 @@ function StepIndicator({
             </div>
 
             {index < STEPS.length - 1 && (
-              <div className="flex-1 mx-2 sm:mx-3 h-px relative overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="flex-1 mx-2 sm:mx-3 h-px relative overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                 <div
                   className={`absolute inset-y-0 left-0 bg-teal-500 transition-all duration-500 ${
                     completedSteps.has(step.id) ? "w-full" : "w-0"
@@ -554,7 +554,7 @@ function RepositoryCard({
         : "bg-orange-50 text-orange-400 dark:bg-orange-500/10 dark:text-orange-500 group-hover:bg-orange-100 dark:group-hover:bg-orange-500/20"
       : isSelected
         ? "bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
-        : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700";
+        : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700";
 
   return (
     <button
@@ -565,7 +565,7 @@ function RepositoryCard({
         focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40
         ${isSelected
           ? "border-teal-500/60 bg-teal-50/50 dark:border-teal-500/40 dark:bg-teal-500/[0.07] shadow-sm shadow-teal-500/10"
-          : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/60 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700 dark:hover:bg-gray-800/50"
+          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:bg-slate-800/50"
         }
       `}
     >
@@ -584,17 +584,17 @@ function RepositoryCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-0.5">
             {owner && (
-              <span className="text-[12px] text-gray-400 dark:text-gray-500 font-medium shrink-0">
-                {owner}<span className="text-gray-300 dark:text-gray-600">/</span>
+              <span className="text-[12px] text-slate-400 dark:text-slate-500 font-medium shrink-0">
+                {owner}<span className="text-slate-300 dark:text-slate-600">/</span>
               </span>
             )}
-            <span className={`text-[13px] font-semibold truncate ${isSelected ? "text-teal-700 dark:text-teal-300" : "text-gray-900 dark:text-white"}`}>
+            <span className={`text-[13px] font-semibold truncate ${isSelected ? "text-teal-700 dark:text-teal-300" : "text-slate-900 dark:text-white"}`}>
               {name}
             </span>
           </div>
 
           <div className="mt-2 flex items-center gap-3">
-            <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
+            <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
               <GitBranch size={10} strokeWidth={2} />
               {defaultBranch}
             </span>
@@ -646,11 +646,13 @@ export default function CodeScanningNewPageClient() {
 
   // ── Onboarding modal state ──
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [hasDismissedOnboardingModal, setHasDismissedOnboardingModal] = useState(false);
   const [isOnboardingReady, setIsOnboardingReady] = useState(false);
 
   const hasAppliedCallbackResume = useRef(false);
 
   const { data: authMe } = useGetAuthMeQuery();
+  const integrationAccountsQuery = useGetIntegrationAccountsQuery();
   const githubAccountsQuery = useGetProviderAccountsQuery("github");
   const gitlabAccountsQuery = useGetProviderAccountsQuery("gitlab");
   const githubRepositoriesQuery = useGetProviderRepositoriesQuery("github");
@@ -691,8 +693,14 @@ export default function CodeScanningNewPageClient() {
 
   const repositories = repositoriesByProvider[selectedProvider];
   const connectedAccounts = accountsByProvider[selectedProvider];
-  const hasAnyConnectedProvider =
-    accountsByProvider.github.length > 0 || accountsByProvider.gitlab.length > 0;
+  const connectedProviderMap = buildConnectedProviderMap(
+    integrationAccountsQuery.data ?? [],
+  );
+  const hasConnectedProvider =
+    connectedProviderMap.github || connectedProviderMap.gitlab;
+  const isProviderAccountsReady = areProviderAccountQueriesReady(
+    integrationAccountsQuery,
+  );
   const filteredRepositories = useMemo(
     () => filterRepositories(repositories, repoSearch),
     [repositories, repoSearch],
@@ -742,24 +750,24 @@ export default function CodeScanningNewPageClient() {
 
   // ── Determine whether to show onboarding modal ──
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const userId = authMe?.user?.user_id?.trim();
-    if (!userId) return;
+    if (!userId || !isProviderAccountsReady) return;
 
     // Already has a connected provider — skip the modal entirely
-    if (hasAnyConnectedProvider) {
+    if (hasConnectedProvider) {
       setShowOnboardingModal(false);
       setIsOnboardingReady(true);
       return;
     }
 
-    const storageKey = buildFirstTimeConnectNoticeKey(userId);
-    const noticeSeen = window.localStorage.getItem(storageKey) === "seen";
-
-    setShowOnboardingModal(!noticeSeen);
+    setShowOnboardingModal(!hasDismissedOnboardingModal);
     setIsOnboardingReady(true);
-  }, [authMe?.user?.user_id, hasAnyConnectedProvider]);
+  }, [
+    authMe?.user?.user_id,
+    hasConnectedProvider,
+    hasDismissedOnboardingModal,
+    isProviderAccountsReady,
+  ]);
 
   useEffect(() => {
     if (initialProvider === "github" || initialProvider === "gitlab") {
@@ -774,7 +782,7 @@ export default function CodeScanningNewPageClient() {
     const provider = searchParams.get("provider");
     const isConnectedProvider =
       (provider === "github" || provider === "gitlab") &&
-      accountsByProvider[provider].length > 0;
+      connectedProviderMap[provider];
 
     if (!isConnectedProvider) return;
 
@@ -788,15 +796,12 @@ export default function CodeScanningNewPageClient() {
       return new Set([...prev, 1]);
     });
     setCurrentStep((prev) => (prev < 2 ? 2 : prev));
-  }, [accountsByProvider, requestedStep, searchParams]);
+  }, [connectedProviderMap, requestedStep, searchParams]);
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
 
   function handleOnboardingAccept() {
-    const userId = authMe?.user?.user_id?.trim();
-    if (userId && typeof window !== "undefined") {
-      window.localStorage.setItem(buildFirstTimeConnectNoticeKey(userId), "seen");
-    }
+    setHasDismissedOnboardingModal(true);
     setShowOnboardingModal(false);
   }
 
@@ -912,37 +917,38 @@ export default function CodeScanningNewPageClient() {
 
   return (
     <>
-      {/* ── Onboarding modal (shown only once for new users) ── */}
+      {/* ── Onboarding modal (shown until a provider account is connected) ── */}
       {isOnboardingReady && showOnboardingModal && (
         <OnboardingModal onAccept={handleOnboardingAccept} onClose={handleOnboardingClose} />
       )}
 
-      <div className="space-y-6">
+      <div className="min-h-screen">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
         {/* Page header */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start justify-between gap-4"
+          className="flex items-start justify-between gap-3 sm:gap-4"
         >
           <div>
             <div className="mb-1 flex items-center gap-2">
-              <Zap size={13} className="text-teal-500 dark:text-teal-400" />
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+              <Zap size={11} className="text-teal-500 sm:size-3.25 dark:text-teal-400" />
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-teal-600 sm:text-[10px] md:text-[11px] dark:text-teal-400">
                 Repository Scanner
               </span>
             </div>
-            <h1 className="text-[24px] sm:text-[28px] font-bold leading-tight text-gray-900 dark:text-white">
+            <h1 className="text-lg font-bold leading-tight text-slate-900 sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
               New Code Scanning Run
             </h1>
-            <p className="mt-1 text-[13px] sm:text-[14px] text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
               Follow the steps below to connect, select, and trigger a scan.
             </p>
           </div>
           <Link
             href="/userdashboard/code-scanning"
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 sm:rounded-xl sm:px-3 sm:py-2 sm:text-[13px] md:px-4 md:py-2.5 md:text-sm dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={12} className="sm:size-3.5" />
             <span className="hidden sm:inline">Back to Projects</span>
             <span className="sm:hidden">Back</span>
           </Link>
@@ -969,25 +975,25 @@ export default function CodeScanningNewPageClient() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="rounded-[28px] border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+          className="rounded-xl border border-slate-200 bg-white sm:rounded-2xl dark:border-slate-800 dark:bg-slate-900"
         >
           {/* Stepper header */}
-          <div className="px-5 sm:px-8 pt-6 pb-5 border-b border-gray-100 dark:border-gray-800">
+          <div className="px-3 pt-4 pb-3 border-b border-slate-100 sm:px-5 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 dark:border-slate-800">
             <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
 
             {/* Mobile step label */}
             <div className="mt-3 sm:hidden text-center">
-              <span className="text-[12px] font-semibold text-gray-500 dark:text-gray-400">
+              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                 Step {currentStep} of {STEPS.length}
               </span>
-              <p className="text-[14px] font-bold text-gray-900 dark:text-white">
+              <p className="text-xs font-bold text-slate-900 dark:text-white">
                 {STEPS[currentStep - 1]?.label}
               </p>
             </div>
           </div>
 
           {/* Step content */}
-          <div className="p-5 sm:p-8">
+          <div className="p-3 sm:p-5 md:p-8">
             <AnimatePresence mode="wait">
               {/* ── STEP 1: Connect Provider ── */}
               {currentStep === 1 && (
@@ -998,9 +1004,9 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-5">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Connect a Provider</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5">
+                    <p className="text-sm font-bold text-slate-900 sm:text-base md:text-lg dark:text-white">Connect a Provider</p>
+                    <p className="mt-1 text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
                       Select a Git provider and authorize access to continue.
                     </p>
                   </div>
@@ -1020,10 +1026,10 @@ export default function CodeScanningNewPageClient() {
                           tabIndex={0}
                           onClick={() => handleSelectProvider(provider)}
                           onKeyDown={(e) => e.key === "Enter" && handleSelectProvider(provider)}
-                          className={`group relative cursor-pointer rounded-2xl border-2 px-5 py-5 text-left transition-all duration-200 ${
+                          className={`group relative cursor-pointer rounded-xl sm:rounded-2xl border-2 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 text-left transition-all duration-200 ${
                             isSelected
                               ? "border-teal-400 bg-teal-50/60 dark:border-teal-500/50 dark:bg-teal-500/10"
-                              : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+                              : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
                           }`}
                         >
                           {isConnected && (
@@ -1033,17 +1039,17 @@ export default function CodeScanningNewPageClient() {
                             </span>
                           )}
                           <div className="flex items-center gap-3">
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${meta.soft}`}>
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-xl sm:rounded-2xl ${meta.soft}`}>
                               <Icon size={22} />
                             </div>
                             <div>
-                              <p className="text-[15px] font-bold text-gray-900 dark:text-white">{meta.label}</p>
-                              <p className="mt-0.5 text-[12px] text-gray-500 dark:text-gray-400">
+                              <p className="text-[15px] font-bold text-slate-900 dark:text-white">{meta.label}</p>
+                              <p className="mt-0.5 text-[12px] text-slate-500 dark:text-slate-400">
                                 {formatConnectedText(accounts)}
                               </p>
                             </div>
                           </div>
-                          <p className="mt-3 text-[13px] leading-5 text-gray-500 dark:text-gray-400">
+                          <p className="mt-3 text-[13px] leading-5 text-slate-500 dark:text-slate-400">
                             {meta.description}
                           </p>
                           <button
@@ -1071,8 +1077,8 @@ export default function CodeScanningNewPageClient() {
                   )}
 
                   {/* Step 1 footer */}
-                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
-                    <p className="text-[13px] text-gray-400 dark:text-gray-500">
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
+                    <p className="text-[13px] text-slate-400 dark:text-slate-500">
                       {canProceedStep1
                         ? `${providerMeta[selectedProvider].label} is connected. You can proceed.`
                         : "Connect a provider to continue."}
@@ -1099,16 +1105,16 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-6">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Choose a Repository</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5 md:mb-6">
+                    <p className="text-sm font-bold text-slate-900 sm:text-base md:text-lg dark:text-white">Choose a Repository</p>
+                    <p className="mt-1 text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
                       Select which repository to scan. Your changes are saved as you select.
                     </p>
                   </div>
 
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-5">
                     <div className="flex-1 min-w-0">
-                      <div className="mb-4 inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-gray-800 dark:bg-gray-800/60">
+                      <div className="mb-4 inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-800/60">
                         {providers.map((provider) => {
                           const meta = providerMeta[provider];
                           const Icon = meta.Icon;
@@ -1123,8 +1129,8 @@ export default function CodeScanningNewPageClient() {
                               className={`
                                 relative inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold transition-all duration-150
                                 ${isActive
-                                  ? "bg-white text-gray-900 shadow-sm shadow-gray-200/80 dark:bg-gray-700 dark:text-white dark:shadow-gray-900"
-                                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                  ? "bg-white text-slate-900 shadow-sm shadow-gray-200/80 dark:bg-slate-700 dark:text-white dark:shadow-gray-900"
+                                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                                 }
                               `}
                             >
@@ -1141,51 +1147,51 @@ export default function CodeScanningNewPageClient() {
                       <div className="relative mb-3">
                         <Search
                           size={14}
-                          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                         />
                         <input
                           value={repoSearch}
                           onChange={(e) => setRepoSearch(e.target.value)}
                           placeholder={`Search ${providerMeta[selectedProvider].label} repositories…`}
                           className="
-                            w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-14
-                            text-[13px] text-gray-900 placeholder-gray-400
+                            w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-14
+                            text-[13px] text-slate-900 placeholder-slate-400
                             focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20
-                            dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500
+                            dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500
                             dark:focus:border-teal-500
                           "
                         />
                         <span className="
                           absolute right-3 top-1/2 -translate-y-1/2
-                          rounded-md border border-gray-200 bg-gray-50
-                          px-1.5 py-0.5 text-[10px] font-semibold text-gray-400
-                          dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500
+                          rounded-md border border-slate-200 bg-slate-50
+                          px-1.5 py-0.5 text-[10px] font-semibold text-slate-400
+                          dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500
                         ">
                           {filteredRepositories.length}
                         </span>
                       </div>
 
                       {connectedAccounts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/40">
-                          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <FolderGit2 size={18} className="text-gray-400 dark:text-gray-500" />
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-900/40">
+                          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+                            <FolderGit2 size={18} className="text-slate-400 dark:text-slate-500" />
                           </div>
-                          <p className="text-[14px] font-semibold text-gray-700 dark:text-gray-300">
+                          <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-300">
                             No account connected
                           </p>
-                          <p className="mt-1 text-[13px] text-gray-400 dark:text-gray-500 max-w-xs">
+                          <p className="mt-1 text-[13px] text-slate-400 dark:text-slate-500 max-w-xs">
                             Go back and connect{" "}
-                            <span className="font-medium text-gray-600 dark:text-gray-300">
+                            <span className="font-medium text-slate-600 dark:text-slate-300">
                               {providerMeta[selectedProvider].label}
                             </span>{" "}
                             to load your repositories.
                           </p>
                         </div>
                       ) : filteredRepositories.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-10 text-center dark:border-gray-700 dark:bg-gray-900/40">
-                          <Search size={16} className="mb-2 text-gray-300 dark:text-gray-600" />
-                          <p className="text-[13px] text-gray-400 dark:text-gray-500">
-                            No repositories match <span className="font-medium text-gray-600 dark:text-gray-300">&ldquo;{repoSearch}&rdquo;</span>
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/40">
+                          <Search size={16} className="mb-2 text-slate-300 dark:text-slate-600" />
+                          <p className="text-[13px] text-slate-400 dark:text-slate-500">
+                            No repositories match <span className="font-medium text-slate-600 dark:text-slate-300">&ldquo;{repoSearch}&rdquo;</span>
                           </p>
                         </div>
                       ) : (
@@ -1208,12 +1214,12 @@ export default function CodeScanningNewPageClient() {
 
                     <div className="w-full md:w-60 lg:w-65 shrink-0">
                       <div className="
-                        sticky top-4 rounded-xl border border-gray-200 bg-gray-50/60
-                        dark:border-gray-800 dark:bg-gray-800/40
+                        sticky top-4 rounded-xl border border-slate-200 bg-slate-50/60
+                        dark:border-slate-800 dark:bg-slate-800/40
                         overflow-hidden
                       ">
-                        <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                        <div className="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
                             Selected
                           </p>
                         </div>
@@ -1229,18 +1235,18 @@ export default function CodeScanningNewPageClient() {
                                 {selectedProvider === "gitlab" ? <FaGitlab size={13} /> : <FaGithub size={13} />}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
+                                <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">
                                   {asText(selectedRepository.name)}
                                 </p>
-                                <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
                                   {asText(selectedRepository.full_name).split("/")[0]}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="space-y-2 pt-1 border-t border-gray-200 dark:border-gray-700">
+                            <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-slate-700">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Visibility</span>
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500">Visibility</span>
                                 <span className={`
                                   inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold
                                   ${selectedRepository.is_private
@@ -1253,15 +1259,15 @@ export default function CodeScanningNewPageClient() {
                                 </span>
                               </div>
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Default branch</span>
-                                <span className="flex items-center gap-1 text-[11px] font-medium text-gray-700 dark:text-gray-300">
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500">Default branch</span>
+                                <span className="flex items-center gap-1 text-[11px] font-medium text-slate-700 dark:text-slate-300">
                                   <GitBranch size={10} strokeWidth={2} />
                                   {asText(selectedRepository.default_branch) || "main"}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[11px] text-gray-400 dark:text-gray-500">Provider</span>
-                                <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300 capitalize">
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500">Provider</span>
+                                <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 capitalize">
                                   {selectedProvider}
                                 </span>
                               </div>
@@ -1279,11 +1285,11 @@ export default function CodeScanningNewPageClient() {
                             <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${
                               selectedProvider === "gitlab"
                                 ? "bg-orange-50 text-orange-300 dark:bg-orange-500/10 dark:text-orange-700"
-                                : "bg-gray-100 text-gray-300 dark:bg-gray-700/60 dark:text-gray-600"
+                                : "bg-slate-100 text-slate-300 dark:bg-slate-700/60 dark:text-slate-600"
                             }`}>
                               {selectedProvider === "gitlab" ? <FaGitlab size={16} /> : <FaGithub size={16} />}
                             </div>
-                            <p className="text-[12px] text-gray-400 dark:text-gray-500 leading-snug">
+                            <p className="text-[12px] text-slate-400 dark:text-slate-500 leading-snug">
                               Pick a repository<br />from the list
                             </p>
                           </div>
@@ -1292,11 +1298,11 @@ export default function CodeScanningNewPageClient() {
                     </div>
                   </div>
 
-                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <button
                       type="button"
                       onClick={() => handleBackToStep(1)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                     >
                       <ArrowLeft size={14} />
                       Back
@@ -1323,18 +1329,18 @@ export default function CodeScanningNewPageClient() {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <div className="mb-6">
-                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">Scan Configuration</p>
-                    <p className="mt-1 text-[14px] text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 sm:mb-5 md:mb-6">
+                    <p className="text-sm font-bold text-slate-900 sm:text-base md:text-lg dark:text-white">Scan Configuration</p>
+                    <p className="mt-1 text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
                       Finalize your project key and target branch before triggering the scan.
                     </p>
                   </div>
 
-                  <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-                    <div className="space-y-4">
-                      <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+                  <div className="grid gap-3 sm:gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
                         <div className="px-4 pt-4 pb-3">
-                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
                             <ShieldCheck size={11} />
                             Project Key
                           </label>
@@ -1346,45 +1352,45 @@ export default function CodeScanningNewPageClient() {
                             }}
                             placeholder="github-acme-api-security"
                             className="
-                              w-full rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-2.5
-                              text-[14px] font-mono text-gray-900 placeholder-gray-300
+                              w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5
+                              text-[14px] font-mono text-slate-900 placeholder-gray-300
                               focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
-                              dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-600
-                              dark:focus:bg-gray-900 transition-colors
+                              dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-gray-600
+                              dark:focus:bg-slate-900 transition-colors
                             "
                           />
                         </div>
-                        <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
-                          <span className="text-[11px] text-gray-400 dark:text-gray-500 shrink-0">Normalized:</span>
+                        <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 dark:border-slate-800 dark:bg-slate-800/40">
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500 shrink-0">Normalized:</span>
                           <code className={`text-[12px] font-mono truncate ${
                             normalizeProjectKey(projectKey)
                               ? "text-teal-600 dark:text-teal-400"
-                              : "text-gray-300 dark:text-gray-600 italic"
+                              : "text-slate-300 dark:text-slate-600 italic"
                           }`}>
                             {normalizeProjectKey(projectKey) || "not set"}
                           </code>
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+                      <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
                         <div className="px-4 pt-4 pb-3">
-                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">
+                          <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
                             <GitBranch size={11} />
                             Target Branch
                           </label>
                           <div className="relative">
-                            <GitBranch size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                            <GitBranch size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                             <select
                               value={selectedBranchValue}
                               onChange={(e) => setBranch(e.target.value)}
                               disabled={!selectedRepository}
                               className="
-                                w-full rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3.5 py-2.5
-                                text-[14px] text-gray-900
+                                w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3.5 py-2.5
+                                text-[14px] text-slate-900
                                 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20
                                 disabled:opacity-50 disabled:cursor-not-allowed
-                                dark:border-gray-700 dark:bg-gray-800 dark:text-white
-                                dark:focus:bg-gray-900 transition-colors
+                                dark:border-slate-700 dark:bg-slate-800 dark:text-white
+                                dark:focus:bg-slate-900 transition-colors
                               "
                             >
                               <option value="">
@@ -1402,13 +1408,13 @@ export default function CodeScanningNewPageClient() {
                             </select>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50/80 px-4 py-2.5 dark:border-gray-800 dark:bg-gray-800/40">
+                        <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 dark:border-slate-800 dark:bg-slate-800/40">
                           {branchesQuery.isFetching ? (
-                            <LoaderCircle size={11} className="animate-spin text-gray-400 dark:text-gray-500" />
+                            <LoaderCircle size={11} className="animate-spin text-slate-400 dark:text-slate-500" />
                           ) : (
-                            <GitBranch size={11} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                            <GitBranch size={11} className="text-slate-400 dark:text-slate-500 shrink-0" />
                           )}
-                          <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500">
                             {branchesQuery.isFetching
                               ? "Fetching branches from remote…"
                               : selectedBranchValue
@@ -1431,9 +1437,9 @@ export default function CodeScanningNewPageClient() {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                      <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
-                        <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40 overflow-hidden">
+                        <div className="border-b border-slate-200 px-4 py-2.5 dark:border-slate-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
                             Scan Target
                           </p>
                         </div>
@@ -1447,16 +1453,16 @@ export default function CodeScanningNewPageClient() {
                               {selectedProvider === "gitlab" ? <FaGitlab size={13} /> : <FaGithub size={13} />}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
+                              <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">
                                 {asText(selectedRepository?.name) || "—"}
                               </p>
-                              <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
                                 {asText(selectedRepository?.full_name).split("/")[0] || providerMeta[selectedProvider].label}
                               </p>
                             </div>
                           </div>
 
-                          <div className="border-t border-gray-200 dark:border-gray-700" />
+                          <div className="border-t border-slate-200 dark:border-slate-700" />
 
                           <div className="space-y-2">
                             {[
@@ -1476,11 +1482,11 @@ export default function CodeScanningNewPageClient() {
                               },
                             ].map(({ label, value, icon, mono }) => (
                               <div key={label} className="flex items-start justify-between gap-2">
-                                <span className="shrink-0 text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1">
+                                <span className="shrink-0 text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
                                   {icon}
                                   {label}
                                 </span>
-                                <span className={`text-right text-[11px] break-all text-gray-700 dark:text-gray-300 max-w-37.5 ${mono ? "font-mono" : "font-medium"}`}>
+                                <span className={`text-right text-[11px] break-all text-slate-700 dark:text-slate-300 max-w-37.5 ${mono ? "font-mono" : "font-medium"}`}>
                                   {value}
                                 </span>
                               </div>
@@ -1489,9 +1495,9 @@ export default function CodeScanningNewPageClient() {
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-gray-200 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40 overflow-hidden">
-                        <div className="border-b border-gray-200 px-4 py-2.5 dark:border-gray-700">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40 overflow-hidden">
+                        <div className="border-b border-slate-200 px-4 py-2.5 dark:border-slate-700">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
                             Readiness
                           </p>
                         </div>
@@ -1504,15 +1510,15 @@ export default function CodeScanningNewPageClient() {
                           ].map(({ label, ok }) => (
                             <div key={label} className="flex items-center gap-2">
                               <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors ${
-                                ok ? "bg-teal-500 text-white" : "bg-gray-200 dark:bg-gray-700"
+                                ok ? "bg-teal-500 text-white" : "bg-slate-200 dark:bg-slate-700"
                               }`}>
                                 {ok
                                   ? <CheckCircle2 size={10} strokeWidth={3} />
-                                  : <span className="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-500" />
+                                  : <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
                                 }
                               </div>
                               <span className={`text-[12px] font-medium ${
-                                ok ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"
+                                ok ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"
                               }`}>
                                 {label}
                               </span>
@@ -1533,11 +1539,11 @@ export default function CodeScanningNewPageClient() {
                     </div>
                   </div>
 
-                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+                  <div className="mt-8 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <button
                       type="button"
                       onClick={() => handleBackToStep(2)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-[14px] font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                     >
                       <ArrowLeft size={14} />
                       Back
@@ -1561,6 +1567,7 @@ export default function CodeScanningNewPageClient() {
             </AnimatePresence>
           </div>
         </motion.div>
+      </div>
       </div>
     </>
   );

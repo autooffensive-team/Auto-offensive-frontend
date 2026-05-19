@@ -269,6 +269,63 @@ export type GetFileIssuesRequest = {
   file_path: string;
 };
 
+// ─── Security Hotspots ───────────────────────────────────────────────────────
+
+export type HotspotResponse = {
+  key: string;
+  security_category: string;
+  vulnerability_probability: string;
+  status: string;
+  message: string;
+  file_path: string;
+  line: number;
+};
+
+export type HotspotListResponse = {
+  hotspots: HotspotResponse[];
+  page: number;
+  page_size: number;
+  total: number;
+};
+
+export type HotspotWhereResponse = {
+  component_key: string;
+  file_path: string;
+  line: number;
+  text_range: TextRangeResponse;
+  code_snippet: string;
+};
+
+export type HotspotReviewResponse = {
+  message: string;
+  vulnerability_probability: string;
+  status: string;
+  security_category: string;
+  rule_key: string;
+  rule_name: string;
+  html_desc: string;
+  resolution: string;
+};
+
+export type HotspotDetailResponse = {
+  where_is_hotspot: HotspotWhereResponse;
+  review: HotspotReviewResponse;
+  activity: IssueActivityResponse;
+  more_info: IssueMoreInfoResponse;
+};
+
+export type ListHotspotsRequest = {
+  scan_id: string;
+  status_filter?: string;
+  page?: number;
+  page_size?: number;
+};
+
+export type GetHotspotDetailRequest = {
+  scan_id: string;
+  hotspot_key: string;
+};
+
 export type ListDependenciesRequest = {
   scan_id: string;
   tool?: string;

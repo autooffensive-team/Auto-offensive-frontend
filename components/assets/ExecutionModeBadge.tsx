@@ -27,7 +27,7 @@ const config: Record<ExecutionMode, { icon: typeof Globe; label: string; classNa
   unknown: {
     icon: HelpCircle,
     label: "Unknown",
-    className: "text-gray-500 dark:text-gray-400",
+    className: "text-slate-500 dark:text-slate-400",
   },
 };
 

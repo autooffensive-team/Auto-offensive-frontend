@@ -1,361 +1,453 @@
 "use client";
 
-import { useState } from "react";
-import { Search, ChevronRight, BookOpen, Shield, Zap, Users, CreditCard, Mail } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 
-interface FAQItem {
+/* ─── Types ─────────────────────────────────── */
+interface AccordionItem {
   id: string;
-  question: string;
-  answer: React.ReactNode;
+  index: string;
+  title: string;
+  content: React.ReactNode;
 }
 
-function FAQAccordion({
-  searchQuery,
-  faqItems,
-  emptyText,
+/* ─── Accordion Item Component ───────────────── */
+function AccItem({
+  item,
+  isOpen,
+  onToggle,
 }: {
-  searchQuery: string;
-  faqItems: FAQItem[];
-  emptyText: string;
+  item: AccordionItem;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-
-  const filteredFAQs = faqItems.filter((item) =>
-    item.question.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="space-y-0">
-      {filteredFAQs.map((item) => (
-        <div key={item.id} className="border-t border-black/[0.14] dark:border-white/[0.14]">
-          <button
-            onClick={() => setOpenId(openId === item.id ? null : item.id)}
-            className="w-full bg-transparent border-none cursor-pointer py-5 md:py-7 text-left flex items-center justify-between gap-4"
-          >
-            <span className="text-base md:text-[1.1rem] font-semibold tracking-[-0.01em] text-[#1A1A1A] dark:text-[#EDEDED]">
-              {item.question}
-            </span>
-            <span
-              className={`w-8 h-8 border rounded-full flex items-center justify-center text-xl leading-none shrink-0 transition-all duration-300 ${
-                openId === item.id
-                  ? "bg-[#00BCA1] border-[#00BCA1] text-white rotate-45"
-                  : "border-black/[0.14] dark:border-white/[0.14] text-[#5C5C5C] dark:text-[#9A9A9A]"
-              }`}
-            >
-              +
-            </span>
-          </button>
-          <div className={`overflow-hidden transition-all duration-300 ${openId === item.id ? "block pb-9" : "hidden"}`}>
-            {item.answer}
-          </div>
-        </div>
-      ))}
-      {filteredFAQs.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-[#5C5C5C] dark:text-[#9A9A9A]">{emptyText}</p>
-        </div>
-      )}
+    <div id={item.id} className="border-t border-black/[0.14] dark:border-white/[0.14]">
+      <button
+        aria-expanded={isOpen}
+        onClick={onToggle}
+        className="w-full bg-transparent border-none cursor-pointer py-5 md:py-7 grid items-center text-left text-[#1A1A1A] dark:text-[#EDEDED] gap-5"
+        style={{ gridTemplateColumns: "44px 1fr auto" }}
+      >
+        <span className="text-[11px] text-[#9A9A9A] tracking-[0.08em] font-sans">
+          {item.index}
+        </span>
+        <span
+          className={`text-base md:text-[1.1rem] font-semibold tracking-[-0.01em] transition-colors duration-200 font-heading ${
+            isOpen ? "text-[#00BCA1]" : ""
+          }`}
+        >
+          {item.title}
+        </span>
+        <span
+          className={`w-8 h-8 border rounded-full flex items-center justify-center text-xl leading-none shrink-0 transition-all duration-300 ${
+            isOpen
+              ? "bg-[#00BCA1] border-[#00BCA1] text-white rotate-45"
+              : "border-black/[0.14] dark:border-white/[0.14] text-[#5C5C5C] dark:text-[#9A9A9A]"
+          }`}
+        >
+          +
+        </span>
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          isOpen ? "block pb-9 pl-16" : "hidden"
+        }`}
+      >
+        {item.content}
+      </div>
     </div>
   );
 }
 
+/* ─── Reusable content components ────────────── */
+const BodyP = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <p className={`text-[20px] leading-[1.9] text-[#5C5C5C] dark:text-[#9A9A9A] mb-4 ${className}`}>
+    {children}
+  </p>
+);
+
+const Em = ({ children }: { children: React.ReactNode }) => (
+  <strong className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">{children}</strong>
+);
+
+const Notice = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
+  <div
+    className={`border-l-[3px] border-[#00BCA1] px-4.5 py-3.5 rounded-r-lg text-[20px] leading-[1.7] my-4 ${
+      dark
+        ? "bg-[#1A1A1A] dark:bg-[#111113] text-[#F7F5F0] dark:text-[#EDEDED]"
+        : "bg-[rgba(0,188,161,0.09)] dark:bg-[rgba(0,188,161,0.12)] text-[#1A1A1A] dark:text-[#EDEDED]"
+    }`}
+  >
+    {children}
+  </div>
+);
+
+const Warning = ({ children }: { children: React.ReactNode }) => (
+  <div className="border-l-[3px] border-amber-500 bg-amber-50 dark:bg-amber-950/30 px-4.5 py-3.5 rounded-r-lg text-[20px] leading-[1.7] my-4">
+    {children}
+  </div>
+);
+
+const CheckList = ({ items }: { items: { text: React.ReactNode; no?: boolean }[] }) => (
+  <ul className="list-none my-3">
+    {items.map((item, i) => (
+      <li key={i} className="text-[20px] text-[#5C5C5C] dark:text-[#9A9A9A] py-1.5 flex gap-2.5 items-start leading-[1.6]">
+        <span className={`shrink-0 mt-px ${item.no ? "text-[#9A9A9A]" : "text-[#00BCA1]"}`}>
+          {item.no ? "✕" : "→"}
+        </span>
+        <span>{item.text}</span>
+      </li>
+    ))}
+  </ul>
+);
+
+const DataRow = ({ label, val, last = false }: { label: string; val: string; last?: boolean }) => (
+  <div
+    className={`flex justify-between items-center py-2.75 text-[20px] ${
+      !last ? "border-b border-black/9 dark:border-white/9" : ""
+    }`}
+  >
+    <span className="text-[#5C5C5C] dark:text-[#9A9A9A]">{label}</span>
+    <span className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">{val}</span>
+  </div>
+);
+
+const ItemCard = ({ label, val }: { label: string; val: string }) => (
+  <div className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded p-4">
+    <div className="text-[11px] tracking-[0.14em] uppercase text-[#9A9A9A] mb-2 font-sans">{label}</div>
+    <div className="text-[20px] text-[#1A1A1A] dark:text-[#EDEDED] leading-[1.6]">{val}</div>
+  </div>
+);
+
+const ContactCard = ({
+  type,
+  email,
+  note,
+}: {
+  type: string;
+  email: string;
+  note: string;
+}) => (
+  <div className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded p-5">
+    <div className="text-[11px] tracking-[0.16em] uppercase text-[#9A9A9A] mb-2.5 font-sans">{type}</div>
+    <div className="text-[20px] text-[#00BCA1] mb-1.5 break-all font-medium">{email}</div>
+    <div className="text-[20px] text-[#9A9A9A]">{note}</div>
+  </div>
+);
+
+/* ─── Main Export ────────────────────────────── */
 export default function HelpCenterContent() {
   const t = useTranslations("helpCenterPage");
-  const [activeCategory, setActiveCategory] = useState<string>("getting-started");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [openId, setOpenId] = useState<string>("what-is");
+  const [activeNav, setActiveNav] = useState<string>("what-is");
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const categories = [
-    { id: "getting-started", label: t("categories.gettingStarted"), icon: BookOpen },
-    { id: "account", label: t("categories.account"), icon: Shield },
-    { id: "scanning", label: t("categories.scanning"), icon: Zap },
-    { id: "team", label: t("categories.team"), icon: Users },
-    { id: "billing", label: t("categories.billing"), icon: CreditCard },
-    { id: "contact", label: t("categories.contact"), icon: Mail },
-  ];
-
-  const answerClass = "text-[20px] leading-[1.9] text-[#5C5C5C] dark:text-[#9A9A9A]";
-
-  const faqItems: FAQItem[] = [
+  const accordionItems: AccordionItem[] = [
     {
       id: "what-is",
-      question: t("faq.whatIs.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.whatIs.p1")}</p>
-          <p>{t("faq.whatIs.p2")}</p>
-        </div>
+      index: "01",
+      title: t("faq.whatIs.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.whatIs.p1")}</BodyP>
+          <BodyP>{t("faq.whatIs.p2")}</BodyP>
+        </>
       ),
     },
     {
       id: "who-for",
-      question: t("faq.whoFor.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.whoFor.intro")}</p>
-          <ul className="list-none space-y-2">
-            {Array.from({ length: 5 }, (_, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#00BCA1]">→</span>
-                {t(`faq.whoFor.items.${i}`)}
-              </li>
-            ))}
-          </ul>
-        </div>
+      index: "02",
+      title: t("faq.whoFor.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.whoFor.intro")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 5 }, (_, i) => ({
+              text: t(`faq.whoFor.items.${i}`),
+            }))}
+          />
+        </>
       ),
     },
     {
       id: "how-start",
-      question: t("faq.howStart.question"),
-      answer: (
-        <div className={answerClass}>
-          <ol className="list-decimal list-inside space-y-3">
-            {Array.from({ length: 5 }, (_, i) => (
-              <li key={i}>{t(`faq.howStart.steps.${i}`)}</li>
-            ))}
-          </ol>
-          <p className="mt-4">{t("faq.howStart.note")}</p>
-        </div>
+      index: "03",
+      title: t("faq.howStart.question"),
+      content: (
+        <>
+          <CheckList
+            items={Array.from({ length: 5 }, (_, i) => ({
+              text: t(`faq.howStart.steps.${i}`),
+            }))}
+          />
+          <Notice>{t("faq.howStart.note")}</Notice>
+        </>
       ),
     },
     {
       id: "legal-scanning",
-      question: t("faq.legalScanning.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.legalScanning.p1")}</p>
-          <div className="border-l-[3px] border-amber-500 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 rounded-r-lg">
+      index: "04",
+      title: t("faq.legalScanning.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.legalScanning.p1")}</BodyP>
+          <Warning>
             <p className="text-amber-800 dark:text-amber-200">{t("faq.legalScanning.warning")}</p>
-          </div>
-          <p className="mt-4">{t("faq.legalScanning.p2")}</p>
-        </div>
+          </Warning>
+          <BodyP>{t("faq.legalScanning.p2")}</BodyP>
+        </>
       ),
     },
     {
       id: "free-tier",
-      question: t("faq.freeTier.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.freeTier.intro")}</p>
-          <ul className="space-y-2 mb-4">
-            {Array.from({ length: 6 }, (_, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#00BCA1]">→</span>
-                {t(`faq.freeTier.items.${i}`)}
-              </li>
-            ))}
-          </ul>
-          <p>{t("faq.freeTier.outro")}</p>
-        </div>
+      index: "05",
+      title: t("faq.freeTier.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.freeTier.intro")}</BodyP>
+          <DataRow label="Daily scans" val="3 scans / day" />
+          <DataRow label="Max scan duration" val="30 minutes" />
+          <DataRow label="Concurrent scans" val="1 at a time" />
+          <DataRow label="Target scope" val="Single domain per scan" />
+          <DataRow label="Storage" val="100 GB scan history" />
+          <DataRow label="Tools available" val="All 14+ tools" last />
+          <BodyP className="mt-4">{t("faq.freeTier.outro")}</BodyP>
+        </>
       ),
     },
     {
       id: "tools-available",
-      question: t("faq.toolsAvailable.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.toolsAvailable.intro")}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      index: "06",
+      title: t("faq.toolsAvailable.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.toolsAvailable.intro")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
             {Array.from({ length: 12 }, (_, i) => (
-              <div key={i} className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded px-3 py-2 text-[#1A1A1A] dark:text-[#EDEDED]">
-                {t(`faq.toolsAvailable.items.${i}`)}
-              </div>
+              <ItemCard key={i} label={`Tool ${String(i + 1).padStart(2, "0")}`} val={t(`faq.toolsAvailable.items.${i}`)} />
             ))}
           </div>
-        </div>
+        </>
       ),
     },
     {
       id: "api-access",
-      question: t("faq.apiAccess.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.apiAccess.intro")}</p>
-          <ul className="space-y-2 mb-4">
-            {Array.from({ length: 4 }, (_, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#00BCA1]">→</span>
-                {t(`faq.apiAccess.items.${i}`)}
-              </li>
-            ))}
-          </ul>
-          <p>{t("faq.apiAccess.outro")}</p>
-        </div>
+      index: "07",
+      title: t("faq.apiAccess.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.apiAccess.intro")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 4 }, (_, i) => ({
+              text: t(`faq.apiAccess.items.${i}`),
+            }))}
+          />
+          <BodyP className="mt-4">{t("faq.apiAccess.outro")}</BodyP>
+        </>
       ),
     },
     {
       id: "data-security",
-      question: t("faq.dataSecurity.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.dataSecurity.intro")}</p>
-          <ul className="space-y-3">
-            {Array.from({ length: 5 }, (_, i) => (
-              <li key={i}>{t(`faq.dataSecurity.items.${i}`)}</li>
-            ))}
-          </ul>
-          <p className="mt-4">{t("faq.dataSecurity.outro")}</p>
-        </div>
+      index: "08",
+      title: t("faq.dataSecurity.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.dataSecurity.intro")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 5 }, (_, i) => ({
+              text: t(`faq.dataSecurity.items.${i}`),
+            }))}
+          />
+          <Notice>{t("faq.dataSecurity.outro")}</Notice>
+        </>
       ),
     },
     {
       id: "team-collab",
-      question: t("faq.teamCollab.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.teamCollab.intro")}</p>
-          <ul className="space-y-2 mb-4">
-            {Array.from({ length: 5 }, (_, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#00BCA1]">→</span>
-                {t(`faq.teamCollab.items.${i}`)}
-              </li>
-            ))}
-          </ul>
-          <p>{t("faq.teamCollab.outro")}</p>
-        </div>
+      index: "09",
+      title: t("faq.teamCollab.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.teamCollab.intro")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 5 }, (_, i) => ({
+              text: t(`faq.teamCollab.items.${i}`),
+            }))}
+          />
+          <BodyP className="mt-4">{t("faq.teamCollab.outro")}</BodyP>
+        </>
       ),
     },
     {
       id: "export-data",
-      question: t("faq.exportData.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.exportData.intro")}</p>
-          <div className="grid grid-cols-3 gap-3 mb-4">
+      index: "10",
+      title: t("faq.exportData.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.exportData.intro")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-5">
             {["JSON", "CSV", "PDF"].map((format, i) => (
-              <div key={format} className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded p-4 text-center">
-                <div className="text-[24px] font-bold text-[#00BCA1] mb-1">{format}</div>
-                <div className="text-[14px] text-[#9A9A9A]">{t(`faq.exportData.formats.${i}`)}</div>
-              </div>
+              <ItemCard key={format} label={format} val={t(`faq.exportData.formats.${i}`)} />
             ))}
           </div>
-          <p>{t("faq.exportData.outro")}</p>
-        </div>
+          <BodyP>{t("faq.exportData.outro")}</BodyP>
+        </>
       ),
     },
     {
       id: "upgrade-plan",
-      question: t("faq.upgradePlan.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.upgradePlan.intro")}</p>
-          <ol className="list-decimal list-inside space-y-2 mb-4">
-            {Array.from({ length: 4 }, (_, i) => (
-              <li key={i}>{t(`faq.upgradePlan.steps.${i}`)}</li>
-            ))}
-          </ol>
-          <p>{t("faq.upgradePlan.outro")}</p>
-        </div>
+      index: "11",
+      title: t("faq.upgradePlan.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.upgradePlan.intro")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 4 }, (_, i) => ({
+              text: t(`faq.upgradePlan.steps.${i}`),
+            }))}
+          />
+          <BodyP className="mt-4">{t("faq.upgradePlan.outro")}</BodyP>
+        </>
       ),
     },
     {
       id: "refund-policy",
-      question: t("faq.refundPolicy.question"),
-      answer: (
-        <div className={answerClass}>
-          <p>{t("faq.refundPolicy.p1")}</p>
-          <p className="mt-4">{t("faq.refundPolicy.p2")}</p>
-          <p className="mt-4">{t("faq.refundPolicy.p3")}</p>
-        </div>
+      index: "12",
+      title: t("faq.refundPolicy.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.refundPolicy.p1")}</BodyP>
+          <BodyP>{t("faq.refundPolicy.p2")}</BodyP>
+          <BodyP>{t("faq.refundPolicy.p3")}</BodyP>
+        </>
       ),
     },
     {
       id: "report-bug",
-      question: t("faq.reportBug.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.reportBug.intro")}</p>
-          <div className="bg-[#111113] dark:bg-[#1A1A1A] border border-black/[0.14] dark:border-white/[0.14] rounded p-4 mb-4">
-            <div className="text-[20px] text-[#00BCA1] font-medium">security@auto-offensive.com</div>
-            <div className="text-[16px] text-[#9A9A9A] mt-1">{t("faq.reportBug.response")}</div>
-          </div>
-          <p>{t("faq.reportBug.include")}</p>
-          <ul className="space-y-1 mt-2">
-            {Array.from({ length: 3 }, (_, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#00BCA1]">→</span>
-                {t(`faq.reportBug.items.${i}`)}
-              </li>
-            ))}
-          </ul>
-        </div>
+      index: "13",
+      title: t("faq.reportBug.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.reportBug.intro")}</BodyP>
+          <ContactCard
+            type="Security"
+            email="security@auto-offensive.com"
+            note={t("faq.reportBug.response")}
+          />
+          <BodyP className="mt-4">{t("faq.reportBug.include")}</BodyP>
+          <CheckList
+            items={Array.from({ length: 3 }, (_, i) => ({
+              text: t(`faq.reportBug.items.${i}`),
+            }))}
+          />
+        </>
       ),
     },
     {
       id: "get-support",
-      question: t("faq.getSupport.question"),
-      answer: (
-        <div className={answerClass}>
-          <p className="mb-4">{t("faq.getSupport.intro")}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      index: "14",
+      title: t("faq.getSupport.question"),
+      content: (
+        <>
+          <BodyP>{t("faq.getSupport.intro")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
             {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded p-4">
-                <div className="text-[16px] text-[#00BCA1] font-medium mb-2">{t(`faq.getSupport.cards.${i}.title`)}</div>
-                <div className="text-[14px]">{t(`faq.getSupport.cards.${i}.value`)}</div>
-                <div className="text-[12px] text-[#9A9A9A] mt-1">{t(`faq.getSupport.cards.${i}.meta`)}</div>
-              </div>
+              <ContactCard
+                key={i}
+                type={t(`faq.getSupport.cards.${i}.title`)}
+                email={t(`faq.getSupport.cards.${i}.value`)}
+                note={t(`faq.getSupport.cards.${i}.meta`)}
+              />
             ))}
           </div>
-        </div>
+        </>
       ),
     },
   ];
 
+  const navItems = accordionItems.map((item) => ({ href: item.id, label: item.title }));
+
+  /* Scroll spy */
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveNav(entry.target.id);
+        });
+      },
+      { rootMargin: "-30% 0px -60% 0px" }
+    );
+    Object.values(sectionRefs.current).forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const handleNavClick = (id: string) => {
+    setOpenId(id);
+    setTimeout(() => {
+      sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 30);
+  };
+
   return (
-    <div className="bg-[#F7F5F0] dark:bg-[#09090B]">
-      <div className="max-w-7xl mx-auto" style={{ padding: "clamp(40px,6vw,72px) clamp(24px,6vw,80px)" }}>
-        <div className="mb-12">
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9A9A9A]" />
-            <input
-              type="text"
-              placeholder={t("searchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded-lg text-[#1A1A1A] dark:text-[#EDEDED] placeholder:text-[#9A9A9A] text-lg"
-            />
+    <>
+      {/* ── MAIN CONTENT ── */}
+      <div
+        className="max-w-7xl mx-auto grid gap-10 lg:gap-16"
+        style={{
+          gridTemplateColumns: "220px 1fr",
+          padding: "clamp(40px,6vw,72px) clamp(24px,6vw,80px)",
+        }}
+      >
+        {/* Sidebar */}
+        <aside className="hidden md:block sticky top-8 h-fit">
+          <div className="text-[11px] tracking-[0.2em] uppercase text-[#9A9A9A] mb-3.5 font-sans">
+            Sections
           </div>
-        </div>
+          <ul className="list-none border-l border-black/[0.14] dark:border-white/[0.14]">
+            {navItems.map((nav) => (
+              <li key={nav.href}>
+                <button
+                  onClick={() => handleNavClick(nav.href)}
+                  className={`block w-full text-left px-4 py-2 text-[20px] tracking-[0.02em] border-l-2 -ml-px transition-all duration-200 bg-transparent border-t-0 border-r-0 border-b-0 cursor-pointer ${
+                    activeNav === nav.href
+                      ? "text-[#1A1A1A] dark:text-[#EDEDED] font-semibold border-l-[#00BCA1]"
+                      : "text-[#5C5C5C] dark:text-[#9A9A9A] border-l-transparent hover:text-[#1A1A1A] dark:hover:text-[#EDEDED]"
+                  }`}
+                >
+                  {nav.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-        <div className="flex flex-wrap gap-2 mb-10">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-[14px] font-medium transition-all ${
-                  activeCategory === cat.id
-                    ? "bg-[#00BCA1] text-white"
-                    : "bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] text-[#5C5C5C] dark:text-[#9A9A9A] hover:border-[#00BCA1]"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] rounded-xl p-6 md:p-10">
-          <h2 className="text-[11px] tracking-[0.2em] uppercase text-[#9A9A9A] mb-8 font-sans">{t("faqTitle")}</h2>
-          <FAQAccordion searchQuery={searchQuery} faqItems={faqItems} emptyText={t("noResults")} />
-        </div>
-
-        <div className="mt-12 text-center">
-          <p className="text-[#5C5C5C] dark:text-[#9A9A9A] mb-4">{t("contactPrompt")}</p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/contact-us" className="flex items-center gap-2 px-6 py-3 bg-[#00BCA1] text-white rounded-lg font-medium hover:bg-[#00A390] transition-colors">
-              {t("contactCta")} <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link href="/docs" className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-[#111113] border border-black/[0.14] dark:border-white/[0.14] text-[#1A1A1A] dark:text-[#EDEDED] rounded-lg font-medium hover:border-[#00BCA1] transition-colors">
-              {t("viewDocs")}
-            </Link>
-          </div>
+        {/* Accordion */}
+        <div className="flex flex-col col-span-full md:col-auto">
+          {accordionItems.map((item) => (
+            <div
+              key={item.id}
+              ref={(el) => { sectionRefs.current[item.id] = el; }}
+            >
+              <AccItem
+                item={item}
+                isOpen={openId === item.id}
+                onToggle={() => setOpenId(openId === item.id ? "" : item.id)}
+              />
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* ── FOOTER ── */}
+      <footer
+        className="border-t border-black/[0.14] dark:border-white/[0.14] flex justify-end items-center"
+        style={{ padding: "32px clamp(24px,6vw,80px)" }}
+      >
+        <p className="text-[11px] text-[#9A9A9A] tracking-[0.06em] text-right leading-[1.8]">
+          Help Center · Auto-Offensive<br />Free Platform · Open Source Friendly
+        </p>
+      </footer>
+    </>
   );
 }
