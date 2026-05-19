@@ -49,36 +49,41 @@ type ResourceItem = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
+const docsAppUrl = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
+// If NEXT_PUBLIC_DOCS_APP_URL is empty, links go to /docs/... on the same origin (handled by rewrites)
+// If set to an external URL, links go directly to that host
+const toDocsUrl = (path: string) => docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`;
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '/tools#tool-subfinder',    icon: '/icons/subfinder.webp'    },
-  { title: 'Naabu',        href: '/tools#tool-naabu',        icon: '/icons/nabuu.webp'        },
-  { title: 'Nmap',         href: '/tools#tool-nmap',         icon: '/icons/nmap.webp'         },
-  { title: 'Httpx',        href: '/tools#tool-httpx',        icon: '/icons/httpx.webp'        },
-  { title: 'Katana',       href: '/tools#tool-katana',       icon: '/icons/katana.webp'       },
-  { title: 'Gobuster',     href: '/tools#tool-gobuster',     icon: '/icons/gobuster.webp'     },
+  { title: 'Subfinder', href: '/tools#tool-subfinder', icon: '/icons/subfinder.webp' },
+  { title: 'Naabu', href: '/tools#tool-naabu', icon: '/icons/nabuu.webp' },
+  { title: 'Nmap', href: '/tools#tool-nmap', icon: '/icons/nmap.webp' },
+  { title: 'Httpx', href: '/tools#tool-httpx', icon: '/icons/httpx.webp' },
+  { title: 'Katana', href: '/tools#tool-katana', icon: '/icons/katana.webp' },
+  { title: 'Gobuster', href: '/tools#tool-gobuster', icon: '/icons/gobuster.webp' },
 ];
 
 const navbarToolLinks = toolLinks;
 
 const featureLinks: FeatureItem[] = [
-  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd',   icon: '/icons/feature-cicd.webp'       },
-  { title: 'AI Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai',     icon: '/icons/feature-aipentest.webp'  },
-  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli',    icon: '/icons/feature-cli.webp'        },
-  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui',  icon: '/icons/feature-automation.webp' },
+  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines', href: '/feature/cicd', icon: '/icons/feature-cicd.webp' },
+  { title: 'AI Pentest', description: 'Accelerate testing with intelligent automation', href: '/feature/ai', icon: '/icons/feature-aipentest.webp' },
+  { title: 'CLI Access', description: 'Execute tools remotely via terminal', href: '/feature/cli', icon: '/icons/feature-cli.webp' },
+  { title: 'Automation Tools', description: 'Run tools instantly from the web UI', href: '/feature/webui', icon: '/icons/feature-automation.webp' },
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'CLI Documents',   description: 'Guides for using tools via command line',        href: '/resource/cli',   icon: '/icons/res-cli.webp'   },
-  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api',   icon: '/icons/res-api.webp'   },
-  { title: 'Tools Documents', description: 'Instructions for using security tools',          href: '/resource/tool',  icon: '/icons/res-tools.webp' },
-  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',          href: '/resource/ci-cd', icon: '/icons/res-cicd.webp'  },
+  { title: 'CLI Documents', description: 'Guides for using tools via command line', href: toDocsUrl('/cli'), icon: '/icons/res-cli.webp' },
+  { title: 'API Documents', description: 'Accelerate testing with intelligent automation', href: toDocsUrl('/api'), icon: '/icons/res-api.webp' },
+  { title: 'Tools Documents', description: 'Instructions for using security tools', href: toDocsUrl('/tools'), icon: '/icons/res-tools.webp' },
+  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration', href: toDocsUrl('/ci-cd'), icon: '/icons/res-cicd.webp' },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
-  { title: 'About Us',   href: '/about-us',   icon: '/icons/about_us_icon.webp'   },
+  { title: 'About Us', href: '/about-us', icon: '/icons/about_us_icon.webp' },
   { title: 'Contact Us', href: '/contact-us', icon: '/icons/contact_us_icon.webp' },
-  { title: 'FAQ',        href: '/help-center', icon: '/icons/faq.webp'            },
+  { title: 'FAQ', href: '/help-center', icon: '/icons/faq.webp' },
 ];
 
 // ── Shared icon box class ────────────────────────────────────────────────────
@@ -269,7 +274,7 @@ function ResourceDocItem({
   asMenuLink = false,
 }: ResourceItem & { asMenuLink?: boolean }) {
   const content = (
-    <Link
+    <a
       href={href}
       onClick={onClick}
       className="flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
@@ -291,7 +296,7 @@ function ResourceDocItem({
           <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{description}</p>
         )}
       </div>
-    </Link>
+    </a>
   );
 
   return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
@@ -506,7 +511,6 @@ export function Header() {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-
               {/* ── Resources ── */}
               <NavigationMenuItem className="flex items-center">
                 <DesktopNavLink href="/resource" label={t('resources')} />
@@ -618,6 +622,17 @@ export function Header() {
             {featureLinks.map((link, i) => (
               <FeatureItem key={i} {...link} onClick={() => setOpen(false)} />
             ))}
+          </div>
+
+          {/* Documentation */}
+          <div className="mt-2">
+            <a
+              href={toDocsUrl('/')}
+              className="flex items-center justify-between rounded-[8px] border border-primary/20 dark:border-primary/30 bg-primary/5 dark:bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 dark:hover:bg-primary/20"
+            >
+              <span>{isKhmer ? 'ឯកសារណែនាំ' : 'Documentation'}</span>
+              <span aria-hidden="true">→</span>
+            </a>
           </div>
 
           {/* Resources */}

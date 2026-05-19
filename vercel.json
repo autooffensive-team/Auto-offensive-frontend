@@ -1,0 +1,27 @@
+{
+    "rewrites": [
+        {
+            "source": "/docs",
+            "destination": "https://auto-offensive-documentation.vercel.app/docs"
+        },
+        {
+            "source": "/docs/:path*",
+            "destination": "https://auto-offensive-documentation.vercel.app/docs/:path*"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Frame-Options",
+                    "value": "SAMEORIGIN"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                }
+            ]
+        }
+    ]
+}

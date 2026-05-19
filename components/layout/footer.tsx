@@ -69,12 +69,11 @@ export function Footer() {
           <div className="text-center md:text-left lg:ms-28">
             <h3 className="text-base font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">{t('resources')}</h3>
             <ul className="space-y-2">
-              <li><Link href="/docs" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('documentation')}</Link></li>
-              <li><Link href="/api-docs" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('apiReference')}</Link></li>
-              <li><Link href="/cli-guide" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('cliGuide')}</Link></li>
-               <li><Link href="/cli-guide" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">CI/CD Intergrate</Link></li>
+              <li><a href="/docs" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('documentation')}</a></li>
+              <li><a href="/docs/api" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('apiReference')}</a></li>
+              <li><a href="/docs/cli" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('cliGuide')}</a></li>
+              <li><a href="/docs/ci-cd" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">CI/CD Integration</a></li>
             </ul>
-            
           </div>
 
           <div className="text-center md:text-left  lg:ms-28">
