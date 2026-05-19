@@ -661,12 +661,6 @@ export function useScanController(initialProjectId?: string) {
           stepId: submit.step_id,
           status: submit.status,
         }));
-        appendLogForMode(
-          "advanced",
-          logFromPayload("system", "submitted", {
-            message: `Advanced command submitted: ${finalCommand}`,
-          }),
-        );
         watchJob("advanced", submit.job_id, submit.step_id, finalCommand);
       } catch (error) {
         appendErrorForMode("advanced", error instanceof Error ? error.message : "Advanced scan failed.");

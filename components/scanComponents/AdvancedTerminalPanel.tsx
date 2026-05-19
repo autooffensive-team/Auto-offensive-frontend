@@ -7,79 +7,20 @@ import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useTheme } from "@/components/theme-provider";
 
-const ASCII_ART_ORIGINAL = `                                                                                                                                                                
-                                                                                                                                                                
-                                                                                                                                                                
-                                                                                                                                                                
-                                                                                                                                                                
-                                                                                                                                                                
-                                                                                                                                                                
-                                                          i<                                                                                                    
-                                                           @_~~                                                                                                 
-                                                              +~<~+                                                                                             
-                                                                +~<<~<_\`                                                                                        
-                                                                 @?<<<~~~_/                                                                                     
-                                                                   <~~~~~~~~+          i                                                                        
-                                                                    x<~~++~~~~+-       *~+                                                                      
-                                                                      ?++++++~~~~~+     L?<i                                                                    
-                                           -_{1~+++++++++++~~~~++~+~~++++++++~~~+~~~+u@   ~<<?                                                                  
-                                   ?+}+++~~~~~~~+++++++++++++++++++++++++++++++++++~~~~+  n+<<<\!                                                                
-                            @+?+++++++++~++++++++++++++++++++++++++~~~~+~+++++++++++~~~~+~> +~~~1   1++~-~/                                                     
-                       u__++++++++++++++++++++++++++++~++++++++++~+~~~+~~~+++++++++++~++++++f+~~~~u   _~~~~~~+++]@                                              
-                   *+++++++++++++++++++++++++++++++~~~~~~~~~~~++++~~~+~~~+~+++++++++++++++++~~~~~~~<   -~~~~~~~~~+++_~k                                         
-              })_+~~~~~++++++++++++++++++++++++++++~~~~~~~~~+<J{f~+~+++~+~~+++++++++++++++++++~~~~~~+_   +~~+++~~++~+~++++_)<@                                  
-           ~_+~~~~+++++++++++++++++++++++~+++~~~~~~+~+~j  [(~~~~~~~~~++~~~+++++++++++++++++~~~+~~~~~~~~   -+?~~~~~~~~~~++~~~~~~~_]                              
-       @_-~~~~~~~~~~+++++++++++++++~~+~~+~~~~~~~~++  U]?+~~~~++~~~~~~~++~~~++++++++++++++++~~~~~~~~~~~~+?       )+~+~~~~++~~~~~~~~~+~-z                         
-     <~<<~~~~}1[<~+~~~+++++++++++++~~~~~~~~~~~    c_~+~~~~~~~~+~++~~~~~~~+++++++++++++++++++++~~~~~~~~~~~+           @l1<+~~~~~~~~~~~~~+_~@                     
-  _~|<}            v_~~++++++++++~~~~+++<~    qw?~++++~~~~~~~~~~+~~~~~~_)+++++++++++++++++~++~+~+J{_<~~~~~i                \!(+~~~~~~~~+~~~~~~                   
-                    @~~~~+++~+~+~~~~~x    wmOr~~~+++~+~~~~~~~~~+~~~~}_[++~~~~~+++++~~~+~++~~~++~+~~++  _+~~_                    L-++~~+++~~~_                   
-                     ~~~~~~~~~~~~+c   kqmmj~~~+~+~+++++++++~+++~++ q(~++~~~~~~~~+~~~~~~~~~++++~~+~~~~~<_@+~~~_                      @++~~~~~[                   
-                    |+~~~~~~~~}l    wmmv{~~~~~~~+~++++++++~~~~+| q[~~~~~~~~~~~~~~~<?]+++~+~~~+++++~~~~~~~++~~+<                      ++~+~~~Y                   
-                    )~~~~~~+(    ammmc+++~+++~~~~~++~~~~+~~+~+ mm_~~~~~~~~~~~~~   -~~~~~~~~~++++~~~~~~~~~~++++~+                     +~~++~~%                   
-                   h~~~~~O}   *mmmZ_~~~++~++~~+~~~~~~~~~~~~?  m)~~~~~~~~~~~{    Q+<<?+x     @[_-+~~~~~~++++++++~~i                  J~~~~+~~                    
-                  ]+<<i@   @wmmmO+~~~~~~~++++++~+~+++++++  dmm~~~~~~~~~~~~      w                   i+~~~~~~~++~~~~+L               ~~~++~~+                    
-                 @~<}J   mmmmm0-+~~~~~~++++++++~++++++~   qwX~~+~~~~~~~~/                              z]+++~~~~~~~<u               +~~~+~~<                    
-                 _}@   wwmmmZ[+++++++++++++++++~~~~~<\!  mmm(+++++~~~~~~_                                  &++~~~~~~~?               ?~~~~~~[                    
-                [m   @mmmmm[~+++++++++++++++++~~~~+-   wmm+~+++++~~~~~1                                     /_+~~~~                 ]~~~~~~[                    
-                    Zmmmm-~~~++++++++++++++++~~~~~<  wwmm_++~~+~~~~~~~                                        ><~                   +~~~~~~+                    
-                  bmmmmU~~~~~~++++++++++++++~~~~>  &mmmQ-++++~~~+~~~<_                                                             #~~~~~~~?                    
-                OmmmmX~_~<}1~~~+++++++++++++~~~l  mmmm0+++++++++~~~~<                                                              ~~~~~~<~                     
-               mmmmm0           +++~+++++++++<l wwmmmO?++~++~++++~~~\!                                                             {+~~~~~~<                     
-             wwmmw               >+~~~+~+++~]   mmmmm+~+~~+++++++~~~[                                                             _+~~+~~~L                     
-            mmw                    +~+~~~~~]  @wmmmm?~~++++++++++~~~)                                                             +~~+~~~~                      
-           k                       ++~++~~-  mmmmmm?~~~~~+++++++~~~~l                                                            ~+++~~~~+                      
-                                   @+~~~+f  wwmmmmX~++~~~++++++++~~~~                                                           ~+++++~~+c                      
-                                    ~~~~]  wmmmmmm++~~~~+++++++++~~~+|                                                          <++++~~~-                       
-                                    f~~<  dwmmmmm(++~~~~++++++++~~+~~~                                                         -+++++~~~~                       
-                                     ~~w  mmmmmmQ~++++~~+~~++++++~~~~~                                                        @+++++~~~~                        
-                                     +@  mmmmmmm+~~~~~~++++++++++++~~~~                                                      <++++++~~<@                        
-                                     _  wmmmmmmr~~+~~~~~~++++++++++~~~+_                                                    -+++++~~~~                         
-                                        wmmmmmm{~~~~~~~~~~+~~~+++~~~~~~_                                                   +++~~++~~~_                          
-                                       wmmmmmmm+{~_+~/<~~~~+~~~+~~~~~~~~~                                                 -+~~+~+~~~<                           
-                                       wmmmmO            ]<+~~~++~~~~~~~~*                                               >+~~~+~+~~~l                           
-                                      wwww     __+~~~+/1@   x_+~~~+~~~~~~~<                                            x>+~~~~+~~~~-                            
-                                      qm        ~~~~~~~~~-    w~+~~~++++~~~~                                          1+~~~~~+~~~~<                             
-                                                i~~~~~~~~~+r    <~~~~~~~~~~~{                                        _+++++~~~~~~~                              
-                                                  ~~~~~~~~~~I    @_~~~~~~~~~~+                                     (_+++++++~~~~~x                              
-                                                  l+~~~~~~~~~~     af~~~~~~~~~_                                  ++~++++++~~+~~~                                
-                                                    +~~~~+~~~~+{      t~~~~~~~~~t                              +++~~~++~~~~~~~<                                 
-                                                     <~~~~~~+~~~++      ]~~~~~~~~+                           ?+~~+~++~++~~~~~~                                  
-                                                      +~~~+++~~~~~~\!      +~~~~~~~~-                       1+++~~+~++~~~~~~~+                                   
-                                                       }+~~+~~++~~~~<~      @]~~~<<<<l                  o_+++~++~~++~~++~~_                                     
-                                                         ++~~~~~+~++++++       wv+<<<<<\!              _~~~~~~~~~~~~~++~~~~                                      
-                                                          <~~+~~+~~++++++++          Y~+_f        ~++~~~~~~+++++~+~~~~~~                                        
-                                                            {+~~+~+~~+~~~~~++++_              @]_+++~+++++~~++~~++~~~<?                                         
-                                                              ~~~~~+~++~++~~~++++++       L+~++++++++++++++~++++~~~~~                                           
-                                                               {+~~~~+++++++++++++++++++++++++++++++++++++++++~~~~?@                                            
-                                                                 f+~~~++++++++++++++++++++++~++++++++++++++~~~~<_                                               
-                                                                    ~~+~~++++~~++++++++++++++++++++++++~~~~~~~>                                                 
-                                                                      1+~~~~~~~++++++++++++++++++++++~~~~~~~{                                                   
-                                                                        \![~~~~~~~~++++++++++++++++~~~~~~~+\!                                                     
-                                                                           _~~~~~~~~++++++++++++++~~~~_l                                                        
-                                                                             L-+~+~~~+++++++++~~~~~<[                                                           
-                                                                                 @+~~~~~~~~+~~~++                                                               
-                                                                                     >++~~~~~>                                                                  
-                                                                                        +~<`;
+// ─── Minimal splash ───────────────────────────────────────────────────────────
+const SPLASH_LINES = [
+  "",
+  "  \x1b[1m\x1b[36mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
+  "  \x1b[90m────────────────────────────────────────\x1b[0m",
+  "  \x1b[33mUsage   \x1b[0m  <tool> [flags] [| <tool> ...]",
+  "  \x1b[33mExample \x1b[0m  \x1b[36mnuclei -u https://example.com\x1b[0m",
+  "  \x1b[33mPipeline\x1b[0m  \x1b[36msubfinder -d example.com | httpx\x1b[0m",
+  "  \x1b[33mHelp    \x1b[0m  \x1b[90mCtrl+C to cancel  ·  clear to reset\x1b[0m",
+  "  \x1b[90m────────────────────────────────────────\x1b[0m",
+  "",
+];
+
+const SPLASH = SPLASH_LINES.join("\r\n");
 
 export function AdvancedTerminalPanel({
   projectId,
@@ -103,7 +44,15 @@ export function AdvancedTerminalPanel({
   const { resolvedTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
-  const commandRef = useRef("");
+
+  // ── Input state ──────────────────────────────────────────────────────────
+  // We maintain a full line buffer + cursor position so arrow keys, Home/End,
+  // and multi-byte pastes all work correctly.
+  const lineRef = useRef("");          // current input buffer
+  const cursorRef = useRef(0);         // cursor position within lineRef
+  const historyRef = useRef<string[]>([]);
+  const histIdxRef = useRef(-1);       // -1 = not browsing history
+
   const logCursorRef = useRef(0);
   const isInputActiveRef = useRef(true);
   const selectedProjectRef = useRef(selectedProject);
@@ -111,47 +60,45 @@ export function AdvancedTerminalPanel({
   const onResetRef = useRef(onReset);
   const prevStepsRef = useRef<ScanStep[]>([]);
   const prevStatusRef = useRef("idle");
-  const asciiShownRef = useRef(false);
-
-  const asciiCol = resolvedTheme === "dark" ? "#00D0B2" : "#0e7490";
+  const prevErrorsLenRef = useRef(0);
 
   const terminalTheme = useMemo(
     () =>
       resolvedTheme === "dark"
         ? {
-            background: "#080d14",
-            foreground: "#e2e8f0",
-            cursor: "#2dd4bf",
-            cursorAccent: "#080d14",
-            selectionBackground: "#134e4a",
-            black: "#1e293b",
-            red: "#f87171",
-            green: "#4ade80",
-            yellow: "#facc15",
-            blue: "#60a5fa",
-            magenta: "#c084fc",
-            cyan: "#2dd4bf",
-            white: "#e2e8f0",
-            brightBlack: "#475569",
-            brightCyan: "#5eead4",
-          }
+          background: "#080d14",
+          foreground: "#e2e8f0",
+          cursor: "#2dd4bf",
+          cursorAccent: "#080d14",
+          selectionBackground: "#134e4a",
+          black: "#1e293b",
+          red: "#f87171",
+          green: "#4ade80",
+          yellow: "#facc15",
+          blue: "#60a5fa",
+          magenta: "#c084fc",
+          cyan: "#2dd4bf",
+          white: "#e2e8f0",
+          brightBlack: "#475569",
+          brightCyan: "#5eead4",
+        }
         : {
-            background: "#f8fafc",
-            foreground: "#0f172a",
-            cursor: "#0f766e",
-            cursorAccent: "#f8fafc",
-            selectionBackground: "#bfdbfe",
-            black: "#334155",
-            red: "#dc2626",
-            green: "#15803d",
-            yellow: "#ca8a04",
-            blue: "#2563eb",
-            magenta: "#9333ea",
-            cyan: "#0f766e",
-            white: "#e2e8f0",
-            brightBlack: "#64748b",
-            brightCyan: "#0d9488",
-          },
+          background: "#f8fafc",
+          foreground: "#0f172a",
+          cursor: "#0f766e",
+          cursorAccent: "#f8fafc",
+          selectionBackground: "#bfdbfe",
+          black: "#334155",
+          red: "#dc2626",
+          green: "#15803d",
+          yellow: "#ca8a04",
+          blue: "#2563eb",
+          magenta: "#9333ea",
+          cyan: "#0f766e",
+          white: "#e2e8f0",
+          brightBlack: "#64748b",
+          brightCyan: "#0d9488",
+        },
     [resolvedTheme],
   );
 
@@ -159,11 +106,37 @@ export function AdvancedTerminalPanel({
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
   useEffect(() => { onResetRef.current = onReset; }, [onReset]);
 
+  // ── Prompt ───────────────────────────────────────────────────────────────
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
     return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m`;
   }, []);
 
+  // ── Redraw current input line after cursor moves ─────────────────────────
+  // Clears from start of line, reprints prompt + buffer, repositions cursor.
+  const redrawLine = useCallback((term: Terminal) => {
+    const project = selectedProjectRef.current?.name ?? "no-project";
+    const promptPlain = `[${project}@auto-offensive]$ `;
+    const buf = lineRef.current;
+    const cur = cursorRef.current;
+    // Move to column 0, clear line, reprint prompt + buffer
+    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m${buf}`);
+    // Move cursor back to correct position
+    const charsAfterCursor = buf.length - cur;
+    if (charsAfterCursor > 0) {
+      term.write(`\x1b[${charsAfterCursor}D`);
+    }
+  }, []);
+
+  // ── Splash / clear ───────────────────────────────────────────────────────
+  const showSplash = useCallback((term: Terminal) => {
+    term.write("\x1b[3J\x1b[2J\x1b[H"); // clear scrollback + screen, home
+    term.write("\r\n");
+    term.write(SPLASH);
+    term.write("\r\n");
+  }, []);
+
+  // ── Boot ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     let disposed = false;
     let ro: ResizeObserver | null = null;
@@ -177,9 +150,9 @@ export function AdvancedTerminalPanel({
 
       const term = new Terminal({
         cursorBlink: true,
-        convertEol: true,
-        fontFamily: "Consolas, monospace",
-        fontSize: 18,
+        convertEol: false,          // we handle \r ourselves
+        fontFamily: "Consolas, 'Courier New', monospace",
+        fontSize: 14,
         lineHeight: 1.4,
         scrollback: 5000,
         theme: terminalTheme,
@@ -190,58 +163,184 @@ export function AdvancedTerminalPanel({
       term.open(containerRef.current);
       fitAddon.fit();
 
-      if (!asciiShownRef.current) {
-        asciiShownRef.current = true;
-        term.write("\x1b[2J\x1b[H");
-        term.write("\r\n");
-        term.write("\x1b[1m\x1b[36m  ╔══════════════════════════════════════════╗\r\n");
-      term.write("  ║  auto-offensive  ·  advanced  scan       ║\r\n");
-      term.write("  ╚══════════════════════════════════════════╝\x1b[0m\r\n");
-      term.write("\x1b[90m  Type a command and press Enter to run it.\r\n");
-      term.write("  Example: nmap example.com -sV | nuclei\r\n");
-      term.write("  Ctrl+C to reset.\x1b[0m");
-        term.write("\r\n");
-      }
+      // Show fastfetch splash on first boot
+      showSplash(term);
       term.write(getPrompt());
 
       term.onData((data) => {
+        // ── Ctrl+C ──────────────────────────────────────────────────────
         if (data === "\x03") {
-          commandRef.current = "";
+          lineRef.current = "";
+          cursorRef.current = 0;
+          histIdxRef.current = -1;
           isInputActiveRef.current = true;
           term.write("^C");
           term.write(getPrompt());
           onResetRef.current();
           return;
         }
+
         if (!isInputActiveRef.current) return;
-        if (data === "\r" && commandRef.current.trim() === "clear") {
-          commandRef.current = "";
-          term.write("\x1bc");
-          term.write(getPrompt());
-          return;
-        }
+
+        // ── Enter ────────────────────────────────────────────────────────
         if (data === "\r") {
-          const cmd = commandRef.current.trim();
+          const cmd = lineRef.current.trim();
           term.write("\r\n");
+          lineRef.current = "";
+          cursorRef.current = 0;
+
+          if (cmd === "clear") {
+            histIdxRef.current = -1;
+            showSplash(term);
+            term.write(getPrompt());
+            return;
+          }
+
           if (cmd) {
+            // Push to history (deduplicate consecutive)
+            if (historyRef.current[0] !== cmd) {
+              historyRef.current.unshift(cmd);
+              if (historyRef.current.length > 100) historyRef.current.pop();
+            }
+            histIdxRef.current = -1;
             isInputActiveRef.current = false;
-            commandRef.current = "";
             onSubmitRef.current(cmd);
           } else {
             term.write(getPrompt());
           }
           return;
         }
+
+        // ── Backspace ────────────────────────────────────────────────────
         if (data === "\u007f") {
-          if (!commandRef.current.length) return;
-          commandRef.current = commandRef.current.slice(0, -1);
-          term.write("\b \b");
+          if (cursorRef.current === 0) return;
+          const buf = lineRef.current;
+          lineRef.current =
+            buf.slice(0, cursorRef.current - 1) + buf.slice(cursorRef.current);
+          cursorRef.current -= 1;
+          redrawLine(term);
           return;
         }
-        if (data >= " " && data !== "\u007f") {
-          commandRef.current += data;
-          term.write(data);
+
+        // ── Escape sequences (arrows, Home, End, Delete) ─────────────────
+        if (data.startsWith("\x1b[") || data.startsWith("\x1bO")) {
+          const seq = data.slice(data.startsWith("\x1bO") ? 2 : 2);
+
+          // Arrow Left
+          if (data === "\x1b[D") {
+            if (cursorRef.current > 0) {
+              cursorRef.current -= 1;
+              term.write("\x1b[D");
+            }
+            return;
+          }
+          // Arrow Right
+          if (data === "\x1b[C") {
+            if (cursorRef.current < lineRef.current.length) {
+              cursorRef.current += 1;
+              term.write("\x1b[C");
+            }
+            return;
+          }
+          // Arrow Up — history prev
+          if (data === "\x1b[A") {
+            const hist = historyRef.current;
+            if (!hist.length) return;
+            const nextIdx = Math.min(histIdxRef.current + 1, hist.length - 1);
+            histIdxRef.current = nextIdx;
+            lineRef.current = hist[nextIdx];
+            cursorRef.current = lineRef.current.length;
+            redrawLine(term);
+            return;
+          }
+          // Arrow Down — history next
+          if (data === "\x1b[B") {
+            if (histIdxRef.current <= 0) {
+              histIdxRef.current = -1;
+              lineRef.current = "";
+              cursorRef.current = 0;
+              redrawLine(term);
+              return;
+            }
+            histIdxRef.current -= 1;
+            lineRef.current = historyRef.current[histIdxRef.current];
+            cursorRef.current = lineRef.current.length;
+            redrawLine(term);
+            return;
+          }
+          // Home / Ctrl+A
+          if (data === "\x1b[H" || data === "\x01") {
+            cursorRef.current = 0;
+            redrawLine(term);
+            return;
+          }
+          // End / Ctrl+E
+          if (data === "\x1b[F" || data === "\x05") {
+            cursorRef.current = lineRef.current.length;
+            redrawLine(term);
+            return;
+          }
+          // Delete (forward delete)
+          if (data === "\x1b[3~") {
+            if (cursorRef.current >= lineRef.current.length) return;
+            const buf = lineRef.current;
+            lineRef.current =
+              buf.slice(0, cursorRef.current) + buf.slice(cursorRef.current + 1);
+            redrawLine(term);
+            return;
+          }
+          // Ctrl+Left — word left
+          if (data === "\x1b[1;5D" || data === "\x1bb") {
+            let pos = cursorRef.current;
+            while (pos > 0 && lineRef.current[pos - 1] === " ") pos--;
+            while (pos > 0 && lineRef.current[pos - 1] !== " ") pos--;
+            cursorRef.current = pos;
+            redrawLine(term);
+            return;
+          }
+          // Ctrl+Right — word right
+          if (data === "\x1b[1;5C" || data === "\x1bf") {
+            let pos = cursorRef.current;
+            const len = lineRef.current.length;
+            while (pos < len && lineRef.current[pos] !== " ") pos++;
+            while (pos < len && lineRef.current[pos] === " ") pos++;
+            cursorRef.current = pos;
+            redrawLine(term);
+            return;
+          }
+          // Ignore other escape sequences
+          return;
         }
+
+        // ── Ctrl+A / Ctrl+E (non-escape variants) ────────────────────────
+        if (data === "\x01") { cursorRef.current = 0; redrawLine(term); return; }
+        if (data === "\x05") { cursorRef.current = lineRef.current.length; redrawLine(term); return; }
+
+        // ── Ctrl+K — kill to end of line ─────────────────────────────────
+        if (data === "\x0b") {
+          lineRef.current = lineRef.current.slice(0, cursorRef.current);
+          redrawLine(term);
+          return;
+        }
+
+        // ── Ctrl+U — kill to start of line ───────────────────────────────
+        if (data === "\x15") {
+          lineRef.current = lineRef.current.slice(cursorRef.current);
+          cursorRef.current = 0;
+          redrawLine(term);
+          return;
+        }
+
+        // ── Printable characters (including multi-char pastes) ────────────
+        // Filter out remaining control characters
+        const printable = data.replace(/[\x00-\x1f\x7f]/g, "");
+        if (!printable) return;
+
+        const buf = lineRef.current;
+        lineRef.current =
+          buf.slice(0, cursorRef.current) + printable + buf.slice(cursorRef.current);
+        cursorRef.current += printable.length;
+        redrawLine(term);
       });
 
       ro = new ResizeObserver(() => fitAddon.fit());
@@ -260,12 +359,14 @@ export function AdvancedTerminalPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Theme hot-swap ───────────────────────────────────────────────────────
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.theme = terminalTheme;
     }
   }, [terminalTheme]);
 
+  // ── Stream logs ──────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
@@ -285,7 +386,7 @@ export function AdvancedTerminalPanel({
     });
   }, [logs]);
 
-  const prevErrorsLenRef = useRef(0);
+  // ── Errors ───────────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
@@ -295,23 +396,15 @@ export function AdvancedTerminalPanel({
     newErrs.forEach((e) => term.write(`\r\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
   }, [errors]);
 
-  useEffect(() => {
-    const term = termRef.current;
-    if (!term || !run.steps.length) return;
-    const prevIds = new Set(prevStepsRef.current.map((s) => s.step_id));
-    run.steps
-      .filter((s) => !prevIds.has(s.step_id))
-      .forEach((s) =>
-        term.write(`\r\x1b[1m\x1b[34m── Step ${s.step_order}: ${s.tool_name} ──\x1b[0m\r\n`),
-      );
-    prevStepsRef.current = run.steps;
-  }, [run.steps]);
+  // ── Step announcements — removed per UX request ─────────────────────────
 
+  // ── Job status ───────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     const status = run.status;
     if (!term || status === prevStatusRef.current) return;
     prevStatusRef.current = status;
+
     if (status === "submitting") {
       term.write(`\r\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
     } else if (status.includes("COMPLETED")) {
@@ -344,7 +437,7 @@ export function AdvancedTerminalPanel({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
     >
-      {/* ── Title bar — untouched ── */}
+      {/* ── Title bar ── */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
@@ -379,58 +472,12 @@ export function AdvancedTerminalPanel({
         </div>
       )}
 
-      {/* ── Split body ── */}
+      {/* ── Full-width xterm ── */}
       <div
-        className="flex h-144 overflow-hidden"
+        ref={containerRef}
+        className="h-144 w-full overflow-hidden"
         style={{ backgroundColor: terminalTheme.background }}
-      >
-
-        {/* LEFT — ASCII pane, no background set — inherits bg-card from parent */}
-        <div
-          className="relative flex w-100 shrink-0 flex-col items-center justify-center overflow-hidden px-4 py-6"
-          style={{ backgroundColor: terminalTheme.background }}
-        >
-
-          {/* top label */}
-          <span
-            className="absolute top-3 left-0 right-0 text-center font-mono tracking-[0.2em] select-none pointer-events-none"
-            style={{ fontSize: "9px", color: asciiCol, opacity: 0.45 }}
-          >
-            AUTO-OFFENSIVE
-          </span>
-
-          {/* ASCII art */}
-          <pre
-            className="font-mono whitespace-pre select-none pointer-events-none"
-            style={{
-              fontSize: "3.6px",
-              lineHeight: 1.15,
-              letterSpacing: "0.25px",
-              color: asciiCol,
-            }}
-          >
-            {ASCII_ART_ORIGINAL}
-          </pre>
-
-          {/* bottom badge */}
-          <span
-            className="absolute bottom-3 left-0 right-0 text-center font-mono tracking-widest select-none pointer-events-none"
-            style={{ fontSize: "9px", color: asciiCol, opacity: 0.45 }}
-          >
-            ◆ v2.0.0 ◆
-          </span>
-        </div>
-
-        {/* thin divider */}
-        <div className="w-px shrink-0" />
-
-        {/* RIGHT — xterm console */}
-        <div
-          ref={containerRef}
-          className="flex-1 overflow-hidden"
-          style={{ backgroundColor: terminalTheme.background }}
-        />
-      </div>
+      />
     </motion.section>
   );
 }
