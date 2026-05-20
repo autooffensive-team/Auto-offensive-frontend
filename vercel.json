@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/docs",
-            "destination": "https://auto-offensive-documentation.vercel.app/docs"
+            "destination": "https://auto-offensive-document.vercel.app/docs"
         },
         {
             "source": "/docs/:path*",
-            "destination": "https://auto-offensive-documentation.vercel.app/docs/:path*"
+            "destination": "https://auto-offensive-document.vercel.app/docs/:path*"
         }
     ],
     "headers": [

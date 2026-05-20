@@ -15,6 +15,12 @@ const socialLinks = [
   { icon: FaGithub, href: "#" },
 ];
 
+// Docs URL helper — same convention as navbar.
+// Empty NEXT_PUBLIC_DOCS_APP_URL → use the same-origin /docs rewrite.
+// Set → link directly to the external docs host.
+const docsAppUrl = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
+const toDocsUrl = (path: string) => docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`;
+
 export function Footer() {
   const t = useTranslations('footer');
   const { theme } = useTheme();
@@ -69,10 +75,10 @@ export function Footer() {
           <div className="text-center md:text-left lg:ms-28">
             <h3 className="text-base font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">{t('resources')}</h3>
             <ul className="space-y-2">
-              <li><a href="/docs" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('documentation')}</a></li>
-              <li><a href="/docs/api" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('apiReference')}</a></li>
-              <li><a href="/docs/cli" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('cliGuide')}</a></li>
-              <li><a href="/docs/ci-cd" className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">CI/CD Integration</a></li>
+              <li><a href={toDocsUrl('/')} className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('documentation')}</a></li>
+              <li><a href={toDocsUrl('/api')} className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('apiReference')}</a></li>
+              <li><a href={toDocsUrl('/cli')} className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">{t('cliGuide')}</a></li>
+              <li><a href={toDocsUrl('/ci-cd')} className="text-lg text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition">CI/CD Integration</a></li>
             </ul>
           </div>
 

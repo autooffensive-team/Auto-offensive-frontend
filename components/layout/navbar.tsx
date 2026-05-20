@@ -74,10 +74,7 @@ const featureLinks: FeatureItem[] = [
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'CLI Documents', description: 'Guides for using tools via command line', href: toDocsUrl('/cli'), icon: '/icons/res-cli.webp' },
-  { title: 'API Documents', description: 'Accelerate testing with intelligent automation', href: toDocsUrl('/api'), icon: '/icons/res-api.webp' },
-  { title: 'Tools Documents', description: 'Instructions for using security tools', href: toDocsUrl('/tools'), icon: '/icons/res-tools.webp' },
-  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration', href: toDocsUrl('/ci-cd'), icon: '/icons/res-cicd.webp' },
+  { title: 'Document', description: ' All documentation for the platform', href: toDocsUrl('/'), icon: '/icons/res-cli.webp' },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [

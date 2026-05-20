@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 // DOCS_APP_URL is server-side only (used in rewrites at build/runtime)
 // NEXT_PUBLIC_DOCS_APP_URL is the client-side counterpart for navbar links
-const docsAppUrl = (process.env.DOCS_APP_URL || 'http://localhost:3001').replace(/\/$/, '');
+const docsAppUrl = (process.env.DOCS_APP_URL || 'https://auto-offensive-document.vercel.app').replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
   images: {
