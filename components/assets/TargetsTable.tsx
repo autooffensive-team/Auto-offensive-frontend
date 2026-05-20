@@ -98,8 +98,8 @@ export default function TargetsTable({
     [projects],
   );
 
-  // Fetch targets for each project, re-fetching every 10s for real-time updates
-  const targetQueries = useTargetQueries(projectIds, 10000);
+  // Fetch targets for each project
+  const targetQueries = useTargetQueries(projectIds);
 
   // Fetch all jobs to compute status and last scan
   const {
@@ -107,7 +107,7 @@ export default function TargetsTable({
     isLoading: jobsLoading,
     isError: jobsError,
     refetch: refetchJobs,
-  } = useListJobsQuery({ limit: 100 }, { pollingInterval: 10000 });
+  } = useListJobsQuery({ limit: 100 });
 
   // Determine loading/error states
   const isLoading =
@@ -161,9 +161,21 @@ export default function TargetsTable({
     return Array.from(types).sort();
   }, [allTargets]);
 
+
+
+  // Sort targets by last_scan descending (most recent first, nulls at the bottom)
+  const sortedTargets = useMemo(() => {
+    return [...allTargets].sort((a, b) => {
+      if (!a.last_scan && !b.last_scan) return 0;
+      if (!a.last_scan) return 1;
+      if (!b.last_scan) return -1;
+      return new Date(b.last_scan).getTime() - new Date(a.last_scan).getTime();
+    });
+  }, [allTargets]);
+
   // Apply filters
   const filteredTargets = useMemo(() => {
-    return allTargets.filter((target) => {
+    return sortedTargets.filter((target) => {
       const matchesSearch =
         !debouncedSearch ||
         target.name.toLowerCase().includes(debouncedSearch.toLowerCase());
@@ -173,7 +185,7 @@ export default function TargetsTable({
         filterProject === "all" || target.project_id === filterProject;
       return matchesSearch && matchesType && matchesProject;
     });
-  }, [allTargets, debouncedSearch, filterType, filterProject]);
+  }, [sortedTargets, debouncedSearch, filterType, filterProject]);
 
   // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(filteredTargets.length / pageSize));

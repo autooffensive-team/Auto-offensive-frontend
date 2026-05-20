@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, RefreshCw, FileX2 } from "lucide-react";
+import { AlertCircle, RefreshCw, FileX2, Search } from "lucide-react";
 import {
   useGetJobDetailsQuery,
   useGetJobParsedDataQuery,
@@ -52,6 +52,17 @@ function formatDuration(start: Date, end: Date): string {
 function StepSection({ step }: { step: ParsedStepData }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search by 200ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setCurrentPage(1);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // Sort columns so that any column starting with "_extra" is always last
   const sortedColumns = [...step.columns].sort((a, b) => {
@@ -62,11 +73,24 @@ function StepSection({ step }: { step: ParsedStepData }) {
     return 0;
   });
 
+  // Filter rows by search query across all columns
+  const filteredRows = useMemo(() => {
+    if (!debouncedSearch.trim()) return step.rows;
+    const query = debouncedSearch.toLowerCase();
+    return step.rows.filter((row) =>
+      sortedColumns.some((col) => {
+        const val = row[col];
+        if (val == null) return false;
+        return String(val).toLowerCase().includes(query);
+      }),
+    );
+  }, [step.rows, sortedColumns, debouncedSearch]);
+
   const hasData = sortedColumns.length > 0 && step.rows.length > 0;
-  const totalPages = hasData ? Math.ceil(step.rows.length / pageSize) : 0;
+  const totalPages = hasData ? Math.ceil(filteredRows.length / pageSize) : 0;
 
   const paginatedRows = hasData
-    ? step.rows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    ? filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : [];
 
   const handlePageChange = (page: number) => {
@@ -81,10 +105,32 @@ function StepSection({ step }: { step: ParsedStepData }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       {/* Step header */}
-      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">
+      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-col sm:flex-row sm:items-center gap-3">
+        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white shrink-0">
           Step {step.step_order} — {step.tool_name}
         </h3>
+        {hasData && (
+          <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search results..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                maxLength={200}
+                className="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                aria-label={`Search results for step ${step.step_order}`}
+              />
+            </div>
+            <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap shrink-0">
+              {debouncedSearch
+                ? `${filteredRows.length} / ${step.rows.length}`
+                : step.rows.length}{" "}
+              rows
+            </span>
+          </div>
+        )}
       </div>
 
       {!hasData ? (
@@ -92,6 +138,13 @@ function StepSection({ step }: { step: ParsedStepData }) {
           <FileX2 size={28} className="text-slate-400 dark:text-slate-500" />
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
             No results available
+          </p>
+        </div>
+      ) : filteredRows.length === 0 ? (
+        <div className="px-4 py-10 flex flex-col items-center justify-center gap-2">
+          <Search size={28} className="text-slate-400 dark:text-slate-500" />
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+            No rows match &ldquo;{debouncedSearch}&rdquo;
           </p>
         </div>
       ) : (
@@ -141,7 +194,7 @@ function StepSection({ step }: { step: ParsedStepData }) {
             pageSizeOptions={[10, 25, 50]}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
-            totalItems={step.rows.length}
+            totalItems={filteredRows.length}
           />
         </>
       )}
