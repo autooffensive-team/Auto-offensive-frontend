@@ -11,6 +11,7 @@ import {
 } from "@/lib/server-env";
 
 const appUrl = readOptionalEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+const docsAppUrl = readOptionalEnv("DOCS_APP_URL", "http://localhost:3001");
 const keycloakIssuer = readRequiredEnv("KEYCLOAK_ISSUER");
 
 export const auth = betterAuth({
@@ -18,7 +19,13 @@ export const auth = betterAuth({
   baseURL: appUrl,
   basePath: "/api/auth",
   secret: readRequiredEnv("BETTER_AUTH_SECRET"),
-  trustedOrigins: [appUrl],
+  // Trust both the main app and the docs app (dev + production)
+  trustedOrigins: [
+    appUrl,
+    docsAppUrl,
+    "http://localhost:3001",
+    "https://auto-offensive-document.vercel.app" 
+  ],
   plugins: [
     genericOAuth({
       config: [
