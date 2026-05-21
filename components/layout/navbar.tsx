@@ -95,13 +95,20 @@ function Logo() {
   const { theme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div style={{ width: 100, height: 40 }} />;
+  if (!mounted) return <div className="h-10 w-25 md:h-auto md:w-25 shrink-0" />;
   const src = theme === 'dark'
     ? '/Auto_Offensive_Dark-mode.png'
     : '/Auto_Offensive_Light-mode.png';
   return (
     <Link href="/" className="cursor-pointer shrink-0">
-      <Image src={src} alt="Auto-Offensive" width={100} height={40} priority style={{ width: 'auto', height: 'auto' }} />
+      <Image
+        src={src}
+        alt="Auto-Offensive"
+        width={100}
+        height={40}
+        priority
+        className="h-10 w-auto md:h-auto md:w-auto"
+      />
     </Link>
   );
 }

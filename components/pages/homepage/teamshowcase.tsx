@@ -162,8 +162,6 @@ export default function TeamShowcase() {
                   height={ourTeamImage.height}
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="h-auto w-full"
-                  priority
-                  unoptimized
                 />
               </div>
             </div>
