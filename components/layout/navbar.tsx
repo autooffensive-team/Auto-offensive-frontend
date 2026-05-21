@@ -146,14 +146,14 @@ function ThemeToggle() {
   );
 }
 
-type Lang = 'en' | 'kh';
+type Lang = 'en' | 'km';
 
 function LanguageToggle() {
   const [mounted, setMounted] = React.useState(false);
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
-  const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
+  const nextLocale: Lang = currentLocale === 'en' ? 'km' : 'en';
   const isEnglish = currentLocale === 'en';
 
   React.useEffect(() => setMounted(true), []);
@@ -166,8 +166,8 @@ function LanguageToggle() {
   };
 
   const options: { value: Lang; flagSrc: string; code: string }[] = [
-    { value: 'en', flagSrc: '/flags/en.png', code: 'EN' },
-    { value: 'kh', flagSrc: '/flags/kh.png', code: 'KH' },
+    { value: 'en', flagSrc: '/flags/kh.png', code: 'KH' },
+    { value: 'km', flagSrc: '/flags/en.png', code: 'EN' },
   ];
 
   if (!mounted) return <div className="h-10 w-23 shrink-0 rounded-full" />;
@@ -179,7 +179,7 @@ function LanguageToggle() {
       type="button"
       onClick={handleLocaleChange}
       disabled={isPending}
-      aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
+      aria-label={`Switch language to ${nextLocale === 'km' ? 'Khmer' : 'English'}`}
       aria-pressed={!isEnglish}
       className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-white/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
     >
@@ -395,7 +395,7 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const { data: session, isPending: isSessionPending } = authClient.useSession();
-  const isKhmer = locale === 'kh';
+  const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';

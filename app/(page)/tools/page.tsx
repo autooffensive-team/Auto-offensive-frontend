@@ -773,7 +773,7 @@ export default function ToolsPage() {
     return () => clearTimeout(timer);
   }, [loading]);
 
-  const isKhmer = locale === 'kh';
+  const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';

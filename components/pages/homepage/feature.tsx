@@ -543,7 +543,7 @@ function ProgressBar({ widthPct }: { widthPct: number }) {
 
 function Ticker({ colors }: { colors: typeof CONFIG.DARK }) {
   const locale = useLocale();
-  const items = locale === "kh" ? TICKER_ITEMS : EN_TICKER_ITEMS;
+  const items = locale === "km" ? TICKER_ITEMS : EN_TICKER_ITEMS;
   const doubled = [...items, ...items];
   return (
     <div
@@ -601,7 +601,7 @@ function CardRow({
   exploreCapabilityLabel: string;
 }) {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
@@ -842,11 +842,11 @@ function CardRow({
 export default function Features() {
   const locale = useLocale();
   const t = useTranslations("homepage.features");
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
-  const cards = locale === "kh" ? CARDS : EN_CARDS;
+  const cards = locale === "km" ? CARDS : EN_CARDS;
   // FIX: scrollPct is now used by ProgressBar
   const [scrollPct, setScrollPct] = useState(0);
   const [spineFill, setSpineFill] = useState(0);

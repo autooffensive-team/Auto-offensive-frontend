@@ -56,7 +56,7 @@ export default function Offline() {
 
           <div className="space-y-4">
             <h2
-              className={`text-4xl font-bold sm:text-5xl ${locale === "kh" ? "font-khmer tracking-normal" : "tracking-tight"}`}
+              className={`text-4xl font-bold sm:text-5xl ${locale === "km" ? "font-khmer tracking-normal" : "tracking-tight"}`}
             >
               {t("title")}
             </h2>

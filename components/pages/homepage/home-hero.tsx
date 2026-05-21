@@ -391,7 +391,7 @@ function FocusWord({
 export default function HomeHero() {
   const t       = useTranslations("homepage.hero");
   const locale  = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);

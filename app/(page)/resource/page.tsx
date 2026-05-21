@@ -5,7 +5,7 @@ import ResourceComponent from "@/components/pages/resourcepage/page-resource";
 
 export default function ResourcePage() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";

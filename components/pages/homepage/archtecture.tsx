@@ -215,7 +215,7 @@ function PathBadge({
 
 export function Architecture() {
   const locale = useLocale()
-  const isKhmer = locale === 'kh'
+  const isKhmer = locale === 'km'
   const bodyFontFamily =
     isKhmer
       ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'

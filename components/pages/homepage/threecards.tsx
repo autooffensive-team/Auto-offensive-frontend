@@ -371,11 +371,11 @@ const ThreeCards: React.FC = () => {
   const isDark = !mounted || resolvedTheme === "dark";
 
   const bodyFontFamily =
-    locale === "kh"
+    locale === "km"
       ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
       : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const displayFontFamily =
-    locale === "kh"
+    locale === "km"
       ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
       : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
 

@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://auto-offensive.com';
 const siteName = 'Auto-Offensive';
 const siteDescription = 'Next-Gen PaaS for Hackers - Automated Security Workflows and Pentesting Platform';
+const defaultOgImagePath = '/Auto-Offensive.webp';
 
 export interface PageMetadata {
   title: string;
@@ -11,23 +12,28 @@ export interface PageMetadata {
   url?: string;
 }
 
+function normalizeSiteUrl(url: string): string {
+  return url.startsWith('http://') || url.startsWith('https://')
+    ? url
+    : `https://${url}`;
+}
+
+function resolveMetadataUrl(pathOrUrl: string | undefined, baseUrl: string, fallbackPath: string): string {
+  return new URL(pathOrUrl || fallbackPath, baseUrl).toString();
+}
+
 export function generateMetadata(options: PageMetadata): Metadata {
   const { title, description, image, url } = options;
-  
-  const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
-  
-  let resolvedSiteUrl = siteUrl;
-  if (!resolvedSiteUrl.startsWith('http://') && !resolvedSiteUrl.startsWith('https://')) {
-    resolvedSiteUrl = `https://${resolvedSiteUrl}`;
-  }
-  
-  const imageUrl = image ? `${resolvedSiteUrl}${image}` : `${resolvedSiteUrl}/og-image.png`;
-  const pageUrl = url ? `${resolvedSiteUrl}${url}` : resolvedSiteUrl;
+
+  const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+  const resolvedSiteUrl = normalizeSiteUrl(siteUrl);
+  const imageUrl = resolveMetadataUrl(image, resolvedSiteUrl, defaultOgImagePath);
+  const pageUrl = resolveMetadataUrl(url, resolvedSiteUrl, '/');
 
   return {
     title: fullTitle,
     description: description,
-metadataBase: new URL(resolvedSiteUrl),
+    metadataBase: new URL(resolvedSiteUrl),
     openGraph: {
       title: fullTitle,
       description: description,
@@ -73,17 +79,17 @@ export const defaultMetadata: Metadata = {
   authors: [{ name: 'Auto-Offensive Team' }],
   creator: 'Auto-Offensive',
   publisher: 'Auto-Offensive',
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(normalizeSiteUrl(siteUrl)),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteUrl,
+    url: normalizeSiteUrl(siteUrl),
     siteName: siteName,
     title: siteName,
     description: siteDescription,
     images: [
       {
-        url: `${siteUrl}/og-image.png`,
+        url: resolveMetadataUrl(undefined, normalizeSiteUrl(siteUrl), defaultOgImagePath),
         width: 1200,
         height: 630,
         alt: siteName,
@@ -94,7 +100,7 @@ export const defaultMetadata: Metadata = {
     card: 'summary_large_image',
     title: siteName,
     description: siteDescription,
-    images: [`${siteUrl}/og-image.png`],
+    images: [resolveMetadataUrl(undefined, normalizeSiteUrl(siteUrl), defaultOgImagePath)],
     creator: '@autooffensive',
   },
   robots: {

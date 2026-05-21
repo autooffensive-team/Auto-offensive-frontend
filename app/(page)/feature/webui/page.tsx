@@ -196,7 +196,7 @@ function ToolConfig({ items }: { items: { name: string; desc: string }[] }) {
 export default function WebUIFeature() {
   const t = useTranslations("featurePages.webui");
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
 
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), sans-serif"

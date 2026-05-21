@@ -4,7 +4,7 @@ import { generateMetadata } from "@/lib/metadata";
 export const metadata = generateMetadata({
   title: "Terms of Service",
   description: "Auto-Offensive Terms of Service - Understand the acceptable use policy and legal terms for using our security platform.",
-  image: "/og-terms.png",
+  image: "/Auto-Offensive.webp",
   url: "/terms-of-service",
 });
 

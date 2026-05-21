@@ -105,7 +105,7 @@
     descRaw?: React.ReactNode;
   };
 
-  const CONTACT_COPY: Record<"en" | "kh", ContactCopyValue> = {
+  const CONTACT_COPY: Record<"en" | "km", ContactCopyValue> = {
     en: {
       eyebrow: "Contact Us",
       title: "Let's Build Something Secure",
@@ -139,7 +139,7 @@
         success: "Message sent successfully! We'll be in touch soon.",
       },
     },
-    kh: {
+    km: {
       eyebrow: "ទំនាក់ទំនងយើង",
       title: "តោះបង្កើតអ្វីមួយដែលមានសុវត្ថិភាព",
       description: "មានសំណួរ? ក្រុមការងាររបស់យើងរីករាយក្នុងការជួយអ្នកការពារប្រព័ន្ធរបស់អ្នកដោយការសាកល្បងសុវត្ថិភាពកម្រិតខ្ពស់។",
@@ -376,8 +376,8 @@
   /* ─── Component ─────────────────────────────────── */
   export default function ContactUs() {
     const locale = useLocale();
-    const isKhmer = locale === "kh";
-    const copy = CONTACT_COPY[isKhmer ? "kh" : "en"];
+    const isKhmer = locale === "km";
+    const copy = CONTACT_COPY[isKhmer ? "km" : "en"];
     const infoItems = buildInfoItems(copy);
     const contactFontClass =
       isKhmer

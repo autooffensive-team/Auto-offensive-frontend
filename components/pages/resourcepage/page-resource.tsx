@@ -86,7 +86,7 @@ const ctaArrowIcon = (
 
 export default function ResourceComponent() {
   const locale = useLocale()
-  const isKhmer = locale === 'kh'
+  const isKhmer = locale === 'km'
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
