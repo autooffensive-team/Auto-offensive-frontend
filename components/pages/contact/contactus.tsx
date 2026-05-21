@@ -2,6 +2,7 @@
 
   import { useRef, useState, useEffect } from "react";
   import { useLocale } from "next-intl";
+  import emailjs from "@emailjs/browser";
 
   /* ─── Info items ─────────────────────────────────── */
   const buildInfoItems = (copy: ContactCopyValue): InfoItem[] => [
@@ -392,15 +393,26 @@
       setupMagneticHover(hexRightRef.current);
     }, []);
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
       e.preventDefault();
-      setSubmitted(true);
       setDisabled(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setDisabled(false);
+
+      try {
+        await emailjs.sendForm(
+          "service_zhzq1y7",
+          "template_n8kycfr",
+          formRef.current!,
+          "R-0a64Uzx7gTDqO9N"
+        );
+        setSubmitted(true);
         formRef.current?.reset();
-      }, 4000);
+      } catch (error) {
+        console.error("EmailJS error:", error);
+        alert("Failed to send message. Please try again later.");
+      } finally {
+        setDisabled(false);
+        setTimeout(() => setSubmitted(false), 4000);
+      }
     }
 
     return (
@@ -679,6 +691,7 @@
                       </label>
                       <input
                         type="text"
+                        name="first_name"
                         placeholder={copy.form.firstNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -690,6 +703,7 @@
                       </label>
                       <input
                         type="text"
+                        name="last_name"
                         placeholder={copy.form.lastNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -704,6 +718,7 @@
                     </label>
                     <input
                       type="email"
+                      name="email"
                       placeholder={copy.form.emailPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -718,6 +733,7 @@
                       </label>
                       <input
                         type="text"
+                        name="company"
                         placeholder={copy.form.companyPlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
@@ -728,6 +744,7 @@
                       </label>
                       <input
                         type="tel"
+                        name="phone"
                         placeholder={copy.form.phonePlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
@@ -741,6 +758,7 @@
                     </label>
                     <input
                       type="text"
+                      name="subject"
                       placeholder={copy.form.subjectPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -753,6 +771,7 @@
                       {copy.form.message}
                     </label>
                     <textarea
+                      name="message"
                       placeholder={copy.form.messagePlaceholder}
                       required
                       className="contact-input contact-textarea text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"

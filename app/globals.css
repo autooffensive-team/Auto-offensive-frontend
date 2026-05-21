@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@xterm/xterm/css/xterm.css";
 
@@ -78,6 +79,42 @@
   to {
     height: 0;
     }
+  }
+}
+
+@keyframes noise-animation {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2%, -3%);
+  }
+  20% {
+    transform: translate(-4%, 2%);
+  }
+  30% {
+    transform: translate(2%, -4%);
+  }
+  40% {
+    transform: translate(-2%, 5%);
+  }
+  50% {
+    transform: translate(-4%, 2%);
+  }
+  60% {
+    transform: translate(3%, 0);
+  }
+  70% {
+    transform: translate(0, 3%);
+  }
+  80% {
+    transform: translate(-3%, 0);
+  }
+  90% {
+    transform: translate(2%, 2%);
+  }
+  100% {
+    transform: translate(1%, 0);
   }
 }
 
@@ -256,6 +293,18 @@ html[lang="kh"] .resource-page h4,
 html[lang="kh"] .resource-page h5,
 html[lang="kh"] .resource-page h6 {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
+  letter-spacing: normal;
+}
+
+html[lang="kh"] .resource-page .resource-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: normal;
+}
+
+html[lang="kh"] .feature-page .feature-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
   letter-spacing: normal;
 }
 

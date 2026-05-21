@@ -265,8 +265,9 @@ function colorizeLogText(text: string): React.ReactNode {
 }
 
 export default function ScanPage() {
-  const [activeTab, setActiveTab] = useState<ScanMode>("basic");
   const searchParams = useSearchParams();
+  const initialMode = (searchParams.get("mode") as ScanMode) || "basic";
+  const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────

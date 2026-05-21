@@ -435,8 +435,8 @@ export function Header() {
 
   return (
     <header
-      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200', {
-        'bg-white/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-white/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70 border-black/[0.07] dark:border-white/[0.07]': scrolled,
+      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200 backdrop-blur-md', {
+        'bg-white/80 dark:bg-[#09090B]/80 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
       <nav
@@ -553,7 +553,8 @@ export function Header() {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle />
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -578,10 +579,9 @@ export function Header() {
           <div className="flex items-center justify-between rounded-xl border border-black/8 dark:border-white/[0.07] bg-white/70 dark:bg-[#111110]/70 p-3 backdrop-blur-md">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
-              <p className="text-sm text-foreground">Language and theme</p>
+              <p className="text-sm text-foreground">Theme</p>
             </div>
             <div className="flex items-center gap-2">
-              <LanguageToggle />
               <ThemeToggle />
             </div>
           </div>

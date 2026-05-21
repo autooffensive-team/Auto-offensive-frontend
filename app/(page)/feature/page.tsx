@@ -113,6 +113,9 @@ export default function PlatformCapabilities() {
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const heroTitleFontFamily = isKhmer
+    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
+    : displayFontFamily;
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
   const sectionTitleFontFamily = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
@@ -123,9 +126,9 @@ export default function PlatformCapabilities() {
   const sectionDescriptionClass =
     "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.7]";
   const primaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 text-[14px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0";
   const secondaryButtonClass =
-    "group inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-[14px] sm:text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0";
+    "ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer";
   const ctaArrowIcon = (
     <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path
@@ -184,7 +187,7 @@ export default function PlatformCapabilities() {
 
   return (
     <div
-      className="min-h-screen bg-[#F7F5F0] dark:bg-[#09090B] font-sans text-slate-900 dark:text-slate-50 transition-colors duration-300"
+      className="feature-page min-h-screen bg-[#F7F5F0] dark:bg-[#09090B] font-sans text-slate-900 dark:text-slate-50 transition-colors duration-300"
       style={{ fontFamily: bodyFontFamily }}
     >
       {/* ══════════════════════════════════════════════════════════════════════
@@ -208,8 +211,8 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={1}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
-              style={{ fontFamily: displayFontFamily, fontWeight: 700 }}
+              className="feature-hero-title text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
+              style={{ fontFamily: heroTitleFontFamily, fontWeight: isKhmer ? 800 : 700 }}
             >
               {t("hero.titleLine1")}
               <br />
@@ -237,18 +240,20 @@ export default function PlatformCapabilities() {
               className="flex w-full flex-row flex-nowrap items-center justify-center gap-2 sm:gap-4"
             >
               <button
-                className={`${primaryButtonClass} min-w-0 flex-1 whitespace-nowrap px-3 py-2.5 sm:flex-none sm:px-3.5 sm:py-2.5 bg-[#00BCA1] text-white hover:bg-[#0AAE98]`}
+                className={`${primaryButtonClass}`}
               >
-                <span className="sm:hidden">Start Scanning</span>
-                <span className="hidden sm:inline">{t("hero.primaryCta")}</span>
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                  <span className="sm:hidden">Start Scanning</span>
+                  <span className="hidden sm:inline">{t("hero.primaryCta")}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </span>
               </button>
               <button
-                className={`${secondaryButtonClass} min-w-0 flex-1 whitespace-nowrap px-3 py-2.5 sm:flex-none sm:px-3.5 sm:py-2.5 bg-[#F7F5F0] text-slate-900 border-[#E2DDD5] hover:bg-[#EFE9DE] hover:border-[#CFC7BA] dark:bg-[#09090B] dark:text-slate-100 dark:border-white/10 dark:hover:bg-[#151A18] dark:hover:border-white/20`}
+                className={`${secondaryButtonClass}`}
               >
                 <span className="sm:hidden">Read the Docs</span>
                 <span className="hidden sm:inline">{t("hero.secondaryCta")}</span>
-                <ExternalLink className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" />
+                <ExternalLink className="w-4 h-4" />
               </button>
             </motion.div>
           </div>
@@ -538,10 +543,12 @@ export default function PlatformCapabilities() {
                 initial="hidden"
                 animate={reportInView ? "visible" : "hidden"}
                 custom={4}
-                className={`${primaryButtonClass} w-fit bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
+                className={`${primaryButtonClass} w-fit`}
               >
-                <FileText className="w-5 h-5 transition-transform duration-300 group-hover:-translate-y-px" />
-                <span>{t("common.viewDocumentation")}</span>
+                <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span>{t("common.viewDocumentation")}</span>
+                </span>
               </motion.button>
             </div>
 
