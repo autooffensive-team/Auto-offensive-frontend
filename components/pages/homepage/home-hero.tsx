@@ -395,6 +395,7 @@ export default function HomeHero() {
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
+  const khmerWordToAccent = "សម្រាប់";
 
   const hexLeftRef  = useRef<SVGSVGElement>(null);
   const hexRightRef = useRef<SVGSVGElement>(null);
@@ -825,7 +826,25 @@ export default function HomeHero() {
               {titleLine3FocusMatch ? (
                 <>
                   {isKhmer
-                    ? <span className="font-khmer">{titleLine3FocusMatch[1]}</span>
+                    ? (
+                      <span className="font-khmer">
+                        {titleLine3FocusMatch[1].split(khmerWordToAccent).map((part, index, array) => (
+                          <span key={`${part}-${index}`}>
+                            {part}
+                            {index < array.length - 1 ? (
+                              <span
+                                style={{
+                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif',
+                                  fontWeight: 800,
+                                }}
+                              >
+                                {khmerWordToAccent}
+                              </span>
+                            ) : null}
+                          </span>
+                        ))}
+                      </span>
+                    )
                     : titleLine3FocusMatch[1]
                   }
                   <FocusWord startAnimation={focusStarted}>

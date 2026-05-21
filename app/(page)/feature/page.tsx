@@ -113,6 +113,9 @@ export default function PlatformCapabilities() {
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const heroTitleFontFamily = isKhmer
+    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
+    : displayFontFamily;
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
   const sectionTitleFontFamily = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
@@ -184,7 +187,7 @@ export default function PlatformCapabilities() {
 
   return (
     <div
-      className="min-h-screen bg-[#F7F5F0] dark:bg-[#09090B] font-sans text-slate-900 dark:text-slate-50 transition-colors duration-300"
+      className="feature-page min-h-screen bg-[#F7F5F0] dark:bg-[#09090B] font-sans text-slate-900 dark:text-slate-50 transition-colors duration-300"
       style={{ fontFamily: bodyFontFamily }}
     >
       {/* ══════════════════════════════════════════════════════════════════════
@@ -208,8 +211,8 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={1}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
-              style={{ fontFamily: displayFontFamily, fontWeight: 700 }}
+              className="feature-hero-title text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
+              style={{ fontFamily: heroTitleFontFamily, fontWeight: isKhmer ? 800 : 700 }}
             >
               {t("hero.titleLine1")}
               <br />

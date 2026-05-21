@@ -296,6 +296,18 @@ html[lang="kh"] .resource-page h6 {
   letter-spacing: normal;
 }
 
+html[lang="kh"] .resource-page .resource-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: normal;
+}
+
+html[lang="kh"] .feature-page .feature-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: normal;
+}
+
 .resource-page-copy {
   font-size: 16px !important;
   line-height: 1.75;

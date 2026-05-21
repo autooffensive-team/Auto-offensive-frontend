@@ -102,6 +102,10 @@ export default function ResourceComponent() {
     ? 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
 
+  const heroTitleFontFamily = isKhmer
+    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
+
   const featureTitleFontFamily = isKhmer
     ? 'var(--font-noto-khmer), var(--font-hackdaddy), sans-serif'
     : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
@@ -587,8 +591,8 @@ export default function ResourceComponent() {
             ) : null}
             <motion.h1
               variants={fadeUp}
-              className="mx-auto max-w-[12ch] text-[clamp(2.65rem,7vw,5.25rem)] font-bold leading-[0.95] text-[#18181B] dark:text-white md:mx-0"
-              style={{ fontFamily: displayFontFamily }}
+              className="resource-hero-title mx-auto max-w-[12ch] text-[clamp(2.65rem,7vw,5.25rem)] font-bold leading-[0.95] text-[#18181B] dark:text-white md:mx-0"
+              style={{ fontFamily: heroTitleFontFamily, fontWeight: isKhmer ? 800 : 700 }}
             >
               {sectionLabels.heroTitleLine1}
               {sectionLabels.heroTitleLine2 ? (
