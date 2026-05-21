@@ -204,6 +204,11 @@ export default function WebUIFeature() {
   const displayFont = isKhmer
     ? "var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const heroTitleFont = isKhmer
+    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    : displayFont;
+  const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
+  const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";
 
   /* ─── RESPONSIVE FONT SIZING ─────────────────────────────
      Mobile:  16px  (text-base)
@@ -483,8 +488,13 @@ export default function WebUIFeature() {
               <motion.h1
                 variants={fadeUp}
                 custom={0}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-5 text-[#18181B] dark:text-white max-w-2xl"
-                style={{ fontFamily: displayFont }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-5 text-[#18181B] dark:text-white max-w-2xl"
+                style={{
+                  fontFamily: heroTitleFont,
+                  fontWeight: isKhmer ? 800 : 700,
+                  lineHeight: heroTitleLineHeight,
+                  letterSpacing: heroTitleLetterSpacing,
+                }}
               >
                                 Orchestrate <span className="text-[#00BCA1]">Scans Without</span> the <span className="text-[#01509E]">CLI.</span>
               </motion.h1>
