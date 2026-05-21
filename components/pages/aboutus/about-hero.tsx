@@ -8,7 +8,7 @@ import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function AboutHero() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const content = isKhmer
     ? {
         titleTop: "ស្គាល់ពី",
@@ -296,9 +296,9 @@ export default function AboutHero() {
               [16, 5],
             ]}
             className={cn(
-              "[mask-image:radial-gradient(600px_circle_at_center,white,transparent)]",
+              "mask-[radial-gradient(600px_circle_at_center,white,transparent)]",
               "inset-0 h-full skew-y-12",
-              "fill-[#00509E]/20 stroke-[#00509E]/20 dark:fill-[#00D0B2]/15 dark:stroke-[#00D0B2]/15",
+              "fill-secondary-start/20 stroke-secondary-start/20 dark:fill-primary/15 dark:stroke-primary/15",
             )}
           />
         </div>

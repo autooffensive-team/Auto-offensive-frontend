@@ -149,7 +149,7 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
 
 export default function TeamAndFooter() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";

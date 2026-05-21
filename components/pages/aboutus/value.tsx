@@ -67,7 +67,7 @@ const VALUES_KH = [
 
 export default function Values() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const values = isKhmer ? VALUES_KH : VALUES_EN;
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"

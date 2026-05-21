@@ -309,7 +309,7 @@ function PipelineVisualFilled({ steps }: { steps: string[] }) {
 
 export default function OurMission() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const slides = isKhmer ? SLIDES_KH : SLIDES_EN;
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"

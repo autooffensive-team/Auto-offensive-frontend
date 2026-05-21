@@ -11,7 +11,7 @@ export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
-  const nextLocale: Locale = locale === "en" ? "kh" : "en";
+  const nextLocale: Locale = locale === "en" ? "km" : "en";
   const flagSrc = locale === "en" ? "/flags/en.png" : "/flags/kh.png";
   const isEnglish = locale === "en";
 
@@ -27,7 +27,7 @@ export function LanguageSwitcher() {
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      aria-label={`Switch language to ${nextLocale === "kh" ? "Khmer" : "English"}`}
+      aria-label={`Switch language to ${nextLocale === "km" ? "Khmer" : "English"}`}
       aria-pressed={!isEnglish}
       className="group inline-flex shrink-0 items-center gap-3 rounded-full px-1 py-1 text-zinc-900 transition-all duration-300 hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 dark:text-zinc-100"
     >

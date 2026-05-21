@@ -34,7 +34,7 @@ const heroStyles = `
 export default function TermsOfServiceHero() {
   const t = useTranslations("termsPage.hero");
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const titleFontFamily = isKhmer
     ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";

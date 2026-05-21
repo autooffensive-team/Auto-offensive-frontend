@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 export default function AiBanner() {
   const t = useTranslations("homepage.aiBanner");
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
