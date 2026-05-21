@@ -1,6 +1,8 @@
 import { baseApi } from "@/lib/redux/services/base-api";
 import type {
+    ReportListResponse,
     ReportManifestResponse,
+    ReportMetaResponse,
     ScanReportRequest,
 } from "@/types/reports";
 
@@ -65,6 +67,82 @@ export const reportsApi = baseApi.injectEndpoints({
         // Returns a static manifest — no network call needed.
         getReportManifest: builder.query<ReportManifestResponse, string>({
             queryFn: (jobId) => ({ data: buildStaticManifest(jobId) }),
+        }),
+
+        // List all stored reports for the current user (paginated + filterable).
+        listReports: builder.query<
+            ReportListResponse,
+            { page?: number; page_size?: number; job_id?: string; format?: string }
+        >({
+            query: ({ page = 1, page_size = 100, job_id, format } = {}) => {
+                const params = new URLSearchParams();
+                params.set("page", String(page));
+                params.set("page_size", String(Math.min(page_size, 100)));
+                if (job_id) params.set("job_id", job_id);
+                if (format) params.set("format", format);
+                return { url: `reports?${params.toString()}`, method: "GET" };
+            },
+            providesTags: ["Report"],
+        }),
+
+        // Get metadata for a single stored report.
+        getReportMeta: builder.query<ReportMetaResponse, string>({
+            query: (reportId) => ({ url: `reports/${reportId}`, method: "GET" }),
+            providesTags: (_result, _error, reportId) => [{ type: "Report", id: reportId }],
+        }),
+
+        // Delete a stored report.
+        deleteReport: builder.mutation<{ success: boolean; report_id: string }, string>({
+            query: (reportId) => ({ url: `reports/${reportId}`, method: "DELETE" }),
+            invalidatesTags: ["Report"],
+        }),
+
+        // Download a stored report by report_id (triggers browser download).
+        downloadStoredReport: builder.mutation<void, { reportId: string; fileName: string }>({
+            queryFn: async ({ reportId, fileName }, _api, _extraOptions, baseQuery) => {
+                const result = await baseQuery({
+                    url: `reports/${reportId}/download`,
+                    method: "GET",
+                    responseHandler: (response: Response) => Promise.resolve(response),
+                });
+
+                if (result.error) return { error: result.error };
+
+                const response = result.data as Response;
+                if (!response.ok) {
+                    return {
+                        error: {
+                            status: response.status as number,
+                            data: response.statusText ?? "Download failed",
+                        } as import("@reduxjs/toolkit/query").FetchBaseQueryError,
+                    };
+                }
+
+                const disposition = response.headers.get("Content-Disposition") ?? "";
+                const filename = extractFilenameFromDisposition(disposition) ?? fileName;
+
+                let url: string | null = null;
+                try {
+                    const blob = await response.blob();
+                    url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    return { data: null as unknown as void };
+                } catch (err) {
+                    if (url !== null) URL.revokeObjectURL(url);
+                    return {
+                        error: {
+                            status: "CUSTOM_ERROR",
+                            error: err instanceof Error ? err.message : "Unknown error",
+                        } as import("@reduxjs/toolkit/query").FetchBaseQueryError,
+                    };
+                }
+            },
         }),
 
         // Two-step flow:
@@ -168,5 +246,11 @@ export const reportsApi = baseApi.injectEndpoints({
     }),
 });
 
-export const { useGetReportManifestQuery, useExportScanReportMutation } =
-    reportsApi;
+export const {
+    useGetReportManifestQuery,
+    useListReportsQuery,
+    useGetReportMetaQuery,
+    useDeleteReportMutation,
+    useDownloadStoredReportMutation,
+    useExportScanReportMutation,
+} = reportsApi;
