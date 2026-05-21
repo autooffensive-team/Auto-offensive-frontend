@@ -156,6 +156,11 @@ export default function CLIFeature() {
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const heroTitleFontFamily = isKhmer
+    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    : displayFontFamily;
+  const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
+  const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";
 
   /* ─── RESPONSIVE FONT SIZING ─────────────────────────────
      Mobile:  16px  (text-[16px])
@@ -244,8 +249,13 @@ export default function CLIFeature() {
               <motion.h1
                 variants={fadeUp}
                 custom={0}
-                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight tracking-tight mb-6 text-[#18181B] dark:text-white max-w-2xl"
-                style={{ fontFamily: displayFontFamily }}
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 text-[#18181B] dark:text-white max-w-2xl"
+                style={{
+                  fontFamily: heroTitleFontFamily,
+                  fontWeight: isKhmer ? 800 : 700,
+                  lineHeight: heroTitleLineHeight,
+                  letterSpacing: heroTitleLetterSpacing,
+                }}
               >
                 {t("hero.titleLine1")}{" "}
                 <span className="text-[#00BCA1] dark:text-[#7CE5D4] block">
