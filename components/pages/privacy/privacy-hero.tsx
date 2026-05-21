@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { GridPattern } from "@/components/ui/grid-pattern";
 
@@ -18,7 +18,7 @@ const heroStyles = `
     opacity: 0;
     animation: ph-fade-up .55s cubic-bezier(.16,1,.3,1) .1s forwards;
   }
-  .ph-h1 {
+  .privacy-hero-title {
     opacity: 0;
     animation: ph-slide-reveal .72s cubic-bezier(.16,1,.3,1) .22s forwards;
   }
@@ -35,6 +35,13 @@ const heroStyles = `
 /* ─── Component ──────────────────────────────── */
 export default function PrivacyHero() {
   const t = useTranslations("privacy");
+  const locale = useLocale();
+  const isKhmer = locale === "kh";
+  const titleFontFamily = isKhmer
+    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const titleLineHeight = isKhmer ? 1.2 : 1;
+  const titleLetterSpacing = isKhmer ? "0" : "-0.03em";
 
   return (
     <section
@@ -78,8 +85,14 @@ export default function PrivacyHero() {
         {/* Headline */}
         <div>
           <h1
-            className="ph-h1 font-heading font-bold leading-none text-[#1A1A1A] dark:text-[#EDEDED] tracking-[-0.03em]"
-            style={{ fontSize: "clamp(2.8rem, 5.5vw, 5rem)" }}
+            className="privacy-hero-title font-bold text-[#1A1A1A] dark:text-[#EDEDED]"
+            style={{
+              fontFamily: titleFontFamily,
+              fontSize: "clamp(2.8rem, 5.5vw, 5rem)",
+              fontWeight: isKhmer ? 800 : 700,
+              lineHeight: titleLineHeight,
+              letterSpacing: titleLetterSpacing,
+            }}
           >
             {t("heroTitle")}<br />
             <em className="not-italic text-[#00BCA1]">{t("heroTitleHighlight")}</em>
