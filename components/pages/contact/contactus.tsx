@@ -376,12 +376,18 @@
   /* ─── Component ─────────────────────────────────── */
   export default function ContactUs() {
     const locale = useLocale();
-    const copy = CONTACT_COPY[locale === "kh" ? "kh" : "en"];
+    const isKhmer = locale === "kh";
+    const copy = CONTACT_COPY[isKhmer ? "kh" : "en"];
     const infoItems = buildInfoItems(copy);
     const contactFontClass =
-      locale === "kh"
+      isKhmer
         ? "font-[var(--font-noto-khmer),sans-serif]"
         : "font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif]";
+    const titleFontFamily = isKhmer
+      ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+      : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    const titleLineHeight = isKhmer ? 1.2 : 1.08;
+    const titleLetterSpacing = isKhmer ? "0" : "-0.02em";
     const formRef = useRef<HTMLFormElement>(null);
     const hexLeftRef = useRef<SVGSVGElement>(null);
     const hexRightRef = useRef<SVGSVGElement>(null);
@@ -655,12 +661,13 @@
               </div>
 
               <h1
-                className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.02em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5"
-                style={
-                  locale === "kh"
-                    ? { fontFamily: 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif' }
-                    : { fontFamily: 'var(--font-google-sans), var(--font-noto-khmer), sans-serif' }
-                }
+                className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5"
+                style={{
+                  fontFamily: titleFontFamily,
+                  fontWeight: isKhmer ? 800 : 700,
+                  lineHeight: titleLineHeight,
+                  letterSpacing: titleLetterSpacing,
+                }}
               >
                 {copy.title}
               </h1>
