@@ -247,9 +247,7 @@ export default function HolographicPlanet() {
     // ─── Load world data ───────────────────────────────────────
     const loadData = async () => {
       try {
-        const response = await fetch(
-          "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/physical/ne_110m_land.json"
-        );
+        const response = await fetch("/ne_110m_land.json");
         if (!response.ok) throw new Error("Failed to load");
         landFeatures = await response.json();
         landDots = generateDots(landFeatures);
