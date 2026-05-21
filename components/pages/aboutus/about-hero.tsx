@@ -35,8 +35,10 @@ export default function AboutHero() {
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
+    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+  const titleLineHeight = isKhmer ? 1.2 : 1.08;
+  const titleTracking = isKhmer ? "-0.02em" : "-0.04em";
   const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";
 
   const hl0Ref = useRef<HTMLSpanElement>(null);
@@ -263,7 +265,7 @@ export default function AboutHero() {
 
       <section
         className="
-          ao-hero
+          about-hero ao-hero
           relative min-h-screen overflow-hidden
           flex flex-col items-center justify-center text-center
           px-[6%] py-25
@@ -303,18 +305,23 @@ export default function AboutHero() {
 
         <div className="ao-content relative z-10 flex flex-col items-center">
           <h1
-            className="mb-[1.4rem] max-w-225 text-[clamp(2.6rem,6vw,5.25rem)] leading-[1.08] tracking-[-0.04em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]"
-            style={{ fontFamily: titleFont }}
+            className="about-hero-title mb-[1.4rem] max-w-225 text-[clamp(2.6rem,6vw,5.25rem)] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]"
+            style={{
+              fontFamily: titleFont,
+              fontWeight: isKhmer ? 800 : 700,
+              lineHeight: titleLineHeight,
+              letterSpacing: titleTracking,
+            }}
           >
-            <span className="block overflow-hidden">
+            <span className={cn("block", !isKhmer && "overflow-hidden")}>
               <span ref={hl0Ref} className="ao-hli block">{content.titleTop}</span>
             </span>
-            <span className="block overflow-hidden">
+            <span className={cn("block", !isKhmer && "overflow-hidden")}>
               <span ref={hl1Ref} className="ao-hli block">
                 <span className="text-primary">{content.titleAccent}</span>
               </span>
             </span>
-            <span className="block overflow-hidden">
+            <span className={cn("block", !isKhmer && "overflow-hidden")}>
               <span ref={hl2Ref} className="ao-hli block">
                 <span className="font-light text-[#01509e] dark:text-[#01509e]">{content.titleBottom}</span>
               </span>
