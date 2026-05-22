@@ -432,12 +432,20 @@ export function Header() {
   ) : session ? (
     <AuthorizedUserIndicator />
   ) : (
-    <Link
-      href="/register"
-      className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-    >
-      {t('signUp')}
-    </Link>
+    <div className="flex items-center gap-2">
+      <a
+        href="/api/guest/start"
+        className="rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
+      >
+        Try Free
+      </a>
+      <Link
+        href="/register"
+        className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+      >
+        {t('signUp')}
+      </Link>
+    </div>
   );
 
   return (

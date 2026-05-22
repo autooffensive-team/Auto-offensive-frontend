@@ -269,8 +269,10 @@ export function useScanController(initialProjectId?: string) {
       setMetaError("");
 
       try {
+        // Fetch projects and tools separately so that a project auth failure
+        // (e.g. guest mode) doesn't prevent tools from loading.
         const [projectData, toolData] = await Promise.all([
-          fetchJson<Project[]>("/projects"),
+          fetchJson<Project[]>("/projects").catch(() => [] as Project[]),
           fetchJson<Tool[]>("/tools?active_only=true"),
         ]);
 
