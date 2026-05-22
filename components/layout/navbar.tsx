@@ -435,7 +435,7 @@ export function Header() {
     <div className="flex items-center gap-2">
       <a
         href="/api/guest/start"
-        className="rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
+        className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
       >
         Try Free
       </a>
@@ -680,13 +680,22 @@ export function Header() {
               className="w-full justify-center rounded-md"
             />
           ) : (
-            <Link
-              href="/register"
-              onClick={() => setOpen(false)}
-              className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-            >
-              {t('signUp')}
-            </Link>
+            <div className="flex flex-col gap-2">
+              <a
+                href="/api/guest/start"
+                onClick={() => setOpen(false)}
+                className="w-full rounded-xl border border-amber-200 bg-amber-50 py-2 text-center text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
+              >
+                Try Free (3 scans)
+              </a>
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                className="w-full rounded-xl border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+              >
+                {t('signUp')}
+              </Link>
+            </div>
           )}
         </div>
       </MobileMenu>

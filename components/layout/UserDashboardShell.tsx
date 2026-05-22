@@ -471,15 +471,15 @@ export default function UserDashboardShell({
               {/* ─── Guest header: badge + login ─── */}
               {isGuest ? (
                 <div className="flex items-center gap-2">
-                  <span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 md:inline-flex dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400">
+                  <span className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400">
                     Guest Mode
                   </span>
                   <Link
                     href="/login"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-black/8 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                   >
                     <LogIn size={14} />
-                    <span className="hidden sm:inline">Login</span>
+                    Login
                   </Link>
                 </div>
               ) : (
