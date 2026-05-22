@@ -496,24 +496,9 @@ export default function AIFeature() {
             <div className="absolute left-[15%] bottom-[10%] h-56 w-56 rounded-full bg-[#e53e3e] opacity-40 blur-3xl dark:opacity-20" />
           </div>
 
-          <div className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-8 px-8 py-5 sm:px-12 sm:py-6 lg:px-16 lg:py-6 max-w-7xl mx-auto">
-            {/* Left — Image (pops outside the frame) */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate={ctaInView ? "visible" : "hidden"}
-              custom={0}
-              className="flex items-center justify-center lg:-my-20 lg:-ml-8"
-            >
-              <img
-                src="/shadow_isolated_automation.webp"
-                alt="Automation illustration"
-                className="w-full max-w-xs sm:max-w-xs lg:max-w-sm xl:max-w-md object-contain drop-shadow-2xl lg:-translate-y-16"
-              />
-            </motion.div>
-
-            {/* Right — Content */}
-            <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <div className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-6 px-8 py-0 sm:px-12 sm:py-0 lg:px-16 lg:py-0 max-w-7xl mx-auto">
+            {/* Left on desktop, Top on mobile — Content */}
+            <div className="order-1 lg:order-2 flex flex-col items-center text-center lg:items-start lg:text-left">
               <motion.h2
                 variants={fadeUp}
                 initial="hidden"
@@ -538,7 +523,7 @@ export default function AIFeature() {
                 initial="hidden"
                 animate={ctaInView ? "visible" : "hidden"}
                 custom={3}
-                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+                className="flex flex-row gap-3 justify-center lg:justify-start"
               >
                 <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
                   <span className="relative z-10 inline-flex items-center justify-center gap-2">
@@ -552,6 +537,21 @@ export default function AIFeature() {
                 </button>
               </motion.div>
             </div>
+
+            {/* Right on desktop, Bottom on mobile — Image */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate={ctaInView ? "visible" : "hidden"}
+              custom={0}
+              className="order-2 lg:order-1 flex items-end justify-center lg:-mt-20 lg:mb-0 lg:-ml-8 overflow-hidden"
+            >
+              <img
+                src="/shadow_isolated_automation.webp"
+                alt="Automation illustration"
+                className="w-full max-w-sm sm:max-w-sm lg:max-w-md xl:max-w-lg object-contain drop-shadow-2xl lg:translate-y-7"
+              />
+            </motion.div>
           </div>
         </motion.div>
       </section>

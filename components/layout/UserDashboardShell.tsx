@@ -20,6 +20,9 @@ import {
   User,
   Settings,
   LogOut,
+  Lock,
+  LogIn,
+  UserPlus,
   Moon,
   Sun,
   Menu,
@@ -30,6 +33,8 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import GoToTop from "@/components/ui/go-to-top";
 import { MobileScreenWarning } from "@/components/shared/MobileScreenWarning";
+import { GuestLockModal } from "@/components/guest/GuestLockModal";
+import { GuestScanLimitBar } from "@/components/guest/GuestScanLimitBar";
 import type { AuthMeResponse } from "@/types/auth";
 
 /**
@@ -51,22 +56,28 @@ function resolveAvatarUrl(value?: string | null): string | null {
   return `/api/backend/${normalized.replace(/^\/+/, "")}`;
 }
 
-const mainNavItems = [
-  { label: "Overview", path: "/userdashboard", icon: LayoutDashboard },
-  { label: "Assets", path: "/userdashboard/assets", icon: Globe },
-  { label: "Projects", path: "/userdashboard/projects", icon: FolderGit2 },
-  { label: "Tools Scan", path: "/userdashboard/scan", icon: Radar },
-  { label: "Code Scan", path: "/userdashboard/code-scanning", icon: Code },
-  { label: "Findings", path: "/userdashboard/findings", icon: ShieldAlert },
-  { label: "Reports", path: "/userdashboard/reports", icon: FileText },
+type NavItem = {
+  label: string;
+  path: string;
+  icon: typeof LayoutDashboard;
+  description: string;
+  guestAllowed: boolean;
+};
+
+const mainNavItems: NavItem[] = [
+  { label: "Overview", path: "/userdashboard", icon: LayoutDashboard, description: "Executive summary", guestAllowed: true },
+  { label: "Assets", path: "/userdashboard/assets", icon: Globe, description: "Surface inventory", guestAllowed: false },
+  { label: "Projects", path: "/userdashboard/projects", icon: FolderGit2, description: "Engagement tracking", guestAllowed: false },
+  { label: "Tools Scan", path: "/userdashboard/scan", icon: Radar, description: "Run assessments", guestAllowed: true },
+  { label: "Code Scan", path: "/userdashboard/code-scanning", icon: Code, description: "Repository analysis", guestAllowed: false },
+  { label: "Findings", path: "/userdashboard/findings", icon: ShieldAlert, description: "Risk triage", guestAllowed: false },
+  { label: "Reports", path: "/userdashboard/reports", icon: FileText, description: "Evidence exports", guestAllowed: false },
 ];
 
-const accountNavItems = [
-  { label: "Profile", path: "/userdashboard/profile", icon: User },
-  { label: "Settings", path: "/userdashboard/settings", icon: Settings },
+const accountNavItems: NavItem[] = [
+  { label: "Profile", path: "/userdashboard/profile", icon: User, description: "User profile", guestAllowed: false },
+  { label: "Settings", path: "/userdashboard/settings", icon: Settings, description: "Preferences", guestAllowed: false },
 ];
-
-
 
 function isItemActive(pathname: string, path: string) {
   if (path === "/userdashboard") {
@@ -88,18 +99,23 @@ function getDashboardDisplayName(
 
 export default function UserDashboardShell({
   initialAuthMe,
+  isGuest = false,
   children,
 }: {
   initialAuthMe?: AuthMeResponse | null;
+  isGuest?: boolean;
   children: React.ReactNode;
 }) {
-  const { data } = useGetAuthMeQuery();
-  const authMe = data ?? initialAuthMe ?? null;
+  // Only call useGetAuthMeQuery for authenticated users — guests don't have tokens
+  const { data } = useGetAuthMeQuery(undefined, { skip: isGuest });
+  const authMe = isGuest ? null : (data ?? initialAuthMe ?? null);
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [lockModalOpen, setLockModalOpen] = useState(false);
+  const [lockedFeatureName, setLockedFeatureName] = useState("");
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const profileRef = useRef<HTMLDivElement>(null);
@@ -110,18 +126,19 @@ export default function UserDashboardShell({
     return match?.label ?? "Dashboard";
   }, [pathname]);
 
-  const displayName = getDashboardDisplayName(
-    authMe?.user.alias_name,
-    authMe?.user.username,
-  );
-  const email = authMe?.user.email ?? "";
-  const avatarUrl = resolveAvatarUrl(authMe?.user.avatar_profile);
-  const initials = displayName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("") || "U";
+  const displayName = isGuest
+    ? "Guest"
+    : getDashboardDisplayName(authMe?.user.alias_name, authMe?.user.username);
+  const email = isGuest ? "" : (authMe?.user.email ?? "");
+  const avatarUrl = isGuest ? null : resolveAvatarUrl(authMe?.user.avatar_profile);
+  const initials = isGuest
+    ? "G"
+    : (displayName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? "")
+        .join("") || "U");
 
   const closeOverlays = () => {
     setMobileMenuOpen(false);
@@ -135,6 +152,12 @@ export default function UserDashboardShell({
     window.location.replace("/logout");
   };
 
+  const handleLockedClick = (label: string) => {
+    setLockedFeatureName(label);
+    setLockModalOpen(true);
+    closeOverlays();
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
@@ -146,6 +169,7 @@ export default function UserDashboardShell({
       if (event.key === "Escape") {
         setMobileMenuOpen(false);
         setProfileOpen(false);
+        setLockModalOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -253,6 +277,37 @@ export default function UserDashboardShell({
           <ul className="space-y-1">
             {mainNavItems.map((item) => {
               const active = isItemActive(pathname, item.path);
+              const isLocked = isGuest && !item.guestAllowed;
+
+              // ─── Locked item for guest ─────────────────────────────
+              if (isLocked) {
+                return (
+                  <li key={item.path}>
+                    <button
+                      type="button"
+                      onClick={() => handleLockedClick(item.label)}
+                      title={collapsed ? `${item.label} (Locked)` : undefined}
+                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                    >
+                      <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
+                        <item.icon size={16} strokeWidth={1.8} />
+                        <Lock size={8} className="absolute -right-1 -top-1 text-amber-500" />
+                      </div>
+                      <div className={collapsed ? "md:hidden" : ""}>
+                        <p className="font-medium text-left">{item.label}</p>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-600 text-left">
+                          {item.description}
+                        </p>
+                      </div>
+                      {!collapsed && (
+                        <Lock size={12} className="ml-auto text-amber-500 shrink-0" />
+                      )}
+                    </button>
+                  </li>
+                );
+              }
+
+              // ─── Normal nav item ───────────────────────────────────
               return (
                 <li key={item.path}>
                   <Link
@@ -277,19 +332,7 @@ export default function UserDashboardShell({
                     <div className={collapsed ? "md:hidden" : ""}>
                       <p className="font-medium">{item.label}</p>
                       <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                        {item.label === "Overview"
-                          ? "Executive summary"
-                          : item.label === "Assets"
-                          ? "Surface inventory"
-                          : item.label === "Projects"
-                          ? "Engagement tracking"
-                          : item.label === "Tools Scan"
-                          ? "Run assessments"
-                          : item.label === "Code Scan"
-                          ? "Repository analysis"
-                          : item.label === "Findings"
-                          ? "Risk triage"
-                          : "Evidence exports"}
+                        {item.description}
                       </p>
                     </div>
                   </Link>
@@ -304,6 +347,32 @@ export default function UserDashboardShell({
           <ul className="space-y-1">
             {accountNavItems.map((item) => {
               const active = isItemActive(pathname, item.path);
+              const isLocked = isGuest && !item.guestAllowed;
+
+              if (isLocked) {
+                return (
+                  <li key={item.path}>
+                    <button
+                      type="button"
+                      onClick={() => handleLockedClick(item.label)}
+                      title={collapsed ? `${item.label} (Locked)` : undefined}
+                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                    >
+                      <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
+                        <item.icon size={16} strokeWidth={1.8} />
+                        <Lock size={8} className="absolute -right-1 -top-1 text-amber-500" />
+                      </div>
+                      <span className={`font-medium ${collapsed ? "md:hidden" : ""}`}>
+                        {item.label}
+                      </span>
+                      {!collapsed && (
+                        <Lock size={12} className="ml-auto text-amber-500 shrink-0" />
+                      )}
+                    </button>
+                  </li>
+                );
+              }
+
               return (
                 <li key={item.path}>
                   <Link
@@ -329,7 +398,9 @@ export default function UserDashboardShell({
           </ul>
         </nav>
 
+        {/* Bottom section */}
         <div className={`border-t border-black/10 p-3 dark:border-white/10 ${collapsed ? "md:p-1.5" : ""}`}>
+          {/* Theme toggle */}
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -343,6 +414,26 @@ export default function UserDashboardShell({
               {mounted && theme === "dark" ? "Light mode" : "Dark mode"}
             </span>
           </button>
+
+          {/* Guest: Login/Register buttons instead of profile */}
+          {isGuest && (
+            <div className={`mt-2 flex gap-2 ${collapsed ? "md:flex-col md:items-center" : ""}`}>
+              <Link
+                href="/login"
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 ${collapsed ? "md:h-10 md:w-10 md:flex-none md:rounded-lg md:px-0" : ""}`}
+              >
+                <LogIn size={14} />
+                <span className={collapsed ? "md:hidden" : ""}>Login</span>
+              </Link>
+              <Link
+                href="/register"
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-slate-950 transition hover:brightness-105 ${collapsed ? "md:h-10 md:w-10 md:flex-none md:rounded-lg md:px-0" : ""}`}
+              >
+                <UserPlus size={14} />
+                <span className={collapsed ? "md:hidden" : ""}>Register</span>
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -359,8 +450,8 @@ export default function UserDashboardShell({
                 <Menu size={18} />
               </button>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-600 dark:text-teal-300">
-                  User Dashboard
+                <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${isGuest ? "text-amber-600 dark:text-amber-400" : "text-teal-600 dark:text-teal-300"}`}>
+                  {isGuest ? "Guest Dashboard" : "User Dashboard"}
                 </p>
                 <h1 className="truncate text-xl font-semibold text-slate-950 dark:text-white">
                   {pageLabel}
@@ -377,85 +468,114 @@ export default function UserDashboardShell({
                 Docs
               </Link>
 
-              <div ref={profileRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileOpen((value) => !value);
-                  }}
-                  className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-slate-950">
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt={`${displayName} avatar`}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
-                  </div>
-                  <div className="hidden md:block">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {displayName}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {email || "Authenticated user"}
-                    </p>
-                  </div>
-                </button>
+              {/* ─── Guest header: badge + login ─── */}
+              {isGuest ? (
+                <div className="flex items-center gap-2">
+                  <span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 md:inline-flex dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400">
+                    Guest Mode
+                  </span>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                  >
+                    <LogIn size={14} />
+                    <span className="hidden sm:inline">Login</span>
+                  </Link>
+                </div>
+              ) : (
+                /* ─── Authenticated header: profile dropdown ─── */
+                <div ref={profileRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileOpen((value) => !value);
+                    }}
+                    className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-slate-950">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={`${displayName} avatar`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        initials
+                      )}
+                    </div>
+                    <div className="hidden md:block">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {displayName}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {email || "Authenticated user"}
+                      </p>
+                    </div>
+                  </button>
 
-                <AnimatePresence>
-                  {profileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
-                    >
-                      <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
-                        <p className="text-sm font-semibold text-slate-950 dark:text-white">
-                          {displayName}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {email}
-                        </p>
-                      </div>
-                      <div className="p-2">
-                        {accountNavItems.slice(0, 2).map((item) => (
-                          <Link
-                            key={item.path}
-                            href={item.path}
-                            onClick={closeOverlays}
-                            className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
+                      >
+                        <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
+                          <p className="text-sm font-semibold text-slate-950 dark:text-white">
+                            {displayName}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {email}
+                          </p>
+                        </div>
+                        <div className="p-2">
+                          {accountNavItems.slice(0, 2).map((item) => (
+                            <Link
+                              key={item.path}
+                              href={item.path}
+                              onClick={closeOverlays}
+                              className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
+                            >
+                              <item.icon size={16} />
+                              {item.label}
+                            </Link>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={handleLogout}
+                            disabled={isLoggingOut}
+                            className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10"
                           >
-                            <item.icon size={16} />
-                            {item.label}
-                          </Link>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={handleLogout}
-                          disabled={isLoggingOut}
-                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10"
-                        >
-                          <LogOut size={16} />
-                          {isLoggingOut ? "Signing out..." : "Logout"}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                            <LogOut size={16} />
+                            {isLoggingOut ? "Signing out..." : "Logout"}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
           </div>
         </header>
 
-        <main className="mx-auto max-w-400 px-4 py-6 md:px-8 md:py-8">
+        <main className={`mx-auto max-w-400 px-4 py-6 md:px-8 md:py-8 ${isGuest ? "pb-20" : ""}`}>
           {children}
         </main>
       </div>
+
+      {/* Guest scan limit bar at bottom */}
+      {isGuest && <GuestScanLimitBar />}
+
+      {/* Lock modal for guest users */}
+      {isGuest && (
+        <GuestLockModal
+          isOpen={lockModalOpen}
+          onClose={() => setLockModalOpen(false)}
+          featureName={lockedFeatureName}
+        />
+      )}
 
       <GoToTop />
     </div>

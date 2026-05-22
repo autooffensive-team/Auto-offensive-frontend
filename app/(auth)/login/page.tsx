@@ -124,6 +124,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Register here
           </Link>
         </p>
+
+        <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-500">
+            Just want to explore?
+          </p>
+          <a
+            href="/api/guest/start"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
+          >
+            Try as Guest
+            <span className="text-xs opacity-70">(3 free scans)</span>
+          </a>
+        </div>
       </div>
     </main>
   );

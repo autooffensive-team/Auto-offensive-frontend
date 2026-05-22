@@ -5,6 +5,8 @@ import UserDashboardShell from "@/components/layout/UserDashboardShell";
 import { readOptionalEnv, readRequiredEnv } from "@/lib/server-env";
 import type { AuthMeResponse } from "@/types/auth";
 import { Toaster } from "sonner";
+import { hasValidGuestSession } from "@/lib/guest/guest-session";
+import { GuestProvider } from "@/lib/guest/GuestContext";
 
 const gatewayBaseUrl =
   readOptionalEnv("BACKEND_URL", "") || readRequiredEnv("FASTAPI_GATEWAY_URL");
@@ -77,30 +79,41 @@ export default async function UserDashboardLayout({
     headers: requestHeaders,
   });
 
-  if (!session) {
+  // ─── Authenticated user flow (unchanged) ───────────────────────────────
+  if (session) {
+    const sessionData = await getValidSessionData(requestHeaders);
+
+    if (!sessionData) {
+      // Session cookie exists but Keycloak tokens are dead.
+      redirect("/logout");
+    }
+
+    return (
+      <>
+        <UserDashboardShell initialAuthMe={sessionData.authMe} isGuest={false}>
+          {children}
+        </UserDashboardShell>
+        <Toaster duration={5000} position="top-center" />
+      </>
+    );
+  }
+
+  // ─── Guest user flow ───────────────────────────────────────────────────
+  // No authenticated session — check if this is a guest access request.
+  // Guest access is triggered by visiting /api/guest/start which sets the cookie,
+  // then redirects here.
+  const guestAccess = await hasValidGuestSession();
+
+  if (!guestAccess) {
     redirect("/login?callbackUrl=%2Fuserdashboard");
   }
 
-  // Validate that the Keycloak token is still usable AND accepted by the backend.
-  // If both access + refresh tokens are expired/rejected (e.g. user left overnight),
-  // redirect through /logout to properly clear the stale session cookie
-  // and Keycloak tokens before landing on /login.
-  const sessionData = await getValidSessionData(requestHeaders);
-
-  if (!sessionData) {
-    // Session cookie exists but Keycloak tokens are dead.
-    // Send through /logout which clears cookies properly as a route handler,
-    // then redirects to /login. This avoids the redirect loop where /login
-    // sees a stale session and bounces back to /userdashboard.
-    redirect("/logout");
-  }
-
   return (
-    <>
-      <UserDashboardShell initialAuthMe={sessionData.authMe}>
+    <GuestProvider>
+      <UserDashboardShell isGuest={true}>
         {children}
       </UserDashboardShell>
       <Toaster duration={5000} position="top-center" />
-    </>
+    </GuestProvider>
   );
 }

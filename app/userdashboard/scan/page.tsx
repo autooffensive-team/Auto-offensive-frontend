@@ -1,7 +1,7 @@
 "use client";
 
-import { RotateCcw, ScanLine, Wrench } from "lucide-react";
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { RotateCcw, ScanLine, Wrench, Lock, Scan } from "lucide-react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
@@ -10,6 +10,9 @@ import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
 import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { useScanController } from "@/hooks/use-scan-controller";
+import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
+import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
+import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -270,6 +273,29 @@ export default function ScanPage() {
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
 
+  // ── Guest scan guard ──────────────────────────────────────────────────────
+  const {
+    isGuest,
+    limitReached,
+    guardedSubmit,
+    guestSubmitBasicScan,
+    showLimitModal,
+    closeLimitModal,
+    showLockModal,
+    closeLockModal,
+    lockedFeature,
+    handleLockedFeature,
+  } = useGuestScanGuard();
+
+  // If guest tries to access advanced mode, block it
+  const handleTabChange = useCallback((mode: ScanMode) => {
+    if (isGuest && mode === "advanced") {
+      handleLockedFeature("Advanced Scan");
+      return;
+    }
+    setActiveTab(mode);
+  }, [isGuest, handleLockedFeature]);
+
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
 
@@ -310,7 +336,10 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController(initialProjectId);
+  } = useScanController(isGuest ? "guest-basic-scan" : initialProjectId);
+
+  // For guests, suppress the meta error about projects failing to load
+  const displayMetaError = isGuest ? "" : metaError;
 
   const activeRun = activeTab === "basic" ? basicRun : mediumRun;
   const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
@@ -319,23 +348,50 @@ export default function ScanPage() {
   const isIdle = activeLogs.length === 0;
 
   return (
+    <>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
         <div>
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+            {isGuest ? (
+              <>
+                Launch Basic or Medium scans and watch live logs as they run.
+                <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                  <Lock size={10} />
+                  Advanced mode requires an account
+                </span>
+              </>
+            ) : (
+              "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
+            )}
           </p>
         </div>
 
-        {metaError && (
+        {displayMetaError && (
           <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
-            {metaError}
+            {displayMetaError}
+          </div>
+        )}
+
+        {isGuest && limitReached && (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 sm:p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
+            <p className="text-xs sm:text-sm font-medium text-rose-700 dark:text-rose-400">
+              You&apos;ve used all 3 guest scans. Please create an account to continue scanning.
+            </p>
           </div>
         )}
 
         <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
-          {loadingMeta ? (
+          {isGuest ? (
+            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Scan size={16} className="text-teal-500" />
+              <span>Guest Scan Session</span>
+              <span className="ml-auto rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                Guest Mode
+              </span>
+            </div>
+          ) : loadingMeta ? (
             <ProjectSelectorSkeleton />
           ) : (
             <ProjectSelector
@@ -350,7 +406,7 @@ export default function ScanPage() {
 
         <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
           <div className="space-y-3 sm:space-y-4 md:space-y-5">
-            <ScanModeTabs value={activeTab} onChange={setActiveTab} />
+            <ScanModeTabs value={activeTab} onChange={handleTabChange} />
 
             <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
               <ScanModeHeader
@@ -366,8 +422,8 @@ export default function ScanPage() {
                 preset={basicPreset}
                 onPresetChange={setBasicPreset}
                 tools={basicTools}
-                disabled={isSubmitting || !projectId}
-                onSubmit={submitBasic}
+                disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
+                onSubmit={() => guardedSubmit(submitBasic)}
               />
             </ScanModePanel>
 
@@ -386,12 +442,12 @@ export default function ScanPage() {
                 onAddStep={addMediumStep}
                 onRemoveStep={removeMediumStep}
                 tools={mediumTools}
-                disabled={isSubmitting || !projectId}
-                onSubmit={submitMedium}
+                disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
+                onSubmit={() => guardedSubmit(submitMedium)}
               />
             </ScanModePanel>
 
-            {activeTab === "advanced" && (
+            {activeTab === "advanced" && !isGuest && (
               <AdvancedTerminalPanel
                 projectId={projectId}
                 selectedProject={selectedProject}
@@ -505,5 +561,10 @@ export default function ScanPage() {
         )}
       </div>
     </div>
+
+    {/* Guest modals */}
+    <GuestScanLimitModal isOpen={showLimitModal} onClose={closeLimitModal} />
+    <GuestLockModal isOpen={showLockModal} onClose={closeLockModal} featureName={lockedFeature} />
+    </>
   );
 }

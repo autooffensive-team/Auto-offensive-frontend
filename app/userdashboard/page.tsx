@@ -33,6 +33,8 @@ import {
 import DashboardOverviewSkeleton from "@/components/skeletons/dashboard-overview-skeleton";
 import type { DashboardMostVulnerableAsset } from "@/types/overview";
 
+import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type MetricCardData = {
@@ -181,25 +183,31 @@ function readErrorMessage(error: unknown): string {
 // ─── Page Component ──────────────────────────────────────────────────────────
 
 export default function UserDashboardPage() {
+  return <AuthenticatedDashboard />;
+}
+
+function AuthenticatedDashboard() {
+  const guestCtx = useOptionalGuestContext();
+  const isGuest = guestCtx?.isGuest ?? false;
+
   const [highRiskAssetsPage, setHighRiskAssetsPage] = useState(1);
-  const { data: authMe } = useGetAuthMeQuery();
-  const overviewQuery = useGetDashboardOverviewQuery();
-  const severityQuery = useGetDashboardVulnerabilitySeverityQuery();
-  const assetsTrendQuery = useGetDashboardAssetsTrendQuery({ range: "30d" });
-  const topPortsQuery = useGetDashboardTopPortsQuery({ limit: 1 });
-  const topServicesQuery = useGetDashboardTopServicesQuery({ limit: 1 });
-  const topTechnologiesQuery = useGetDashboardTopTechnologiesQuery({ limit: 1 });
+  const { data: authMe } = useGetAuthMeQuery(undefined, { skip: isGuest });
+  const overviewQuery = useGetDashboardOverviewQuery(undefined, { skip: isGuest });
+  const severityQuery = useGetDashboardVulnerabilitySeverityQuery(undefined, { skip: isGuest });
+  const assetsTrendQuery = useGetDashboardAssetsTrendQuery({ range: "30d" }, { skip: isGuest });
+  const topPortsQuery = useGetDashboardTopPortsQuery({ limit: 1 }, { skip: isGuest });
+  const topServicesQuery = useGetDashboardTopServicesQuery({ limit: 1 }, { skip: isGuest });
+  const topTechnologiesQuery = useGetDashboardTopTechnologiesQuery({ limit: 1 }, { skip: isGuest });
   const mostVulnerableQuery = useGetDashboardMostVulnerableAssetsQuery({
     page: highRiskAssetsPage,
     pageSize: HIGH_RISK_ASSETS_PAGE_SIZE,
     sortBy: "riskScore",
     order: "desc",
-  });
+  }, { skip: isGuest });
 
-  const displayName = getDashboardDisplayName(
-    authMe?.user.alias_name,
-    authMe?.user.username,
-  );
+  const displayName = isGuest
+    ? "Guest"
+    : getDashboardDisplayName(authMe?.user.alias_name, authMe?.user.username);
 
   const overview = overviewQuery.data;
   const severity = severityQuery.data;

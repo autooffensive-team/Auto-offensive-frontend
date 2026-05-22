@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import HolographicPlanet from "./holographic-planet";
+import HolographicPlanetLazy from "./holographic-planet-lazy";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -431,10 +431,10 @@ export default function HomeHero() {
     };
   }, []);
 
-  // Staggered fade-up helper for content blocks
+  // Staggered fade-in helper for content blocks (no vertical shift to avoid layout jump)
   const fadeUp = (delay: number) => ({
-    initial:    { opacity:0, y:18 } as const,
-    animate:    { opacity:1, y:0  } as const,
+    initial:    { opacity:0 } as const,
+    animate:    { opacity:1 } as const,
     transition: { duration:0.65, delay, ease:"easeOut" as const },
   });
 
@@ -692,7 +692,7 @@ export default function HomeHero() {
             style={{ aspectRatio: "1 / 1" }}
           >
             <div className="absolute inset-0">
-              <HolographicPlanet />
+              <HolographicPlanetLazy />
             </div>
           </div>
 

@@ -58,8 +58,12 @@ const proxyBaseQueryWithReauth: BaseQueryFn<
     // the session cookie + Keycloak tokens, then land on /login.
     // This avoids a redirect loop where /login sees a stale session
     // and sends the user back to /userdashboard.
+    // Skip redirect for guest users (they don't have auth sessions).
     if (typeof window !== "undefined") {
-      window.location.replace("/logout");
+      const isGuestMode = document.cookie.includes("guest_session_id=");
+      if (!isGuestMode) {
+        window.location.replace("/logout");
+      }
     }
   }
 
