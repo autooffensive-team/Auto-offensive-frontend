@@ -357,7 +357,7 @@ export default function ScanPage() {
             {isGuest ? (
               <>
                 Launch Basic or Medium scans and watch live logs as they run.
-                <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
                   <Lock size={10} />
                   Advanced mode requires an account
                 </span>
@@ -387,7 +387,7 @@ export default function ScanPage() {
             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
               <Scan size={16} className="text-teal-500" />
               <span>Guest Scan Session</span>
-              <span className="ml-auto rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+              <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
                 Guest Mode
               </span>
             </div>

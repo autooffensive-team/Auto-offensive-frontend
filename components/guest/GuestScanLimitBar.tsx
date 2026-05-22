@@ -58,7 +58,7 @@ export function GuestScanLimitBar() {
         {isExhausted ? (
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:brightness-105"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:brightness-105"
           >
             <LogIn size={14} />
             Create Account
