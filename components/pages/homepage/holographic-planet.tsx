@@ -7,6 +7,7 @@ export default function HolographicPlanet() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
     const container = containerRef.current;
     if (!container) return;
 
@@ -49,15 +50,22 @@ export default function HolographicPlanet() {
     let destroyed = false;
     let planetVisible = false;
     let planetOpacity = 0;
+    let introStart = 0;
+    let introActive = false;
 
     // Delay planet appearance until after sweep comet finishes (~2.1s)
-    const PLANET_DELAY = 1400;
+    const PLANET_DELAY = 1800;
     const PLANET_FADE_DURATION = 500; // ms to fade in
+    const PLANET_INTRO_DURATION = 1050;
+    const PLANET_START_SCALE = 0.42;
+    const PLANET_SPIN_DEGREES = 360;
     let planetFadeStart = 0;
 
     const planetDelayTimer = setTimeout(() => {
       planetVisible = true;
       planetFadeStart = performance.now();
+      introStart = planetFadeStart;
+      introActive = true;
     }, PLANET_DELAY);
 
     // ─── Theme detection ───────────────────────────────────────
@@ -171,15 +179,17 @@ export default function HolographicPlanet() {
         ctx.stroke();
 
         // Halftone dots on land
+        const dotRadius = (dark ? 0.8 : 1.0) * scaleFactor;
+        ctx.beginPath();
         landDots.forEach((dot) => {
           const projected = projection(dot);
           if (projected) {
-            ctx.beginPath();
-            ctx.arc(projected[0], projected[1], (dark ? 0.8 : 1.0) * scaleFactor, 0, 2 * Math.PI);
-            ctx.fillStyle = dotFill;
-            ctx.fill();
+            ctx.moveTo(projected[0] + dotRadius, projected[1]);
+            ctx.arc(projected[0], projected[1], dotRadius, 0, 2 * Math.PI);
           }
         });
+        ctx.fillStyle = dotFill;
+        ctx.fill();
       }
 
       ctx.globalAlpha = 1;
@@ -188,15 +198,14 @@ export default function HolographicPlanet() {
     // ─── Animation loop ────────────────────────────────────────
     let animId: number;
     let lastFrame = 0;
-    const FRAME_INTERVAL = 1000 / 30;
+    const AUTO_ROTATE_DEGREES_PER_MS = 0.009;
 
     const animate = (timestamp: number) => {
       if (destroyed) return;
       animId = requestAnimationFrame(animate);
 
-      const delta = timestamp - lastFrame;
-      if (delta < FRAME_INTERVAL) return;
-      lastFrame = timestamp - (delta % FRAME_INTERVAL);
+      const delta = lastFrame ? timestamp - lastFrame : 16.67;
+      lastFrame = timestamp;
 
       // Update planet fade-in opacity
       if (planetVisible && planetOpacity < 1) {
@@ -204,9 +213,24 @@ export default function HolographicPlanet() {
         planetOpacity = Math.min(1, elapsed / PLANET_FADE_DURATION);
       }
 
-      // Auto-rotate
-      if (autoRotate) {
-        rotation[0] += 0.3;
+      // Intro: pop from small to full size while doing one fast full spin.
+      if (introActive) {
+        const introElapsed = timestamp - introStart;
+        const introProgress = Math.min(1, introElapsed / PLANET_INTRO_DURATION);
+        const eased = easeOutCubic(introProgress);
+
+        projection.scale(radius * (PLANET_START_SCALE + (1 - PLANET_START_SCALE) * eased));
+        rotation[0] = PLANET_SPIN_DEGREES * eased;
+        projection.rotate(rotation);
+
+        if (introProgress >= 1) {
+          introActive = false;
+          projection.scale(radius);
+          rotation[0] = PLANET_SPIN_DEGREES;
+        }
+      } else if (autoRotate) {
+        projection.scale(radius);
+        rotation[0] += delta * AUTO_ROTATE_DEGREES_PER_MS;
         projection.rotate(rotation);
       }
 
@@ -274,7 +298,16 @@ export default function HolographicPlanet() {
         canvas.style.height = `${h}px`;
         ctx.setTransform(newDpr, 0, 0, newDpr, 0, 0);
         const newRadius = Math.min(w, h) / 2.5;
-        projection.scale(newRadius).translate([w / 2, h / 2]);
+        const introProgress = introActive
+          ? Math.min(1, (performance.now() - introStart) / PLANET_INTRO_DURATION)
+          : 1;
+        const introScale = introActive
+          ? PLANET_START_SCALE + (1 - PLANET_START_SCALE) * easeOutCubic(introProgress)
+          : 1;
+
+        projection
+          .scale(newRadius * introScale)
+          .translate([w / 2, h / 2]);
         render();
       }
     });
