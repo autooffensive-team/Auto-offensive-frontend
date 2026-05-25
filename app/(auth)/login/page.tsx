@@ -66,7 +66,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-4 py-8 transition-colors duration-300 dark:bg-[#09090B]">
-      <div className="grid min-h-[600px] w-full max-w-7xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-colors duration-300 md:grid-cols-2 dark:border-gray-700 dark:bg-[#111114]">
+      <div className="grid min-h-150 w-full max-w-7xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-colors duration-300 md:grid-cols-2 dark:border-gray-700 dark:bg-[#111114]">
 
         {/* ── Left Side — Login form panel ── */}
         <div className="flex flex-col justify-center border-b border-slate-200/80 bg-white px-12 py-10 transition-colors duration-300 md:border-b-0 md:border-r dark:border-gray-700 dark:bg-[#111114]">
