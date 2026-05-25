@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
+import FocusWord from "@/components/ui/focus-word";
 
 const VALUES_EN = [
   {
@@ -101,6 +102,24 @@ export default function Values() {
   const drumWrapRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
   const facesBuilt = useRef(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [titleAnimStarted, setTitleAnimStarted] = useState(false);
+
+  // Trigger FocusWord animation when title scrolls into view
+  useEffect(() => {
+    if (!titleRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTitleAnimStarted(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(titleRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     const drum = drumRef.current;
@@ -544,8 +563,11 @@ export default function Values() {
             <div className="vs-grid">
               <div className="vs-left">
                 <div className="vs-left-inner">
-                  <h2 className="vs-title" style={{ fontFamily: titleFont }}>
-                    {ui.titleTop} <span className="vs-title-ac">{ui.titleAccent}</span>
+                  <h2 className="vs-title" style={{ fontFamily: titleFont }} ref={titleRef}>
+                    {ui.titleTop}{" "}
+                    <FocusWord startAnimation={titleAnimStarted}>
+                      <span className="vs-title-ac">{ui.titleAccent}</span>
+                    </FocusWord>
                     <br />
                     {ui.titleBottom}
                   </h2>

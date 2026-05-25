@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
+import FocusWord from "@/components/ui/focus-word";
 
 const SOCIAL_LINKS = {
   github: { label: "GitHub", Icon: IconGithub },
@@ -159,15 +160,15 @@ export default function TeamAndFooter() {
 
   const copy = isKhmer
     ? {
-        heroLine1: "ក្រុមមនុស្សនៅពីក្រោយ",
-        heroLine2Lead: "វេទិកា",
-        heroLine2Accent: "",
+        heroLine1: "The People Behind",
+        heroLine2Lead: "the",
+        heroLine2Accent: "Platform",
         heroBody:
           "អ្នកស្រាវជ្រាវសុវត្ថិភាព វិស្វករ និងអ្នកបង្កើត ដែលរួមគ្នាក្នុងបេសកកម្មតែមួយ គឺធ្វើឱ្យ offensive security ងាយប្រើសម្រាប់គ្រប់គ្នា។",
-        mentorsLead: "ទីប្រឹក្សា",
-        mentorsAccent: "របស់យើង",
-        teamLead: "ក្រុម",
-        teamAccent: "ស្នូល",
+        mentorsLead: "Our",
+        mentorsAccent: "Mentors",
+        teamLead: "Core",
+        teamAccent: "Team",
         footerPath: ["Scan", "Analyse", "Report"],
         footerLead: "ត្រៀមប្រើស្វ័យប្រវត្តិកម្មសម្រាប់",
         footerAccent: "ការធ្វើតេស្តសុវត្ថិភាពរបស់អ្នកឬនៅ?",
@@ -197,6 +198,37 @@ export default function TeamAndFooter() {
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const bgRef = useRef<HTMLDivElement>(null);
+  const heroTitleRef = useRef<HTMLHeadingElement>(null);
+  const mentorsTitleRef = useRef<HTMLHeadingElement>(null);
+  const teamTitleRef = useRef<HTMLHeadingElement>(null);
+  const [heroAnimStarted, setHeroAnimStarted] = useState(false);
+  const [mentorsAnimStarted, setMentorsAnimStarted] = useState(false);
+  const [teamAnimStarted, setTeamAnimStarted] = useState(false);
+
+  // Trigger FocusWord animations when headings scroll into view
+  useEffect(() => {
+    const entries: [React.RefObject<HTMLHeadingElement | null>, (v: boolean) => void][] = [
+      [heroTitleRef, setHeroAnimStarted],
+      [mentorsTitleRef, setMentorsAnimStarted],
+      [teamTitleRef, setTeamAnimStarted],
+    ];
+    const obs = new IntersectionObserver(
+      (ioEntries) => {
+        ioEntries.forEach((e) => {
+          if (e.isIntersecting) {
+            const match = entries.find(([ref]) => ref.current === e.target);
+            if (match) {
+              match[1](true);
+              obs.unobserve(e.target);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    entries.forEach(([ref]) => { if (ref.current) obs.observe(ref.current); });
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -315,21 +347,23 @@ export default function TeamAndFooter() {
         <div className="relative z-10 w-full h-px bg-linear-to-r from-transparent via-[rgba(0,208,177,0.45)] to-transparent" />
 
         <div className="relative z-10 tf-intro px-[6%] pt-23 pb-10 text-center overflow-hidden">
-          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: titleFont }}>
+          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={heroTitleRef}>
             {copy.heroLine1}<br />
-            {isKhmer ? (
-              <>{copy.heroLine2Lead}</>
-            ) : (
-              <>{copy.heroLine2Lead} <em className="text-primary not-italic">{copy.heroLine2Accent}</em></>
-            )}
+            {copy.heroLine2Lead}{" "}
+            <FocusWord startAnimation={heroAnimStarted}>
+              <em className="text-primary not-italic">{copy.heroLine2Accent}</em>
+            </FocusWord>
           </h2>
           <p className="tf-body-text text-[#4a6e65] dark:text-[#9cb8b1] max-w-115 mx-auto leading-[1.8]">{copy.heroBody}</p>
         </div>
 
         <div className="relative z-10 px-[6%] pt-6 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
-              {copy.mentorsLead} <em className="text-primary not-italic">{copy.mentorsAccent}</em>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={mentorsTitleRef}>
+              {copy.mentorsLead}{" "}
+              <FocusWord startAnimation={mentorsAnimStarted}>
+                <em className="text-primary not-italic">{copy.mentorsAccent}</em>
+              </FocusWord>
             </h2>
           </div>
 
@@ -364,8 +398,11 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-2 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
-              {copy.teamLead} <em className="text-primary not-italic">{copy.teamAccent}</em>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={teamTitleRef}>
+              {copy.teamLead}{" "}
+              <FocusWord startAnimation={teamAnimStarted}>
+                <em className="text-primary not-italic">{copy.teamAccent}</em>
+              </FocusWord>
             </h2>
           </div>
 

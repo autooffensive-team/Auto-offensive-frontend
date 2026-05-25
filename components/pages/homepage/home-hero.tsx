@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import HolographicPlanetLazy from "./holographic-planet-lazy";
+import FocusWord from "@/components/ui/focus-word";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -264,112 +265,6 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
     });
     resetAll();
   };
-}
-
-// ─── Focus word corners ───────────────────────────────────────────────
-// "frame-half" close-to-open animation:
-// The frame starts collapsed (zero width, like inset: 0 50%) with all 4
-// corner brackets meeting at center. Then it expands horizontally to full
-// width, with corners riding the edges outward. Text is clipped/hidden
-// until the frame opens enough to reveal it.
-
-const CORNER_ANCHOR: Record<"tl"|"tr"|"bl"|"br", string> = {
-  tl: "top-0 left-0",
-  tr: "top-0 right-0",
-  bl: "bottom-0 left-0",
-  br: "bottom-0 right-0",
-};
-
-// Final offset from the corner (the visual "spread" away from the text box)
-const CORNER_OFFSET: Record<"tl"|"tr"|"bl"|"br", { x:number; y:number }> = {
-  tl: { x:-4, y:-4 },
-  tr: { x: 4, y:-4 },
-  bl: { x:-4, y: 4 },
-  br: { x: 4, y: 4 },
-};
-
-function CornerBracket({
-  pos,
-  svgPath,
-}: {
-  pos: "tl"|"tr"|"bl"|"br";
-  svgPath: string;
-}) {
-  const offset = CORNER_OFFSET[pos];
-
-  return (
-    <svg
-      className={`absolute w-[0.5em] h-[0.5em] text-[#6346FF] z-10 overflow-visible
-        md:w-[0.58em] md:h-[0.58em] lg:w-[0.62em] lg:h-[0.62em] ${CORNER_ANCHOR[pos]}`}
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
-      style={{
-        filter: "drop-shadow(0 0 5px rgba(99,70,255,0.35))",
-        transform: `translate(${offset.x}px, ${offset.y}px)`,
-      }}
-    >
-      <path d={svgPath} />
-    </svg>
-  );
-}
-
-function FocusWord({
-  children,
-  startAnimation,
-}: {
-  children: string;
-  startAnimation: boolean;
-}) {
-  return (
-    <span
-      className="
-        relative inline-grid items-center justify-center
-        mx-[0.16em] px-[0.08em] pt-[0.01em] pb-[0.03em]
-        isolate gap-0 leading-none w-max align-baseline
-        md:mx-[0.18em] md:px-[0.1em] md:pt-[0.02em] md:pb-[0.04em]
-        lg:px-[0.12em] lg:pt-[0.03em] lg:pb-[0.05em]
-      "
-    >
-      {/* The frame wrapper — animates from 0% width (collapsed) to 100% width (open) */}
-      <motion.span
-        className="absolute inset-y-0 left-1/2 flex items-center justify-center overflow-hidden"
-        style={{ translateX: "-50%" }}
-        initial={{ width: "0%" }}
-        animate={startAnimation ? { width: "100%" } : { width: "0%" }}
-        transition={{
-          duration: 0.65,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-      >
-        {/* Inner frame that holds the 4 corner brackets — always full size */}
-        <span className="relative w-full h-full" style={{ minWidth: "100%" }}>
-          <CornerBracket pos="tl" svgPath="M2 10V2H10" />
-          <CornerBracket pos="tr" svgPath="M10 2H18V10" />
-          <CornerBracket pos="bl" svgPath="M2 10V18H10" />
-          <CornerBracket pos="br" svgPath="M10 18H18V10" />
-        </span>
-      </motion.span>
-
-      {/* Text — clips from center outward in sync with the frame */}
-      <motion.span
-        className="relative z-1 text-primary font-bold tracking-[-0.04em] whitespace-nowrap leading-[0.92]"
-        initial={{ opacity: 0 }}
-        animate={startAnimation ? { opacity: 1 } : { opacity: 0 }}
-        transition={{
-          duration: 0.35,
-          delay: 0.25,
-          ease: "easeOut",
-        }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
 }
 
 // ─── Main hero component ─────────────────────────────────────────────
