@@ -1,7 +1,7 @@
 "use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
-import { RotateCcw, ScanLine, Wrench } from "lucide-react";
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
