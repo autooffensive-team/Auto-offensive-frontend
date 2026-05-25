@@ -142,135 +142,139 @@ function useStableAsciiScale() {
     };
   }, []);
 
-  return { ref, fontSize };
-}
+  useEffect(() => {
+    return () => {
+      streamAbortRef.current?.abort();
+    };
+  }, []);
 
-function colorizeLogText(text: string): React.ReactNode {
-  const patterns: { regex: RegExp; className: string }[] = [
-    { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400 dark:text-blue-400" },
-    { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-500 dark:text-violet-400" },
-    { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-500 dark:text-cyan-400" },
-    { regex: /\bopen\b/g, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400 dark:text-rose-400" },
-    { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-500 dark:text-amber-400" },
-    { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400 dark:text-sky-400" },
-    { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-500 dark:text-red-400 font-semibold" },
-    { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-500 dark:text-teal-400" },
-    { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400 dark:text-orange-400" },
-  ];
+  async function consumeScanStream(response: Response) {
+    if (!response.body) {
+      throw new Error("Streaming response body is missing.");
+    }
 
-  type Match = { start: number; end: number; className: string };
-  const matches: Match[] = [];
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
 
-  for (const { regex, className } of patterns) {
-    const re = new RegExp(regex.source, regex.flags);
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(text)) !== null) {
-      const start = m.index;
-      const end = m.index + m[0].length;
-      const overlaps = matches.some(
-        (existing) => start < existing.end && end > existing.start
-      );
-      if (!overlaps) matches.push({ start, end, className });
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+
+      while (buffer.includes("\n\n")) {
+        const boundary = buffer.indexOf("\n\n");
+        const block = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+
+        const lines = block.split("\n");
+        let eventName = "message";
+        const dataLines: string[] = [];
+
+        for (const line of lines) {
+          if (line.startsWith("event:")) {
+            eventName = line.slice(6).trim();
+          }
+          if (line.startsWith("data:")) {
+            dataLines.push(line.slice(5).trimStart());
+          }
+        }
+
+        if (!dataLines.length || eventName === "ping") {
+          continue;
+        }
+
+        const rawData = dataLines.join("\n");
+        let payload: unknown = rawData;
+
+        try {
+          payload = JSON.parse(rawData);
+        } catch {
+          payload = rawData;
+        }
+
+        const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+        if (typeof record?.status === "string") {
+          setScanStatus(record.status);
+        }
+        if (eventName === "done") {
+          setPageMessage({ tone: "success", text: "Scan completed." });
+        }
+        if (eventName === "error") {
+          setPageMessage({
+            tone: "danger",
+            text: typeof record?.error === "string" ? record.error : "The scan stream returned an error.",
+          });
+        }
+
+        setActivityEntries((current) => [
+          {
+            id: `${Date.now()}-${current.length}`,
+            event: eventName,
+            message: describeEvent(eventName, payload),
+          },
+          ...current,
+        ].slice(0, 6));
+      }
     }
   }
 
-  if (matches.length === 0) {
-    return <span className="text-gray-700 dark:text-gray-300">{text}</span>;
-  }
+  async function handleStartScan(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  matches.sort((a, b) => a.start - b.start);
-  const fragments: React.ReactNode[] = [];
-  let cursor = 0;
-
-  matches.forEach((match, i) => {
-    if (cursor < match.start) {
-      fragments.push(
-        <span key={`t-${i}`} className="text-gray-700 dark:text-gray-300">
-          {text.slice(cursor, match.start)}
-        </span>
-      );
+    if (!selectedTool || !resolvedPreset || !target.trim()) {
+      setPageMessage({
+        tone: "danger",
+        text: "Choose a tool, choose a preset, and enter a target before starting.",
+      });
+      return;
     }
-    fragments.push(
-      <span key={`m-${i}`} className={match.className}>
-        {text.slice(match.start, match.end)}
-      </span>
-    );
-    cursor = match.end;
-  });
 
-  if (cursor < text.length) {
-    fragments.push(
-      <span key="tail" className="text-gray-700 dark:text-gray-300">
-        {text.slice(cursor)}
-      </span>
-    );
+    streamAbortRef.current?.abort();
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
+
+    setIsStartingScan(true);
+    setPageMessage(null);
+    setScanStatus("JOB_STATUS_PENDING");
+    setActivityEntries([]);
+
+    try {
+      const response = await fetch("/api/guest-scan/basic/submit", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "text/event-stream",
+        },
+        body: JSON.stringify({
+          target: target.trim(),
+          tool: selectedTool.tool_name,
+          preset: resolvedPreset,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      await consumeScanStream(response);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        const message = error instanceof Error ? error.message : "Unable to start the scan.";
+        setPageMessage({ tone: "danger", text: message });
+        setScanStatus("JOB_STATUS_FAILED");
+      }
+    } finally {
+      if (streamAbortRef.current === controller) {
+        streamAbortRef.current = null;
+      }
+      setIsStartingScan(false);
+    }
   }
-
-  return <>{fragments}</>;
-}
-
-export default function ScanPage() {
-  const [activeTab, setActiveTab] = useState<ScanMode>("basic");
-  const searchParams = useSearchParams();
-  const initialProjectId = searchParams.get("project") || undefined;
-
-  const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
-
-  const {
-    projects,
-    tools,
-    projectId,
-    setProjectId,
-    loadingMeta,
-    metaError,
-    basicTarget,
-    setBasicTarget,
-    basicToolId,
-    setBasicToolId,
-    basicPreset,
-    setBasicPreset,
-    basicTools,
-    mediumTarget,
-    setMediumTarget,
-    mediumSteps,
-    mediumTools,
-    isSubmitting,
-    basicRun,
-    basicLogs,
-    basicErrors,
-    mediumRun,
-    mediumLogs,
-    mediumErrors,
-    advancedRun,
-    advancedLogs,
-    advancedErrors,
-    selectedProject,
-    resetRun,
-    submitBasic,
-    submitMedium,
-    submitAdvanced,
-    updateMediumStep,
-    updateMediumOption,
-    addMediumStep,
-    removeMediumStep,
-  } = useScanController(initialProjectId);
-
-  const activeRun = activeTab === "basic" ? basicRun : mediumRun;
-  const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
-  const activeErrors = activeTab === "basic" ? basicErrors : mediumErrors;
-
-  const isIdle = activeLogs.length === 0;
-
-  // ── Derive jobId from the active run ────────────────────────────────────────
-  // basicRun / mediumRun are the run objects returned after scan submission.
-  // Adjust the field name below if your run object uses a different key
-  // (e.g. run.job_id, run.scan_id, run.id, etc.)
-const jobId: string =
-  activeTab === "basic"
-    ? basicRun?.jobId ?? ""
-    : mediumRun?.jobId ?? "";
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">

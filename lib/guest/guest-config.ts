@@ -13,7 +13,7 @@ export const GUEST_SESSION_COOKIE = "guest_session_id";
 export const GUEST_SESSION_TTL_SECONDS = 60 * 60 * 24;
 
 /** Scan modes allowed for guest users */
-export const GUEST_ALLOWED_SCAN_MODES = ["basic", "medium"] as const;
+export const GUEST_ALLOWED_SCAN_MODES = ["basic", "medium", "advanced"] as const;
 
 /** Dashboard routes that guests can access */
 export const GUEST_ALLOWED_ROUTES = [

@@ -1087,7 +1087,7 @@ export default function CodeScanningNewPageClient() {
                       type="button"
                       onClick={handleNextFromStep1}
                       disabled={!canProceedStep1}
-                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-black transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Next: Choose Repository
                       <ArrowRight size={15} />
@@ -1311,7 +1311,7 @@ export default function CodeScanningNewPageClient() {
                       type="button"
                       onClick={handleNextFromStep2}
                       disabled={!canProceedStep2}
-                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-5 py-2.5 text-[14px] font-semibold text-black transition-colors hover:bg-teal-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Next: Configure Scan
                       <ArrowRight size={15} />
@@ -1552,7 +1552,7 @@ export default function CodeScanningNewPageClient() {
                       type="button"
                       onClick={handleCreate}
                       disabled={isCreating}
-                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-teal-500/30 transition-all hover:bg-teal-600 hover:shadow-teal-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
+                      className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-6 py-2.5 text-[14px] font-semibold text-black shadow-sm shadow-teal-500/30 transition-all hover:bg-teal-600 hover:shadow-teal-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
                     >
                       {isCreating ? (
                         <LoaderCircle size={15} className="animate-spin" />

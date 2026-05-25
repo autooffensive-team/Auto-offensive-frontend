@@ -60,7 +60,7 @@ export function ScanModeTabs({ value, onChange }: ScanModeTabsProps) {
             className={cn(
               "flex items-center justify-center gap-2 rounded-md px-3 py-2.5 text-xs sm:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               isActive 
-                ? "bg-[#00d0b2] text-primary-foreground" 
+                ? "bg-[#00d0b2] text-black" 
                 : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
             )}
           >

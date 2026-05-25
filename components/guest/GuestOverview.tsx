@@ -42,7 +42,7 @@ const quickActions: QuickAction[] = [
     label: "Advanced Scan",
     description: "Full terminal access with custom commands",
     icon: Shield,
-    locked: true,
+    href: "/userdashboard/scan?mode=advanced",
   },
   {
     label: "Code Scanning",
@@ -76,8 +76,8 @@ export function GuestOverview() {
               Welcome, Guest
             </h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              You&apos;re using Auto Offensive in guest mode. You have access to Basic and
-              Medium scans with a limit of {guest?.maxScans ?? 3} total scans.
+              You&apos;re using Auto Offensive in guest mode. You have access to Basic,
+              Medium, and Advanced scans with a limit of {guest?.maxScans ?? 3} total scans.
               Create a free account to unlock all features.
             </p>
           </div>

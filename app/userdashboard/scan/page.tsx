@@ -279,6 +279,7 @@ export default function ScanPage() {
     limitReached,
     guardedSubmit,
     guestSubmitBasicScan,
+    maxScans,
     showLimitModal,
     closeLimitModal,
     showLockModal,
@@ -287,14 +288,10 @@ export default function ScanPage() {
     handleLockedFeature,
   } = useGuestScanGuard();
 
-  // If guest tries to access advanced mode, block it
+  // If guest tries to access advanced mode, allow it (uses guest API endpoints)
   const handleTabChange = useCallback((mode: ScanMode) => {
-    if (isGuest && mode === "advanced") {
-      handleLockedFeature("Advanced Scan");
-      return;
-    }
     setActiveTab(mode);
-  }, [isGuest, handleLockedFeature]);
+  }, []);
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
@@ -336,7 +333,7 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController(isGuest ? "guest-basic-scan" : initialProjectId);
+  } = useScanController(isGuest ? "guest-advanced-scan" : initialProjectId, { guestMode: isGuest });
 
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
@@ -351,16 +348,21 @@ export default function ScanPage() {
     <>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
-            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-              Launch Basic, Medium, or Advanced scans and watch live logs as they run.
-            </p>
-          </div>
-          <div className="shrink-0 pt-1">
-            <AISuggestion jobId={basicRun?.jobId ?? ""} />
-          </div>
+        <div>
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+            {isGuest ? (
+              <>
+                Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+                <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                  <Lock size={10} />
+                  Limited to {maxScans} scans in guest mode
+                </span>
+              </>
+            ) : (
+              "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
+            )}
+          </p>
         </div>
 
         {displayMetaError && (
@@ -442,10 +444,10 @@ export default function ScanPage() {
               />
             </ScanModePanel>
 
-            {activeTab === "advanced" && !isGuest && (
+            {activeTab === "advanced" && (
               <AdvancedTerminalPanel
-                projectId={projectId}
-                selectedProject={selectedProject}
+                projectId={isGuest ? "guest-advanced-scan" : projectId}
+                selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
                 logs={advancedLogs}
                 run={advancedRun}
                 errors={advancedErrors}
