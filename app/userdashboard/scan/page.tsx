@@ -1,5 +1,5 @@
 "use client";
-
+import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
 import { RotateCcw, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -320,11 +320,16 @@ export default function ScanPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
-        <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
-          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            Launch Basic, Medium, or Advanced scans and watch live logs as they run.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+              Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+            </p>
+          </div>
+          <div className="shrink-0 pt-1">
+            <AISuggestion jobId={basicRun?.jobId ?? ""} />
+          </div>
         </div>
 
         {metaError && (
