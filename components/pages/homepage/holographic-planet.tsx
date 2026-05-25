@@ -15,9 +15,15 @@ export default function HolographicPlanet() {
     const containerHeight = container.offsetHeight;
     if (containerWidth === 0 || containerHeight === 0) return;
 
+    // ─── Detect mobile for performance tuning ──────────────────
+    const isMobile = containerWidth < 768;
+    const DOT_SPACING = isMobile ? 3.0 : 2.0;
+    const TARGET_FPS = isMobile ? 30 : 60;
+    const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
     // ─── Canvas setup ──────────────────────────────────────────
     const canvas = document.createElement("canvas");
-    const dpr = Math.min(window.devicePixelRatio, 2);
+    const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
     canvas.width = containerWidth * dpr;
     canvas.height = containerHeight * dpr;
     canvas.style.width = `${containerWidth}px`;
@@ -26,7 +32,7 @@ export default function HolographicPlanet() {
     canvas.style.inset = "0";
     container.appendChild(canvas);
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
@@ -55,7 +61,7 @@ export default function HolographicPlanet() {
 
     // Delay planet appearance until after sweep comet finishes (~2.1s)
     const PLANET_DELAY = 1800;
-    const PLANET_FADE_DURATION = 500; // ms to fade in
+    const PLANET_FADE_DURATION = 500;
     const PLANET_INTRO_DURATION = 1050;
     const PLANET_START_SCALE = 0.42;
     const PLANET_SPIN_DEGREES = 360;
@@ -113,12 +119,12 @@ export default function HolographicPlanet() {
 
     const generateDots = (features: any) => {
       const dots: [number, number][] = [];
-      const dotSpacing = 2.0;
+      const spacing = DOT_SPACING;
       features.features.forEach((feature: any) => {
         const bounds = d3.geoBounds(feature);
         const [[minLng, minLat], [maxLng, maxLat]] = bounds;
-        for (let lng = minLng; lng <= maxLng; lng += dotSpacing) {
-          for (let lat = minLat; lat <= maxLat; lat += dotSpacing) {
+        for (let lng = minLng; lng <= maxLng; lng += spacing) {
+          for (let lat = minLat; lat <= maxLat; lat += spacing) {
             const point: [number, number] = [lng, lat];
             if (pointInFeature(point, feature)) {
               dots.push(point);
@@ -130,13 +136,23 @@ export default function HolographicPlanet() {
     };
 
     // ─── Render frame ──────────────────────────────────────────
+    // Cache theme to avoid DOM reads every frame
+    let cachedDark = isDark();
+    let themeCheckCounter = 0;
+
     const render = () => {
       ctx.clearRect(0, 0, containerWidth, containerHeight);
 
       // Don't render until planet is visible
       if (!planetVisible) return;
 
-      const dark = isDark();
+      // Only check theme every 60 frames to avoid forced reflows
+      if (++themeCheckCounter >= 60) {
+        themeCheckCounter = 0;
+        cachedDark = isDark();
+      }
+
+      const dark = cachedDark;
       const lineColor = dark ? "#00ffdd" : "#01509e";
       const gridColor = dark ? "rgba(0, 255, 221, 0.08)" : "rgba(1, 80, 158, 0.2)";
       const dotFill = dark ? "rgba(0, 255, 221, 0.35)" : "rgba(1, 80, 158, 0.5)";
@@ -195,14 +211,20 @@ export default function HolographicPlanet() {
       ctx.globalAlpha = 1;
     };
 
-    // ─── Animation loop ────────────────────────────────────────
+    // ─── Animation loop (frame-throttled) ──────────────────────
     let animId: number;
     let lastFrame = 0;
+    let lastRenderTime = 0;
     const AUTO_ROTATE_DEGREES_PER_MS = 0.009;
 
     const animate = (timestamp: number) => {
       if (destroyed) return;
       animId = requestAnimationFrame(animate);
+
+      // Frame throttling for mobile performance
+      const sinceLast = timestamp - lastRenderTime;
+      if (sinceLast < FRAME_INTERVAL) return;
+      lastRenderTime = timestamp - (sinceLast % FRAME_INTERVAL);
 
       const delta = lastFrame ? timestamp - lastFrame : 16.67;
       lastFrame = timestamp;
@@ -268,6 +290,41 @@ export default function HolographicPlanet() {
 
     canvas.addEventListener("mousedown", handleMouseDown);
 
+    // ─── Touch interaction (mobile) ────────────────────────────
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      autoRotate = false;
+      const touch = event.touches[0];
+      const startX = touch.clientX;
+      const startY = touch.clientY;
+      const startRotation: [number, number] = [...rotation];
+
+      const handleTouchMove = (moveEvent: TouchEvent) => {
+        if (moveEvent.touches.length !== 1) return;
+        const t = moveEvent.touches[0];
+        const sensitivity = 0.4;
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        rotation[0] = startRotation[0] + dx * sensitivity;
+        rotation[1] = Math.max(-90, Math.min(90, startRotation[1] - dy * sensitivity));
+        projection.rotate(rotation);
+        render();
+      };
+
+      const handleTouchEnd = () => {
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleTouchEnd);
+        setTimeout(() => {
+          autoRotate = true;
+        }, 50);
+      };
+
+      document.addEventListener("touchmove", handleTouchMove, { passive: true });
+      document.addEventListener("touchend", handleTouchEnd);
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+
     // ─── Load world data ───────────────────────────────────────
     const loadData = async () => {
       try {
@@ -285,40 +342,59 @@ export default function HolographicPlanet() {
     loadData();
     animId = requestAnimationFrame(animate);
 
-    // ─── Resize ────────────────────────────────────────────────
+    // ─── Resize (debounced) ────────────────────────────────────
+    let resizeTimeout: ReturnType<typeof setTimeout>;
     const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const w = entry.contentRect.width;
-        const h = entry.contentRect.height;
-        if (w === 0 || h === 0) return;
-        const newDpr = Math.min(window.devicePixelRatio, 2);
-        canvas.width = w * newDpr;
-        canvas.height = h * newDpr;
-        canvas.style.width = `${w}px`;
-        canvas.style.height = `${h}px`;
-        ctx.setTransform(newDpr, 0, 0, newDpr, 0, 0);
-        const newRadius = Math.min(w, h) / 2.5;
-        const introProgress = introActive
-          ? Math.min(1, (performance.now() - introStart) / PLANET_INTRO_DURATION)
-          : 1;
-        const introScale = introActive
-          ? PLANET_START_SCALE + (1 - PLANET_START_SCALE) * easeOutCubic(introProgress)
-          : 1;
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        for (const entry of entries) {
+          const w = entry.contentRect.width;
+          const h = entry.contentRect.height;
+          if (w === 0 || h === 0) return;
+          const newDpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+          canvas.width = w * newDpr;
+          canvas.height = h * newDpr;
+          canvas.style.width = `${w}px`;
+          canvas.style.height = `${h}px`;
+          ctx.setTransform(newDpr, 0, 0, newDpr, 0, 0);
+          const newRadius = Math.min(w, h) / 2.5;
+          const introProgress = introActive
+            ? Math.min(1, (performance.now() - introStart) / PLANET_INTRO_DURATION)
+            : 1;
+          const introScale = introActive
+            ? PLANET_START_SCALE + (1 - PLANET_START_SCALE) * easeOutCubic(introProgress)
+            : 1;
 
-        projection
-          .scale(newRadius * introScale)
-          .translate([w / 2, h / 2]);
-        render();
-      }
+          projection
+            .scale(newRadius * introScale)
+            .translate([w / 2, h / 2]);
+          render();
+        }
+      }, 100);
     });
     resizeObserver.observe(container);
+
+    // ─── Visibility: pause when off-screen ─────────────────────
+    let pageVisible = true;
+    const handleVisibility = () => {
+      pageVisible = !document.hidden;
+      if (pageVisible && !destroyed) {
+        lastFrame = 0;
+        lastRenderTime = 0;
+        animId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     // ─── Cleanup ───────────────────────────────────────────────
     return () => {
       destroyed = true;
       cancelAnimationFrame(animId);
       clearTimeout(planetDelayTimer);
+      clearTimeout(resizeTimeout);
       canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("visibilitychange", handleVisibility);
       resizeObserver.disconnect();
       if (container.contains(canvas)) {
         container.removeChild(canvas);
@@ -333,7 +409,7 @@ export default function HolographicPlanet() {
       style={{
         isolation: "isolate",
         willChange: "transform",
-        contain: "layout paint",
+        contain: "layout paint style",
       }}
     />
   );

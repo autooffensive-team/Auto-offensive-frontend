@@ -11,6 +11,7 @@ import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { useScanController } from "@/hooks/use-scan-controller";
 import AISuggestionPanel from "@/components/AiSuggestion/AISuggestionPanel";
+import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -97,54 +98,7 @@ const ASCII_ART = `                                                             
                                                                                                           !-++~~~~~~<+
                                                                                                               x~~`;
 
-function useStableAsciiScale() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [fontSize, setFontSize] = useState(4);
-
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-
-    const element = ref.current;
-    const measure = (width: number) => {
-      if (width <= 0) return;
-      let scale: number;
-      if (width >= 1024) {
-        scale = 4;
-      } else if (width >= 600) {
-        scale = 2.5 + ((width - 600) / (1024 - 600)) * 1.5;
-      } else {
-        scale = 1.5 + (width / 600) * 1.0;
-      }
-      setFontSize(parseFloat(scale.toFixed(2)));
-    };
-
-    let frameId = 0;
-    const update = () => {
-      frameId = window.requestAnimationFrame(() => {
-        measure(element.clientWidth);
-      });
-    };
-
-    update();
-    frameId = window.requestAnimationFrame(update);
-
-    const observer = new ResizeObserver(([entry]) => {
-      measure(entry.contentRect.width);
-    });
-
-    observer.observe(element);
-    window.addEventListener("resize", update);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", update);
-      window.cancelAnimationFrame(frameId);
-    };
-  }, []);
-
-  return { ref, fontSize };
-}
-
+// ─── Log text colorizer ───────────────────────────────────────────────────────
 function colorizeLogText(text: string): React.ReactNode {
   const patterns: { regex: RegExp; className: string }[] = [
     { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400 dark:text-blue-400" },
@@ -220,7 +174,50 @@ export default function BasicScanPage() {
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
 
-  const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
+  // ── Responsive ASCII ──────────────────────────────────────────────────────
+  const asciiRef = useRef<HTMLDivElement>(null);
+  const [asciiFontSize, setAsciiFontSize] = useState(4);
+
+  useLayoutEffect(() => {
+    if (!asciiRef.current) return;
+
+    const element = asciiRef.current;
+    const measure = (width: number) => {
+      if (width <= 0) return;
+      let scale: number;
+      if (width >= 1024) {
+        scale = 4;
+      } else if (width >= 600) {
+        scale = 2.5 + ((width - 600) / (1024 - 600)) * 1.5;
+      } else {
+        scale = 1.5 + (width / 600) * 1.0;
+      }
+      setAsciiFontSize(parseFloat(scale.toFixed(2)));
+    };
+
+    let frameId = 0;
+    const update = () => {
+      frameId = window.requestAnimationFrame(() => {
+        measure(element.clientWidth);
+      });
+    };
+
+    update();
+    frameId = window.requestAnimationFrame(update);
+
+    const observer = new ResizeObserver(([entry]) => {
+      measure(entry.contentRect.width);
+    });
+
+    observer.observe(element);
+    window.addEventListener("resize", update);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+      window.cancelAnimationFrame(frameId);
+    };
+  }, []);
 
   const {
     projects,
@@ -264,11 +261,14 @@ export default function BasicScanPage() {
   const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
   const activeErrors = activeTab === "basic" ? basicErrors : mediumErrors;
   const isIdle = activeLogs.length === 0;
-  const jobId = activeRun?.jobId;
+  const jobId = activeRun?.jobId || "";
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+
+        {/* ── Guest Scan Tour (auto-starts for first-time visitors) ── */}
+        <GuestScanTour />
 
         {/* ── Page header with AI Suggestion button ── */}
         <div className="flex items-start justify-between gap-4">
@@ -281,9 +281,10 @@ export default function BasicScanPage() {
             </p>
           </div>
 
-          {/* AI Suggestion button — jobId is populated once a scan is submitted */}
-          <div className="shrink-0 pt-1">
-            <AISuggestionPanel jobId={jobId ?? ""} />
+          {/* AI Suggestion + Tour replay button */}
+          <div className="flex items-center gap-2 shrink-0 pt-1">
+            <TourTriggerButton />
+            <AISuggestionPanel jobId={jobId} />
           </div>
         </div>
 
@@ -365,10 +366,12 @@ export default function BasicScanPage() {
           </div>
 
           {activeTab !== "advanced" && (
-            <LiveConsole
-              run={activeRun}
-              errors={activeErrors}
-            />
+            <div id="tour-terminal">
+              <LiveConsole
+                run={activeRun}
+                errors={activeErrors}
+              />
+            </div>
           )}
         </div>
 

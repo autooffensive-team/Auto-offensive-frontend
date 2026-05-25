@@ -1,4 +1,5 @@
 "use client";
+import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
 import { Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
@@ -12,7 +13,8 @@ import { useScanController } from "@/hooks/use-scan-controller";
 import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
 import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
-import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
+import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
+import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -353,8 +355,14 @@ export default function ScanPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+
+        {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
+        {isGuest && <GuestScanTour />}
+        {!isGuest && <AuthUserScanTour />}
+
+        <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
             <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -372,6 +380,12 @@ export default function ScanPage() {
             </p>
           </div>
 
+          {/* Tour replay button */}
+          <div className="shrink-0 pt-1">
+            {isGuest ? <TourTriggerButton /> : <AuthTourTriggerButton />}
+          </div>
+        </div>
+
           {displayMetaError && (
             <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
               {displayMetaError}
@@ -386,27 +400,27 @@ export default function ScanPage() {
             </div>
           )}
 
-          <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
-            {isGuest ? (
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <Scan size={16} className="text-teal-500" />
-                <span>Guest Scan Session</span>
-                <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                  Guest Mode
-                </span>
-              </div>
-            ) : loadingMeta ? (
-              <ProjectSelectorSkeleton />
-            ) : (
-              <ProjectSelector
-                projects={projects}
-                value={projectId}
-                onChange={setProjectId}
-                disabled={loadingMeta}
-                loading={loadingMeta}
-              />
-            )}
-          </div>
+        <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+          {isGuest ? (
+            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Scan size={16} className="text-teal-500" />
+              <span>Guest Scan Session</span>
+              <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                Guest Mode
+              </span>
+            </div>
+          ) : loadingMeta ? (
+            <ProjectSelectorSkeleton />
+          ) : (
+            <ProjectSelector
+              projects={projects}
+              value={projectId}
+              onChange={setProjectId}
+              disabled={loadingMeta}
+              loading={loadingMeta}
+            />
+          )}
+        </div>
 
           <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
             <div className="space-y-3 sm:space-y-4 md:space-y-5">
@@ -465,48 +479,50 @@ export default function ScanPage() {
               )}
             </div>
 
-            {activeTab !== "advanced" && (
+          {activeTab !== "advanced" && (
+            <div id="tour-terminal">
               <LiveConsole
                 run={activeRun}
                 errors={activeErrors}
               />
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* BOTTOM SECTION: Full-width stream logs terminal */}
-          {activeTab !== "advanced" && (
-            <div className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex gap-1.5">
-                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500" />
-                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400" />
-                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500" />
-                  </div>
-                  <span className="font-mono text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
-                    {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
-                  </span>
+        {/* BOTTOM SECTION: Full-width stream logs terminal */}
+        {activeTab !== "advanced" && (
+          <div id="tour-stream-logs" className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500" />
+                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400" />
+                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500" />
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                  {activeLogs.length > 0 && (
-                    <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
-                      {activeLogs.length} lines
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => resetRun(activeTab)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-                  >
-                    <RotateCcw size={12} />
-                    Reset
-                  </button>
-                </div>
+                <span className="font-mono text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
+                </span>
               </div>
-              <div className="p-3 sm:p-4">
-                <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
-                  {isIdle ? (
-                    <div className="flex flex-col items-center h-full">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                {activeLogs.length > 0 && (
+                  <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
+                    {activeLogs.length} lines
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => resetRun(activeTab)}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                >
+                  <RotateCcw size={12} />
+                  Reset
+                </button>
+              </div>
+            </div>
+            <div className="p-3 sm:p-4">
+              <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
+                {isIdle ? (
+                  <div className="flex flex-col items-center h-full">
 
                       {/* ── Responsive ASCII container ─────────────────────────── */}
                       <div

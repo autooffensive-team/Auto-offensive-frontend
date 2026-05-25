@@ -399,15 +399,14 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
     <div
       id="mobile-menu"
       className={cn(
-        'bg-white/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-white/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70',
-        'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y md:hidden',
+        'bg-white/80 dark:bg-[#09090B]/80 backdrop-blur-xl backdrop-saturate-150',
+        'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col border-y md:hidden',
+        'overflow-y-auto overscroll-contain',
       )}
     >
       <div
-        data-slot={open ? 'open' : 'closed'}
         className={cn(
-          'data-[slot=open]:animate-in data-[slot=open]:zoom-in-97 ease-out',
-          'size-full p-4',
+          'w-full flex-1 px-3 py-3',
           className,
         )}
         {...props}
@@ -433,8 +432,27 @@ export function Header() {
   const scrolled = useScroll(10);
 
   React.useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${window.scrollY}px`;
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      }
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
   }, [open]);
 
   React.useEffect(() => {
@@ -470,7 +488,7 @@ export function Header() {
 
   return (
     <header
-      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200 backdrop-blur-md', {
+      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200 backdrop-blur-xl', {
         'bg-white/80 dark:bg-[#09090B]/80 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
@@ -500,6 +518,15 @@ export function Header() {
         .btn-try-free::after {
           border-color: #F59E0B;
           animation-delay: 0.6s;
+        }
+
+        @media (max-width: 767px) {
+          .btn-try-free::before,
+          .btn-try-free::after {
+            animation: none;
+            opacity: 0;
+            display: none;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {

@@ -441,93 +441,91 @@ export default function HomeHero() {
   return (
     <>
       <style>{`
-        /* ── Star animations ── */
+        /* ── Star animations (GPU-composited: transform + opacity only) ── */
         @keyframes mvStar {
-          from { transform: translateY(0); }
-          to   { transform: translateY(-2000px); }
+          from { transform: translateY(0) translateZ(0); }
+          to   { transform: translateY(-2000px) translateZ(0); }
         }
         @keyframes glowPulse {
-          0%,100% { filter: blur(0px);   opacity: 0.55; }
-          50%      { filter: blur(0.6px); opacity: 1;    }
+          0%,100% { opacity: 0.55; transform: translateY(var(--star-y, 0)) translateZ(0) scale(1); }
+          50%     { opacity: 1;    transform: translateY(var(--star-y, 0)) translateZ(0) scale(1.15); }
         }
-        .ao-s1 { animation: mvStar 50s  linear infinite, glowPulse 3s ease-in-out infinite; }
-        .ao-s2 { animation: mvStar 100s linear infinite; }
-        .ao-s3 { animation: mvStar 150s linear infinite, glowPulse 5s ease-in-out 1.5s infinite; }
+        .ao-s1 { animation: mvStar 50s  linear infinite; opacity: 0.7; will-change: transform; }
+        .ao-s2 { animation: mvStar 100s linear infinite; will-change: transform; }
+        .ao-s3 { animation: mvStar 150s linear infinite; opacity: 0.8; will-change: transform; }
 
-        /* ── Scroll bob ── */
+        /* ── Scroll bob (GPU-composited) ── */
         @keyframes ao-bob {
-          0%,100% { transform: translateX(-50%) translateY(0); }
-          50%      { transform: translateX(-50%) translateY(5px); }
+          0%,100% { transform: translateX(-50%) translateY(0) translateZ(0); }
+          50%      { transform: translateX(-50%) translateY(5px) translateZ(0); }
         }
-        .scroll-indicator { animation: ao-bob 2.5s ease-in-out infinite; }
+        .scroll-indicator { animation: ao-bob 2.5s ease-in-out infinite; will-change: transform; }
 
-        /* ── Planet hero intro + sweep comets (GPU-accelerated, multi-layer) ── */
+        /* ── Planet hero intro + sweep comets (GPU-accelerated) ── */
         @keyframes planetHeroIntro {
           0% {
             opacity: 1;
-            transform: scale(1);
-            filter: saturate(1) blur(0);
+            transform: scale(1) translateZ(0);
           }
           100% {
             opacity: 1;
-            transform: scale(1);
-            filter: saturate(1) blur(0);
+            transform: scale(1) translateZ(0);
           }
         }
         @keyframes cometSweepIntro {
           0% {
             opacity: 0;
-            transform: scale(0.92);
+            transform: scale(0.92) translateZ(0);
           }
           100% {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateZ(0);
           }
         }
         @keyframes sweepLeft {
-          0%   { transform: rotate(-112deg) scale(0.96); opacity: 0; }
+          0%   { transform: rotate(-112deg) scale(0.96) translateZ(0); opacity: 0; }
           14%  { opacity: 0.42; }
           34%  { opacity: 0.98; }
-          70%  { transform: rotate(10deg) scale(1); opacity: 1; }
-          88%  { transform: rotate(16deg) scale(1.01); opacity: 0.22; }
-          100% { transform: rotate(16deg) scale(1.01); opacity: 0; }
+          70%  { transform: rotate(10deg) scale(1) translateZ(0); opacity: 1; }
+          88%  { transform: rotate(16deg) scale(1.01) translateZ(0); opacity: 0.22; }
+          100% { transform: rotate(16deg) scale(1.01) translateZ(0); opacity: 0; }
         }
         @keyframes sweepRight {
-          0%   { transform: rotate(112deg) scale(0.96); opacity: 0; }
+          0%   { transform: rotate(112deg) scale(0.96) translateZ(0); opacity: 0; }
           14%  { opacity: 0.42; }
           34%  { opacity: 0.98; }
-          70%  { transform: rotate(-10deg) scale(1); opacity: 1; }
-          88%  { transform: rotate(-16deg) scale(1.01); opacity: 0.22; }
-          100% { transform: rotate(-16deg) scale(1.01); opacity: 0; }
+          70%  { transform: rotate(-10deg) scale(1) translateZ(0); opacity: 1; }
+          88%  { transform: rotate(-16deg) scale(1.01) translateZ(0); opacity: 0.22; }
+          100% { transform: rotate(-16deg) scale(1.01) translateZ(0); opacity: 0; }
         }
         @keyframes sweepLeftTrail {
-          0%   { transform: rotate(-118deg) scale(0.94); opacity: 0; }
+          0%   { transform: rotate(-118deg) scale(0.94) translateZ(0); opacity: 0; }
           22%  { opacity: 0.48; }
-          72%  { transform: rotate(6deg) scale(1); opacity: 0.62; }
-          90%  { transform: rotate(10deg) scale(1); opacity: 0.12; }
-          100% { transform: rotate(10deg) scale(1); opacity: 0; }
+          72%  { transform: rotate(6deg) scale(1) translateZ(0); opacity: 0.62; }
+          90%  { transform: rotate(10deg) scale(1) translateZ(0); opacity: 0.12; }
+          100% { transform: rotate(10deg) scale(1) translateZ(0); opacity: 0; }
         }
         @keyframes sweepRightTrail {
-          0%   { transform: rotate(118deg) scale(0.94); opacity: 0; }
+          0%   { transform: rotate(118deg) scale(0.94) translateZ(0); opacity: 0; }
           22%  { opacity: 0.48; }
-          72%  { transform: rotate(-6deg) scale(1); opacity: 0.62; }
-          90%  { transform: rotate(-10deg) scale(1); opacity: 0.12; }
-          100% { transform: rotate(-10deg) scale(1); opacity: 0; }
+          72%  { transform: rotate(-6deg) scale(1) translateZ(0); opacity: 0.62; }
+          90%  { transform: rotate(-10deg) scale(1) translateZ(0); opacity: 0.12; }
+          100% { transform: rotate(-10deg) scale(1) translateZ(0); opacity: 0; }
         }
         @keyframes convergePulse {
-          0%,50%  { opacity: 0; transform: scale(0); }
-          56%     { opacity: 0; transform: scale(0); }
-          62%     { opacity: 1; transform: scale(1); }
-          74%     { opacity: 0.6; transform: scale(1.8); }
-          88%     { opacity: 0; transform: scale(2.5); }
-          100%    { opacity: 0; transform: scale(2.5); }
+          0%,50%  { opacity: 0; transform: scale(0) translateZ(0); }
+          56%     { opacity: 0; transform: scale(0) translateZ(0); }
+          62%     { opacity: 1; transform: scale(1) translateZ(0); }
+          74%     { opacity: 0.6; transform: scale(1.8) translateZ(0); }
+          88%     { opacity: 0; transform: scale(2.5) translateZ(0); }
+          100%    { opacity: 0; transform: scale(2.5) translateZ(0); }
         }
         @keyframes convergeRing {
-          0%,54%  { opacity: 0; transform: scale(0); }
-          60%     { opacity: 0; transform: scale(0); }
-          66%     { opacity: 0.8; transform: scale(1); }
-          82%     { opacity: 0; transform: scale(3.5); }
-          100%    { opacity: 0; transform: scale(3.5); }
+          0%,54%  { opacity: 0; transform: scale(0) translateZ(0); }
+          60%     { opacity: 0; transform: scale(0) translateZ(0); }
+          66%     { opacity: 0.8; transform: scale(1) translateZ(0); }
+          82%     { opacity: 0; transform: scale(3.5) translateZ(0); }
+          100%    { opacity: 0; transform: scale(3.5) translateZ(0); }
         }
         @keyframes convergeFlash {
           0%,56%  { opacity: 0; }
@@ -538,7 +536,8 @@ export default function HomeHero() {
         .planet-intro {
           animation: planetHeroIntro 0.01s linear 0s both;
           transform-origin: 50% 50%;
-          will-change: transform, opacity, filter;
+          will-change: transform, opacity;
+          contain: layout style paint;
         }
         .hero-comet-orbit {
           animation: cometSweepIntro 1.15s ease-out 0.78s both;
@@ -607,33 +606,34 @@ export default function HomeHero() {
           stroke: #00D0B2;
           stroke-width: 1;
           opacity: 0.09;
-          transition: opacity .25s ease, filter .25s ease, fill .25s ease, stroke-width .25s ease, transform .18s cubic-bezier(0.23, 1, 0.32, 1);
+          transition: opacity .25s ease, fill .25s ease, stroke .25s ease, stroke-width .25s ease, transform .18s cubic-bezier(0.23, 1, 0.32, 1);
           cursor: default;
-          will-change: transform;
+          will-change: transform, opacity;
         }
+        /* GPU-composited: opacity-only animations (no filter) */
         @keyframes star-bright {
-          0%,100% { opacity: 0.07; filter: none; }
-          40%,60% { opacity: 0.72; filter: drop-shadow(0 0 4px #00D0B2) drop-shadow(0 0 10px rgba(0,208,178,.5)); }
+          0%,100% { opacity: 0.07; }
+          40%,60% { opacity: 0.72; }
         }
         @keyframes star-bright-dk {
-          0%,100% { opacity: 0.07; filter: none; }
-          40%,60% { opacity: 1; filter: drop-shadow(0 0 6px #00D0B2) drop-shadow(0 0 16px rgba(0,208,178,.7)) drop-shadow(0 0 32px rgba(0,208,178,.3)); }
+          0%,100% { opacity: 0.07; }
+          40%,60% { opacity: 1; }
         }
         @keyframes star-mid {
-          0%,100% { opacity: 0.05; filter: none; }
-          50% { opacity: 0.30; filter: drop-shadow(0 0 2px rgba(0,208,178,.38)); }
+          0%,100% { opacity: 0.05; }
+          50% { opacity: 0.30; }
         }
         @keyframes star-mid-dk {
-          0%,100% { opacity: 0.05; filter: none; }
-          50% { opacity: 0.45; filter: drop-shadow(0 0 4px rgba(0,208,178,.5)); }
+          0%,100% { opacity: 0.05; }
+          50% { opacity: 0.45; }
         }
         @keyframes star-dim {
           0%,100% { opacity: 0.03; }
           50% { opacity: 0.10; }
         }
-        .hx.bright { animation: star-bright 4s ease-in-out infinite; }
-        .hx.mid { animation: star-mid 5s ease-in-out infinite; }
-        .hx.dim { animation: star-dim 6.5s ease-in-out infinite; }
+        .hx.bright { animation: star-bright 4s ease-in-out infinite; will-change: opacity; }
+        .hx.mid { animation: star-mid 5s ease-in-out infinite; will-change: opacity; }
+        .hx.dim { animation: star-dim 6.5s ease-in-out infinite; will-change: opacity; }
         @media (prefers-color-scheme: dark) {
           .hx.bright { animation-name: star-bright-dk; }
           .hx.mid { animation-name: star-mid-dk; }
@@ -646,24 +646,24 @@ export default function HomeHero() {
         .hx.hovered {
           opacity: 1 !important;
           fill: rgba(0,208,178,0.08) !important;
-          stroke: #00D0B2 !important;
+          stroke: #00FFD4 !important;
           stroke-width: 1.8 !important;
-          filter: drop-shadow(0 0 6px #00D0B2) drop-shadow(0 0 16px rgba(0,208,178,.45)) !important;
           animation-play-state: paused !important;
         }
         .dark .hx.hovered {
-          filter: drop-shadow(0 0 8px #00D0B2) drop-shadow(0 0 22px rgba(0,208,178,.75)) drop-shadow(0 0 40px rgba(0,208,178,.35)) !important;
+          stroke: #00FFE8 !important;
+          fill: rgba(0,208,178,0.12) !important;
         }
         .hx.neighbor {
           opacity: 0.5 !important;
           fill: rgba(0,208,178,0.03) !important;
           stroke: #00D0B2 !important;
           stroke-width: 1.2 !important;
-          filter: drop-shadow(0 0 3px rgba(0,208,178,.3)) !important;
           animation-play-state: paused !important;
         }
         .dark .hx.neighbor {
-          filter: drop-shadow(0 0 5px rgba(0,208,178,.4)) drop-shadow(0 0 12px rgba(0,208,178,.2)) !important;
+          opacity: 0.6 !important;
+          fill: rgba(0,208,178,0.05) !important;
         }
         .hex-grid {
           position: absolute;
@@ -680,6 +680,22 @@ export default function HomeHero() {
           right: -158px; top: -15px;
           -webkit-mask-image: linear-gradient(to bottom left, rgba(0,0,0,.92) 0%, rgba(0,0,0,.55) 40%, rgba(0,0,0,.1) 68%, transparent 100%);
           mask-image: linear-gradient(to bottom left, rgba(0,0,0,.92) 0%, rgba(0,0,0,.55) 40%, rgba(0,0,0,.1) 68%, transparent 100%);
+        }
+
+        /* ── Reduced motion: disable all animations ── */
+        @media (prefers-reduced-motion: reduce) {
+          .ao-s1, .ao-s2, .ao-s3, .scroll-indicator,
+          .hx.bright, .hx.mid, .hx.dim,
+          .planet-intro, .hero-comet-orbit,
+          .sweep-left, .sweep-right, .sweep-left-trail, .sweep-right-trail,
+          .converge, .converge-ring, .converge-flash {
+            animation: none !important;
+          }
+          .ao-s1, .ao-s2, .ao-s3 { opacity: 0.6; }
+          .hx.bright { opacity: 0.5; }
+          .hx.mid { opacity: 0.2; }
+          .hx.dim { opacity: 0.08; }
+          .hero-comet-orbit { opacity: 0; }
         }
 
         /* ── Accent underline on title line 1 ── */

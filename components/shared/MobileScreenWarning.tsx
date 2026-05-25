@@ -350,7 +350,10 @@ export function MobileScreenWarning() {
 
               <button
                 type="button"
-                onClick={() => setVisible(false)}
+                onClick={() => {
+                  setVisible(false);
+                  window.dispatchEvent(new CustomEvent("mobile-warning-dismissed"));
+                }}
                 className="msw-btn-secondary"
               >
                 <X size={16} />
