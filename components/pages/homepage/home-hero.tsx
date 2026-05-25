@@ -101,11 +101,6 @@ const RIGHT_HEXES: HexDef[] = [
 
 // ─── Animation timing ────────────────────────────────────────────────
 const SPEEDS = {
-  CORNER_POP_UP:       0.15,
-  CORNER_SPREAD:       0.05,
-  CORNER_SPREAD_DELAY: 0.45,
-  TEXT_POP_IN:         0.5,
-  TEXT_POP_IN_DELAY:   0.65,
   INITIAL_DELAY:       0.55,
 };
 
@@ -272,45 +267,38 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
 }
 
 // ─── Focus word corners ───────────────────────────────────────────────
-// Spread values match original CSS --focus-bracket-shift-x/y (8px / 6px)
-// We animate the whole SVG element (not the inner path) so the bracket
-// visually moves away from center — identical to the CSS version.
-const CORNER_SPREAD: Record<"tl"|"tr"|"bl"|"br", { x:number; y:number }> = {
-  tl: { x:-8, y:-6 },
-  tr: { x: 8, y:-6 },
-  bl: { x:-8, y: 6 },
-  br: { x: 8, y: 6 },
-};
+// "frame-half" close-to-open animation:
+// The frame starts collapsed (zero width, like inset: 0 50%) with all 4
+// corner brackets meeting at center. Then it expands horizontally to full
+// width, with corners riding the edges outward. Text is clipped/hidden
+// until the frame opens enough to reveal it.
 
 const CORNER_ANCHOR: Record<"tl"|"tr"|"bl"|"br", string> = {
-  tl: "top-[-0.01em] left-[-0.05em]",
-  tr: "top-[-0.01em] right-[-0.05em]",
-  bl: "bottom-[0.01em] left-[-0.05em]",
-  br: "bottom-[0.01em] right-[-0.05em]",
+  tl: "top-0 left-0",
+  tr: "top-0 right-0",
+  bl: "bottom-0 left-0",
+  br: "bottom-0 right-0",
 };
 
-// Total keyframe timeline: popUp → hold → spread
-// t0=0  t1=popUpEnd  t2=spreadStart  t3=1
-const POP_T   = SPEEDS.CORNER_POP_UP;
-const HOLD_T  = SPEEDS.CORNER_SPREAD_DELAY;
-const SPREAD_T = 0.1;
-const TOTAL_T  = POP_T + HOLD_T + SPREAD_T;
-
-const KF_TIMES = [0, POP_T / TOTAL_T, (POP_T + HOLD_T) / TOTAL_T, 1];
+// Final offset from the corner (the visual "spread" away from the text box)
+const CORNER_OFFSET: Record<"tl"|"tr"|"bl"|"br", { x:number; y:number }> = {
+  tl: { x:-4, y:-4 },
+  tr: { x: 4, y:-4 },
+  bl: { x:-4, y: 4 },
+  br: { x: 4, y: 4 },
+};
 
 function CornerBracket({
   pos,
   svgPath,
-  startAnimation,
 }: {
   pos: "tl"|"tr"|"bl"|"br";
   svgPath: string;
-  startAnimation: boolean;
 }) {
-  const sp = CORNER_SPREAD[pos];
+  const offset = CORNER_OFFSET[pos];
 
   return (
-    <motion.svg
+    <svg
       className={`absolute w-[0.5em] h-[0.5em] text-[#6346FF] z-10 overflow-visible
         md:w-[0.58em] md:h-[0.58em] lg:w-[0.62em] lg:h-[0.62em] ${CORNER_ANCHOR[pos]}`}
       aria-hidden="true"
@@ -320,28 +308,13 @@ function CornerBracket({
       strokeWidth="1.3"
       strokeLinecap="square"
       strokeLinejoin="miter"
-      style={{ filter:"drop-shadow(0 0 5px rgba(99,70,255,0.35))" }}
-      // Framer Motion props — animate the SVG element itself
-      initial={{ opacity:0, scale:0.72, y:8, x:0 }}
-      animate={
-        startAnimation
-          ? {
-              // 4-keyframe sequence: hidden → pop in → hold → spread
-              opacity: [0,    1,    1,    1   ],
-              scale:   [0.72, 1,    1,    1   ],
-              y:       [8,    0,    0,    sp.y],
-              x:       [0,    0,    0,    sp.x],
-            }
-          : { opacity:0, scale:0.72, y:8, x:0 }
-      }
-      transition={{
-        duration: TOTAL_T,
-        times:    KF_TIMES,
-        ease:     "easeOut",
+      style={{
+        filter: "drop-shadow(0 0 5px rgba(99,70,255,0.35))",
+        transform: `translate(${offset.x}px, ${offset.y}px)`,
       }}
     >
       <path d={svgPath} />
-    </motion.svg>
+    </svg>
   );
 }
 
@@ -362,23 +335,35 @@ function FocusWord({
         lg:px-[0.12em] lg:pt-[0.03em] lg:pb-[0.05em]
       "
     >
-      <CornerBracket pos="tl" svgPath="M2 10V2H10"   startAnimation={startAnimation} />
-      <CornerBracket pos="tr" svgPath="M10 2H18V10"  startAnimation={startAnimation} />
-      <CornerBracket pos="bl" svgPath="M2 10V18H10"  startAnimation={startAnimation} />
-      <CornerBracket pos="br" svgPath="M10 18H18V10" startAnimation={startAnimation} />
+      {/* The frame wrapper — animates from 0% width (collapsed) to 100% width (open) */}
+      <motion.span
+        className="absolute inset-y-0 left-1/2 flex items-center justify-center overflow-hidden"
+        style={{ translateX: "-50%" }}
+        initial={{ width: "0%" }}
+        animate={startAnimation ? { width: "100%" } : { width: "0%" }}
+        transition={{
+          duration: 0.65,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      >
+        {/* Inner frame that holds the 4 corner brackets — always full size */}
+        <span className="relative w-full h-full" style={{ minWidth: "100%" }}>
+          <CornerBracket pos="tl" svgPath="M2 10V2H10" />
+          <CornerBracket pos="tr" svgPath="M10 2H18V10" />
+          <CornerBracket pos="bl" svgPath="M2 10V18H10" />
+          <CornerBracket pos="br" svgPath="M10 18H18V10" />
+        </span>
+      </motion.span>
 
+      {/* Text — clips from center outward in sync with the frame */}
       <motion.span
         className="relative z-1 text-primary font-bold tracking-[-0.04em] whitespace-nowrap leading-[0.92]"
-        initial={{ opacity:0, y:8, scale:0.96 }}
-        animate={
-          startAnimation
-            ? { opacity:1, y:0, scale:1 }
-            : { opacity:0, y:8, scale:0.96 }
-        }
+        initial={{ opacity: 0 }}
+        animate={startAnimation ? { opacity: 1 } : { opacity: 0 }}
         transition={{
-          duration: SPEEDS.TEXT_POP_IN,
-          delay:    SPEEDS.TEXT_POP_IN_DELAY,
-          ease:     [0.22, 1, 0.36, 1],
+          duration: 0.35,
+          delay: 0.25,
+          ease: "easeOut",
         }}
       >
         {children}
