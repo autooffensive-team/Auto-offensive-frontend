@@ -144,6 +144,6 @@ export function useGuestScanGuard() {
     lockedFeature,
     handleLockedFeature,
     scansRemaining: guest?.scansRemaining ?? 0,
-    maxScans: guest?.maxScans ?? 3,
+    maxScans: guest?.maxScans ?? 20,
   };
 }
