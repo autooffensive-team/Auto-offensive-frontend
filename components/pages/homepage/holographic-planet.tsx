@@ -135,21 +135,22 @@ export default function HolographicPlanet() {
     };
 
     // ─── Render frame ──────────────────────────────────────────
-    // Cache theme to avoid DOM reads every frame
+    // Watch theme changes via MutationObserver (instant, no polling)
     let cachedDark = isDark();
-    let themeCheckCounter = 0;
+
+    const themeObserver = new MutationObserver(() => {
+      cachedDark = isDark();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     const render = () => {
       ctx.clearRect(0, 0, containerWidth, containerHeight);
 
       // Don't render until planet is visible
       if (!planetVisible) return;
-
-      // Only check theme every 60 frames to avoid forced reflows
-      if (++themeCheckCounter >= 60) {
-        themeCheckCounter = 0;
-        cachedDark = isDark();
-      }
 
       const dark = cachedDark;
       const lineColor = dark ? "#00ffdd" : "#01509e";
@@ -391,6 +392,7 @@ export default function HolographicPlanet() {
       cancelAnimationFrame(animId);
       clearTimeout(planetDelayTimer);
       clearTimeout(resizeTimeout);
+      themeObserver.disconnect();
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("visibilitychange", handleVisibility);
