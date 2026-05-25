@@ -18,7 +18,7 @@ export default function AuthorizedUserIndicator({
       title="Dashboard"
       aria-label="Go to dashboard"
       className={[
-        "inline-flex h-10 items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:border-primary/30 dark:bg-primary/12",
+        "inline-flex h-10 items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 text-sm font-semibold text-black dark:text-white transition-all hover:bg-primary hover:text-black dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:border-primary/30 dark:bg-primary/12",
         className,
       ]
         .filter(Boolean)
