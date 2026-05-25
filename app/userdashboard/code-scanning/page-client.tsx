@@ -306,7 +306,7 @@ function ScanProjectCard({
     >
       {/* New badge */}
       {isNew ? (
-        <div className="pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
+        <div className="pointer-events-none absolute -right-1 -top-1 z-30 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
           New
         </div>
