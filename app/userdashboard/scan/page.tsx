@@ -13,6 +13,7 @@ import { useScanController } from "@/hooks/use-scan-controller";
 import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
 import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
+import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -348,21 +349,34 @@ export default function ScanPage() {
     <>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
-        <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
-          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            {isGuest ? (
-              <>
-                Launch Basic, Medium, or Advanced scans and watch live logs as they run.
-                <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                  <Lock size={10} />
-                  Limited to {maxScans} scans in guest mode
-                </span>
-              </>
-            ) : (
-              "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
-            )}
-          </p>
+
+        {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
+        {isGuest && <GuestScanTour />}
+
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+              {isGuest ? (
+                <>
+                  Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+                  <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                    <Lock size={10} />
+                    Limited to {maxScans} scans in guest mode
+                  </span>
+                </>
+              ) : (
+                "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
+              )}
+            </p>
+          </div>
+
+          {/* Tour replay button for guests */}
+          {isGuest && (
+            <div className="shrink-0 pt-1">
+              <TourTriggerButton />
+            </div>
+          )}
         </div>
 
         {displayMetaError && (
@@ -459,16 +473,18 @@ export default function ScanPage() {
           </div>
 
           {activeTab !== "advanced" && (
-            <LiveConsole
-              run={activeRun}
-              errors={activeErrors}
-            />
+            <div id="tour-terminal">
+              <LiveConsole
+                run={activeRun}
+                errors={activeErrors}
+              />
+            </div>
           )}
         </div>
 
         {/* BOTTOM SECTION: Full-width stream logs terminal */}
         {activeTab !== "advanced" && (
-          <div className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div id="tour-stream-logs" className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex gap-1.5">

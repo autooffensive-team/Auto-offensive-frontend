@@ -11,6 +11,7 @@ import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { useScanController } from "@/hooks/use-scan-controller";
 import AISuggestionPanel from "@/components/AiSuggestion/AISuggestionPanel";
+import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -266,6 +267,9 @@ export default function BasicScanPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
 
+        {/* ── Guest Scan Tour (auto-starts for first-time visitors) ── */}
+        <GuestScanTour />
+
         {/* ── Page header with AI Suggestion button ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -277,8 +281,9 @@ export default function BasicScanPage() {
             </p>
           </div>
 
-          {/* AI Suggestion button — jobId is populated once a scan is submitted */}
-          <div className="shrink-0 pt-1">
+          {/* AI Suggestion + Tour replay button */}
+          <div className="flex items-center gap-2 shrink-0 pt-1">
+            <TourTriggerButton />
             <AISuggestionPanel jobId={jobId} />
           </div>
         </div>
@@ -361,10 +366,12 @@ export default function BasicScanPage() {
           </div>
 
           {activeTab !== "advanced" && (
-            <LiveConsole
-              run={activeRun}
-              errors={activeErrors}
-            />
+            <div id="tour-terminal">
+              <LiveConsole
+                run={activeRun}
+                errors={activeErrors}
+              />
+            </div>
           )}
         </div>
 

@@ -85,18 +85,20 @@ export function BasicScanForm({
         onDragEnd={handleDragEnd}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Target">
-            <Input
-              value={target}
-              onChange={(e) => onTargetChange(e.target.value)}
-              placeholder="example.com, https://example.com, 10.0.0.0/24"
-              disabled={disabled}
-              className="font-mono text-xs sm:text-sm"
-            />
-          </Field>
+          <div id="tour-basic-target">
+            <Field label="Target">
+              <Input
+                value={target}
+                onChange={(e) => onTargetChange(e.target.value)}
+                placeholder="example.com, https://example.com, 10.0.0.0/24"
+                disabled={disabled}
+                className="font-mono text-xs sm:text-sm"
+              />
+            </Field>
+          </div>
 
           {/* ToolSelector dropdown — hover color fix via wrapper */}
-          <div className="[&_select]:hover:border-teal-500/50 [&_select]:focus:border-teal-500 [&_select]:focus:ring-teal-500/20">
+          <div id="tour-basic-tool" className="[&_select]:hover:border-teal-500/50 [&_select]:focus:border-teal-500 [&_select]:focus:ring-teal-500/20">
             <ToolSelector
               tools={tools}
               value={toolId}
@@ -120,12 +122,14 @@ export function BasicScanForm({
         onDrop={handleDrop}
         onDragEnd={handleDragEnd}
       >
-        <PresetSelector
-          presets={presets}
-          selected={preset}
-          onSelect={onPresetChange}
-          disabled={disabled || presets.length === 0}
-        />
+        <div id="tour-basic-preset">
+          <PresetSelector
+            presets={presets}
+            selected={preset}
+            onSelect={onPresetChange}
+            disabled={disabled || presets.length === 0}
+          />
+        </div>
       </DraggableWidget>
     ),
 
@@ -141,11 +145,13 @@ export function BasicScanForm({
         onDrop={handleDrop}
         onDragEnd={handleDragEnd}
       >
-        <SubmitButton
-          disabled={disabled || !target.trim() || !toolId || !preset}
-          onClick={onSubmit}
-          label="Start Basic Scan"
-        />
+        <div id="tour-basic-submit">
+          <SubmitButton
+            disabled={disabled || !target.trim() || !toolId || !preset}
+            onClick={onSubmit}
+            label="Start Basic Scan"
+          />
+        </div>
       </DraggableWidget>
     ),
 
