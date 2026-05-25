@@ -17,6 +17,7 @@ import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTou
 import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
+import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
 
 const ASCII_ART = `                                                                         ><
                                                                           @++~~
