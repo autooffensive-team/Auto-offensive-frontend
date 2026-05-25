@@ -14,6 +14,7 @@ import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
 import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
+import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
 
@@ -352,6 +353,7 @@ export default function ScanPage() {
 
         {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
         {isGuest && <GuestScanTour />}
+        {!isGuest && <AuthUserScanTour />}
 
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -371,12 +373,10 @@ export default function ScanPage() {
             </p>
           </div>
 
-          {/* Tour replay button for guests */}
-          {isGuest && (
-            <div className="shrink-0 pt-1">
-              <TourTriggerButton />
-            </div>
-          )}
+          {/* Tour replay button */}
+          <div className="shrink-0 pt-1">
+            {isGuest ? <TourTriggerButton /> : <AuthTourTriggerButton />}
+          </div>
         </div>
 
         {displayMetaError && (
@@ -393,7 +393,7 @@ export default function ScanPage() {
           </div>
         )}
 
-        <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+        <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           {isGuest ? (
             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
               <Scan size={16} className="text-teal-500" />
