@@ -63,7 +63,7 @@ export function useGuestScanGuard() {
 
   /**
    * Submit a basic scan using the guest-friendly API endpoint.
-   * This uses /api/basic-scan/submit which authenticates via env token,
+   * This uses /api/guest-scan/basic/submit which authenticates via env token,
    * not user session. Returns the SSE response for streaming.
    */
   const guestSubmitBasicScan = useCallback(
@@ -72,14 +72,13 @@ export function useGuestScanGuard() {
       toolName: string;
       preset: string;
     }): Promise<Response> => {
-      const response = await fetch("/api/basic-scan/submit", {
+      const response = await fetch("/api/guest-scan/basic/submit", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           accept: "text/event-stream",
         },
         body: JSON.stringify({
-          project_id: "guest-basic-scan",
           target: params.target.trim(),
           tool: params.toolName,
           preset: params.preset,
@@ -89,6 +88,34 @@ export function useGuestScanGuard() {
       if (!response.ok) {
         const text = await response.text();
         throw new Error(text || "Failed to start scan");
+      }
+
+      return response;
+    },
+    [],
+  );
+
+  /**
+   * Submit an advanced scan using the guest-friendly API endpoint.
+   * This uses /api/guest-scan/advanced/submit which authenticates via env token,
+   * not user session. Returns the SSE response for streaming.
+   */
+  const guestSubmitAdvancedScan = useCallback(
+    async (params: { command: string }): Promise<Response> => {
+      const response = await fetch("/api/guest-scan/advanced/submit", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "text/event-stream",
+        },
+        body: JSON.stringify({
+          command: params.command.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Failed to start advanced scan");
       }
 
       return response;
@@ -109,6 +136,7 @@ export function useGuestScanGuard() {
     limitReached,
     guardedSubmit,
     guestSubmitBasicScan,
+    guestSubmitAdvancedScan,
     showLimitModal,
     closeLimitModal,
     showLockModal,

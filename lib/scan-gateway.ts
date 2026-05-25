@@ -100,3 +100,68 @@ export async function proxyToScanGateway(
     headers: responseHeaders,
   });
 }
+
+/**
+ * Proxy to the scan gateway WITHOUT attaching any authorization header.
+ * Used for anonymous/guest endpoints like /scans/basic/try and /scans/advanced/try
+ * which don't require authentication on the backend.
+ * Forwards rate-limit headers from the backend response.
+ */
+export async function proxyToScanGatewayAnonymous(
+  request: Request,
+  path: string,
+  init: RequestInit = {},
+) {
+  const url = new URL(`${getBaseUrl()}${path}`);
+  const method = init.method ?? request.method;
+  const headers = new Headers(init.headers);
+
+  const contentType = request.headers.get("content-type");
+  if (contentType && !headers.has("content-type")) {
+    headers.set("content-type", contentType);
+  }
+
+  const accept = request.headers.get("accept");
+  if (accept && !headers.has("accept")) {
+    headers.set("accept", accept);
+  }
+
+  const upstream = await fetch(url, {
+    ...init,
+    method,
+    headers,
+    cache: "no-store",
+  });
+
+  const responseHeaders = new Headers();
+  const upstreamContentType = upstream.headers.get("content-type");
+
+  if (upstreamContentType) {
+    responseHeaders.set("content-type", upstreamContentType);
+  }
+
+  if (upstreamContentType?.includes("text/event-stream")) {
+    responseHeaders.set("cache-control", "no-cache");
+    responseHeaders.set("connection", "keep-alive");
+    responseHeaders.set("x-accel-buffering", "no");
+  }
+
+  // Forward rate-limit headers from the backend
+  const rateLimitHeaders = [
+    "x-ratelimit-limit",
+    "x-ratelimit-remaining",
+    "x-ratelimit-reset",
+  ];
+  for (const header of rateLimitHeaders) {
+    const value = upstream.headers.get(header);
+    if (value) {
+      responseHeaders.set(header, value);
+    }
+  }
+
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: responseHeaders,
+  });
+}

@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { GUEST_MAX_SCANS, GUEST_ALLOWED_SCAN_MODES } from "./guest-config";
+import { GUEST_ALLOWED_SCAN_MODES } from "./guest-config";
 
 type GuestSessionState = {
   isGuest: boolean;
@@ -16,18 +16,24 @@ type GuestSessionState = {
   scansUsed: number;
   scansRemaining: number;
   maxScans: number;
+  resetAt: number | null;
+  limitReached: boolean;
   loading: boolean;
 };
 
 type GuestContextValue = GuestSessionState & {
-  /** Validate and consume one scan credit. Returns true if allowed. */
+  /** Validate scan — now just checks local state (backend is the authority) */
   validateScan: () => Promise<boolean>;
   /** Check if a scan mode is allowed for guests */
   isScanModeAllowed: (mode: string) => boolean;
   /** Check if a route/feature is locked for guests */
   isFeatureLocked: (feature: string) => boolean;
-  /** Refresh session data from server */
+  /** Refresh rate limit data from backend */
   refreshSession: () => Promise<void>;
+  /** Update rate limit info from a backend response (429 or success with headers) */
+  updateRateLimitFromResponse: (response: Response) => void;
+  /** Update rate limit from a 429 error body */
+  updateRateLimitFromError: (detail: { limit?: number; remaining?: number; reset_at?: number }) => void;
 };
 
 const GuestContext = createContext<GuestContextValue | null>(null);
@@ -41,7 +47,6 @@ const LOCKED_FEATURES = new Set([
   "reports",
   "profile",
   "settings",
-  "advanced-scan",
 ]);
 
 export function GuestProvider({ children }: { children: ReactNode }) {
@@ -49,24 +54,33 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     isGuest: true,
     sessionId: null,
     scansUsed: 0,
-    scansRemaining: GUEST_MAX_SCANS,
-    maxScans: GUEST_MAX_SCANS,
+    scansRemaining: 3,
+    maxScans: 3,
+    resetAt: null,
+    limitReached: false,
     loading: true,
   });
 
+  /**
+   * Fetch the real rate limit from the backend via our proxy endpoint.
+   * This probes the backend without consuming a scan.
+   */
   const refreshSession = useCallback(async () => {
     try {
-      const response = await fetch("/api/guest/session", { cache: "no-store" });
+      const response = await fetch("/api/guest-scan/status", { cache: "no-store" });
       if (response.ok) {
         const data = await response.json();
-        setState({
-          isGuest: true,
-          sessionId: data.sessionId,
-          scansUsed: data.scansUsed,
-          scansRemaining: data.scansRemaining,
-          maxScans: data.maxScans,
+        setState((prev) => ({
+          ...prev,
+          maxScans: data.maxScans ?? prev.maxScans,
+          scansUsed: data.scansUsed ?? prev.scansUsed,
+          scansRemaining: data.scansRemaining ?? prev.scansRemaining,
+          resetAt: data.resetAt ?? prev.resetAt,
+          limitReached: data.limitReached ?? (data.scansRemaining === 0),
           loading: false,
-        });
+        }));
+      } else {
+        setState((prev) => ({ ...prev, loading: false }));
       }
     } catch {
       setState((prev) => ({ ...prev, loading: false }));
@@ -77,35 +91,17 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     refreshSession();
   }, [refreshSession]);
 
+  /**
+   * Check if the guest can scan (based on local state from backend).
+   * The backend is the real authority — if local state says OK but backend
+   * returns 429, the scan controller handles it.
+   */
   const validateScan = useCallback(async (): Promise<boolean> => {
-    try {
-      const response = await fetch("/api/guest/scan/validate", {
-        method: "POST",
-      });
-      const data = await response.json();
-
-      if (response.ok && data.allowed) {
-        setState((prev) => ({
-          ...prev,
-          scansUsed: data.scansUsed,
-          scansRemaining: data.scansRemaining,
-        }));
-        return true;
-      }
-
-      // Update state with server values
-      if (data.scansUsed !== undefined) {
-        setState((prev) => ({
-          ...prev,
-          scansUsed: data.scansUsed,
-          scansRemaining: data.scansRemaining ?? 0,
-        }));
-      }
-      return false;
-    } catch {
+    if (state.scansRemaining <= 0 || state.limitReached) {
       return false;
     }
-  }, []);
+    return true;
+  }, [state.scansRemaining, state.limitReached]);
 
   const isScanModeAllowed = useCallback((mode: string): boolean => {
     return (GUEST_ALLOWED_SCAN_MODES as readonly string[]).includes(mode);
@@ -115,6 +111,50 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     return LOCKED_FEATURES.has(feature);
   }, []);
 
+  /**
+   * Update rate limit state from backend response headers.
+   * Call this after any guest scan API response to sync the limit info.
+   */
+  const updateRateLimitFromResponse = useCallback((response: Response) => {
+    const limit = response.headers.get("x-ratelimit-limit");
+    const remaining = response.headers.get("x-ratelimit-remaining");
+    const resetAt = response.headers.get("x-ratelimit-reset");
+
+    if (limit != null || remaining != null) {
+      setState((prev) => {
+        const maxScans = limit != null ? Number(limit) : prev.maxScans;
+        const scansRemaining = remaining != null ? Number(remaining) : prev.scansRemaining;
+        const scansUsed = maxScans - scansRemaining;
+        return {
+          ...prev,
+          maxScans,
+          scansUsed,
+          scansRemaining,
+          resetAt: resetAt ? Number(resetAt) : prev.resetAt,
+          limitReached: scansRemaining <= 0,
+        };
+      });
+    }
+  }, []);
+
+  /**
+   * Update rate limit from a 429 error response body.
+   * The backend returns: { detail: { error, limit, remaining, reset_at } }
+   */
+  const updateRateLimitFromError = useCallback(
+    (detail: { limit?: number; remaining?: number; reset_at?: number }) => {
+      setState((prev) => ({
+        ...prev,
+        maxScans: detail.limit ?? prev.maxScans,
+        scansRemaining: detail.remaining ?? 0,
+        scansUsed: (detail.limit ?? prev.maxScans) - (detail.remaining ?? 0),
+        resetAt: detail.reset_at ?? prev.resetAt,
+        limitReached: true,
+      }));
+    },
+    [],
+  );
+
   return (
     <GuestContext.Provider
       value={{
@@ -123,6 +163,8 @@ export function GuestProvider({ children }: { children: ReactNode }) {
         isScanModeAllowed,
         isFeatureLocked,
         refreshSession,
+        updateRateLimitFromResponse,
+        updateRateLimitFromError,
       }}
     >
       {children}

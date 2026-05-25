@@ -61,7 +61,8 @@ type RunSetter = React.Dispatch<React.SetStateAction<ActiveRun>>;
 type LogsSetter = React.Dispatch<React.SetStateAction<LogLine[]>>;
 type ErrorsSetter = React.Dispatch<React.SetStateAction<string[]>>;
 
-export function useScanController(initialProjectId?: string) {
+export function useScanController(initialProjectId?: string, options?: { guestMode?: boolean }) {
+  const guestMode = options?.guestMode ?? false;
   const [projects, setProjects] = useState<Project[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
   const [projectId, setProjectId] = useState(initialProjectId || "");
@@ -158,6 +159,8 @@ export function useScanController(initialProjectId?: string) {
     },
     [],
   );
+  const openGuestBasicStepStreamRef = useRef<((mode: ScanMode, stepId: string) => void) | null>(null);
+  const fetchGuestBasicParsedDataRef = useRef<((mode: ScanMode, stepId: string) => Promise<void>) | null>(null);
 
   // ---------------------------------------------------------------------------
   // Watching / streaming
@@ -483,7 +486,7 @@ export function useScanController(initialProjectId?: string) {
   // ---------------------------------------------------------------------------
 
   const submitBasic = useCallback(async () => {
-    if (!projectId) {
+    if (!guestMode && !projectId) {
       toast.error("Select a project before starting a scan.");
       return;
     }
@@ -500,9 +503,171 @@ export function useScanController(initialProjectId?: string) {
     setIsSubmitting(true);
     setRunForMode("basic", (current) => ({ ...current, mode: "basic", status: "submitting" }));
 
+    if (guestMode) {
+      // Guest mode: use the anonymous /scans/basic/try endpoint
+      try {
+        const response = await fetch("/api/guest-scan/basic/submit", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            accept: "text/event-stream",
+          },
+          body: JSON.stringify({
+            target: basicTarget.trim(),
+            tool: selectedBasicTool.tool_name,
+            preset: basicPreset || undefined,
+          }),
+        });
+
+        if (!response.ok) {
+          // Handle 429 rate limit from backend
+          if (response.status === 429) {
+            let errorMsg = "Anonymous scan quota exceeded.";
+            try {
+              const body = await response.json();
+              if (body?.detail?.error) {
+                errorMsg = body.detail.error;
+              }
+              if (body?.detail?.limit != null) {
+                errorMsg += ` Limit: ${body.detail.limit}, remaining: ${body.detail.remaining ?? 0}.`;
+              }
+              if (body?.detail?.reset_at) {
+                const resetDate = new Date(body.detail.reset_at * 1000);
+                errorMsg += ` Resets at: ${resetDate.toLocaleString()}.`;
+              }
+            } catch {
+              const limit = response.headers.get("x-ratelimit-limit");
+              const remaining = response.headers.get("x-ratelimit-remaining");
+              if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+            }
+            toast.error(errorMsg);
+            appendErrorForMode("basic", errorMsg);
+            setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
+            setIsSubmitting(false);
+            return;
+          }
+
+          if (response.status === 422) {
+            let errorMsg = "Validation error.";
+            try {
+              const body = await response.json();
+              if (body?.detail && Array.isArray(body.detail)) {
+                errorMsg = body.detail.map((d: any) => d.msg ?? String(d)).join(", ");
+              }
+            } catch { /* ignore */ }
+            throw new Error(errorMsg);
+          }
+
+          const errorText = await response.text();
+          throw new Error(errorText || "Basic scan failed to start.");
+        }
+
+        // The response is an SSE stream — consume it
+        if (response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let resolvedStepId = "";
+
+          setRunForMode("basic", (current) => ({
+            ...current,
+            status: "JOB_STATUS_RUNNING",
+          }));
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+
+            while (buffer.includes("\n\n")) {
+              const boundary = buffer.indexOf("\n\n");
+              const block = buffer.slice(0, boundary);
+              buffer = buffer.slice(boundary + 2);
+
+              const lines = block.split("\n");
+              let eventName = "message";
+              const dataLines: string[] = [];
+
+              for (const line of lines) {
+                if (line.startsWith("event:")) eventName = line.slice(6).trim();
+                if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
+              }
+
+              if (!dataLines.length || eventName === "ping") continue;
+
+              const rawData = dataLines.join("\n");
+              let payload: unknown = rawData;
+              try { payload = JSON.parse(rawData); } catch { payload = rawData; }
+
+              const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+
+              if (eventName === "scan_started" && record) {
+                resolvedStepId = typeof record.step_id === "string" ? record.step_id : "";
+                setRunForMode("basic", (current) => ({
+                  ...current,
+                  stepId: resolvedStepId,
+                  jobId: typeof record.job_id === "string" ? record.job_id : current.jobId,
+                  status: typeof record.status === "string" ? record.status : "JOB_STATUS_RUNNING",
+                }));
+                appendLogForMode("basic", logFromPayload("basic", "submitted", {
+                  message: `Basic scan submitted for ${basicTarget.trim()}`,
+                }));
+                // Open the guest log stream for this step
+                if (resolvedStepId) {
+                  openGuestBasicStepStreamRef.current?.("basic", resolvedStepId);
+                }
+              }
+
+              if (eventName === "status" && record) {
+                if (typeof record.status === "string") {
+                  setRunForMode("basic", (current) => ({ ...current, status: record!.status as string }));
+                }
+              }
+
+              if (eventName === "log") {
+                appendLogForMode("basic", logFromPayload("basic", "log", payload));
+              }
+
+              if (eventName === "done" && record) {
+                const finalStatus = typeof record.status === "string" ? record.status : "JOB_STATUS_COMPLETED";
+                setRunForMode("basic", (current) => ({
+                  ...current,
+                  status: finalStatus,
+                  findings: typeof record!.total_findings === "number" ? record!.total_findings as number : current.findings,
+                }));
+                appendLogForMode("basic", logFromPayload("basic", "done", payload));
+                if (resolvedStepId) {
+                  void fetchGuestBasicParsedDataRef.current?.("basic", resolvedStepId);
+                }
+              }
+
+              if (eventName === "error" && record) {
+                appendErrorForMode("basic", typeof record.error === "string" ? record.error : "Scan error occurred.");
+                setRunForMode("basic", (current) => ({ ...current, status: "JOB_STATUS_FAILED" }));
+              }
+            }
+          }
+
+          // Stream ended
+          setRunForMode("basic", (current) => {
+            if (!isTerminalStatus(current.status)) {
+              return { ...current, status: "JOB_STATUS_COMPLETED" };
+            }
+            return current;
+          });
+        }
+      } catch (error) {
+        appendErrorForMode("basic", error instanceof Error ? error.message : "Basic scan failed.");
+        setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // Authenticated mode (original behavior)
     try {
-      // /scans/basic/submit returns plain JSON (job_id, step_id, status),
-      // NOT an SSE stream — use the same watchJob pattern as medium/advanced.
       const submit = await fetchJson<{ job_id: string; step_id: string; status: string }>(
         "/scans/basic/submit",
         {
@@ -540,6 +705,7 @@ export function useScanController(initialProjectId?: string) {
     appendLogForMode,
     basicPreset,
     basicTarget,
+    guestMode,
     projectId,
     resetRun,
     selectedBasicTool,
@@ -625,12 +791,322 @@ export function useScanController(initialProjectId?: string) {
   ]);
 
   // ---------------------------------------------------------------------------
+  // Guest-mode helpers for advanced scan
+  // ---------------------------------------------------------------------------
+  const guestEventSourceRef = useRef<EventSource | null>(null);
+  const guestStreamStepRef = useRef("");
+
+  const openGuestStepStream = useCallback(
+    (mode: ScanMode, stepId: string) => {
+      if (!stepId || guestStreamStepRef.current === stepId) return;
+
+      guestEventSourceRef.current?.close();
+      guestStreamStepRef.current = stepId;
+
+      const source = new EventSource(`/api/guest-scan/advanced/${stepId}/logs`);
+      guestEventSourceRef.current = source;
+
+      const handleEvent = (eventName: string, event: MessageEvent) => {
+        const payload = parseJsonMaybe(event.data);
+
+        if (eventName === "done") {
+          source.close();
+          guestEventSourceRef.current = null;
+          guestStreamStepRef.current = "";
+          appendLogForMode(mode, logFromPayload(mode, "done", payload));
+          return;
+        }
+
+        if (eventName === "stream-error" || eventName === "error") {
+          appendErrorForMode(mode, formatPayloadLine(payload));
+        }
+        if (!["heartbeat", "ping", "ready"].includes(eventName)) {
+          appendLogForMode(mode, logFromPayload(mode, eventName, payload));
+        }
+      };
+
+      source.onmessage = (event) => handleEvent("log", event);
+      source.addEventListener("log", (event) => handleEvent("log", event as MessageEvent));
+      source.addEventListener("done", (event) => handleEvent("done", event as MessageEvent));
+      source.addEventListener("stream-error", (event) => handleEvent("stream-error", event as MessageEvent));
+      source.onerror = () => {
+        if (guestStreamStepRef.current === stepId) {
+          // Don't spam errors — the SSE might just have ended naturally
+          source.close();
+          guestEventSourceRef.current = null;
+          guestStreamStepRef.current = "";
+        }
+      };
+    },
+    [appendLogForMode, appendErrorForMode],
+  );
+
+  const fetchGuestParsedData = useCallback(
+    async (mode: ScanMode, stepId: string) => {
+      try {
+        const response = await fetch(`/api/guest-scan/advanced/${stepId}/parsed-data`, { cache: "no-store" });
+        if (!response.ok) return;
+        const parsed = await response.json();
+        setRunForMode(mode, (current) => ({
+          ...current,
+          parsedSteps: Array.isArray(parsed?.steps) ? parsed.steps : parsed ? [parsed] : [],
+        }));
+      } catch {
+        // ignore — parsed data is best-effort
+      }
+    },
+    [setRunForMode],
+  );
+
+  const openGuestBasicStepStream = useCallback(
+    (mode: ScanMode, stepId: string) => {
+      if (!stepId || guestStreamStepRef.current === stepId) return;
+
+      guestEventSourceRef.current?.close();
+      guestStreamStepRef.current = stepId;
+
+      const source = new EventSource(`/api/guest-scan/basic/${stepId}/logs`);
+      guestEventSourceRef.current = source;
+
+      const handleEvent = (eventName: string, event: MessageEvent) => {
+        const payload = parseJsonMaybe(event.data);
+
+        if (eventName === "done") {
+          source.close();
+          guestEventSourceRef.current = null;
+          guestStreamStepRef.current = "";
+          appendLogForMode(mode, logFromPayload(mode, "done", payload));
+          return;
+        }
+
+        if (eventName === "stream-error" || eventName === "error") {
+          appendErrorForMode(mode, formatPayloadLine(payload));
+        }
+        if (!["heartbeat", "ping", "ready"].includes(eventName)) {
+          appendLogForMode(mode, logFromPayload(mode, eventName, payload));
+        }
+      };
+
+      source.onmessage = (event) => handleEvent("log", event);
+      source.addEventListener("log", (event) => handleEvent("log", event as MessageEvent));
+      source.addEventListener("done", (event) => handleEvent("done", event as MessageEvent));
+      source.addEventListener("stream-error", (event) => handleEvent("stream-error", event as MessageEvent));
+      source.onerror = () => {
+        if (guestStreamStepRef.current === stepId) {
+          source.close();
+          guestEventSourceRef.current = null;
+          guestStreamStepRef.current = "";
+        }
+      };
+    },
+    [appendLogForMode, appendErrorForMode],
+  );
+
+  const fetchGuestBasicParsedData = useCallback(
+    async (mode: ScanMode, stepId: string) => {
+      try {
+        const response = await fetch(`/api/guest-scan/basic/${stepId}/parsed-data`, { cache: "no-store" });
+        if (!response.ok) return;
+        const parsed = await response.json();
+        setRunForMode(mode, (current) => ({
+          ...current,
+          parsedSteps: Array.isArray(parsed?.steps) ? parsed.steps : parsed ? [parsed] : [],
+        }));
+      } catch {
+        // ignore — parsed data is best-effort
+      }
+    },
+    [setRunForMode],
+  );
+
+  useEffect(() => {
+    openGuestBasicStepStreamRef.current = openGuestBasicStepStream;
+    fetchGuestBasicParsedDataRef.current = fetchGuestBasicParsedData;
+  }, [fetchGuestBasicParsedData, openGuestBasicStepStream]);
+
+  // ---------------------------------------------------------------------------
   // Advanced scan
   // ---------------------------------------------------------------------------
   const submitAdvanced = useCallback(
     async (command: string) => {
       const finalCommand = command.trim();
       setAdvancedCommand(finalCommand);
+
+      if (guestMode) {
+        // Guest mode: use the anonymous /try endpoint
+        if (!finalCommand) {
+          toast.error("Enter a command to run.");
+          return;
+        }
+
+        resetRun("advanced");
+        setIsSubmitting(true);
+        setRunForMode("advanced", (current) => ({ ...current, mode: "advanced", status: "submitting" }));
+        analyzeAdvancedCommand(finalCommand, tools).forEach((warning) => {
+          appendLogForMode("advanced", logFromPayload("system", "warning", { message: warning.message }));
+        });
+
+        try {
+          const response = await fetch("/api/guest-scan/advanced/submit", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              accept: "text/event-stream",
+            },
+            body: JSON.stringify({ command: finalCommand }),
+          });
+
+          if (!response.ok) {
+            // Handle 429 rate limit from backend
+            if (response.status === 429) {
+              const limit = response.headers.get("x-ratelimit-limit");
+              const remaining = response.headers.get("x-ratelimit-remaining");
+              const resetAt = response.headers.get("x-ratelimit-reset");
+              let errorMsg = "Anonymous scan quota exceeded.";
+              try {
+                const body = await response.json();
+                if (body?.detail?.error) {
+                  errorMsg = body.detail.error;
+                }
+                if (body?.detail?.limit != null) {
+                  errorMsg += ` Limit: ${body.detail.limit}, remaining: ${body.detail.remaining ?? 0}.`;
+                }
+                if (body?.detail?.reset_at) {
+                  const resetDate = new Date(body.detail.reset_at * 1000);
+                  errorMsg += ` Resets at: ${resetDate.toLocaleString()}.`;
+                }
+              } catch {
+                if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+              }
+              toast.error(errorMsg);
+              appendErrorForMode("advanced", errorMsg);
+              setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));
+              setIsSubmitting(false);
+              return;
+            }
+
+            // Handle 422 validation error
+            if (response.status === 422) {
+              let errorMsg = "Validation error.";
+              try {
+                const body = await response.json();
+                if (body?.detail && Array.isArray(body.detail)) {
+                  errorMsg = body.detail.map((d: any) => d.msg ?? String(d)).join(", ");
+                }
+              } catch { /* ignore */ }
+              throw new Error(errorMsg);
+            }
+
+            const errorText = await response.text();
+            throw new Error(errorText || "Advanced scan failed to start.");
+          }
+
+          // The response is an SSE stream — consume it
+          if (response.body) {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let resolvedStepId = "";
+
+            setRunForMode("advanced", (current) => ({
+              ...current,
+              status: "JOB_STATUS_RUNNING",
+            }));
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+
+              while (buffer.includes("\n\n")) {
+                const boundary = buffer.indexOf("\n\n");
+                const block = buffer.slice(0, boundary);
+                buffer = buffer.slice(boundary + 2);
+
+                const lines = block.split("\n");
+                let eventName = "message";
+                const dataLines: string[] = [];
+
+                for (const line of lines) {
+                  if (line.startsWith("event:")) eventName = line.slice(6).trim();
+                  if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
+                }
+
+                if (!dataLines.length || eventName === "ping") continue;
+
+                const rawData = dataLines.join("\n");
+                let payload: unknown = rawData;
+                try { payload = JSON.parse(rawData); } catch { payload = rawData; }
+
+                const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+
+                if (eventName === "scan_started" && record) {
+                  resolvedStepId = typeof record.step_id === "string" ? record.step_id : "";
+                  setRunForMode("advanced", (current) => ({
+                    ...current,
+                    stepId: resolvedStepId,
+                    jobId: typeof record.job_id === "string" ? record.job_id : current.jobId,
+                    status: typeof record.status === "string" ? record.status : "JOB_STATUS_RUNNING",
+                  }));
+                  appendLogForMode("advanced", logFromPayload("advanced", "submitted", {
+                    message: `Advanced scan submitted: ${finalCommand}`,
+                  }));
+                  // Open the guest log stream for this step
+                  if (resolvedStepId) {
+                    openGuestStepStream("advanced", resolvedStepId);
+                  }
+                }
+
+                if (eventName === "status" && record) {
+                  if (typeof record.status === "string") {
+                    setRunForMode("advanced", (current) => ({ ...current, status: record!.status as string }));
+                  }
+                }
+
+                if (eventName === "log") {
+                  appendLogForMode("advanced", logFromPayload("advanced", "log", payload));
+                }
+
+                if (eventName === "done" && record) {
+                  const finalStatus = typeof record.status === "string" ? record.status : "JOB_STATUS_COMPLETED";
+                  setRunForMode("advanced", (current) => ({
+                    ...current,
+                    status: finalStatus,
+                    findings: typeof record!.total_findings === "number" ? record!.total_findings as number : current.findings,
+                  }));
+                  appendLogForMode("advanced", logFromPayload("advanced", "done", payload));
+                  // Fetch parsed data
+                  if (resolvedStepId) {
+                    void fetchGuestParsedData("advanced", resolvedStepId);
+                  }
+                }
+
+                if (eventName === "error" && record) {
+                  appendErrorForMode("advanced", typeof record.error === "string" ? record.error : "Scan error occurred.");
+                  setRunForMode("advanced", (current) => ({ ...current, status: "JOB_STATUS_FAILED" }));
+                }
+              }
+            }
+
+            // Stream ended — if no terminal status was set, mark as completed
+            setRunForMode("advanced", (current) => {
+              if (!isTerminalStatus(current.status)) {
+                return { ...current, status: "JOB_STATUS_COMPLETED" };
+              }
+              return current;
+            });
+          }
+        } catch (error) {
+          appendErrorForMode("advanced", error instanceof Error ? error.message : "Advanced scan failed.");
+          setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));
+        } finally {
+          setIsSubmitting(false);
+        }
+        return;
+      }
+
+      // Authenticated mode (original behavior)
       if (!projectId || !finalCommand) {
         if (!projectId) toast.error("Select a project before starting a scan.");
         else toast.error("Enter a command to run.");
@@ -671,7 +1147,7 @@ export function useScanController(initialProjectId?: string) {
         setIsSubmitting(false);
       }
     },
-    [appendErrorForMode, appendLogForMode, projectId, resetRun, setRunForMode, tools, watchJob],
+    [appendErrorForMode, appendLogForMode, fetchGuestParsedData, guestMode, openGuestStepStream, projectId, resetRun, setRunForMode, tools, watchJob],
   );
 
   // ---------------------------------------------------------------------------

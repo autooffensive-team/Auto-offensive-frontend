@@ -278,14 +278,13 @@ export default function BasicScanPage() {
     setActivityEntries([]);
 
     try {
-      const response = await fetch("/api/basic-scan/submit", {
+      const response = await fetch("/api/guest-scan/basic/submit", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           accept: "text/event-stream",
         },
         body: JSON.stringify({
-          project_id: "guest-basic-scan",
           target: target.trim(),
           tool: selectedTool.tool_name,
           preset: resolvedPreset,

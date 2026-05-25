@@ -279,6 +279,7 @@ export default function ScanPage() {
     limitReached,
     guardedSubmit,
     guestSubmitBasicScan,
+    maxScans,
     showLimitModal,
     closeLimitModal,
     showLockModal,
@@ -287,14 +288,10 @@ export default function ScanPage() {
     handleLockedFeature,
   } = useGuestScanGuard();
 
-  // If guest tries to access advanced mode, block it
+  // If guest tries to access advanced mode, allow it (uses guest API endpoints)
   const handleTabChange = useCallback((mode: ScanMode) => {
-    if (isGuest && mode === "advanced") {
-      handleLockedFeature("Advanced Scan");
-      return;
-    }
     setActiveTab(mode);
-  }, [isGuest, handleLockedFeature]);
+  }, []);
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const { ref: asciiRef, fontSize: asciiFontSize } = useStableAsciiScale();
@@ -336,7 +333,7 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController(isGuest ? "guest-basic-scan" : initialProjectId);
+  } = useScanController(isGuest ? "guest-advanced-scan" : initialProjectId, { guestMode: isGuest });
 
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
@@ -356,10 +353,10 @@ export default function ScanPage() {
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
             {isGuest ? (
               <>
-                Launch Basic or Medium scans and watch live logs as they run.
+                Launch Basic, Medium, or Advanced scans and watch live logs as they run.
                 <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
                   <Lock size={10} />
-                  Advanced mode requires an account
+                  Limited to {maxScans} scans in guest mode
                 </span>
               </>
             ) : (
@@ -447,10 +444,10 @@ export default function ScanPage() {
               />
             </ScanModePanel>
 
-            {activeTab === "advanced" && !isGuest && (
+            {activeTab === "advanced" && (
               <AdvancedTerminalPanel
-                projectId={projectId}
-                selectedProject={selectedProject}
+                projectId={isGuest ? "guest-advanced-scan" : projectId}
+                selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
                 logs={advancedLogs}
                 run={advancedRun}
                 errors={advancedErrors}
