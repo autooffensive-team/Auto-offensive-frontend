@@ -409,16 +409,20 @@ export default function HomeHero() {
     const cleanupHexLeft = setupMagneticHover(hexLeftRef.current);
     const cleanupHexRight = setupMagneticHover(hexRightRef.current);
 
-    if (s1Ref.current) s1Ref.current.style.boxShadow = generateStars(700, [
+    // Reduce star count on mobile for better paint performance
+    const isMobile = window.innerWidth < 768;
+    const starMultiplier = isMobile ? 0.4 : 1;
+
+    if (s1Ref.current) s1Ref.current.style.boxShadow = generateStars(Math.round(700 * starMultiplier), [
       "rgba(0,208,178,0.55)", "rgba(0,208,178,0.35)",
       "rgba(55,65,81,0.45)",  "rgba(55,65,81,0.3)",
       "rgba(107,114,128,0.4)",
     ]);
-    if (s2Ref.current) s2Ref.current.style.boxShadow = generateStars(200, [
+    if (s2Ref.current) s2Ref.current.style.boxShadow = generateStars(Math.round(200 * starMultiplier), [
       "rgba(55,65,81,0.55)", "rgba(55,65,81,0.4)",
       "rgba(0,208,178,0.6)", "rgba(107,114,128,0.45)",
     ]);
-    if (s3Ref.current) s3Ref.current.style.boxShadow = generateStars(100, [
+    if (s3Ref.current) s3Ref.current.style.boxShadow = generateStars(Math.round(100 * starMultiplier), [
       "rgba(0,208,178,0.9)", "rgba(0,208,178,0.7)",
       "rgba(0,208,178,0.5)", "rgba(55,65,81,0.7)",
     ]);
@@ -850,9 +854,11 @@ export default function HomeHero() {
           " />
         </div>
 
-        {/* ── Hex grids ── */}
-        <HexGrid hexes={LEFT_HEXES}  svgRef={hexLeftRef}  className="hex-grid-left" />
-        <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
+        {/* ── Hex grids (hidden on mobile for performance) ── */}
+        <div className="hidden md:block">
+          <HexGrid hexes={LEFT_HEXES}  svgRef={hexLeftRef}  className="hex-grid-left" />
+          <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
+        </div>
 
         {/* ── Main content ── */}
         <div className="relative z-10 flex flex-col items-center max-w-260 w-full">

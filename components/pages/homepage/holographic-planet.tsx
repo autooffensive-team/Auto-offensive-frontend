@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as d3 from "d3";
+import { geoOrthographic, geoPath, geoGraticule, geoBounds } from "d3-geo";
 
 export default function HolographicPlanet() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,14 +39,13 @@ export default function HolographicPlanet() {
     const radius = Math.min(containerWidth, containerHeight) / 2.5;
 
     // ─── D3 projection ─────────────────────────────────────────
-    const projection = d3
-      .geoOrthographic()
+    const projection = geoOrthographic()
       .scale(radius)
       .translate([containerWidth / 2, containerHeight / 2])
       .clipAngle(90);
 
-    const path = d3.geoPath().projection(projection).context(ctx);
-    const graticule = d3.geoGraticule();
+    const path = geoPath().projection(projection).context(ctx);
+    const graticule = geoGraticule();
 
     // ─── State ─────────────────────────────────────────────────
     let landFeatures: any = null;
@@ -59,10 +58,10 @@ export default function HolographicPlanet() {
     let introStart = 0;
     let introActive = false;
 
-    // Delay planet appearance until after sweep comet finishes (~2.1s)
-    const PLANET_DELAY = 1800;
-    const PLANET_FADE_DURATION = 500;
-    const PLANET_INTRO_DURATION = 1050;
+    // Delay planet appearance - show shortly after comets start sweeping
+    const PLANET_DELAY = 1200;
+    const PLANET_FADE_DURATION = 250;
+    const PLANET_INTRO_DURATION = 600;
     const PLANET_START_SCALE = 0.42;
     const PLANET_SPIN_DEGREES = 360;
     let planetFadeStart = 0;
@@ -121,7 +120,7 @@ export default function HolographicPlanet() {
       const dots: [number, number][] = [];
       const spacing = DOT_SPACING;
       features.features.forEach((feature: any) => {
-        const bounds = d3.geoBounds(feature);
+        const bounds = geoBounds(feature);
         const [[minLng, minLat], [maxLng, maxLat]] = bounds;
         for (let lng = minLng; lng <= maxLng; lng += spacing) {
           for (let lat = minLat; lat <= maxLat; lat += spacing) {

@@ -47,7 +47,7 @@ import type {
   ProviderAccount,
   ProviderRepository,
 } from "@/types/git-provider";
-import { FaGithub, FaGitlab } from "react-icons/fa";
+import { FaGithub, FaGitlab } from "@/components/icons/social-icons";
 
 const providers: GitProvider[] = ["github", "gitlab"];
 

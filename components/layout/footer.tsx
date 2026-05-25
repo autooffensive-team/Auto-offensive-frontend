@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { FaFacebook, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
+import { FaFacebook, FaLinkedin, FaGithub, FaTwitter } from "@/components/icons/social-icons";
 import { useTheme } from "@/components/theme-provider";
 import * as React from "react";
 import { useTranslations } from "next-intl";
