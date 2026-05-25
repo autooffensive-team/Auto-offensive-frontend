@@ -842,7 +842,12 @@ function CardRow({
 export default function Features() {
   const locale = useLocale();
   const t = useTranslations("homepage.features");
-  const isKhmer = locale === "km";
+  const isKhmer = locale === "km" || locale === "kh";
+  const isEnglish = locale === "en";
+  const sectionTitleLine2 = t("sectionTitleLine2");
+  const sectionTitlePrefix = sectionTitleLine2
+    .replace(/\s*(Auto Offensive|Reffensive)\s*$/i, "")
+    .trim();
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
@@ -1060,8 +1065,29 @@ export default function Features() {
             }}
           >
             <span className="block">{t("sectionTitleLine1")}</span>
-            <span className="block" style={{ color: colors.accent2 }}>
-              {t("sectionTitleLine2")}
+            <span className="block">
+              {isEnglish || isKhmer ? (
+                <>
+                  {sectionTitlePrefix}
+                  {sectionTitlePrefix ? " " : ""}
+                  <span
+                    style={{
+                      color: colors.accent2,
+                    }}
+                  >
+                    Auto
+                  </span>{" "}
+                  <span
+                    style={{
+                      color: colors.accent1,
+                    }}
+                  >
+                    Offensive
+                  </span>
+                </>
+              ) : (
+                <span style={{ color: colors.accent2 }}>{sectionTitleLine2}</span>
+              )}
             </span>
           </h2>
         </div>

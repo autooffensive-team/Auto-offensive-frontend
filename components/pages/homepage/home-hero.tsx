@@ -461,34 +461,58 @@ export default function HomeHero() {
         }
         .scroll-indicator { animation: ao-bob 2.5s ease-in-out infinite; }
 
-        /* ── Planet sweep comets (GPU-accelerated, multi-layer) ── */
+        /* ── Planet hero intro + sweep comets (GPU-accelerated, multi-layer) ── */
+        @keyframes planetHeroIntro {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+            filter: saturate(1) blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+            filter: saturate(1) blur(0);
+          }
+        }
+        @keyframes cometSweepIntro {
+          0% {
+            opacity: 0;
+            transform: scale(0.92);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
         @keyframes sweepLeft {
-          0%   { transform: rotate(-80deg); opacity: 0; }
-          6%   { opacity: 1; }
-          55%  { transform: rotate(0deg); opacity: 1; }
-          72%  { transform: rotate(0deg); opacity: 0; }
-          100% { transform: rotate(0deg); opacity: 0; }
+          0%   { transform: rotate(-112deg) scale(0.96); opacity: 0; }
+          14%  { opacity: 0.42; }
+          34%  { opacity: 0.98; }
+          70%  { transform: rotate(10deg) scale(1); opacity: 1; }
+          88%  { transform: rotate(16deg) scale(1.01); opacity: 0.22; }
+          100% { transform: rotate(16deg) scale(1.01); opacity: 0; }
         }
         @keyframes sweepRight {
-          0%   { transform: rotate(80deg); opacity: 0; }
-          6%   { opacity: 1; }
-          55%  { transform: rotate(0deg); opacity: 1; }
-          72%  { transform: rotate(0deg); opacity: 0; }
-          100% { transform: rotate(0deg); opacity: 0; }
+          0%   { transform: rotate(112deg) scale(0.96); opacity: 0; }
+          14%  { opacity: 0.42; }
+          34%  { opacity: 0.98; }
+          70%  { transform: rotate(-10deg) scale(1); opacity: 1; }
+          88%  { transform: rotate(-16deg) scale(1.01); opacity: 0.22; }
+          100% { transform: rotate(-16deg) scale(1.01); opacity: 0; }
         }
         @keyframes sweepLeftTrail {
-          0%   { transform: rotate(-80deg); opacity: 0; }
-          10%  { opacity: 0.6; }
-          58%  { transform: rotate(-2deg); opacity: 0.4; }
-          75%  { transform: rotate(-2deg); opacity: 0; }
-          100% { transform: rotate(-2deg); opacity: 0; }
+          0%   { transform: rotate(-118deg) scale(0.94); opacity: 0; }
+          22%  { opacity: 0.48; }
+          72%  { transform: rotate(6deg) scale(1); opacity: 0.62; }
+          90%  { transform: rotate(10deg) scale(1); opacity: 0.12; }
+          100% { transform: rotate(10deg) scale(1); opacity: 0; }
         }
         @keyframes sweepRightTrail {
-          0%   { transform: rotate(80deg); opacity: 0; }
-          10%  { opacity: 0.6; }
-          58%  { transform: rotate(2deg); opacity: 0.4; }
-          75%  { transform: rotate(2deg); opacity: 0; }
-          100% { transform: rotate(2deg); opacity: 0; }
+          0%   { transform: rotate(118deg) scale(0.94); opacity: 0; }
+          22%  { opacity: 0.48; }
+          72%  { transform: rotate(-6deg) scale(1); opacity: 0.62; }
+          90%  { transform: rotate(-10deg) scale(1); opacity: 0.12; }
+          100% { transform: rotate(-10deg) scale(1); opacity: 0; }
         }
         @keyframes convergePulse {
           0%,50%  { opacity: 0; transform: scale(0); }
@@ -511,39 +535,48 @@ export default function HomeHero() {
           70%     { opacity: 0; }
           100%    { opacity: 0; }
         }
+        .planet-intro {
+          animation: planetHeroIntro 0.01s linear 0s both;
+          transform-origin: 50% 50%;
+          will-change: transform, opacity, filter;
+        }
+        .hero-comet-orbit {
+          animation: cometSweepIntro 1.15s ease-out 0.78s both;
+          will-change: transform, opacity;
+        }
         .sweep-left {
           transform-origin: 100px 100px;
           will-change: transform, opacity;
-          animation: sweepLeft 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s 1 forwards;
+          animation: sweepLeft 3.8s cubic-bezier(0.16, 1, 0.3, 1) 1.02s 1 forwards;
         }
         .sweep-left-trail {
           transform-origin: 100px 100px;
           will-change: transform, opacity;
-          animation: sweepLeftTrail 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s 1 forwards;
+          animation: sweepLeftTrail 4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s 1 forwards;
         }
         .sweep-right {
           transform-origin: 100px 100px;
           will-change: transform, opacity;
-          animation: sweepRight 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s 1 forwards;
+          animation: sweepRight 3.8s cubic-bezier(0.16, 1, 0.3, 1) 1.02s 1 forwards;
         }
         .sweep-right-trail {
           transform-origin: 100px 100px;
           will-change: transform, opacity;
-          animation: sweepRightTrail 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s 1 forwards;
+          animation: sweepRightTrail 4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s 1 forwards;
         }
         .converge {
           transform-origin: 100px 200px;
           will-change: transform, opacity;
-          animation: convergePulse 2.4s ease-out 0.3s 1 forwards;
+          animation: convergePulse 2.9s ease-out 0.82s 1 forwards;
         }
         .converge-ring {
           transform-origin: 100px 200px;
           will-change: transform, opacity;
-          animation: convergeRing 2.4s ease-out 0.3s 1 forwards;
+          animation: convergeRing 2.9s ease-out 0.82s 1 forwards;
         }
         .converge-flash {
           will-change: opacity;
-          animation: convergeFlash 2.4s ease-out 0.3s 1 forwards;
+          animation: convergeFlash 2.9s ease-out 0.82s 1 forwards;
         }
 
         /* ── Ripple button ── */
@@ -691,14 +724,14 @@ export default function HomeHero() {
             className="absolute top-[-2.5%] left-1/2 -translate-x-1/2 w-[180%] sm:w-[180%] md:w-[200%] lg:w-[220%] max-w-500"
             style={{ aspectRatio: "1 / 1" }}
           >
-            <div className="absolute inset-0">
+            <div className="planet-intro absolute inset-0">
               <HolographicPlanetLazy />
             </div>
           </div>
 
           {/* Sweep comet SVG */}
           <div
-            className="absolute top-[1%] left-1/2 -translate-x-1/2 w-[120%] rounded-full pointer-events-none z-6 overflow-visible"
+            className="hero-comet-orbit absolute top-[1%] left-1/2 -translate-x-1/2 w-[120%] rounded-full pointer-events-none z-6 overflow-visible"
             style={{ paddingTop:"152%", willChange: "transform", contain: "layout style" }}
           >
             <svg
@@ -710,26 +743,26 @@ export default function HomeHero() {
                 {/* Main comet gradient — bright head with teal-to-white */}
                 <linearGradient id="cometGradL" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="200" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
-                  <stop offset="40%"  stopColor="#00D0B2" stopOpacity="0.4" />
-                  <stop offset="80%"  stopColor="#00FFD4" stopOpacity="0.8" />
+                  <stop offset="34%"  stopColor="#00BFA5" stopOpacity="0.62" />
+                  <stop offset="76%"  stopColor="#00FFD4" stopOpacity="0.96" />
                   <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
                 </linearGradient>
                 <linearGradient id="cometGradR" gradientUnits="userSpaceOnUse" x1="200" y1="100" x2="0" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
-                  <stop offset="40%"  stopColor="#00D0B2" stopOpacity="0.4" />
-                  <stop offset="80%"  stopColor="#00FFD4" stopOpacity="0.8" />
+                  <stop offset="34%"  stopColor="#00BFA5" stopOpacity="0.62" />
+                  <stop offset="76%"  stopColor="#00FFD4" stopOpacity="0.96" />
                   <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
                 </linearGradient>
                 {/* Softer trail gradient */}
                 <linearGradient id="trailGradL" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="200" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
-                  <stop offset="50%"  stopColor="#00D0B2" stopOpacity="0.15" />
-                  <stop offset="100%" stopColor="#00FFD4" stopOpacity="0.35" />
+                  <stop offset="44%"  stopColor="#00D0B2" stopOpacity="0.28" />
+                  <stop offset="100%" stopColor="#00FFD4" stopOpacity="0.5" />
                 </linearGradient>
                 <linearGradient id="trailGradR" gradientUnits="userSpaceOnUse" x1="200" y1="100" x2="0" y2="100">
                   <stop offset="0%"   stopColor="#00D0B2" stopOpacity="0" />
-                  <stop offset="50%"  stopColor="#00D0B2" stopOpacity="0.15" />
-                  <stop offset="100%" stopColor="#00FFD4" stopOpacity="0.35" />
+                  <stop offset="44%"  stopColor="#00D0B2" stopOpacity="0.28" />
+                  <stop offset="100%" stopColor="#00FFD4" stopOpacity="0.5" />
                 </linearGradient>
                 {/* Convergence radial glow */}
                 <radialGradient id="convergeGlow" cx="50%" cy="50%" r="50%">
@@ -738,7 +771,7 @@ export default function HomeHero() {
                   <stop offset="100%" stopColor="#00D0B2" stopOpacity="0" />
                 </radialGradient>
                 <filter id="cometGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="0.8" result="blur" />
+                  <feGaussianBlur stdDeviation="1.4" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
                 <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -750,13 +783,13 @@ export default function HomeHero() {
               {/* ── Left comet: soft trail layer (wider, dimmer, slightly delayed) ── */}
               <g className="sweep-left-trail" style={{ opacity: 0, transformOrigin: "100px 100px" }}>
                 <circle cx="100" cy="100" r="100" fill="none" stroke="url(#trailGradL)"
-                  strokeWidth="6" strokeLinecap="round" strokeDasharray="90 538.32"
+                  strokeWidth="7.5" strokeLinecap="round" strokeDasharray="102 526.32"
                   strokeDashoffset="0" />
               </g>
               {/* ── Left comet: bright head layer ── */}
               <g className="sweep-left" style={{ opacity: 0, transformOrigin: "100px 100px" }}>
                 <circle cx="100" cy="100" r="100" fill="none" stroke="url(#cometGradL)"
-                  strokeWidth="2" strokeLinecap="round" strokeDasharray="55 573.32"
+                  strokeWidth="3.2" strokeLinecap="round" strokeDasharray="70 558.32"
                   strokeDashoffset="0"
                   filter="url(#cometGlow)" />
               </g>
@@ -765,7 +798,7 @@ export default function HomeHero() {
               <g className="sweep-right-trail" style={{ opacity: 0, transformOrigin: "100px 100px" }}>
                 <g transform="scale(-1,1) translate(-200,0)">
                   <circle cx="100" cy="100" r="100" fill="none" stroke="url(#trailGradR)"
-                    strokeWidth="6" strokeLinecap="round" strokeDasharray="90 538.32"
+                    strokeWidth="7.5" strokeLinecap="round" strokeDasharray="102 526.32"
                     strokeDashoffset="0" />
                 </g>
               </g>
@@ -773,7 +806,7 @@ export default function HomeHero() {
               <g className="sweep-right" style={{ opacity: 0, transformOrigin: "100px 100px" }}>
                 <g transform="scale(-1,1) translate(-200,0)">
                   <circle cx="100" cy="100" r="100" fill="none" stroke="url(#cometGradR)"
-                    strokeWidth="2" strokeLinecap="round" strokeDasharray="55 573.32"
+                    strokeWidth="3.2" strokeLinecap="round" strokeDasharray="70 558.32"
                     strokeDashoffset="0"
                     filter="url(#cometGlow)" />
                 </g>

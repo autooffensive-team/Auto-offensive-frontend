@@ -368,6 +368,29 @@ function useScroll(threshold: number) {
 }
 
 // ── Mobile Menu ───────────────────────────────────────────────────────────────
+function TryFreeButton({
+  className,
+  children,
+  onClick,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+}) {
+  return (
+    <a
+      href="/api/guest/start"
+      onClick={onClick}
+      className={cn(
+        'btn-try-free relative inline-flex items-center justify-center overflow-visible rounded-full border border-[#FACC15] bg-[#FEF3C7] px-7 py-3 text-[15px] font-medium tracking-wide text-[#B45309] transition-colors duration-300 focus:outline-none',
+        className,
+      )}
+    >
+      <span className="relative z-10">{children}</span>
+    </a>
+  );
+}
+
 type MobileMenuProps = React.ComponentProps<'div'> & { open: boolean };
 
 function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
@@ -433,12 +456,9 @@ export function Header() {
     <AuthorizedUserIndicator />
   ) : (
     <div className="flex items-center gap-2">
-      <a
-        href="/api/guest/start"
-        className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
-      >
+      <TryFreeButton className="px-3 py-1.5 text-xs">
         Try Free
-      </a>
+      </TryFreeButton>
       <Link
         href="/register"
         className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
@@ -454,6 +474,42 @@ export function Header() {
         'bg-white/80 dark:bg-[#09090B]/80 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
+      <style>{`
+        @keyframes try-free-pulse-ring {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(1.5);
+            opacity: 0;
+          }
+        }
+
+        .btn-try-free::before,
+        .btn-try-free::after {
+          content: "";
+          position: absolute;
+          inset: -3px;
+          border-radius: 9999px;
+          border: 2px solid #FACC15;
+          animation: try-free-pulse-ring 1.8s ease-out infinite;
+          pointer-events: none;
+        }
+
+        .btn-try-free::after {
+          border-color: #F59E0B;
+          animation-delay: 0.6s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .btn-try-free::before,
+          .btn-try-free::after {
+            animation: none;
+            opacity: 0;
+          }
+        }
+      `}</style>
       <nav
         className="mx-auto z-50 flex h-14 w-full max-w-7xl items-center justify-between px-4"
         style={{ fontFamily: bodyFontFamily }}
@@ -681,13 +737,12 @@ export function Header() {
             />
           ) : (
             <div className="flex flex-col gap-2">
-              <a
-                href="/api/guest/start"
+              <TryFreeButton
                 onClick={() => setOpen(false)}
-                className="w-full rounded-xl border border-amber-200 bg-amber-50 py-2 text-center text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
+                className="w-full py-2 text-center"
               >
                 Try Free (3 scans)
-              </a>
+              </TryFreeButton>
               <Link
                 href="/register"
                 onClick={() => setOpen(false)}
