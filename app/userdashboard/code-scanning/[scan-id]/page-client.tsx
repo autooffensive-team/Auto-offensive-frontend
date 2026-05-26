@@ -902,7 +902,7 @@ export default function CodeScanningDetailPageClient({
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
       <div className="flex items-center justify-between gap-2 sm:gap-3">
         <PreviousPageButton onClick={handleGoBack} />
         <button
