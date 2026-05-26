@@ -21,6 +21,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import { useListCurrentUserScanIdsQuery } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import { CodeScanTour, CodeScanTourTriggerButton } from "@/components/tour/CodeScanTour";
 import type { ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -594,6 +595,9 @@ export default function CodeScanningPageClient() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
 
+      {/* ── Code Scan Tour ── */}
+      <CodeScanTour />
+
       {/* ── Header ── */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -616,6 +620,7 @@ export default function CodeScanningPageClient() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:pt-1">
+          <CodeScanTourTriggerButton />
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
@@ -628,6 +633,7 @@ export default function CodeScanningPageClient() {
           </motion.button>
           <Link
             href="/userdashboard/code-scanning/new"
+            id="tour-import-repo-btn"
             className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#00d0b2] px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-base"
           >
             <Plus size={14} />
@@ -723,7 +729,7 @@ export default function CodeScanningPageClient() {
       </AnimatePresence>
 
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop ── */}
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {isLoading && scanProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 dark:border-slate-800 dark:bg-slate-900">
             <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />
