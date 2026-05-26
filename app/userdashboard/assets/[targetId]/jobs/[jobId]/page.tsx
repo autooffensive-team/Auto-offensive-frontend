@@ -4,9 +4,14 @@ import { use } from "react";
 import { motion } from "framer-motion";
 import { AlertCircle, ArrowLeft, FileSearch, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useGetJobDetailsQuery } from "@/lib/redux/services/userdashboard/assets/assets-api";
+import {
+  useGetJobDetailsQuery,
+  useGetJobParsedDataQuery,
+} from "@/lib/redux/services/userdashboard/assets/assets-api";
 import Breadcrumb from "@/components/assets/Breadcrumb";
 import ScanResultsView from "@/components/assets/ScanResultsView";
+import AISuggestionPanel from "@/components/AiSuggestion/AISuggestionPanel";
+import GenerateReportButton from "@/components/report/GenerateReportButton";
 
 type PageProps = {
   params: Promise<{ targetId: string; jobId: string }>;
@@ -21,6 +26,8 @@ export default function ScanResultsPage({ params }: PageProps) {
     isError: isErrorJob,
     refetch: refetchJob,
   } = useGetJobDetailsQuery(jobId);
+
+  const { data: parsedData } = useGetJobParsedDataQuery(jobId);
 
   const targetName = isLoadingJob
     ? "Loading..."
@@ -81,46 +88,57 @@ export default function ScanResultsPage({ params }: PageProps) {
           animate="visible"
           className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6"
         >
-          {/* Breadcrumb */}
-          <motion.div variants={itemVariants}>
+          {/* Breadcrumb + Back link */}
+          <motion.div variants={itemVariants} className="flex items-center justify-between">
             <Breadcrumb segments={breadcrumbSegments} />
+            <Link
+              href={`/userdashboard/assets/${targetId}`}
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+              Back to Target
+            </Link>
           </motion.div>
 
-          {/* Header row: title + back button */}
+          {/* Header: title + action buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4"
+            className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 sm:p-2.5 rounded-xl bg-teal-50 dark:bg-teal-500/10 shrink-0">
-                  <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 dark:text-teal-400" />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
-                    Job {jobId.slice(0, 8)}
-                  </h1>
-                  <p className="mt-0.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    Scan results for <span className="font-medium text-slate-700 dark:text-slate-300">{targetName}</span>
-                  </p>
-                </div>
+            {/* Left: icon + title */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-teal-50 dark:bg-teal-500/10 shrink-0">
+                <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600 dark:text-teal-400" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                  Job {jobId.slice(0, 8)}
+                </h1>
+                <p className="mt-0.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  Scan results for{" "}
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
+                    {targetName}
+                  </span>
+                </p>
               </div>
             </div>
 
-            {/* Back button - right aligned */}
-            <Link
-              href={`/userdashboard/assets/${targetId}`}
-              className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm self-start sm:self-auto shrink-0 group"
-            >
-              <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
-              <span className="hidden sm:inline">Back to Target</span>
-              <span className="sm:hidden">Back</span>
-            </Link>
+            {/* Right: action buttons grouped */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              <AISuggestionPanel jobId={jobId} />
+              {parsedData && jobDetails && (
+                <GenerateReportButton
+                  jobId={jobId}
+                  steps={jobDetails.steps}
+                  parsedSteps={parsedData.steps}
+                />
+              )}
+            </div>
           </motion.div>
 
           {/* Scan Results */}
           <motion.div variants={itemVariants}>
-            <ScanResultsView jobId={jobId} />
+            <ScanResultsView jobId={jobId} hideReportButton />
           </motion.div>
         </motion.div>
       </div>

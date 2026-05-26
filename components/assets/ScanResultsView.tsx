@@ -14,6 +14,7 @@ import GenerateReportButton from "@/components/report/GenerateReportButton";
 
 type ScanResultsViewProps = {
   jobId: string;
+  hideReportButton?: boolean;
 };
 
 /**
@@ -202,7 +203,7 @@ function StepSection({ step }: { step: ParsedStepData }) {
   );
 }
 
-export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
+export default function ScanResultsView({ jobId, hideReportButton }: ScanResultsViewProps) {
   const {
     data: jobDetails,
     isLoading: isLoadingDetails,
@@ -260,7 +261,7 @@ export default function ScanResultsView({ jobId }: ScanResultsViewProps) {
       {jobDetails && (
         <div className="space-y-3">
           {/* Top row: Generate Report button aligned right */}
-          {parsedData && (
+          {!hideReportButton && parsedData && (
             <div className="flex justify-end">
               <GenerateReportButton
                 jobId={jobId}

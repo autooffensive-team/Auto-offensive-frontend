@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -62,15 +61,17 @@ export default function GenerateReportButton({
         <div className="relative">
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                    <Button
+                    <button
                         disabled={isLoading}
-                        className="rounded-xl bg-[#00d0b2] text-slate-900 font-semibold hover:bg-[#00b89e] border-0 shadow-sm"
+                        className="inline-flex items-center gap-2 rounded-xl border-0 bg-[#00d0b2] px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isLoading && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                        {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                        ) : (
+                            <FileText className="h-4 w-4" aria-hidden="true" />
                         )}
-                        Generate Report
-                    </Button>
+                        <span>Generate Report</span>
+                    </button>
                 </DropdownMenuTrigger>
 
                 <ReportDropdown
@@ -95,6 +96,7 @@ export default function GenerateReportButton({
                     />
                 </div>
             )}
+
         </div>
     );
 }
