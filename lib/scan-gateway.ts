@@ -106,6 +106,8 @@ export async function proxyToScanGateway(
  * Used for anonymous/guest endpoints like /scans/basic/try and /scans/advanced/try
  * which don't require authentication on the backend.
  * Forwards rate-limit headers from the backend response.
+ * Forwards the client's real IP via X-Forwarded-For so the backend can
+ * rate-limit per client rather than per server.
  */
 export async function proxyToScanGatewayAnonymous(
   request: Request,
@@ -115,6 +117,16 @@ export async function proxyToScanGatewayAnonymous(
   const url = new URL(`${getBaseUrl()}${path}`);
   const method = init.method ?? request.method;
   const headers = new Headers(init.headers);
+
+  // Forward client IP so the backend can rate-limit per real user
+  const clientIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    request.headers.get("cf-connecting-ip");
+  if (clientIp) {
+    headers.set("x-forwarded-for", clientIp);
+    headers.set("x-real-ip", clientIp);
+  }
 
   const contentType = request.headers.get("content-type");
   if (contentType && !headers.has("content-type")) {

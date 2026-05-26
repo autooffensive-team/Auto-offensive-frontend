@@ -288,6 +288,8 @@ export default function ScanPage() {
     closeLockModal,
     lockedFeature,
     handleLockedFeature,
+    refreshSession,
+    updateRateLimitDirect,
   } = useGuestScanGuard();
 
   // If guest tries to access advanced mode, allow it (uses guest API endpoints)
@@ -335,7 +337,10 @@ export default function ScanPage() {
     updateMediumOption,
     addMediumStep,
     removeMediumStep,
-  } = useScanController(isGuest ? "guest-advanced-scan" : initialProjectId, { guestMode: isGuest });
+  } = useScanController(isGuest ? "guest-advanced-scan" : initialProjectId, {
+    guestMode: isGuest,
+    onGuestScanConsumed: updateRateLimitDirect,
+  });
 
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;

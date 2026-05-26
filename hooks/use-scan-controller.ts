@@ -61,8 +61,9 @@ type RunSetter = React.Dispatch<React.SetStateAction<ActiveRun>>;
 type LogsSetter = React.Dispatch<React.SetStateAction<LogLine[]>>;
 type ErrorsSetter = React.Dispatch<React.SetStateAction<string[]>>;
 
-export function useScanController(initialProjectId?: string, options?: { guestMode?: boolean }) {
+export function useScanController(initialProjectId?: string, options?: { guestMode?: boolean; onGuestScanConsumed?: (rateLimitInfo: { limit?: number; remaining?: number; reset?: number }) => void }) {
   const guestMode = options?.guestMode ?? false;
+  const onGuestScanConsumed = options?.onGuestScanConsumed;
   const [projects, setProjects] = useState<Project[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
   const [projectId, setProjectId] = useState(initialProjectId || "");
@@ -523,6 +524,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           // Handle 429 rate limit from backend
           if (response.status === 429) {
             let errorMsg = "Anonymous scan quota exceeded.";
+            const rlLimit = response.headers.get("x-ratelimit-limit");
+            const rlRemaining = response.headers.get("x-ratelimit-remaining");
+            const rlReset = response.headers.get("x-ratelimit-reset");
             try {
               const body = await response.json();
               if (body?.detail?.error) {
@@ -536,13 +540,16 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
                 errorMsg += ` Resets at: ${resetDate.toLocaleString()}.`;
               }
             } catch {
-              const limit = response.headers.get("x-ratelimit-limit");
-              const remaining = response.headers.get("x-ratelimit-remaining");
-              if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+              if (rlLimit) errorMsg += ` Limit: ${rlLimit}, remaining: ${rlRemaining ?? 0}.`;
             }
             toast.error(errorMsg);
             appendErrorForMode("basic", errorMsg);
             setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
+            onGuestScanConsumed?.({
+              limit: rlLimit ? Number(rlLimit) : undefined,
+              remaining: rlRemaining ? Number(rlRemaining) : 0,
+              reset: rlReset ? Number(rlReset) : undefined,
+            });
             setIsSubmitting(false);
             return;
           }
@@ -561,6 +568,18 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           const errorText = await response.text();
           throw new Error(errorText || "Basic scan failed to start.");
         }
+
+        // Extract rate-limit headers from the successful response
+        const rlLimitOk = response.headers.get("x-ratelimit-limit");
+        const rlRemainingOk = response.headers.get("x-ratelimit-remaining");
+        const rlResetOk = response.headers.get("x-ratelimit-reset");
+
+        // Update guest quota: use headers if available, otherwise optimistic decrement
+        onGuestScanConsumed?.({
+          limit: rlLimitOk ? Number(rlLimitOk) : undefined,
+          remaining: rlRemainingOk ? Number(rlRemainingOk) : undefined,
+          reset: rlResetOk ? Number(rlResetOk) : undefined,
+        });
 
         // The response is an SSE stream — consume it
         if (response.body) {
@@ -706,6 +725,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
     basicPreset,
     basicTarget,
     guestMode,
+    onGuestScanConsumed,
     projectId,
     resetRun,
     selectedBasicTool,
@@ -959,9 +979,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           if (!response.ok) {
             // Handle 429 rate limit from backend
             if (response.status === 429) {
-              const limit = response.headers.get("x-ratelimit-limit");
-              const remaining = response.headers.get("x-ratelimit-remaining");
-              const resetAt = response.headers.get("x-ratelimit-reset");
+              const rlLimit = response.headers.get("x-ratelimit-limit");
+              const rlRemaining = response.headers.get("x-ratelimit-remaining");
+              const rlReset = response.headers.get("x-ratelimit-reset");
               let errorMsg = "Anonymous scan quota exceeded.";
               try {
                 const body = await response.json();
@@ -976,11 +996,16 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
                   errorMsg += ` Resets at: ${resetDate.toLocaleString()}.`;
                 }
               } catch {
-                if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+                if (rlLimit) errorMsg += ` Limit: ${rlLimit}, remaining: ${rlRemaining ?? 0}.`;
               }
               toast.error(errorMsg);
               appendErrorForMode("advanced", errorMsg);
               setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));
+              onGuestScanConsumed?.({
+                limit: rlLimit ? Number(rlLimit) : undefined,
+                remaining: rlRemaining ? Number(rlRemaining) : 0,
+                reset: rlReset ? Number(rlReset) : undefined,
+              });
               setIsSubmitting(false);
               return;
             }
@@ -1000,6 +1025,18 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             const errorText = await response.text();
             throw new Error(errorText || "Advanced scan failed to start.");
           }
+
+          // Extract rate-limit headers from the successful response
+          const rlLimitOk = response.headers.get("x-ratelimit-limit");
+          const rlRemainingOk = response.headers.get("x-ratelimit-remaining");
+          const rlResetOk = response.headers.get("x-ratelimit-reset");
+
+          // Update guest quota: use headers if available, otherwise optimistic decrement
+          onGuestScanConsumed?.({
+            limit: rlLimitOk ? Number(rlLimitOk) : undefined,
+            remaining: rlRemainingOk ? Number(rlRemainingOk) : undefined,
+            reset: rlResetOk ? Number(rlResetOk) : undefined,
+          });
 
           // The response is an SSE stream — consume it
           if (response.body) {
@@ -1147,7 +1184,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         setIsSubmitting(false);
       }
     },
-    [appendErrorForMode, appendLogForMode, fetchGuestParsedData, guestMode, openGuestStepStream, projectId, resetRun, setRunForMode, tools, watchJob],
+    [appendErrorForMode, appendLogForMode, fetchGuestParsedData, guestMode, onGuestScanConsumed, openGuestStepStream, projectId, resetRun, setRunForMode, tools, watchJob],
   );
 
   // ---------------------------------------------------------------------------
