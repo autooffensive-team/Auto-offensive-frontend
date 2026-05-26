@@ -232,9 +232,12 @@ function DependencySeverityDistribution({
 function collectDependencyToolOptions(
   items: DependencyResponse[]
 ): FilterOption[] {
+  const hiddenTools = ["npm_audit", "npm-audit"];
   const tools = Array.from(
     new Set(items.map((item) => item.tool).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b));
+  )
+    .filter((tool) => !hiddenTools.includes(tool.toLowerCase()))
+    .sort((a, b) => a.localeCompare(b));
   return [
     { label: "All checkers", value: "" },
     ...tools.map((tool) => ({ label: formatLabel(tool), value: tool })),
@@ -303,12 +306,16 @@ function DependencyList({
                   >
                     {dependency.severity || "UNKNOWN"}
                   </span>
-                  <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
-                    {formatLabel(dependency.tool)}
-                  </span>
-                  <span className="rounded-lg bg-sky-50 px-2.5 py-1 text-xs text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
-                    {formatLabel(dependency.language)}
-                  </span>
+                  {dependency.tool && !["npm_audit", "npm-audit"].includes(dependency.tool.toLowerCase()) && (
+                    <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
+                      {formatLabel(dependency.tool)}
+                    </span>
+                  )}
+                  {dependency.language && !["node", "nodejs"].includes(dependency.language.toLowerCase()) && (
+                    <span className="rounded-lg bg-sky-50 px-2.5 py-1 text-xs text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
+                      {formatLabel(dependency.language)}
+                    </span>
+                  )}
                   {dependency.is_vulnerable ? (
                     <span className="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-300">
                       Vulnerable

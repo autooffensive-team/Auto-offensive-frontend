@@ -22,7 +22,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import { useListCurrentUserScanIdsQuery } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import { CodeScanTour, CodeScanTourTriggerButton } from "@/components/tour/CodeScanTour";
-import type { ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
+import type { ScanStatus, ScanStatusResponse, ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -285,11 +285,13 @@ function ScanProjectCard({
   index,
   seenProjects,
   onOpen,
+  status,
 }: {
   project: ScanProjectSummary;
   index: number;
   seenProjects: Set<string>;
   onOpen: (projectKey: string) => void;
+  status?: ScanStatus | null;
 }) {
   const provider = getProviderFromKey(project.projectKey);
   const href = buildCodeScanningProjectHref(project.projectKey);
@@ -354,10 +356,24 @@ function ScanProjectCard({
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-[7px]">
-            <span className="inline-flex items-center gap-1 rounded-full border border-[#00d0b2] px-2 py-[3px] text-[10px] font-medium text-[#01509e] sm:gap-[5px] sm:px-[10px] sm:py-[4px] sm:text-[12px] dark:text-[#00d0b2]">
-              <span className="inline-block h-[5px] w-[5px] rounded-full bg-[#00d0b2] sm:h-[6px] sm:w-[6px]" />
-              Active
-            </span>
+            {(() => {
+              const statusLabel = status
+                ? status.toLowerCase().split("_").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" ")
+                : "Active";
+              const isSuccess = status === "SUCCESS";
+              const isFailed = status === "FAILED";
+              const isRunning = status === "PENDING" || status === "IN_PROGRESS";
+              const borderColor = isFailed ? "#ef4444" : isRunning ? "#f59e0b" : "#00d0b2";
+              const dotColor = isFailed ? "#ef4444" : isRunning ? "#f59e0b" : "#00d0b2";
+              const textColor = isFailed ? "text-red-600 dark:text-red-400" : isRunning ? "text-amber-600 dark:text-amber-400" : "text-[#01509e] dark:text-[#00d0b2]";
+
+              return (
+                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-[3px] text-[10px] font-medium sm:gap-[5px] sm:px-[10px] sm:py-[4px] sm:text-[12px] ${textColor}`} style={{ borderColor }}>
+                  <span className="inline-block h-[5px] w-[5px] rounded-full sm:h-[6px] sm:w-[6px]" style={{ backgroundColor: dotColor }} />
+                  {statusLabel}
+                </span>
+              );
+            })()}
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -404,7 +420,7 @@ function ScanProjectCard({
               onOpen(project.projectKey);
               window.location.href = href;
             }}
-            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-[#01509e] px-3 py-[6px] text-[11px] font-medium text-white transition-colors hover:bg-[#00d0b2] active:scale-[0.98] sm:gap-[6px] sm:px-4 sm:py-[7px] sm:text-[13px]"
+            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-[#01509e] px-3 py-[6px] text-[11px] font-medium text-white transition-colors hover:bg-[#00d0b2] hover:text-black active:scale-[0.98] sm:gap-[6px] sm:px-4 sm:py-[7px] sm:text-[13px]"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[14px] sm:w-[14px]" aria-hidden="true">
               <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
@@ -430,6 +446,7 @@ export default function CodeScanningPageClient() {
     isLoading: false,
     totalIssues: 0,
   });
+  const [projectStatuses, setProjectStatuses] = useState<Map<string, ScanStatus>>(new Map());
 
   const {
     data: scanRefsResponse,
@@ -549,6 +566,55 @@ export default function CodeScanningPageClient() {
           totalIssues: 0,
         });
       });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [scanProjects, latestProjectScanIds]);
+
+  // Fetch scan status for each project's latest scan
+  useEffect(() => {
+    if (scanProjects.length === 0) {
+      setProjectStatuses(new Map());
+      return;
+    }
+
+    const controller = new AbortController();
+    let isActive = true;
+
+    void Promise.all(
+      scanProjects.map(async (project) => {
+        const scanId = latestProjectScanIds.get(project.projectKey);
+        if (!scanId) return { projectKey: project.projectKey, status: null };
+
+        try {
+          const response = await fetch(`/api/scanner/scans/${encodeURIComponent(scanId)}/status`, {
+            credentials: "include",
+            signal: controller.signal,
+            cache: "no-store",
+          });
+
+          if (!response.ok) return { projectKey: project.projectKey, status: null };
+
+          const data = (await response.json()) as ScanStatusResponse;
+          return { projectKey: project.projectKey, status: data.status };
+        } catch {
+          return { projectKey: project.projectKey, status: null };
+        }
+      }),
+    ).then((results) => {
+      if (!isActive) return;
+      const statusMap = new Map<string, ScanStatus>();
+      for (const result of results) {
+        if (result.status) {
+          statusMap.set(result.projectKey, result.status);
+        }
+      }
+      setProjectStatuses(statusMap);
+    }).catch(() => {
+      // silently ignore
+    });
 
     return () => {
       isActive = false;
@@ -736,6 +802,7 @@ export default function CodeScanningPageClient() {
                 index={index}
                 seenProjects={seenProjects}
                 onOpen={handleProjectOpen}
+                status={projectStatuses.get(project.projectKey)}
               />
             ))}
           </AnimatePresence>
