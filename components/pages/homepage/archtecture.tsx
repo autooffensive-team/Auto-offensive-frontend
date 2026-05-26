@@ -320,13 +320,13 @@ export function Architecture() {
         </motion.div>
 
         <div className="relative mx-auto w-full max-w-295">
-          <div className="h-56.25 sm:h-75 md:h-107.5 lg:h-140 xl:h-170">
+          <div className="h-62.5 sm:h-80 md:h-107.5 lg:h-140 xl:h-170">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.55 }}
-              className="absolute left-1/2 top-0 h-170 w-275 origin-top -translate-x-1/2 scale-[0.31] overflow-hidden rounded-[34px] border border-[rgba(0,208,178,0.14)] bg-[linear-gradient(135deg,rgba(0,208,178,0.05),rgba(247,245,240,0.98)_36%,rgba(1,80,158,0.06))] backdrop-blur-md sm:scale-[0.43] md:scale-[0.63] lg:scale-[0.82] xl:scale-100 dark:border-[rgba(255,255,255,0.08)] dark:bg-[linear-gradient(135deg,rgba(0,208,178,0.08),rgba(9,9,11,0.98)_36%,rgba(1,80,158,0.12))]"
+              className="absolute left-1/2 top-0 h-170 w-275 origin-top -translate-x-1/2 scale-[0.36] overflow-hidden rounded-[34px] border border-[rgba(0,208,178,0.14)] bg-[linear-gradient(135deg,rgba(0,208,178,0.05),rgba(247,245,240,0.98)_36%,rgba(1,80,158,0.06))] backdrop-blur-md sm:scale-[0.46] md:scale-[0.63] lg:scale-[0.82] xl:scale-100 dark:border-[rgba(255,255,255,0.08)] dark:bg-[linear-gradient(135deg,rgba(0,208,178,0.08),rgba(9,9,11,0.98)_36%,rgba(1,80,158,0.12))]"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.08),transparent_30%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.14),transparent_32%)]" />
               <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[rgba(0,208,178,0.35)] to-transparent" />
