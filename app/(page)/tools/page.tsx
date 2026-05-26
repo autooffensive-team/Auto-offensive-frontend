@@ -754,7 +754,7 @@ export default function ToolsPage() {
   const descriptionTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const subtitleTextClass = 'text-[16px] md:text-[17px] lg:text-[18px]';
 
-  const heroTitle = 'Security tools in one live catalog';
+  const heroTitle = (<><span className="text-[#01509e] dark:text-[#4fa3e5]">Security tools</span> in one live catalog</>);
 
   const heroSubtitle = useMemo(() => {
     if (tools.length === 0) {
@@ -802,7 +802,7 @@ export default function ToolsPage() {
           style={{ zIndex: 10 }}
         >
           <div className="flex w-full max-w-4xl flex-col items-center gap-5 text-center">
-            <h1 className="text-3xl sm:text-4xl font-display lg:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
+            <h1 className="text-[clamp(2rem,7vw,80px)] font-display font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
               {heroTitle}
             </h1>
             <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-lg ${descriptionTextClass} leading-relaxed`}>

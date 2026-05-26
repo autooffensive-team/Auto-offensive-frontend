@@ -307,7 +307,7 @@ export function Architecture() {
             className="text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-slate-900 dark:text-white md:text-[3rem] lg:text-[3.7rem]"
             style={{ fontFamily: displayFontFamily }}
           >
-            {copy.titleLine1}
+            <span className="text-[#01509e] dark:text-[#4fa3e5]">{copy.titleLine1}</span>
             <br />
             {copy.titleLine2}
           </h2>
