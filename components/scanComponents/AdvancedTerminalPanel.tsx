@@ -79,7 +79,7 @@ export function AdvancedTerminalPanel({
           magenta: "#c084fc",
           cyan: "#2dd4bf",
           white: "#e2e8f0",
-          brightBlack: "#475569",
+          brightBlack: "#94a3b8",  // was #475569 (slate-600) — now slate-400, readable on dark bg
           brightCyan: "#5eead4",
         }
         : {
@@ -88,16 +88,16 @@ export function AdvancedTerminalPanel({
           cursor: "#0f766e",
           cursorAccent: "#f8fafc",
           selectionBackground: "#bfdbfe",
-          black: "#334155",
-          red: "#dc2626",
-          green: "#15803d",
-          yellow: "#ca8a04",
-          blue: "#2563eb",
-          magenta: "#9333ea",
-          cyan: "#0f766e",
-          white: "#e2e8f0",
-          brightBlack: "#64748b",
-          brightCyan: "#0d9488",
+          black: "#1e293b",       // was #334155 — darker for better contrast
+          red: "#b91c1c",         // was #dc2626 — slightly deeper red
+          green: "#166534",       // was #15803d — deeper green
+          yellow: "#92400e",      // was #ca8a04 — amber-800, much more readable
+          blue: "#1d4ed8",        // was #2563eb — slightly deeper blue
+          magenta: "#7e22ce",     // was #9333ea — deeper purple
+          cyan: "#0f766e",        // was #0f766e — teal-700, unchanged (good)
+          white: "#334155",       // was #e2e8f0 — slate-700 so "white" text is dark
+          brightBlack: "#475569", // was #64748b — slate-600, much more readable on light bg
+          brightCyan: "#0d9488",  // was #0d9488 — unchanged (good)
         },
     [resolvedTheme],
   );
