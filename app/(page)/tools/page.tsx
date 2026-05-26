@@ -363,8 +363,8 @@ const CategoryStatBar = memo(function CategoryStatBar({
 function LoadingSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 animate-pulse">
             <div className="flex items-start justify-between">
               <div className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-white/5" />
@@ -614,7 +614,7 @@ const CategorySection = memo(function CategorySection({
 
       {/* Tool cards grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }} variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }} variants={listMotion} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {categoryTools.map((tool) => (
             <ToolCard
               key={tool.tool_id}
