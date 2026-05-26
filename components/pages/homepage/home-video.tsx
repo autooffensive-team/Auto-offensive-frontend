@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 interface VideoThumbnailPlayerProps {
@@ -54,6 +54,12 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
 }) => {
   const youtubeEmbedUrl = useMemo(() => getYouTubeEmbedUrl(videoUrl), [videoUrl]);
   const isYoutube = Boolean(youtubeEmbedUrl);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  function handlePlay() {
+    setIsPlaying(true);
+    onPlay?.();
+  }
 
   return (
     <section className={`w-full bg-[#F7F5F0] px-4 py-16 dark:bg-[#09090B] sm:px-6 lg:px-8 ${className}`}>
@@ -62,21 +68,50 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
           className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] bg-[#111214]"
         >
           <div className="relative aspect-video w-full">
-            {isYoutube ? (
-              <iframe
-                src={youtubeEmbedUrl ?? undefined}
-                title={title}
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
+            {isPlaying ? (
+              isYoutube ? (
+                <iframe
+                  src={youtubeEmbedUrl ?? undefined}
+                  title={title}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={videoUrl}
+                  className="h-full w-full object-cover"
+                  controls
+                  autoPlay
+                  playsInline
+                />
+              )
             ) : (
-              <video
-                src={videoUrl}
-                className="h-full w-full object-cover"
-                controls
-                playsInline
-              />
+              <button
+                type="button"
+                onClick={handlePlay}
+                className="group relative h-full w-full cursor-pointer border-none bg-transparent p-0"
+                aria-label={playLabel || 'Play video'}
+              >
+                <img
+                  src={thumbnailUrl}
+                  alt={title}
+                  className="h-full w-full object-cover"
+                />
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform group-hover:scale-110 sm:h-20 sm:w-20">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="#111214"
+                      className="ml-1 h-7 w-7 sm:h-8 sm:w-8"
+                      aria-hidden="true"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </button>
             )}
           </div>
         </div>

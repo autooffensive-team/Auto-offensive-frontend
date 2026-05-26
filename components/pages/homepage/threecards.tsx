@@ -385,9 +385,11 @@ const ThreeCards: React.FC = () => {
 
   const handleStartNow = (scanMode: "basic" | "medium" | "advanced") => {
     if (session && sessionHealthy !== false) {
+      // Logged-in user → go to userdashboard scan page
       router.push(`/userdashboard/scan?mode=${scanMode}`);
     } else {
-      router.push(`/login?callbackUrl=${encodeURIComponent(`/userdashboard/scan?mode=${scanMode}`)}`);
+      // Not logged in → start guest session with free 3 trial scans
+      window.location.href = "/api/guest/start";
     }
   };
 
