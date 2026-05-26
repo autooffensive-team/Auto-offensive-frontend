@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import HolographicPlanetLazy from "./holographic-planet-lazy";
+import FocusWord from "@/components/ui/focus-word";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -101,11 +102,6 @@ const RIGHT_HEXES: HexDef[] = [
 
 // ─── Animation timing ────────────────────────────────────────────────
 const SPEEDS = {
-  CORNER_POP_UP:       0.15,
-  CORNER_SPREAD:       0.05,
-  CORNER_SPREAD_DELAY: 0.45,
-  TEXT_POP_IN:         0.5,
-  TEXT_POP_IN_DELAY:   0.65,
   INITIAL_DELAY:       0.55,
 };
 
@@ -271,122 +267,6 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
   };
 }
 
-// ─── Focus word corners ───────────────────────────────────────────────
-// Spread values match original CSS --focus-bracket-shift-x/y (8px / 6px)
-// We animate the whole SVG element (not the inner path) so the bracket
-// visually moves away from center — identical to the CSS version.
-const CORNER_SPREAD: Record<"tl"|"tr"|"bl"|"br", { x:number; y:number }> = {
-  tl: { x:-8, y:-6 },
-  tr: { x: 8, y:-6 },
-  bl: { x:-8, y: 6 },
-  br: { x: 8, y: 6 },
-};
-
-const CORNER_ANCHOR: Record<"tl"|"tr"|"bl"|"br", string> = {
-  tl: "top-[-0.01em] left-[-0.05em]",
-  tr: "top-[-0.01em] right-[-0.05em]",
-  bl: "bottom-[0.01em] left-[-0.05em]",
-  br: "bottom-[0.01em] right-[-0.05em]",
-};
-
-// Total keyframe timeline: popUp → hold → spread
-// t0=0  t1=popUpEnd  t2=spreadStart  t3=1
-const POP_T   = SPEEDS.CORNER_POP_UP;
-const HOLD_T  = SPEEDS.CORNER_SPREAD_DELAY;
-const SPREAD_T = 0.1;
-const TOTAL_T  = POP_T + HOLD_T + SPREAD_T;
-
-const KF_TIMES = [0, POP_T / TOTAL_T, (POP_T + HOLD_T) / TOTAL_T, 1];
-
-function CornerBracket({
-  pos,
-  svgPath,
-  startAnimation,
-}: {
-  pos: "tl"|"tr"|"bl"|"br";
-  svgPath: string;
-  startAnimation: boolean;
-}) {
-  const sp = CORNER_SPREAD[pos];
-
-  return (
-    <motion.svg
-      className={`absolute w-[0.5em] h-[0.5em] text-[#6346FF] z-10 overflow-visible
-        md:w-[0.58em] md:h-[0.58em] lg:w-[0.62em] lg:h-[0.62em] ${CORNER_ANCHOR[pos]}`}
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
-      style={{ filter:"drop-shadow(0 0 5px rgba(99,70,255,0.35))" }}
-      // Framer Motion props — animate the SVG element itself
-      initial={{ opacity:0, scale:0.72, y:8, x:0 }}
-      animate={
-        startAnimation
-          ? {
-              // 4-keyframe sequence: hidden → pop in → hold → spread
-              opacity: [0,    1,    1,    1   ],
-              scale:   [0.72, 1,    1,    1   ],
-              y:       [8,    0,    0,    sp.y],
-              x:       [0,    0,    0,    sp.x],
-            }
-          : { opacity:0, scale:0.72, y:8, x:0 }
-      }
-      transition={{
-        duration: TOTAL_T,
-        times:    KF_TIMES,
-        ease:     "easeOut",
-      }}
-    >
-      <path d={svgPath} />
-    </motion.svg>
-  );
-}
-
-function FocusWord({
-  children,
-  startAnimation,
-}: {
-  children: string;
-  startAnimation: boolean;
-}) {
-  return (
-    <span
-      className="
-        relative inline-grid items-center justify-center
-        mx-[0.16em] px-[0.08em] pt-[0.01em] pb-[0.03em]
-        isolate gap-0 leading-none w-max align-baseline
-        md:mx-[0.18em] md:px-[0.1em] md:pt-[0.02em] md:pb-[0.04em]
-        lg:px-[0.12em] lg:pt-[0.03em] lg:pb-[0.05em]
-      "
-    >
-      <CornerBracket pos="tl" svgPath="M2 10V2H10"   startAnimation={startAnimation} />
-      <CornerBracket pos="tr" svgPath="M10 2H18V10"  startAnimation={startAnimation} />
-      <CornerBracket pos="bl" svgPath="M2 10V18H10"  startAnimation={startAnimation} />
-      <CornerBracket pos="br" svgPath="M10 18H18V10" startAnimation={startAnimation} />
-
-      <motion.span
-        className="relative z-1 text-primary font-bold tracking-[-0.04em] whitespace-nowrap leading-[0.92]"
-        initial={{ opacity:0, y:8, scale:0.96 }}
-        animate={
-          startAnimation
-            ? { opacity:1, y:0, scale:1 }
-            : { opacity:0, y:8, scale:0.96 }
-        }
-        transition={{
-          duration: SPEEDS.TEXT_POP_IN,
-          delay:    SPEEDS.TEXT_POP_IN_DELAY,
-          ease:     [0.22, 1, 0.36, 1],
-        }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
 // ─── Main hero component ─────────────────────────────────────────────
 export default function HomeHero() {
   const t       = useTranslations("homepage.hero");
@@ -409,16 +289,20 @@ export default function HomeHero() {
     const cleanupHexLeft = setupMagneticHover(hexLeftRef.current);
     const cleanupHexRight = setupMagneticHover(hexRightRef.current);
 
-    if (s1Ref.current) s1Ref.current.style.boxShadow = generateStars(700, [
+    // Reduce star count on mobile for better paint performance
+    const isMobile = window.innerWidth < 768;
+    const starMultiplier = isMobile ? 0.4 : 1;
+
+    if (s1Ref.current) s1Ref.current.style.boxShadow = generateStars(Math.round(700 * starMultiplier), [
       "rgba(0,208,178,0.55)", "rgba(0,208,178,0.35)",
       "rgba(55,65,81,0.45)",  "rgba(55,65,81,0.3)",
       "rgba(107,114,128,0.4)",
     ]);
-    if (s2Ref.current) s2Ref.current.style.boxShadow = generateStars(200, [
+    if (s2Ref.current) s2Ref.current.style.boxShadow = generateStars(Math.round(200 * starMultiplier), [
       "rgba(55,65,81,0.55)", "rgba(55,65,81,0.4)",
       "rgba(0,208,178,0.6)", "rgba(107,114,128,0.45)",
     ]);
-    if (s3Ref.current) s3Ref.current.style.boxShadow = generateStars(100, [
+    if (s3Ref.current) s3Ref.current.style.boxShadow = generateStars(Math.round(100 * starMultiplier), [
       "rgba(0,208,178,0.9)", "rgba(0,208,178,0.7)",
       "rgba(0,208,178,0.5)", "rgba(55,65,81,0.7)",
     ]);
@@ -850,9 +734,11 @@ export default function HomeHero() {
           " />
         </div>
 
-        {/* ── Hex grids ── */}
-        <HexGrid hexes={LEFT_HEXES}  svgRef={hexLeftRef}  className="hex-grid-left" />
-        <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
+        {/* ── Hex grids (hidden on mobile for performance) ── */}
+        <div className="hidden md:block">
+          <HexGrid hexes={LEFT_HEXES}  svgRef={hexLeftRef}  className="hex-grid-left" />
+          <HexGrid hexes={RIGHT_HEXES} svgRef={hexRightRef} className="hex-grid-right" />
+        </div>
 
         {/* ── Main content ── */}
         <div className="relative z-10 flex flex-col items-center max-w-260 w-full">

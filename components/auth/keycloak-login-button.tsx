@@ -66,7 +66,7 @@ export default function KeycloakLoginButton({
             void startLogin();
           }}
           disabled={pending}
-          className="w-full rounded-xl"
+          className="w-full rounded-xl py-6 text-base text-black dark:text-black"
         >
           {pending ? "Redirecting..." : "Continue to login"}
         </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as d3 from "d3";
+import { geoOrthographic, geoPath, geoGraticule, geoBounds } from "d3-geo";
 
 export default function HolographicPlanet() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,14 +39,13 @@ export default function HolographicPlanet() {
     const radius = Math.min(containerWidth, containerHeight) / 2.5;
 
     // ─── D3 projection ─────────────────────────────────────────
-    const projection = d3
-      .geoOrthographic()
+    const projection = geoOrthographic()
       .scale(radius)
       .translate([containerWidth / 2, containerHeight / 2])
       .clipAngle(90);
 
-    const path = d3.geoPath().projection(projection).context(ctx);
-    const graticule = d3.geoGraticule();
+    const path = geoPath().projection(projection).context(ctx);
+    const graticule = geoGraticule();
 
     // ─── State ─────────────────────────────────────────────────
     let landFeatures: any = null;
@@ -59,10 +58,10 @@ export default function HolographicPlanet() {
     let introStart = 0;
     let introActive = false;
 
-    // Delay planet appearance until after sweep comet finishes (~2.1s)
-    const PLANET_DELAY = 1800;
-    const PLANET_FADE_DURATION = 500;
-    const PLANET_INTRO_DURATION = 1050;
+    // Delay planet appearance - show shortly after comets start sweeping
+    const PLANET_DELAY = 1200;
+    const PLANET_FADE_DURATION = 250;
+    const PLANET_INTRO_DURATION = 600;
     const PLANET_START_SCALE = 0.42;
     const PLANET_SPIN_DEGREES = 360;
     let planetFadeStart = 0;
@@ -121,7 +120,7 @@ export default function HolographicPlanet() {
       const dots: [number, number][] = [];
       const spacing = DOT_SPACING;
       features.features.forEach((feature: any) => {
-        const bounds = d3.geoBounds(feature);
+        const bounds = geoBounds(feature);
         const [[minLng, minLat], [maxLng, maxLat]] = bounds;
         for (let lng = minLng; lng <= maxLng; lng += spacing) {
           for (let lat = minLat; lat <= maxLat; lat += spacing) {
@@ -136,21 +135,22 @@ export default function HolographicPlanet() {
     };
 
     // ─── Render frame ──────────────────────────────────────────
-    // Cache theme to avoid DOM reads every frame
+    // Watch theme changes via MutationObserver (instant, no polling)
     let cachedDark = isDark();
-    let themeCheckCounter = 0;
+
+    const themeObserver = new MutationObserver(() => {
+      cachedDark = isDark();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     const render = () => {
       ctx.clearRect(0, 0, containerWidth, containerHeight);
 
       // Don't render until planet is visible
       if (!planetVisible) return;
-
-      // Only check theme every 60 frames to avoid forced reflows
-      if (++themeCheckCounter >= 60) {
-        themeCheckCounter = 0;
-        cachedDark = isDark();
-      }
 
       const dark = cachedDark;
       const lineColor = dark ? "#00ffdd" : "#01509e";
@@ -392,6 +392,7 @@ export default function HolographicPlanet() {
       cancelAnimationFrame(animId);
       clearTimeout(planetDelayTimer);
       clearTimeout(resizeTimeout);
+      themeObserver.disconnect();
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("visibilitychange", handleVisibility);

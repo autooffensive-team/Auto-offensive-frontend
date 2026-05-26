@@ -116,6 +116,7 @@ export default function UserDashboardShell({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [lockedFeatureName, setLockedFeatureName] = useState("");
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const profileRef = useRef<HTMLDivElement>(null);
@@ -149,7 +150,12 @@ export default function UserDashboardShell({
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     closeOverlays();
+    setLogoutConfirmOpen(false);
     window.location.replace("/logout");
+  };
+
+  const handleLogoutClick = () => {
+    setLogoutConfirmOpen(true);
   };
 
   const handleLockedClick = (label: string) => {
@@ -170,6 +176,7 @@ export default function UserDashboardShell({
         setMobileMenuOpen(false);
         setProfileOpen(false);
         setLockModalOpen(false);
+        setLogoutConfirmOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -395,6 +402,26 @@ export default function UserDashboardShell({
                 </li>
               );
             })}
+
+            {/* Logout button in sidebar */}
+            {!isGuest && (
+              <li>
+                <button
+                  type="button"
+                  onClick={handleLogoutClick}
+                  disabled={isLoggingOut}
+                  title={collapsed ? "Logout" : undefined}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-rose-600 hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10`}
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-rose-200 text-rose-500 dark:border-rose-800 dark:text-rose-400">
+                    <LogOut size={16} strokeWidth={1.8} />
+                  </div>
+                  <span className={`font-medium ${collapsed ? "md:hidden" : ""}`}>
+                    {isLoggingOut ? "Signing out..." : "Logout"}
+                  </span>
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
 
@@ -543,7 +570,7 @@ export default function UserDashboardShell({
                           ))}
                           <button
                             type="button"
-                            onClick={handleLogout}
+                            onClick={handleLogoutClick}
                             disabled={isLoggingOut}
                             className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10"
                           >
@@ -576,6 +603,56 @@ export default function UserDashboardShell({
           featureName={lockedFeatureName}
         />
       )}
+
+      {/* Logout confirmation modal */}
+      <AnimatePresence>
+        {logoutConfirmOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setLogoutConfirmOpen(false)}
+              className="fixed inset-0 z-[60] bg-slate-950/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 z-[61] flex items-center justify-center p-4"
+            >
+              <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-500/10">
+                  <LogOut className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Are you sure you want to logout?
+                </h3>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                  You will be signed out of your account and redirected to the homepage.
+                </p>
+                <div className="mt-6 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setLogoutConfirmOpen(false)}
+                    className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex-1 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-rose-700 disabled:opacity-70 dark:bg-rose-600 dark:hover:bg-rose-700"
+                  >
+                    {isLoggingOut ? "Signing out..." : "Yes, logout"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <GoToTop />
     </div>

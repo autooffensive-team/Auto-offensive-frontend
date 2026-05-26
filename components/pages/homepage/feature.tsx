@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import FocusWord from "@/components/ui/focus-word";
 
 // ─── CUSTOMIZATION CONSTANTS ──────────────────────────────────────────────────
 const CONFIG = {
@@ -858,6 +859,7 @@ export default function Features() {
   const [spineClip, setSpineClip] = useState("inset(9999px 0 0 0)");
   const [visibleCards, setVisibleCards] = useState<boolean[]>(cards.map(() => false));
   const [logoVisible, setLogoVisible] = useState(false);
+  const [titleFocusStarted, setTitleFocusStarted] = useState(false);
 
   const colors = useTheme();
   const isDark = colors === CONFIG.DARK;
@@ -869,6 +871,23 @@ export default function Features() {
   const lastCardRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const featureSectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+
+  // ─── Title focus animation trigger (when section header enters viewport) ──
+  useEffect(() => {
+    if (!titleRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTitleFocusStarted(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(titleRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   // ─── Scroll: progress bar + spine fill + spine clip ───────────────────────
   useEffect(() => {
@@ -1056,6 +1075,7 @@ export default function Features() {
           }}
         >
           <h2
+            ref={titleRef}
             className="font-bold leading-[1.1]"
             style={{
               fontFamily: displayFontFamily,
@@ -1070,20 +1090,10 @@ export default function Features() {
                 <>
                   {sectionTitlePrefix}
                   {sectionTitlePrefix ? " " : ""}
-                  <span
-                    style={{
-                      color: colors.accent2,
-                    }}
-                  >
-                    Auto
-                  </span>{" "}
-                  <span
-                    style={{
-                      color: colors.accent1,
-                    }}
-                  >
-                    Offensive
-                  </span>
+                  <FocusWord startAnimation={titleFocusStarted}>
+                    <span style={{ color: colors.accent2 }}>Auto</span>{" "}
+                    <span style={{ color: colors.accent1 }}>Offensive</span>
+                  </FocusWord>
                 </>
               ) : (
                 <span style={{ color: colors.accent2 }}>{sectionTitleLine2}</span>

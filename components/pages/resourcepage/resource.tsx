@@ -1,9 +1,8 @@
 'use client'
 
-import { FileText, Link2, Code2 } from 'lucide-react'
+import { FileText, Link2, Code2, Circle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import { TbPoint } from 'react-icons/tb'
 import AnimatedCta from '../homepage/animated-cta'
 
 export default function ResourceSections() {
@@ -85,7 +84,7 @@ export default function ResourceSections() {
                 <div className="mb-5 space-y-1.5 flex-1">
                   {resource.items.map((item, iIdx) => (
                     <div key={iIdx} className="resource-page-meta flex items-center gap-2 text-foreground/80">
-                      <TbPoint className={resource.iconColor} size={18} />
+                      <Circle className={resource.iconColor} size={8} fill="currentColor" strokeWidth={0} />
                       {item}
                     </div>
                   ))}

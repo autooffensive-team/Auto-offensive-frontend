@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     })
     .catch(() => null);
 
-  const postLogoutRedirectUrl = new URL("/login?manual=1&prompt=login", appUrl);
+  const postLogoutRedirectUrl = new URL("/", appUrl);
   const redirectUrl = tokenResult?.idToken
     ? new URL(`${keycloakIssuer}/protocol/openid-connect/logout`)
     : postLogoutRedirectUrl;
