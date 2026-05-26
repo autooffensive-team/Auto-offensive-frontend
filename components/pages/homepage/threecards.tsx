@@ -5,6 +5,7 @@ import Image, { StaticImageData } from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { useSessionHealth } from "@/hooks/use-session-health";
 import { useTheme } from "@/components/theme-provider";
 import img1 from "@/public/home-image/code1.webp";
 import img2 from "@/public/home-image/code2.webp";
@@ -361,6 +362,7 @@ const ThreeCards: React.FC = () => {
   const locale = useLocale();
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const sessionHealthy = useSessionHealth(!!session);
   const { resolvedTheme } = useTheme();
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -382,7 +384,7 @@ const ThreeCards: React.FC = () => {
   const cards = getCards(t);
 
   const handleStartNow = (scanMode: "basic" | "medium" | "advanced") => {
-    if (session) {
+    if (session && sessionHealthy !== false) {
       router.push(`/userdashboard/scan?mode=${scanMode}`);
     } else {
       router.push(`/login?callbackUrl=${encodeURIComponent(`/userdashboard/scan?mode=${scanMode}`)}`);
