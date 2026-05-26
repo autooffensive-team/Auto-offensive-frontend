@@ -8,6 +8,7 @@ const SOCIAL_LINKS = {
   github: { label: "GitHub", Icon: IconGithub },
   telegram: { label: "Telegram", Icon: IconTelegram },
   linkedin: { label: "LinkedIn", Icon: IconLinkedin },
+  portfolio: { label: "Portfolio", Icon: IconPortfolio },
 };
 
 const MENTORS = [
@@ -25,6 +26,7 @@ const MENTORS = [
       github: "https://github.com/sokpheng001",
       telegram: "https://t.me/sokpheng001",
       linkedin: "https://www.linkedin.com/in/kim-chansokpheng-6b6513267/",
+      portfolio: "#",
     },
   },
   {
@@ -41,20 +43,21 @@ const MENTORS = [
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
       linkedin: "https://www.linkedin.com/in/sreng-chipor-a31346239/",
+      portfolio: "#",
     },
   },
 ];
 
 const TEAM = [
-  { name: "Chheng Panharoth", nameKh: "ឆេង បញ្ញារតន៍", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "/images/panharoth.png", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/" } },
-  { name: "Pech Rathanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/" } },
-  { name: "Kry Sobothty", nameKh: "គ្រី សុបុត្រទី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every very bug\nhas codex.", img: "/images/bohty.png", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/" } },
-  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/" } },
-  { name: "Ey Channim", nameKh: "អ៊ី ចាន់និម", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Practice make perfect", img: "/images/channim.png", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/" } },
-  { name: "Mom Reaksmey", nameKh: "មុំ រស្មី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Cyber safety starts with you", img: "/images/reaksmey.png", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/" } },
-  { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "If it hard\nI work harder.", img: "/images/ratha.png", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/" } },
-  { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Process over perfection", img: "/images/loemheng.png", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/" } },
-  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/" } },
+  { name: "Chheng Panharoth", nameKh: "ឆេង បញ្ញារតន៍", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "/images/panharoth.png", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/", portfolio: "https://portfolio-panharoth.vercel.app" } },
+  { name: "Pech Rathanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/", portfolio: "#" } },
+  { name: "Kry Sobothty", nameKh: "គ្រី សុបុត្រទី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every very bug\nhas codex.", img: "/images/bohty.png", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/", portfolio: "https://www.sobothty.tech/" } },
+  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/", portfolio: "#" } },
+  { name: "Ey Channim", nameKh: "អុី ចាន់នីម", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Practice make perfect", img: "/images/channim.png", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/", portfolio: "https://channim-dev.vercel.app/" } },
+  { name: "Mom Reaksmey", nameKh: "មុំ រស្មី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Cyber safety starts with you", img: "/images/reaksmey.png", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/", portfolio: "#" } },
+  { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "If it hard\nI work harder.", img: "/images/ratha.png", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/", portfolio: "https://h-ratha-portfolio.vercel.app/" } },
+  { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Process over perfection", img: "/images/loemheng.png", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/", portfolio: "https://benloemheng.vercel.app/" } },
+  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/", portfolio: "#" } },
 ];
 
 function IconGithub() {
@@ -79,6 +82,15 @@ function IconLinkedin() {
       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
       <rect x="2" y="9" width="4" height="12" />
       <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function IconPortfolio() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
     </svg>
   );
 }
