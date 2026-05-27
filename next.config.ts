@@ -8,6 +8,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 const docsAppUrl = (process.env.DOCS_APP_URL || 'https://auto-offensive-document.vercel.app').replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
