@@ -139,14 +139,14 @@ export default function ExportConfigPanel({
                 {/* Step scope */}
                 <fieldset>
                     <legend className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Step scope
+                        Table scope
                     </legend>
                     <div className="flex flex-col gap-2">
                         {(
                             [
-                                { value: "all", label: "All steps" },
-                                { value: "last", label: "Last step only" },
-                                { value: "specific", label: "Specific steps" },
+                                { value: "all", label: "All tables" },
+                                { value: "last", label: "Last table only" },
+                                { value: "specific", label: "Specific tables" },
                             ] as { value: StepScope; label: string }[]
                         ).map(({ value, label }) => (
                             <label
@@ -171,7 +171,7 @@ export default function ExportConfigPanel({
                 {stepScope === "specific" && (
                     <fieldset>
                         <legend className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                            Select steps
+                            Select tables
                         </legend>
                         <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto">
                             {steps.map((step) => (

@@ -77,14 +77,14 @@ export function GuestOverview() {
             </h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               You&apos;re using Auto Offensive in guest mode. You have access to Basic,
-              Medium, and Advanced scans with a limit of {guest?.maxScans ?? 3} total scans.
+              Medium, and Advanced scans with a limit of {guest?.maxScans ?? 20} total scans.
               Create a free account to unlock all features.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-white/80 px-4 py-2 text-center dark:bg-black/20">
               <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-                {guest?.scansRemaining ?? 3}
+                {guest?.scansRemaining ?? 20}
               </p>
               <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
                 Scans left

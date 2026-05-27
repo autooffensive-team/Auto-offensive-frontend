@@ -566,6 +566,23 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           }
 
           const errorText = await response.text();
+          // Guard against raw HTML error pages (e.g. Cloudflare gateway errors)
+          // leaking into the UI as unreadable markup.
+          const isHtml = errorText.trimStart().startsWith("<");
+          if (isHtml) {
+            throw new Error(`Scan service error (${response.status}). The backend may be temporarily unavailable.`);
+          }
+          // Try to extract a human-readable message from a JSON error body
+          // (e.g. FastAPI's {"detail": "gRPC request failed"} on 502/504).
+          try {
+            const jsonBody = JSON.parse(errorText);
+            const detail = jsonBody?.detail ?? jsonBody?.error ?? jsonBody?.message;
+            if (detail && typeof detail === "string") {
+              throw new Error(detail);
+            }
+          } catch (parseErr) {
+            if (parseErr instanceof Error && parseErr.message !== errorText) throw parseErr;
+          }
           throw new Error(errorText || "Basic scan failed to start.");
         }
 
@@ -754,10 +771,16 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       })
       .filter((step) => step.tool_id || step.tool_name);
 
-    if (!projectId || !mediumTarget.trim() || !steps.length) {
-      if (!projectId) toast.error("Select a project before starting a scan.");
-      else if (!mediumTarget.trim()) toast.error("Enter a target before starting the scan.");
-      else toast.error("Add at least one pipeline step.");
+    if (!guestMode && !projectId) {
+      toast.error("Select a project before starting a scan.");
+      return;
+    }
+    if (!mediumTarget.trim()) {
+      toast.error("Enter a target before starting the scan.");
+      return;
+    }
+    if (!steps.length) {
+      toast.error("Add at least one pipeline step.");
       return;
     }
 
@@ -765,6 +788,126 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
     setIsSubmitting(true);
     setRunForMode("medium", (current) => ({ ...current, mode: "medium", status: "submitting" }));
 
+    if (guestMode) {
+      // Guest mode: use the anonymous /scans/medium/try endpoint
+      try {
+        const response = await fetch("/api/guest-scan/medium/submit", {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "text/event-stream" },
+          body: JSON.stringify({
+            target_value: mediumTarget.trim(),
+            steps,
+          }),
+        });
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            let errorMsg = "Anonymous scan quota exceeded.";
+            try {
+              const body = await response.json();
+              if (body?.detail?.error) errorMsg = body.detail.error;
+              if (body?.detail?.limit != null) errorMsg += ` Limit: ${body.detail.limit}, remaining: ${body.detail.remaining ?? 0}.`;
+              if (body?.detail?.reset_at) errorMsg += ` Resets at: ${new Date(body.detail.reset_at * 1000).toLocaleString()}.`;
+            } catch {
+              const limit = response.headers.get("x-ratelimit-limit");
+              const remaining = response.headers.get("x-ratelimit-remaining");
+              if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+            }
+            toast.error(errorMsg);
+            appendErrorForMode("medium", errorMsg);
+            setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
+            onQuotaExceededRef.current?.();
+            setIsSubmitting(false);
+            return;
+          }
+          const errorText = await response.text();
+          const isHtml = errorText.trimStart().startsWith("<");
+          if (isHtml) throw new Error(`Scan service error (${response.status}). The backend may be temporarily unavailable.`);
+          try {
+            const jsonBody = JSON.parse(errorText);
+            const detail = jsonBody?.detail ?? jsonBody?.error ?? jsonBody?.message;
+            if (detail && typeof detail === "string") throw new Error(detail);
+          } catch (parseErr) {
+            if (parseErr instanceof Error && parseErr.message !== errorText) throw parseErr;
+          }
+          throw new Error(errorText || "Medium scan failed to start.");
+        }
+
+        // Consume the SSE stream
+        if (response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let resolvedStepId = "";
+
+          setRunForMode("medium", (current) => ({ ...current, status: "JOB_STATUS_RUNNING" }));
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            while (buffer.includes("\n\n")) {
+              const boundary = buffer.indexOf("\n\n");
+              const block = buffer.slice(0, boundary);
+              buffer = buffer.slice(boundary + 2);
+
+              const lines = block.split("\n");
+              let eventName = "message";
+              const dataLines: string[] = [];
+              for (const line of lines) {
+                if (line.startsWith("event:")) eventName = line.slice(6).trim();
+                if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
+              }
+              if (!dataLines.length || eventName === "ping") continue;
+
+              const rawData = dataLines.join("\n");
+              let payload: unknown = rawData;
+              try { payload = JSON.parse(rawData); } catch { payload = rawData; }
+              const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+
+              if (eventName === "scan_started" && record) {
+                resolvedStepId = typeof record.step_id === "string" ? record.step_id : "";
+                setRunForMode("medium", (current) => ({
+                  ...current,
+                  stepId: resolvedStepId,
+                  jobId: typeof record.job_id === "string" ? record.job_id : current.jobId,
+                  status: typeof record.status === "string" ? record.status : "JOB_STATUS_RUNNING",
+                }));
+                appendLogForMode("medium", logFromPayload("medium", "submitted", { message: `Medium scan submitted for ${mediumTarget.trim()}` }));
+              }
+              if (eventName === "log") appendLogForMode("medium", logFromPayload("medium", "log", payload));
+              if (eventName === "done" && record) {
+                const finalStatus = typeof record.status === "string" ? record.status : "JOB_STATUS_COMPLETED";
+                setRunForMode("medium", (current) => ({
+                  ...current,
+                  status: finalStatus,
+                  findings: typeof record.total_findings === "number" ? record.total_findings as number : current.findings,
+                }));
+                appendLogForMode("medium", logFromPayload("medium", "done", payload));
+              }
+              if (eventName === "error" && record) {
+                appendErrorForMode("medium", typeof record.error === "string" ? record.error : "Scan error occurred.");
+                setRunForMode("medium", (current) => ({ ...current, status: "JOB_STATUS_FAILED" }));
+              }
+            }
+          }
+
+          setRunForMode("medium", (current) => {
+            if (!isTerminalStatus(current.status)) return { ...current, status: "JOB_STATUS_COMPLETED" };
+            return current;
+          });
+        }
+      } catch (error) {
+        appendErrorForMode("medium", error instanceof Error ? error.message : "Medium scan failed.");
+        setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // Authenticated path
     try {
       const submit = await fetchJson<{ job_id: string; step_id: string; status: string }>(
         "/scans/medium/submit",

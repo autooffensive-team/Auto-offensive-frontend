@@ -17,6 +17,7 @@ import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTou
 import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
 import type { ScanMode } from "@/types/scan";
 import { cn } from "@/lib/utils";
+import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
 
 const ASCII_ART = `                                                                         ><
                                                                           @++~~
@@ -292,6 +293,10 @@ export default function ScanPage() {
     updateRateLimitDirect,
   } = useGuestScanGuard();
 
+  // Grab refreshSession so we can re-sync the quota bar after a 429
+  const guestCtx = useOptionalGuestContext();
+  const refreshGuestSession = guestCtx?.refreshSession;
+
   // If guest tries to access advanced mode, allow it (uses guest API endpoints)
   const handleTabChange = useCallback((mode: ScanMode) => {
     setActiveTab(mode);
@@ -384,19 +389,19 @@ export default function ScanPage() {
           </div>
         </div>
 
-        {displayMetaError && (
-          <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
-            {displayMetaError}
-          </div>
-        )}
+          {displayMetaError && (
+            <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
+              {displayMetaError}
+            </div>
+          )}
 
-        {isGuest && limitReached && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 sm:p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
-            <p className="text-xs sm:text-sm font-medium text-rose-700 dark:text-rose-400">
-              You&apos;ve used all 3 guest scans. Please create an account to continue scanning.
-            </p>
-          </div>
-        )}
+          {isGuest && limitReached && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 sm:p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
+              <p className="text-xs sm:text-sm font-medium text-rose-700 dark:text-rose-400">
+                You&apos;ve used all {maxScans} guest scans. Please create an account to continue scanning.
+              </p>
+            </div>
+          )}
 
         <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
           {isGuest ? (
@@ -420,62 +425,62 @@ export default function ScanPage() {
           )}
         </div>
 
-        <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
-          <div className="space-y-3 sm:space-y-4 md:space-y-5">
-            <ScanModeTabs value={activeTab} onChange={handleTabChange} />
+          <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
+            <div className="space-y-3 sm:space-y-4 md:space-y-5">
+              <ScanModeTabs value={activeTab} onChange={handleTabChange} />
 
-            <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
-              <ScanModeHeader
-                icon={ScanLine}
-                title="Basic Scan"
-                description="Choose one provided preset for a supported tool."
-              />
-              <BasicScanForm
-                target={basicTarget}
-                onTargetChange={setBasicTarget}
-                toolId={basicToolId}
-                onToolChange={setBasicToolId}
-                preset={basicPreset}
-                onPresetChange={setBasicPreset}
-                tools={basicTools}
-                disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
-                onSubmit={() => guardedSubmit(submitBasic)}
-              />
-            </ScanModePanel>
+              <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
+                <ScanModeHeader
+                  icon={ScanLine}
+                  title="Basic Scan"
+                  description="Choose one provided preset for a supported tool."
+                />
+                <BasicScanForm
+                  target={basicTarget}
+                  onTargetChange={setBasicTarget}
+                  toolId={basicToolId}
+                  onToolChange={setBasicToolId}
+                  preset={basicPreset}
+                  onPresetChange={setBasicPreset}
+                  tools={basicTools}
+                  disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
+                  onSubmit={() => guardedSubmit(submitBasic)}
+                />
+              </ScanModePanel>
 
-            <ScanModePanel mode="medium" isActive={activeTab === "medium"}>
-              <ScanModeHeader
-                icon={Wrench}
-                title="Medium Scan"
-                description="Chain tools with allowed options from the tool metadata."
-              />
-              <MediumScanForm
-                target={mediumTarget}
-                onTargetChange={setMediumTarget}
-                steps={mediumSteps}
-                onStepChange={updateMediumStep}
-                onOptionChange={updateMediumOption}
-                onAddStep={addMediumStep}
-                onRemoveStep={removeMediumStep}
-                tools={mediumTools}
-                disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
-                onSubmit={() => guardedSubmit(submitMedium)}
-              />
-            </ScanModePanel>
+              <ScanModePanel mode="medium" isActive={activeTab === "medium"}>
+                <ScanModeHeader
+                  icon={Wrench}
+                  title="Medium Scan"
+                  description="Chain tools with allowed options from the tool metadata."
+                />
+                <MediumScanForm
+                  target={mediumTarget}
+                  onTargetChange={setMediumTarget}
+                  steps={mediumSteps}
+                  onStepChange={updateMediumStep}
+                  onOptionChange={updateMediumOption}
+                  onAddStep={addMediumStep}
+                  onRemoveStep={removeMediumStep}
+                  tools={mediumTools}
+                  disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
+                  onSubmit={() => guardedSubmit(submitMedium)}
+                />
+              </ScanModePanel>
 
-            {activeTab === "advanced" && (
-              <AdvancedTerminalPanel
-                projectId={isGuest ? "guest-advanced-scan" : projectId}
-                selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
-                logs={advancedLogs}
-                run={advancedRun}
-                errors={advancedErrors}
-                isSubmitting={isSubmitting}
-                onSubmit={submitAdvanced}
-                onReset={() => resetRun("advanced")}
-              />
-            )}
-          </div>
+              {activeTab === "advanced" && (
+                <AdvancedTerminalPanel
+                  projectId={isGuest ? "guest-advanced-scan" : projectId}
+                  selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
+                  logs={advancedLogs}
+                  run={advancedRun}
+                  errors={advancedErrors}
+                  isSubmitting={isSubmitting}
+                  onSubmit={submitAdvanced}
+                  onReset={() => resetRun("advanced")}
+                />
+              )}
+            </div>
 
           {activeTab !== "advanced" && (
             <div id="tour-terminal">
@@ -522,67 +527,67 @@ export default function ScanPage() {
                 {isIdle ? (
                   <div className="flex flex-col items-center h-full">
 
-                    {/* ── Responsive ASCII container ─────────────────────────── */}
-                    <div
-                      ref={asciiRef}
-                      className="w-full overflow-x-auto"
-                      aria-hidden="true"
-                    >
-                      <pre
-                        className="select-none font-[Consolas,monospace]"
-                        style={{
-                          fontSize: `${asciiFontSize}px`,
-                          lineHeight: "1.2",
-                          letterSpacing: "0.01em",
-                          whiteSpace: "pre",
-                          color: "hsl(var(--primary) / 0.3)",
-                          margin: "0 auto",
-                          display: "table", // shrinks to content width so auto margins work
-                        }}
+                      {/* ── Responsive ASCII container ─────────────────────────── */}
+                      <div
+                        ref={asciiRef}
+                        className="w-full overflow-x-auto"
+                        aria-hidden="true"
                       >
-                        {ASCII_ART}
-                      </pre>
-                    </div>
-                    {/* ── End responsive ASCII ───────────────────────────────── */}
-
-                    <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[14px] sm:text-[17px] shrink-0">
-                      Logs will appear here when a scan starts.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="p-2 sm:p-3">
-                    {activeLogs.map((line) => (
-                      <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
-                        <span className="shrink-0 text-gray-400 dark:text-gray-500">
-                          {new Date(line.timestamp).toLocaleTimeString()}
-                        </span>
-                        <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
-                        <span
-                          className={cn(
-                            "shrink-0 font-semibold",
-                            line.level === "ERROR" && "text-red-600 dark:text-red-400",
-                            line.level === "WARN" && "text-amber-500 dark:text-amber-400",
-                            line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                            !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
-                          )}
+                        <pre
+                          className="select-none font-[Consolas,monospace]"
+                          style={{
+                            fontSize: `${asciiFontSize}px`,
+                            lineHeight: "1.2",
+                            letterSpacing: "0.01em",
+                            whiteSpace: "pre",
+                            color: "hsl(var(--primary) / 0.3)",
+                            margin: "0 auto",
+                            display: "table", // shrinks to content width so auto margins work
+                          }}
                         >
-                          {line.level}
-                        </span>
-                        {colorizeLogText(line.text)}
+                          {ASCII_ART}
+                        </pre>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      {/* ── End responsive ASCII ───────────────────────────────── */}
+
+                      <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[14px] sm:text-[17px] shrink-0">
+                        Logs will appear here when a scan starts.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-2 sm:p-3">
+                      {activeLogs.map((line) => (
+                        <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
+                          <span className="shrink-0 text-gray-400 dark:text-gray-500">
+                            {new Date(line.timestamp).toLocaleTimeString()}
+                          </span>
+                          <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
+                          <span
+                            className={cn(
+                              "shrink-0 font-semibold",
+                              line.level === "ERROR" && "text-red-600 dark:text-red-400",
+                              line.level === "WARN" && "text-amber-500 dark:text-amber-400",
+                              line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
+                              !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
+                            )}
+                          >
+                            {line.level}
+                          </span>
+                          {colorizeLogText(line.text)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
 
-    {/* Guest modals */}
-    <GuestScanLimitModal isOpen={showLimitModal} onClose={closeLimitModal} />
-    <GuestLockModal isOpen={showLockModal} onClose={closeLockModal} featureName={lockedFeature} />
+      {/* Guest modals */}
+      <GuestScanLimitModal isOpen={showLimitModal} onClose={closeLimitModal} />
+      <GuestLockModal isOpen={showLockModal} onClose={closeLockModal} featureName={lockedFeature} />
     </>
   );
 }

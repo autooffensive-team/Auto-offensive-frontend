@@ -138,37 +138,65 @@ export async function proxyToScanGatewayAnonymous(
     headers.set("accept", accept);
   }
 
-  const upstream = await fetch(url, {
-    ...init,
-    method,
-    headers,
-    cache: "no-store",
-  });
-
-  const responseHeaders = new Headers();
-  const upstreamContentType = upstream.headers.get("content-type");
-
-  if (upstreamContentType) {
-    responseHeaders.set("content-type", upstreamContentType);
+  let upstream: Response;
+  try {
+    upstream = await fetch(url, {
+      ...init,
+      method,
+      headers,
+      cache: "no-store",
+    });
+  } catch (err) {
+    // Network-level failure (DNS, connection refused, etc.)
+    return Response.json(
+      { detail: "The scan service is currently unreachable. Please try again later." },
+      { status: 503 },
+    );
   }
 
-  if (upstreamContentType?.includes("text/event-stream")) {
-    responseHeaders.set("cache-control", "no-cache");
-    responseHeaders.set("connection", "keep-alive");
-    responseHeaders.set("x-accel-buffering", "no");
-  }
+  const upstreamContentType = upstream.headers.get("content-type") ?? "";
 
-  // Forward rate-limit headers from the backend
+  // Collect rate-limit headers to forward regardless of response shape
   const rateLimitHeaders = [
     "x-ratelimit-limit",
     "x-ratelimit-remaining",
     "x-ratelimit-reset",
   ];
+  const forwardedRateLimitHeaders: Record<string, string> = {};
   for (const header of rateLimitHeaders) {
     const value = upstream.headers.get(header);
-    if (value) {
-      responseHeaders.set(header, value);
-    }
+    if (value) forwardedRateLimitHeaders[header] = value;
+  }
+
+  // If the upstream returned an error status with an HTML body (e.g. a
+  // Cloudflare 502/503/504 page), replace it with a clean JSON error so the
+  // client never has to parse raw markup.
+  if (!upstream.ok && upstreamContentType.includes("text/html")) {
+    const statusMessages: Record<number, string> = {
+      502: "The scan service returned a bad gateway error (502). It may be temporarily down.",
+      503: "The scan service is temporarily unavailable (503). Please try again later.",
+      504: "The scan service timed out (504). Please try again later.",
+    };
+    const detail =
+      statusMessages[upstream.status] ??
+      `The scan service returned an unexpected error (${upstream.status}). Please try again later.`;
+
+    return Response.json(
+      { detail },
+      { status: upstream.status, headers: forwardedRateLimitHeaders },
+    );
+  }
+
+  const responseHeaders = new Headers(forwardedRateLimitHeaders);
+
+  if (upstreamContentType) {
+    responseHeaders.set("content-type", upstreamContentType);
+  }
+
+  if (upstreamContentType.includes("text/event-stream")) {
+    responseHeaders.set("cache-control", "no-cache");
+    responseHeaders.set("connection", "keep-alive");
+    responseHeaders.set("x-accel-buffering", "no");
   }
 
   return new Response(upstream.body, {
