@@ -667,7 +667,7 @@ export default function AdvanceScanPage() {
                       logs.map((entry) => (
                         <div
                           key={entry.id}
-                          className={`rounded-xl border px-3 py-2 font-mono text-xs ${
+                          className={`rounded-xl border px-3 py-2 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace] ${
                             entry.tone === "danger"
                               ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
                               : entry.tone === "success"
@@ -775,7 +775,7 @@ export default function AdvanceScanPage() {
                             </table>
                           </div>
                         ) : parsedData.lines && parsedData.lines.length > 0 ? (
-                          <pre className="max-h-96 overflow-auto rounded-xl border border-white/10 bg-white/5 p-4 font-mono text-xs text-gray-300">
+                          <pre className="max-h-96 overflow-auto rounded-xl border border-white/10 bg-white/5 p-4 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace] text-gray-300">
                             {parsedData.lines.join("\n")}
                           </pre>
                         ) : (
@@ -793,7 +793,7 @@ export default function AdvanceScanPage() {
                         Raw output will appear here during the scan.
                       </p>
                     ) : (
-                      <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-white/5 p-4 font-mono text-xs text-gray-300">
+                      <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-white/5 p-4 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace] text-gray-300">
                         {rawLines.join("\n")}
                       </pre>
                     )}

@@ -5,13 +5,15 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/guest-scan/status
+ * Probes the backend's anonymous scan rate limit by sending an intentionally
+ * invalid request body (empty JSON) to /scans/basic/try.
  *
- * Fetches the real anonymous quota info from the backend's dedicated
- * GET /scans/quota/anon endpoint. This is a read-only probe — it never
- * increments the scan counter, so calling it on page load is safe.
- *
- * Previously this sent a dummy POST to /scans/basic/try which accidentally
- * consumed a quota slot before the 422 validation fired.
+ * Inference logic:
+ * - If the backend returns x-ratelimit-* headers (on any status), use them directly.
+ * - If the backend returns 429 (no headers), the quota is exhausted → remaining = 0.
+ * - If the backend returns 422 (no headers), the quota is NOT exhausted (validation
+ *   error means the request passed rate-limiting). We can't know the exact count,
+ *   so we return null to let the frontend keep its local state.
  */
 export async function GET(request: NextRequest) {
   const upstream = await proxyToScanGatewayAnonymous(request, "/scans/quota/anon", {
@@ -21,30 +23,57 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  if (!upstream.ok) {
-    // Backend unavailable — return nulls so the UI falls back to defaults
+  const limit = upstream.headers.get("x-ratelimit-limit");
+  const remaining = upstream.headers.get("x-ratelimit-remaining");
+  const reset = upstream.headers.get("x-ratelimit-reset");
+
+  // If we got rate limit headers, return them regardless of status code
+  if (limit != null || remaining != null) {
+    const maxScans = limit != null ? Number(limit) : null;
+    const scansRemaining = remaining != null ? Number(remaining) : null;
+    const scansUsed = maxScans != null && scansRemaining != null ? maxScans - scansRemaining : null;
+
     return NextResponse.json({
-      maxScans: null,
-      scansUsed: null,
-      scansRemaining: null,
-      resetAt: null,
-      limitReached: false,
+      maxScans,
+      scansUsed,
+      scansRemaining,
+      resetAt: reset ? Number(reset) : null,
+      limitReached: scansRemaining === 0,
     });
   }
 
-  const data = await upstream.json() as {
-    limit: number;
-    remaining: number;
-    used: number;
-    reset_at: number;
-    limit_reached: boolean;
-  };
+  // No rate-limit headers — infer from HTTP status code
+  if (upstream.status === 429) {
+    // Backend rejected due to rate limit — quota is exhausted
+    // Try to extract reset info from the 429 body
+    let resetAt: number | null = null;
+    let maxScans: number | null = 3; // default assumption
+    try {
+      const body = await upstream.json();
+      if (body?.detail?.reset_at) {
+        resetAt = Number(body.detail.reset_at);
+      }
+      if (body?.detail?.limit) {
+        maxScans = Number(body.detail.limit);
+      }
+    } catch { /* ignore */ }
 
+    return NextResponse.json({
+      maxScans,
+      scansUsed: maxScans,
+      scansRemaining: 0,
+      resetAt,
+      limitReached: true,
+    });
+  }
+
+  // 422 or other status without headers — quota is NOT exhausted,
+  // but we don't know the exact count. Return null to preserve frontend local state.
   return NextResponse.json({
-    maxScans: data.limit,
-    scansUsed: data.used,
-    scansRemaining: data.remaining,
-    resetAt: data.reset_at,
-    limitReached: data.limit_reached,
+    maxScans: null,
+    scansUsed: null,
+    scansRemaining: null,
+    resetAt: null,
+    limitReached: null,
   });
 }

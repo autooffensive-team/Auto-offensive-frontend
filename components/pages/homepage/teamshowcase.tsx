@@ -26,15 +26,15 @@ export default function TeamShowcase() {
       <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-12 lg:grid-cols-[1.2fr_1.6fr] lg:gap-20">
         <div className="relative z-10">
           <h3
-            className="mb-2 font-bold uppercase leading-[1.1] text-[#01509e] dark:text-white"
+            className="mb-2 font-bold uppercase leading-[1.1]"
             style={{
               fontFamily: displayFontFamily,
               fontSize: "clamp(32px, 4.5vw, 56px)",
             }}
           >
-            <span className="block whitespace-nowrap">{t("titleLine1")}</span>
+            <span className="block whitespace-nowrap text-[#01509e] dark:text-[#4fa3e5]">{t("titleLine1")}</span>
             <span className="block whitespace-nowrap text-[#00BCA1]">{t("titleLine2")}</span>
-            <span className="block whitespace-nowrap">{t("titleLine3")}</span>
+            <span className="block whitespace-nowrap text-black dark:text-white">{t("titleLine3")}</span>
           </h3>
 
           <div

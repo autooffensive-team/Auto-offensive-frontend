@@ -124,7 +124,7 @@ export default function ResourceComponent() {
   const sectionLabels = isKhmer
     ? {
         heroBadge: '',
-        heroTitleLine1: 'ឯកសារ និង Resources',
+        heroTitleLine1: (<>ឯកសារ និង <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
         heroTitleLine2: '',
         heroSubtitle:
           'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
@@ -150,7 +150,7 @@ export default function ResourceComponent() {
       }
     : {
         heroBadge: '',
-        heroTitleLine1: 'Docs & Resources',
+        heroTitleLine1: (<>Docs & <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
         heroTitleLine2: '',
         heroSubtitle:
           'Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.',
@@ -591,7 +591,7 @@ export default function ResourceComponent() {
             ) : null}
             <motion.h1
               variants={fadeUp}
-              className="resource-hero-title mx-auto max-w-[12ch] text-[clamp(2.65rem,7vw,5.25rem)] font-bold leading-[0.95] text-[#18181B] dark:text-white md:mx-0"
+              className="resource-hero-title mx-auto max-w-[12ch] text-[clamp(2.65rem,7vw,80px)] font-bold leading-[0.95] text-[#18181B] dark:text-white md:mx-0"
               style={{ fontFamily: heroTitleFontFamily, fontWeight: isKhmer ? 800 : 700 }}
             >
               {sectionLabels.heroTitleLine1}
@@ -749,32 +749,140 @@ export default function ResourceComponent() {
       <section className="bg-[#F7F5F0] px-4 pb-14 dark:bg-[#09090B] md:pb-18">
         <div className="mx-auto max-w-7xl">
           <div className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-2xl bg-[#F1F6F1] p-5 dark:bg-[#101713]">
-              <div className="mb-5">
+            {/* Title — shows on top centered on mobile, hidden on desktop (shown in second column instead) */}
+            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center lg:hidden">
+              <h2
+                className="text-[clamp(2.2rem,5vw,2.8125rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#18181B] dark:text-white"
+                style={{ fontFamily: displayFontFamily }}
+              >
+                <span className="block">{workflowCopy.titleLine1}</span>
+                <span className="block text-[#01509E]">{workflowCopy.titleLine2}</span>
+              </h2>
+            </motion.div>
+
+            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-2xl p-6 overflow-visible">
+              <div className="mb-6">
                 <h2 className="text-xl font-bold text-[#18181B] dark:text-white">{sectionLabels.workflowSteps}</h2>
               </div>
-              <div className="space-y-4">
-                {workflowSteps.map((step, index) => (
-                  <div key={step.no} className="flex items-center gap-4 rounded-xl bg-[#F8FAF6] p-4 dark:bg-[#151A18]">
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                        index === 0 ? 'bg-[#0A6A69] text-white' : 'bg-[#BEE3DA] text-[#0A6A69]'
-                      }`}
-                    >
-                      <span className="text-sm font-bold">{step.no}</span>
-                    </div>
+
+              {/* Roadmap with winding path */}
+              <div className="relative w-full" style={{ height: '540px' }}>
+                {/* Animated road CSS */}
+                <style jsx>{`
+                  @keyframes dashFlow {
+                    0% { stroke-dashoffset: 0; }
+                    100% { stroke-dashoffset: -40; }
+                  }
+                  @keyframes dotPulse {
+                    0%, 100% { opacity: 0.4; r: 3; }
+                    50% { opacity: 1; r: 5; }
+                  }
+                  @keyframes travelDot {
+                    0% { offset-distance: 0%; opacity: 0; }
+                    5% { opacity: 1; }
+                    95% { opacity: 1; }
+                    100% { offset-distance: 100%; opacity: 0; }
+                  }
+                  .road-dashes {
+                    animation: dashFlow 1.5s linear infinite;
+                  }
+                  .dot-pulse {
+                    animation: dotPulse 2s ease-in-out infinite;
+                  }
+                  .travel-dot {
+                    offset-path: path("M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510");
+                    animation: travelDot 4s ease-in-out infinite;
+                  }
+                `}</style>
+
+                {/* Winding road SVG */}
+                <svg
+                  className="absolute inset-0 h-full w-full pointer-events-none"
+                  viewBox="0 0 500 540"
+                  fill="none"
+                  preserveAspectRatio="xMidYMid meet"
+                  aria-hidden="true"
+                >
+                  {/* Road body (wide, light) */}
+                  <path
+                    d="M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510"
+                    stroke="#d1e8e3"
+                    strokeWidth="34"
+                    strokeLinecap="round"
+                    fill="none"
+                    className="dark:opacity-20"
+                  />
+                  {/* Road center dashes — animated flow */}
+                  <path
+                    d="M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510"
+                    stroke="#00BCA1"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="12 8"
+                    fill="none"
+                    className="road-dashes dark:opacity-60"
+                  />
+                  {/* Glowing travel dot along the path */}
+                  <circle r="6" fill="#00BCA1" className="travel-dot" opacity="0.9">
+                    <animate attributeName="r" values="4;7;4" dur="4s" repeatCount="indefinite" />
+                  </circle>
+                  {/* Small dot markers along the road — with pulse */}
+                  <circle cx="170" cy="95" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0s' }} />
+                  <circle cx="290" cy="125" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.3s' }} />
+                  <circle cx="380" cy="170" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.6s' }} />
+                  <circle cx="430" cy="230" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.9s' }} />
+                  <circle cx="310" cy="310" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.2s' }} />
+                  <circle cx="160" cy="380" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.5s' }} />
+                  <circle cx="230" cy="460" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.8s' }} />
+                </svg>
+
+                {/* Step 1 — Top left */}
+                <div className="absolute top-[16px] left-[4%] flex items-center gap-3 z-10">
+                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
+                    <div className="h-[14px] w-[14px] rounded-full bg-[#00BCA1]" />
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
+                    <div className="h-9 w-[3px] rounded-full bg-[#00BCA1]" />
                     <div>
-                      <p className="text-[13px] font-bold text-[#18181B] dark:text-white">{step.title}</p>
-                      <p className="resource-page-meta text-[#6B7280] dark:text-[#A1A1AA]">{step.desc}</p>
+                      <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#00BCA1] mr-1.5">1.</span>{workflowSteps[0].title}</p>
+                      <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[0].desc}</p>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Step 2 — Middle right */}
+                <div className="absolute top-[220px] right-[4%] flex items-center gap-3 z-10">
+                  <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
+                    <div className="h-9 w-[3px] rounded-full bg-[#00BCA1]" />
+                    <div>
+                      <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#00BCA1] mr-1.5">2.</span>{workflowSteps[1].title}</p>
+                      <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[1].desc}</p>
+                    </div>
+                  </div>
+                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
+                    <div className="h-[14px] w-[14px] rounded-full bg-[#00BCA1]" />
+                  </div>
+                </div>
+
+                {/* Step 3 — Bottom left */}
+                <div className="absolute bottom-[16px] left-[4%] flex items-center gap-3 z-10">
+                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#01509e] bg-transparent">
+                    <div className="h-[14px] w-[14px] rounded-full bg-[#01509e]" />
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
+                    <div className="h-9 w-[3px] rounded-full bg-[#01509e]" />
+                    <div>
+                      <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#01509e] mr-1.5">3.</span>{workflowSteps[2].title}</p>
+                      <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[2].desc}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
             <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               <h2
-                className="max-w-[15ch] text-[clamp(2.2rem,5vw,2.8125rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#18181B] dark:text-white lg:max-w-[16ch]"
+                className="hidden lg:block max-w-[15ch] text-[clamp(2.2rem,5vw,2.8125rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#18181B] dark:text-white lg:max-w-[16ch]"
                 style={{ fontFamily: displayFontFamily }}
               >
                 <span className="block">{workflowCopy.titleLine1}</span>
@@ -816,8 +924,8 @@ export default function ResourceComponent() {
             <p className="resource-page-copy mt-3 text-[#52525B] dark:text-[#A1A1AA]">{sectionLabels.systemStatusSubtitle}</p>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-[#CBEDE6] bg-[#F7F5F0] shadow-[0_18px_50px_rgba(1,80,158,0.08)] dark:border-white/10 dark:bg-[#09090B]">
-            <div className="border-b border-[#D9F4EF] bg-[#F7F5F0] px-4 py-3 text-[13px] font-medium text-[#01509E] dark:bg-[#09090B] md:hidden">
+          <div className="overflow-hidden rounded-2xl border border-[#01509e] bg-[#F7F5F0] dark:border-white/10 dark:bg-[#09090B]">
+            <div className="border-b border-[#01509e]/20 bg-[#F7F5F0] px-4 py-3 text-[13px] font-medium text-[#01509E] dark:border-white/10 dark:bg-[#09090B] md:hidden">
               {sectionLabels.mobileTableHint}
             </div>
             <div className="w-full overflow-x-auto">
@@ -840,7 +948,7 @@ export default function ResourceComponent() {
                 </thead>
                 <tbody>
                   {statusRows.map((row, index) => (
-                    <tr key={row.service} className={index % 2 === 0 ? 'bg-[#F7F5F0] dark:bg-[#09090B]' : 'bg-[#F2EFE7] dark:bg-[#111113]'}>
+                    <tr key={row.service} className={`border-b border-[#01509e]/20 dark:border-white/10 last:border-b-0 ${index % 2 === 0 ? 'bg-[#F7F5F0] dark:bg-[#09090B]' : 'bg-[#F2EFE7] dark:bg-[#111113]'}`}>
                       <td className="resource-page-meta whitespace-nowrap px-6 py-5 font-bold text-[#18181B] dark:text-white">{row.service}</td>
                       <td className="resource-page-meta whitespace-nowrap px-6 py-5 text-[#52525B] dark:text-[#A1A1AA]">{row.version}</td>
                       <td className="px-6 py-5">

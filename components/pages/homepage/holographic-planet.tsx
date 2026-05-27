@@ -16,32 +16,44 @@ export default function HolographicPlanet() {
     if (containerWidth === 0 || containerHeight === 0) return;
 
     // ─── Detect mobile for performance tuning ──────────────────
-    const isMobile = containerWidth < 768;
-    const DOT_SPACING = isMobile ? 3.0 : 2.0;
-    const TARGET_FPS = isMobile ? 30 : 60;
+    // Use both viewport width AND touch capability for reliable mobile detection
+    const isMobile = containerWidth < 768 || ("ontouchstart" in window && navigator.maxTouchPoints > 0);
+    const DOT_SPACING = isMobile ? 4.5 : 2.0;
+    const TARGET_FPS = isMobile ? 24 : 60;
     const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
     // ─── Canvas setup ──────────────────────────────────────────
     const canvas = document.createElement("canvas");
+    // Force DPR 1 on mobile to drastically reduce pixel fill
     const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
-    canvas.width = containerWidth * dpr;
-    canvas.height = containerHeight * dpr;
+    // On mobile, render at reduced resolution for smoother animation
+    const renderScale = isMobile ? 0.65 : 1;
+    const renderWidth = Math.round(containerWidth * renderScale);
+    const renderHeight = Math.round(containerHeight * renderScale);
+    canvas.width = renderWidth * dpr;
+    canvas.height = renderHeight * dpr;
     canvas.style.width = `${containerWidth}px`;
     canvas.style.height = `${containerHeight}px`;
     canvas.style.position = "absolute";
     canvas.style.inset = "0";
+    // Use CSS to upscale the lower-res canvas smoothly
+    canvas.style.imageRendering = "auto";
     container.appendChild(canvas);
 
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    const radius = Math.min(containerWidth, containerHeight) / 2.5;
+    // Use the render dimensions for all drawing calculations
+    const drawWidth = renderWidth;
+    const drawHeight = renderHeight;
+
+    const radius = Math.min(drawWidth, drawHeight) / 2.5;
 
     // ─── D3 projection ─────────────────────────────────────────
     const projection = geoOrthographic()
       .scale(radius)
-      .translate([containerWidth / 2, containerHeight / 2])
+      .translate([drawWidth / 2, drawHeight / 2])
       .clipAngle(90);
 
     const path = geoPath().projection(projection).context(ctx);
@@ -60,10 +72,10 @@ export default function HolographicPlanet() {
 
     // Delay planet appearance - show shortly after comets start sweeping
     const PLANET_DELAY = 1200;
-    const PLANET_FADE_DURATION = 250;
-    const PLANET_INTRO_DURATION = 600;
-    const PLANET_START_SCALE = 0.42;
-    const PLANET_SPIN_DEGREES = 360;
+    const PLANET_FADE_DURATION = isMobile ? 400 : 250;
+    const PLANET_INTRO_DURATION = isMobile ? 400 : 600;
+    const PLANET_START_SCALE = isMobile ? 0.75 : 0.42;
+    const PLANET_SPIN_DEGREES = isMobile ? 90 : 360;
     let planetFadeStart = 0;
 
     const planetDelayTimer = setTimeout(() => {
@@ -147,7 +159,7 @@ export default function HolographicPlanet() {
     });
 
     const render = () => {
-      ctx.clearRect(0, 0, containerWidth, containerHeight);
+      ctx.clearRect(0, 0, drawWidth, drawHeight);
 
       // Don't render until planet is visible
       if (!planetVisible) return;
@@ -166,7 +178,7 @@ export default function HolographicPlanet() {
 
       // Globe background
       ctx.beginPath();
-      ctx.arc(containerWidth / 2, containerHeight / 2, currentScale, 0, 2 * Math.PI);
+      ctx.arc(drawWidth / 2, drawHeight / 2, currentScale, 0, 2 * Math.PI);
       if (!dark) {
         ctx.fillStyle = "rgba(255, 255, 255, 1)";
         ctx.fill();
@@ -178,12 +190,14 @@ export default function HolographicPlanet() {
       ctx.globalAlpha = planetOpacity;
 
       if (landFeatures) {
-        // Graticule
-        ctx.beginPath();
-        path(graticule());
-        ctx.strokeStyle = gridColor;
-        ctx.lineWidth = (dark ? 0.5 : 0.7) * scaleFactor;
-        ctx.stroke();
+        // Skip graticule on mobile for performance
+        if (!isMobile) {
+          ctx.beginPath();
+          path(graticule());
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = (dark ? 0.5 : 0.7) * scaleFactor;
+          ctx.stroke();
+        }
 
         // Land outlines
         ctx.beginPath();
@@ -259,7 +273,7 @@ export default function HolographicPlanet() {
       render();
     };
 
-    // ─── Mouse interaction ─────────────────────────────────────
+    // ─── Mouse interaction (desktop only) ─────────────────────
     const handleMouseDown = (event: MouseEvent) => {
       autoRotate = false;
       const startX = event.clientX;
@@ -288,42 +302,10 @@ export default function HolographicPlanet() {
       document.addEventListener("mouseup", handleMouseUp);
     };
 
-    canvas.addEventListener("mousedown", handleMouseDown);
-
-    // ─── Touch interaction (mobile) ────────────────────────────
-    const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) return;
-      autoRotate = false;
-      const touch = event.touches[0];
-      const startX = touch.clientX;
-      const startY = touch.clientY;
-      const startRotation: [number, number] = [...rotation];
-
-      const handleTouchMove = (moveEvent: TouchEvent) => {
-        if (moveEvent.touches.length !== 1) return;
-        const t = moveEvent.touches[0];
-        const sensitivity = 0.4;
-        const dx = t.clientX - startX;
-        const dy = t.clientY - startY;
-        rotation[0] = startRotation[0] + dx * sensitivity;
-        rotation[1] = Math.max(-90, Math.min(90, startRotation[1] - dy * sensitivity));
-        projection.rotate(rotation);
-        render();
-      };
-
-      const handleTouchEnd = () => {
-        document.removeEventListener("touchmove", handleTouchMove);
-        document.removeEventListener("touchend", handleTouchEnd);
-        setTimeout(() => {
-          autoRotate = true;
-        }, 50);
-      };
-
-      document.addEventListener("touchmove", handleTouchMove, { passive: true });
-      document.addEventListener("touchend", handleTouchEnd);
-    };
-
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+    // Only attach drag interactions on desktop
+    if (!isMobile) {
+      canvas.addEventListener("mousedown", handleMouseDown);
+    }
 
     // ─── Load world data ───────────────────────────────────────
     const loadData = async () => {
@@ -352,12 +334,14 @@ export default function HolographicPlanet() {
           const h = entry.contentRect.height;
           if (w === 0 || h === 0) return;
           const newDpr = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
-          canvas.width = w * newDpr;
-          canvas.height = h * newDpr;
+          const rw = Math.round(w * renderScale);
+          const rh = Math.round(h * renderScale);
+          canvas.width = rw * newDpr;
+          canvas.height = rh * newDpr;
           canvas.style.width = `${w}px`;
           canvas.style.height = `${h}px`;
           ctx.setTransform(newDpr, 0, 0, newDpr, 0, 0);
-          const newRadius = Math.min(w, h) / 2.5;
+          const newRadius = Math.min(rw, rh) / 2.5;
           const introProgress = introActive
             ? Math.min(1, (performance.now() - introStart) / PLANET_INTRO_DURATION)
             : 1;
@@ -367,10 +351,10 @@ export default function HolographicPlanet() {
 
           projection
             .scale(newRadius * introScale)
-            .translate([w / 2, h / 2]);
+            .translate([rw / 2, rh / 2]);
           render();
         }
-      }, 100);
+      }, 150);
     });
     resizeObserver.observe(container);
 
@@ -394,7 +378,6 @@ export default function HolographicPlanet() {
       clearTimeout(resizeTimeout);
       themeObserver.disconnect();
       canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("visibilitychange", handleVisibility);
       resizeObserver.disconnect();
       if (container.contains(canvas)) {
@@ -406,7 +389,7 @@ export default function HolographicPlanet() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full pointer-events-auto z-2"
+      className="absolute inset-0 w-full h-full md:pointer-events-auto pointer-events-none z-2"
       style={{
         isolation: "isolate",
         willChange: "transform",

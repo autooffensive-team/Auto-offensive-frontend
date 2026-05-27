@@ -117,14 +117,14 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5"
+      className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4 md:p-5"
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className={`text-[28px] font-bold leading-none ${s.value}`}>
+          <p className={`text-xl font-bold leading-none sm:text-2xl md:text-[28px] ${s.value}`}>
             {value}
           </p>
-          <p className="mt-2 text-[12px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <p className="mt-1.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sm:mt-2 sm:text-[12px]">
             {label}
           </p>
         </div>
@@ -161,12 +161,12 @@ function ProjectCard({
       className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white dark:border-white/10 dark:bg-[#101828]"
     >
       {/* ── Card body ── */}
-      <div className="px-5 py-[18px]">
+      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-[18px]">
         {/* Row 1: avatar + meta + badge + edit */}
-        <div className="mb-[14px] flex items-center justify-between">
-          <div className="flex items-center gap-[10px]">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#1a1a1a] dark:bg-white/10">
-              <FolderGit2 size={22} className="text-white" />
+        <div className="mb-3 flex items-center justify-between sm:mb-[14px]">
+          <div className="flex items-center gap-2 sm:gap-[10px]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#1a1a1a] sm:h-10 sm:w-10 dark:bg-white/10">
+              <FolderGit2 size={20} className="text-white sm:h-[22px] sm:w-[22px]" />
             </div>
             <div>
               <p className="text-[12px] font-medium text-[#555] dark:text-white/70">
@@ -194,24 +194,16 @@ function ProjectCard({
         </div>
 
         {/* Project name */}
-        <p className="mb-1 truncate text-[17px] font-medium text-[#111] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
+        <p className="mb-1 truncate text-[14px] font-medium text-[#111] sm:text-[17px] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
           {project.name}
         </p>
-        <p className="mb-4 text-[12px] text-[#888] dark:text-white/40 truncate">
+        <p className="mb-3 text-[11px] text-[#888] sm:mb-4 sm:text-[12px] dark:text-white/40 truncate">
           {project.description || "No description provided"}
         </p>
 
         {/* Footer: tags + actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-[6px]">
-            <span className="inline-flex items-center gap-[4px] rounded-[6px] bg-[#e6faf8] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="7.5" cy="15.5" r="5.5" />
-                <path d="m21 2-9.6 9.6" />
-                <path d="m15.5 7.5 3 3L22 7l-3-3" />
-              </svg>
-              Project key
-            </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-[6px]">
             <span className="inline-flex items-center gap-[4px] rounded-[6px] bg-[#e6faf8] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
               <Clock size={13} />
               {formatProjectDate(project.last_modified)}
@@ -585,7 +577,7 @@ export default function ProjectsPageClient({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
 
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -686,7 +678,7 @@ export default function ProjectsPageClient({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
         {isLoading && projects.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />

@@ -11,6 +11,7 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import AuthorizedUserIndicator from '@/components/auth/authorized-user-indicator';
 import { authClient } from '@/lib/auth-client';
+import { useSessionHealth } from '@/hooks/use-session-health';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -424,6 +425,7 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const { data: session, isPending: isSessionPending } = authClient.useSession();
+  const sessionHealthy = useSessionHealth(!!session);
   const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
@@ -470,7 +472,7 @@ export function Header() {
       aria-hidden="true"
       className="h-9 w-9 rounded-full border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
     />
-  ) : session ? (
+  ) : session && sessionHealthy !== false ? (
     <AuthorizedUserIndicator />
   ) : (
     <div className="flex items-center gap-2">
@@ -758,7 +760,7 @@ export function Header() {
               aria-hidden="true"
               className="h-10 w-full rounded-md border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
             />
-          ) : session ? (
+          ) : session && sessionHealthy !== false ? (
             <AuthorizedUserIndicator
               className="w-full justify-center rounded-md"
             />

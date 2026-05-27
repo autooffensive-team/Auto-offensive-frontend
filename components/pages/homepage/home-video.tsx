@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import Image from 'next/image';
 
 interface VideoThumbnailPlayerProps {
   title: string;
@@ -53,24 +52,20 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
   className = '',
   onPlay,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
   const youtubeEmbedUrl = useMemo(() => getYouTubeEmbedUrl(videoUrl), [videoUrl]);
   const isYoutube = Boolean(youtubeEmbedUrl);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const handlePlayClick = () => {
+  function handlePlay() {
     setIsPlaying(true);
     onPlay?.();
-  };
+  }
 
   return (
     <section className={`w-full bg-[#F7F5F0] px-4 py-16 dark:bg-[#09090B] sm:px-6 lg:px-8 ${className}`}>
       <div className="mx-auto w-full max-w-7xl">
         <div
-          className="group relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] border border-[#DDD6CA] bg-[#111214]"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] bg-[#111214]"
         >
           <div className="relative aspect-video w-full">
             {isPlaying ? (
@@ -92,56 +87,31 @@ export const VideoThumbnailPlayer: React.FC<VideoThumbnailPlayerProps> = ({
                 />
               )
             ) : (
-              <>
-                <Image
+              <button
+                type="button"
+                onClick={handlePlay}
+                className="group relative h-full w-full cursor-pointer border-none bg-transparent p-0"
+                aria-label={playLabel || 'Play video'}
+              >
+                <img
                   src={thumbnailUrl}
                   alt={title}
-                  fill
-                  className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${
-                    isHovered ? 'scale-[1.04]' : 'scale-100'
-                  }`}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  className="h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,0,0,0.38)_0%,rgba(0,0,0,0.08)_45%,rgba(0,0,0,0.62)_100%)]" />
-                <div className="absolute inset-x-0 bottom-0 h-2/5 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.62)_62%,rgba(0,0,0,0.84)_100%)]" />
-
-                <button
-                  type="button"
-                  onClick={handlePlayClick}
-                  className="absolute inset-0 z-20 flex items-center justify-center"
-                  aria-label={`${playLabel}: ${title}`}
-                >
-                  <span
-                    className={`flex h-18 w-18 items-center justify-center rounded-full border border-white/25 bg-white/12 backdrop-blur-md transition-all duration-300 sm:h-21 sm:w-21 ${
-                      isHovered ? 'scale-110 bg-white/18' : ''
-                    }`}
-                  >
-                    <span className="ml-1 h-0 w-0 border-y-13 border-y-transparent border-l-21 border-l-white sm:border-y-15 sm:border-l-25" />
-                  </span>
-                </button>
-
-                <div className="absolute bottom-0 left-0 z-30 hidden max-w-[78%] p-6 sm:block sm:p-8 md:p-10">
-                  <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/72">
-                    {eyebrow}
-                  </p>
-                  <h2
-                    className={`text-[clamp(2rem,4vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.04em] text-white transition-transform duration-300 ${
-                      isHovered ? '-translate-y-1' : 'translate-y-0'
-                    }`}
-                    style={{ fontFamily }}
-                  >
-                    {title}
-                  </h2>
-                  {subtitle ? (
-                    <p
-                      className="mt-3 max-w-2xl text-[16px] leading-[1.75] text-white/76 sm:text-[18px]"
-                      style={{ fontFamily }}
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform group-hover:scale-110 sm:h-20 sm:w-20">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="#111214"
+                      className="ml-1 h-7 w-7 sm:h-8 sm:w-8"
+                      aria-hidden="true"
                     >
-                      {subtitle}
-                    </p>
-                  ) : null}
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
-              </>
+              </button>
             )}
           </div>
         </div>
@@ -166,7 +136,7 @@ export default function HomeVideo() {
       playLabel={t('playLabel')}
       fontFamily={fontFamily}
       thumbnailUrl="https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=1600&h=900&fit=crop"
-      videoUrl="https://www.youtube.com/embed/RSw9066kqHw?si=tGNjgYblVnpV87lA"
+      videoUrl="https://www.youtube.com/embed/4LSkSDirDD0"
     />
   );
 }

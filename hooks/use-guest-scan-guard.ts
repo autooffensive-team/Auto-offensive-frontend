@@ -144,6 +144,8 @@ export function useGuestScanGuard() {
     lockedFeature,
     handleLockedFeature,
     scansRemaining: guest?.scansRemaining ?? 0,
-    maxScans: guest?.maxScans ?? 20,
+    maxScans: guest?.maxScans ?? 3,
+    refreshSession: guest?.refreshSession,
+    updateRateLimitDirect: guest?.updateRateLimitDirect,
   };
 }

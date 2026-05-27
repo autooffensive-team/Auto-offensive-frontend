@@ -21,7 +21,8 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { buildCodeScanningProjectHref } from "@/lib/scanner-route";
 import { useListCurrentUserScanIdsQuery } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
-import type { ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
+import { CodeScanTour, CodeScanTourTriggerButton } from "@/components/tour/CodeScanTour";
+import type { ScanStatus, ScanStatusResponse, ScanSummaryResponse, ScanTaskRefResponse } from "@/types/scanner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -211,13 +212,13 @@ function HexStatCard({
   }).join(" ");
   const ringR = [42, 24];
 
-  const newLocal = "h-[56px] w-[56px] sm:h-[72px] sm:w-[72px] md:h-[92px] md:w-[92px]";
+  const newLocal = "h-[56px] w-[56px] sm:h-[68px] sm:w-[68px] md:h-[76px] md:w-[76px] lg:h-[92px] lg:w-[92px]";
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3.5 sm:px-4.5 sm:py-4 md:gap-4.5 md:px-5.5 md:py-4.5 dark:border-slate-800 dark:bg-slate-900"
+      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4.5 lg:px-5.5 lg:py-4.5 dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Subtle corner gradient */}
       <span
@@ -284,11 +285,13 @@ function ScanProjectCard({
   index,
   seenProjects,
   onOpen,
+  status,
 }: {
   project: ScanProjectSummary;
   index: number;
   seenProjects: Set<string>;
   onOpen: (projectKey: string) => void;
+  status?: ScanStatus | null;
 }) {
   const provider = getProviderFromKey(project.projectKey);
   const href = buildCodeScanningProjectHref(project.projectKey);
@@ -322,7 +325,7 @@ function ScanProjectCard({
       />
 
       {/* ── Card body ── */}
-      <div className="px-3 py-3 sm:px-5 sm:py-[18px]">
+      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-[18px]">
         {/* Row 1: avatar + meta + badge + external */}
         <div className="mb-3 flex items-center justify-between gap-2 sm:mb-[14px]">
           <div className="flex min-w-0 items-center gap-2 sm:gap-[10px]">
@@ -353,10 +356,24 @@ function ScanProjectCard({
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-[7px]">
-            <span className="inline-flex items-center gap-1 rounded-full border border-[#00d0b2] px-2 py-[3px] text-[10px] font-medium text-[#01509e] sm:gap-[5px] sm:px-[10px] sm:py-[4px] sm:text-[12px] dark:text-[#00d0b2]">
-              <span className="inline-block h-[5px] w-[5px] rounded-full bg-[#00d0b2] sm:h-[6px] sm:w-[6px]" />
-              Active
-            </span>
+            {(() => {
+              const statusLabel = status
+                ? status.toLowerCase().split("_").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" ")
+                : "Active";
+              const isSuccess = status === "SUCCESS";
+              const isFailed = status === "FAILED";
+              const isRunning = status === "PENDING" || status === "IN_PROGRESS";
+              const borderColor = isFailed ? "#ef4444" : isRunning ? "#f59e0b" : "#00d0b2";
+              const dotColor = isFailed ? "#ef4444" : isRunning ? "#f59e0b" : "#00d0b2";
+              const textColor = isFailed ? "text-red-600 dark:text-red-400" : isRunning ? "text-amber-600 dark:text-amber-400" : "text-[#01509e] dark:text-[#00d0b2]";
+
+              return (
+                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-[3px] text-[10px] font-medium sm:gap-[5px] sm:px-[10px] sm:py-[4px] sm:text-[12px] ${textColor}`} style={{ borderColor }}>
+                  <span className="inline-block h-[5px] w-[5px] rounded-full sm:h-[6px] sm:w-[6px]" style={{ backgroundColor: dotColor }} />
+                  {statusLabel}
+                </span>
+              );
+            })()}
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -388,14 +405,6 @@ function ScanProjectCard({
           <div className="flex flex-wrap gap-1.5 sm:gap-[6px]">
             <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e6faf8] px-2 py-[3px] text-[10px] font-medium text-[#01509e] sm:gap-[4px] sm:px-[10px] sm:py-[4px] sm:text-[12px] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[13px] sm:w-[13px]" aria-hidden="true">
-                <circle cx="7.5" cy="15.5" r="5.5" />
-                <path d="m21 2-9.6 9.6" />
-                <path d="m15.5 7.5 3 3L22 7l-3-3" />
-              </svg>
-              Project key
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e6faf8] px-2 py-[3px] text-[10px] font-medium text-[#01509e] sm:gap-[4px] sm:px-[10px] sm:py-[4px] sm:text-[12px] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[13px] sm:w-[13px]" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
                 <rect x="14" y="14" width="7" height="7" />
@@ -411,7 +420,7 @@ function ScanProjectCard({
               onOpen(project.projectKey);
               window.location.href = href;
             }}
-            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-[#01509e] px-3 py-[6px] text-[11px] font-medium text-white transition-colors hover:bg-[#00d0b2] active:scale-[0.98] sm:gap-[6px] sm:px-4 sm:py-[7px] sm:text-[13px]"
+            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-[#01509e] px-3 py-[6px] text-[11px] font-medium text-white transition-colors hover:bg-[#00d0b2] hover:text-black active:scale-[0.98] sm:gap-[6px] sm:px-4 sm:py-[7px] sm:text-[13px]"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[14px] sm:w-[14px]" aria-hidden="true">
               <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
@@ -437,6 +446,7 @@ export default function CodeScanningPageClient() {
     isLoading: false,
     totalIssues: 0,
   });
+  const [projectStatuses, setProjectStatuses] = useState<Map<string, ScanStatus>>(new Map());
 
   const {
     data: scanRefsResponse,
@@ -563,6 +573,55 @@ export default function CodeScanningPageClient() {
     };
   }, [scanProjects, latestProjectScanIds]);
 
+  // Fetch scan status for each project's latest scan
+  useEffect(() => {
+    if (scanProjects.length === 0) {
+      setProjectStatuses(new Map());
+      return;
+    }
+
+    const controller = new AbortController();
+    let isActive = true;
+
+    void Promise.all(
+      scanProjects.map(async (project) => {
+        const scanId = latestProjectScanIds.get(project.projectKey);
+        if (!scanId) return { projectKey: project.projectKey, status: null };
+
+        try {
+          const response = await fetch(`/api/scanner/scans/${encodeURIComponent(scanId)}/status`, {
+            credentials: "include",
+            signal: controller.signal,
+            cache: "no-store",
+          });
+
+          if (!response.ok) return { projectKey: project.projectKey, status: null };
+
+          const data = (await response.json()) as ScanStatusResponse;
+          return { projectKey: project.projectKey, status: data.status };
+        } catch {
+          return { projectKey: project.projectKey, status: null };
+        }
+      }),
+    ).then((results) => {
+      if (!isActive) return;
+      const statusMap = new Map<string, ScanStatus>();
+      for (const result of results) {
+        if (result.status) {
+          statusMap.set(result.projectKey, result.status);
+        }
+      }
+      setProjectStatuses(statusMap);
+    }).catch(() => {
+      // silently ignore
+    });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [scanProjects, latestProjectScanIds]);
+
   const totalScans = scanRefsResponse?.total ?? scanRefsResponse?.tasks.length ?? 0;
   const uniqueProjectCount = scanRefsResponse?.project_keys.length ?? scanProjects.length;
   const totalIssues = issueSummaryState.totalIssues;
@@ -592,7 +651,10 @@ export default function CodeScanningPageClient() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
+
+      {/* ── Code Scan Tour ── */}
+      <CodeScanTour />
 
       {/* ── Header ── */}
       <motion.div
@@ -616,6 +678,7 @@ export default function CodeScanningPageClient() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:pt-1">
+          <CodeScanTourTriggerButton />
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
@@ -628,6 +691,7 @@ export default function CodeScanningPageClient() {
           </motion.button>
           <Link
             href="/userdashboard/code-scanning/new"
+            id="tour-import-repo-btn"
             className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#00d0b2] px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-[#00b89e] sm:flex-none sm:justify-start sm:gap-2 sm:px-4 sm:text-base"
           >
             <Plus size={14} />
@@ -660,8 +724,8 @@ export default function CodeScanningPageClient() {
         </div>
       ) : null}
 
-      {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet/desktop ── */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 lg:grid-cols-4">
+      {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet+ ── */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-4">
         <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
         <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
         <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
@@ -722,10 +786,10 @@ export default function CodeScanningPageClient() {
         ) : null}
       </AnimatePresence>
 
-      {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop ── */}
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+      {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop / 4 col wide ── */}
+      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
         {isLoading && scanProjects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
             <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />
             <p className="text-sm text-slate-500 sm:text-base dark:text-slate-400">Loading projects…</p>
           </div>
@@ -738,6 +802,7 @@ export default function CodeScanningPageClient() {
                 index={index}
                 seenProjects={seenProjects}
                 onOpen={handleProjectOpen}
+                status={projectStatuses.get(project.projectKey)}
               />
             ))}
           </AnimatePresence>
@@ -745,7 +810,7 @@ export default function CodeScanningPageClient() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl md:rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 dark:border-slate-700 dark:bg-slate-900"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl md:rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 2xl:col-span-4 dark:border-slate-700 dark:bg-slate-900"
           >
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 sm:mb-4 sm:h-12 sm:w-12 dark:border-slate-700 dark:bg-slate-800">
               <FolderGit2 size={20} className="text-slate-400 dark:text-slate-500" />

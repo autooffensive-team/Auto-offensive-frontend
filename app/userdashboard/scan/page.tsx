@@ -289,6 +289,8 @@ export default function ScanPage() {
     closeLockModal,
     lockedFeature,
     handleLockedFeature,
+    refreshSession,
+    updateRateLimitDirect,
   } = useGuestScanGuard();
 
   // Grab refreshSession so we can re-sync the quota bar after a 429
@@ -342,7 +344,7 @@ export default function ScanPage() {
     removeMediumStep,
   } = useScanController(isGuest ? "guest-advanced-scan" : initialProjectId, {
     guestMode: isGuest,
-    onQuotaExceeded: refreshGuestSession,
+    onGuestScanConsumed: updateRateLimitDirect,
   });
 
   // For guests, suppress the meta error about projects failing to load

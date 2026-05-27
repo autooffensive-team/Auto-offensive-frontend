@@ -211,7 +211,7 @@ export default function PlatformCapabilities() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               custom={1}
-              className="feature-hero-title text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
+              className="feature-hero-title text-[clamp(2rem,7vw,80px)] font-bold tracking-tight leading-tight mb-6 text-slate-900 dark:text-white transition-colors duration-300"
               style={{ fontFamily: heroTitleFontFamily, fontWeight: isKhmer ? 800 : 700 }}
             >
               {t("hero.titleLine1")}
