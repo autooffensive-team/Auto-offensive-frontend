@@ -582,32 +582,6 @@ export default function HomeHero() {
           .hero-comet-orbit { opacity: 0; }
         }
 
-        /* ── Mobile performance: simplify heavy animations ── */
-        @media (max-width: 767px) {
-          /* Disable expensive SVG blur filters on mobile */
-          .sweep-left, .sweep-right {
-            filter: none !important;
-          }
-          /* Reduce comet animation complexity */
-          .sweep-left-trail, .sweep-right-trail {
-            display: none;
-          }
-          /* Simplify hex grid animations */
-          .hx.bright, .hx.mid, .hx.dim {
-            animation-duration: 8s !important;
-          }
-          /* Reduce star layer animations */
-          .ao-s1 { animation-duration: 80s !important; }
-          .ao-s2 { animation-duration: 150s !important; }
-          .ao-s3 { animation-duration: 200s !important; }
-          /* Remove will-change from non-essential elements to free GPU memory */
-          .sweep-left, .sweep-right, .sweep-left-trail, .sweep-right-trail,
-          .converge, .converge-ring, .converge-flash,
-          .hx {
-            will-change: auto !important;
-          }
-        }
-
         /* ── Accent underline on title line 1 ── */
         .accent-underline { position: relative; display: inline-block; }
         .accent-underline::after {
