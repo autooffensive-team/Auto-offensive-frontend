@@ -152,7 +152,7 @@ export function AdvancedTerminalPanel({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
         fontFamily: "Consolas, 'Courier New', monospace",
-        fontSize: 14,
+        fontSize: 17,
         lineHeight: 1.4,
         scrollback: 5000,
         theme: terminalTheme,
