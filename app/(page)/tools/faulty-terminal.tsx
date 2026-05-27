@@ -51,8 +51,15 @@ export function FaultyTerminal({
   }, []);
   useEffect(() => {
     const ctn = containerRef.current; if (!ctn) return;
-    const renderer = new Renderer({ dpr, alpha: true }); rendererRef.current = renderer;
-    const gl = renderer.gl; gl.clearColor(0, 0, 0, 0);
+    // Pre-check WebGL availability before OGL tries (and fails with a console error)
+    const testCanvas = document.createElement('canvas');
+    const testCtx = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+    if (!testCtx) return; // WebGL not supported — skip silently
+    const renderer = new Renderer({ dpr, alpha: true });
+    const gl = renderer.gl;
+    if (!gl) return;
+    rendererRef.current = renderer;
+    gl.clearColor(0, 0, 0, 0);
     const geometry = new Triangle(gl);
     const program = new Program(gl, {
       vertex: _vertexShader, fragment: _fragmentShader,
