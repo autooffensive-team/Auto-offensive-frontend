@@ -25,6 +25,7 @@ const passthroughResponseHeaders = [
   "etag",
   "last-modified",
   "location",
+  "x-accel-buffering",
 ];
 
 export type GatewayRouteContext = {
@@ -130,6 +131,32 @@ async function proxyToGateway(
   });
 }
 
+// Best-effort detection of transient network failures from undici/node fetch.
+// These can happen when the upstream restarts, sleeps, or briefly drops a
+// keep-alive connection. A single retry catches most of them safely.
+function isTransientFetchError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const cause = (error as { cause?: { code?: string; message?: string } }).cause;
+  const code = cause?.code ?? "";
+  const message = `${error.message ?? ""} ${cause?.message ?? ""}`.toLowerCase();
+  if (
+    code === "ECONNRESET" ||
+    code === "ECONNREFUSED" ||
+    code === "ETIMEDOUT" ||
+    code === "EAI_AGAIN" ||
+    code === "UND_ERR_SOCKET" ||
+    code === "UND_ERR_CONNECT_TIMEOUT"
+  ) {
+    return true;
+  }
+  return (
+    message.includes("fetch failed") ||
+    message.includes("socket hang up") ||
+    message.includes("network socket disconnected") ||
+    message.includes("other side closed")
+  );
+}
+
 export async function proxyGatewayRequest(
   request: NextRequest,
   context: GatewayRouteContext,
@@ -159,12 +186,29 @@ export async function proxyGatewayRequest(
   }
 
   try {
-    let upstreamResponse = await proxyToGateway(
-      request,
-      upstreamUrl,
-      body,
-      accessToken ?? undefined,
-    );
+    let upstreamResponse: Response;
+    try {
+      upstreamResponse = await proxyToGateway(
+        request,
+        upstreamUrl,
+        body,
+        accessToken ?? undefined,
+      );
+    } catch (firstError) {
+      // Retry once for transient network errors (idle keep-alive sockets,
+      // upstream restarts, brief DNS hiccups). Same body buffer is reused.
+      if (!isTransientFetchError(firstError)) throw firstError;
+      console.warn(
+        `[gateway-proxy] transient upstream fetch error, retrying once: ${method} ${upstreamUrl}`,
+        firstError,
+      );
+      upstreamResponse = await proxyToGateway(
+        request,
+        upstreamUrl,
+        body,
+        accessToken ?? undefined,
+      );
+    }
 
     if (!isPublicPath && upstreamResponse.status === 401) {
       const refreshedAccessToken = await refreshKeycloakAccessToken(request);
@@ -182,9 +226,15 @@ export async function proxyGatewayRequest(
       status: upstreamResponse.status,
       headers: copyResponseHeaders(upstreamResponse.headers),
     });
-  } catch {
+  } catch (error) {
+    const cause = (error as { cause?: { code?: string } })?.cause;
+    const code = cause?.code ?? (error instanceof Error ? error.name : "unknown");
+    console.error(
+      `[gateway-proxy] upstream fetch failed: ${method} ${upstreamUrl} (${code})`,
+      error,
+    );
     return NextResponse.json(
-      { error: "Unable to reach backend service" },
+      { error: "Unable to reach backend service", code },
       { status: 502 },
     );
   }

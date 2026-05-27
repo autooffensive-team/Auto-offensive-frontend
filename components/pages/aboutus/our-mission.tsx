@@ -75,41 +75,72 @@ const SLIDES_KH = [
   },
 ];
 
-function SlidePathPointer({ from, to, nextLabel }: { from: string; to: string; nextLabel: string }) {
+function SlidePathPointer({ from, to }: { from: string; to: string; nextLabel: string }) {
   return (
     <div
-      className="ms-path-pointer relative flex h-full w-[30vw] shrink-0 flex-col items-center justify-center gap-2.5 pointer-events-none"
+      className="ms-path-pointer relative flex h-full w-[30vw] shrink-0 items-center justify-center pointer-events-none"
       aria-hidden="true"
     >
-      <div className="flex w-full items-center justify-between px-0.5">
-        <span className="text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[rgba(0,208,178,.35)]">{from}</span>
-        <span className="text-[0.55rem] font-bold uppercase tracking-[0.18em] text-[rgba(0,208,178,.6)]">{to}</span>
-      </div>
-
       <svg
         className="w-full overflow-visible"
-        style={{ height: "48px" }}
-        viewBox="0 0 320 48"
+        style={{ height: "80px" }}
+        viewBox="0 0 400 80"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
       >
-        <path d="M 0 24 Q 80 4 160 24 Q 240 44 320 24" stroke="rgba(0,208,178,0.22)" strokeWidth="1" strokeDasharray="5 5" fill="none" />
-        <path d="M 0 24 Q 80 4 160 24 Q 240 44 320 24" stroke="rgba(0,208,178,0.55)" strokeWidth="1.5" fill="none" strokeDasharray="30 290" strokeDashoffset="0" className="ms-pp-animated-dash" />
-        <path d="M 310 18 L 320 24 L 310 30" stroke="rgba(0,208,178,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <circle r="3" fill="#00D0B2" opacity="0.9">
-          <animateMotion dur="2.8s" repeatCount="indefinite" path="M 0 24 Q 80 4 160 24 Q 240 44 320 24" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" />
-        </circle>
-        <circle r="7" fill="#00D0B2" opacity="0.15">
-          <animateMotion dur="2.8s" repeatCount="indefinite" path="M 0 24 Q 80 4 160 24 Q 240 44 320 24" calcMode="spline" keySplines="0.4 0 0.6 1" keyTimes="0;1" />
-        </circle>
-      </svg>
+        {/* PCB trace path: right-angle segments with rounded corners */}
+        <path
+          d="M 0 40 H 60 Q 68 40 68 32 V 20 Q 68 12 76 12 H 180 Q 188 12 188 20 V 60 Q 188 68 196 68 H 324 Q 332 68 332 60 V 40 H 400"
+          stroke="rgba(0,80,158,0.2)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Animated pulse traveling along the trace */}
+        <path
+          d="M 0 40 H 60 Q 68 40 68 32 V 20 Q 68 12 76 12 H 180 Q 188 12 188 20 V 60 Q 188 68 196 68 H 324 Q 332 68 332 60 V 40 H 400"
+          stroke="rgba(0,80,158,0.85)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          strokeDasharray="40 560"
+          className="ms-circuit-pulse"
+        />
+        {/* Glow behind the pulse */}
+        <path
+          d="M 0 40 H 60 Q 68 40 68 32 V 20 Q 68 12 76 12 H 180 Q 188 12 188 20 V 60 Q 188 68 196 68 H 324 Q 332 68 332 60 V 40 H 400"
+          stroke="rgba(0,80,158,0.3)"
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          strokeDasharray="40 560"
+          className="ms-circuit-pulse"
+        />
 
-      <div className="flex items-center gap-2 text-[0.5rem] font-bold uppercase tracking-[0.22em] text-[rgba(0,208,178,.3)]">
-        <span className="ms-pp-step-icon text-[0.65rem] text-[rgba(0,208,178,.25)]">□</span>
-        {nextLabel}
-        <span className="ms-pp-step-icon ms-pp-step-icon--last text-[0.65rem] text-[rgba(0,208,178,.25)]">□</span>
-      </div>
+        {/* Start pad (from node) */}
+        <circle cx="0" cy="40" r="6" fill="rgba(0,80,158,0.12)" stroke="rgba(0,80,158,0.5)" strokeWidth="1.5" />
+        <circle cx="0" cy="40" r="2.5" fill="#00509E" />
+
+        {/* End pad (to node) */}
+        <circle cx="400" cy="40" r="6" fill="rgba(0,80,158,0.12)" stroke="rgba(0,80,158,0.5)" strokeWidth="1.5" />
+        <circle cx="400" cy="40" r="2.5" fill="#00509E" />
+
+        {/* Junction dots along the trace */}
+        <circle cx="68" cy="40" r="2" fill="rgba(0,80,158,0.4)" />
+        <circle cx="68" cy="12" r="2" fill="rgba(0,80,158,0.4)" />
+        <circle cx="188" cy="12" r="2" fill="rgba(0,80,158,0.4)" />
+        <circle cx="188" cy="68" r="2" fill="rgba(0,80,158,0.4)" />
+        <circle cx="332" cy="68" r="2" fill="rgba(0,80,158,0.4)" />
+        <circle cx="332" cy="40" r="2" fill="rgba(0,80,158,0.4)" />
+
+        {/* Labels */}
+        <text x="0" y="60" textAnchor="middle" className="ms-circuit-label" fontSize="9" fontWeight="700" fill="rgba(0,80,158,0.7)">{from}</text>
+        <text x="400" y="60" textAnchor="middle" className="ms-circuit-label" fontSize="9" fontWeight="700" fill="rgba(0,80,158,0.7)">{to}</text>
+      </svg>
     </div>
   );
 }
@@ -278,7 +309,7 @@ function PipelineVisualFilled({ steps }: { steps: string[] }) {
 
 export default function OurMission() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const slides = isKhmer ? SLIDES_KH : SLIDES_EN;
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
@@ -415,8 +446,8 @@ export default function OurMission() {
         .ms-sticky { background: var(--bg); }
         .ms-bg-grid {
           background-image:
-            linear-gradient(rgba(0,208,178,.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,208,178,.04) 1px, transparent 1px);
+            linear-gradient(rgba(0,80,158,.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,80,158,.06) 1px, transparent 1px);
           background-size: 72px 72px;
           mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
         }
@@ -493,17 +524,17 @@ export default function OurMission() {
         .ms-vp-icon { color: rgba(0,208,178,.3); }
         .ms-vp-step.active .ms-vp-icon { color: #00D0B2; }
         .ms-vp-line { background: rgba(0,208,178,.14); }
-        @keyframes ms-dash-travel {
-          0% { stroke-dashoffset: 320; }
-          100% { stroke-dashoffset: -320; }
+        @keyframes ms-circuit-travel {
+          0% { stroke-dashoffset: 600; }
+          100% { stroke-dashoffset: -600; }
         }
-        .ms-pp-animated-dash { animation: ms-dash-travel 2.8s linear infinite; }
-        @keyframes ms-pp-icon-pulse {
-          0% { opacity: .2; transform: scale(.9); }
-          100% { opacity: .7; transform: scale(1.1); }
+        .ms-circuit-pulse {
+          animation: ms-circuit-travel 3s cubic-bezier(.4,0,.6,1) infinite;
         }
-        .ms-pp-step-icon { animation: ms-pp-icon-pulse 2s ease-in-out infinite alternate; }
-        .ms-pp-step-icon--last { animation-delay: .4s; }
+        .ms-circuit-label {
+          font-family: var(--font-title, monospace);
+          letter-spacing: 0.06em;
+        }
         .ms-copy { font-size: 16px; }
         @media (min-width: 768px) {
           .ms-copy { font-size: 18px; }
@@ -651,7 +682,7 @@ export default function OurMission() {
                         <div className="ms-slide-tag mb-4 flex items-center gap-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[rgba(0,208,178,.6)]">
                           {slide.tag}
                         </div>
-                        <h2 className="ms-slide-title mb-4 text-[clamp(1.8rem,3vw,3rem)] leading-[1.1] font-bold tracking-[-0.03em]" style={{ color: "var(--text)", fontFamily: titleFont }}>
+                        <h2 className="ms-slide-title mb-4 whitespace-nowrap text-[clamp(1.8rem,3vw,3rem)] leading-[1.1] font-bold tracking-[-0.03em]" style={{ color: "var(--text)", fontFamily: titleFont }}>
                           {slide.title.map((line, lineIndex) => (
                             <Fragment key={line}>
                               {lineIndex === slide.accentIndex ? <span className="text-primary">{line}</span> : line}

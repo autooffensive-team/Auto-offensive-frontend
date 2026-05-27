@@ -21,9 +21,9 @@
 
 ## ✨ Overview
 
-`Auto-Offensive` is a **Platform as a Service (PaaS)** that enables **automated penetration testing** through:
+`Auto-Offensive` is a hybrid **Platform as a Service (PaaS) and Software as a Service (SaaS)** that enables **automated penetration testing** through:
 
-- 🖥️ Web Dashboard  
+- 🖥 Web Dashboard  
 - 💻 CLI Interface  
 - 🔗 API Integration  
 
@@ -33,7 +33,7 @@ No local setup. No tool configuration. Just scan.
 
 ---
 
-## 🖼️ Preview
+## 🖼 Preview
 
 <p align="center">
   <img src="./public/desktop-preview.png" width="360"/>
@@ -47,7 +47,7 @@ No local setup. No tool configuration. Just scan.
 
 **Auto-Offensive delivers security automation across 4 core capabilities:**
 
-### 🖥️ Automated Penetration Testing (Web UI)
+### 🖥 Automated Penetration Testing (Web UI)
 - **🔍 One-Click Scanning** – Launch complex security scans directly from the dashboard with no manual configuration.
 - **⚙️ Dynamic Tool Management** – Admins can add new security tools through the UI without touching backend code.
 - **🔗 Tool Piping & Chaining** – Select multiple tools and pipe them together (e.g., use Nmap output as direct input for Nuclei).
@@ -60,7 +60,7 @@ No local setup. No tool configuration. Just scan.
 ### 💻 Remote CLI Execution
 - **🌐 Remote Execution** – Run scans from your local terminal without installing tools locally; the CLI calls our server-side API.
 - **🔐 Cloud Synct** – Full login and authentication support to sync your sessions and history across devices.
-- **⚡ Instant Results** – After a scan, the CLI returns a direct URL to view the web report or download it immediately.
+- **⚡️ Instant Results** – After a scan, the CLI returns a direct URL to view the web report or download it immediately.
 
 ### 🔒 Source Code & CI/CD Security
 - **🧬 Git Integration** – Scan GitHub and GitLab repositories directly for code quality issues and hardcoded secrets.
@@ -103,8 +103,8 @@ Auto-Offensive leverages a modern, high-performance stack designed for security,
 
 ### 🎨 Frontend Technologies
 
-#### **🏗️ Core Framework & Libraries**
-- **⚡ Next.js (App Router)** - React-based full-stack framework with SSR, SSG, and performance optimization
+#### **🏗 Core Framework & Libraries**
+- **⚡️ Next.js (App Router)** - React-based full-stack framework with SSR, SSG, and performance optimization
 - **📘 TypeScript** - Strongly typed JavaScript for enhanced reliability and developer experience
 
 #### **🎭 Styling & UI Components**
@@ -114,7 +114,7 @@ Auto-Offensive leverages a modern, high-performance stack designed for security,
 - **🧩 Shadcn/ui Components** - Modern, accessible, and customizable component library
 
 #### **🔄 State Management & Logic**
-- **🗃️ Redux** - Predictable state container for complex application state management
+- **🗃 Redux** - Predictable state container for complex application state management
 - **🚀 JavaScript (ES6+)** - Modern JavaScript features for enhanced functionality
 
 ### ⚙️ Backend & Security
@@ -127,8 +127,9 @@ Auto-Offensive leverages a modern, high-performance stack designed for security,
 
 ### 💾 Database & Caching
 
-#### **🗄️ Primary Database**
+#### **🗄 Primary Database**
 - **🐘 PostgreSQL** - Our primary relational database, ensuring ACID compliance and robust data integrity for user and scan records.
+- **🟥 Redis** -  (Remote Dictionary Server) is an open-source, in-memory NoSQL data structure store
 
 
 
@@ -138,17 +139,18 @@ Auto-Offensive leverages a modern, high-performance stack designed for security,
 - **🐋 Docker** - Containerization for:
   - 📦 Application packaging and deployment
   - 🔄 Environment consistency
-  - 🏗️ Microservices orchestration
+  - 🏗 Microservices orchestration
   - 📈 Simplified scaling
+- **🔒 gVisor** - is an open-source container runtime developed by Google that acts as a secure, sandboxed middleman between your containerized applications and the host operating system
 
 #### **🌐 Web Server & Infrastructure**
 - **🚀 NGINX** - High-performance reverse proxy for load balancing and SSL termination
 - **☁️ Cloud Deployment** - Scalable cloud infrastructure
 - **🔄 CI/CD Pipeline** - Automated testing, building, and deployment
-
+-- **☸️ Jenkins** - is a free, open-source automation server that helps software teams build, test, and deploy their applications automatically
 ---
 
-## 🗺️ Navigation Structure
+## 🗺 Navigation Structure
 
 Clear and intuitive navigation across **public**, **user**, and **admin** areas ensures a seamless experience.
 
@@ -157,27 +159,27 @@ Clear and intuitive navigation across **public**, **user**, and **admin** areas 
 ### 🌐 Public Navigation
 
 - 🏠 **Home**  
-  [https://auto-offensive.com/](#)  
+  [https://auto-offensive.vercel.app/](https://auto-offensive.vercel.app/)  
   → Platform overview and introduction  
 
-- 🛠️ **Tools**  
-  [https://auto-offensive.com/tools](#)  
+- 🛠 **Tools**  
+  [https://auto-offensive.vercel.app/tools](https://auto-offensive.vercel.app/tools)  
   → Explore automated security tools  
 
 - ✨ **Features**  
-  [https://auto-offensive.com/features](#)  
+  [https://auto-offensive.vercel.app/feature](https://auto-offensive.vercel.app/feature)  
   → Discover orchestration & automation capabilities  
 
 - 📚 **Resources**  
-  [https://auto-offensive.com/kb](#)  
+  [https://auto-offensive.vercel.app/resource](https://auto-offensive.vercel.app/resource)  
   → Knowledge base and security documentation  
 
 - 🔑 **Login**  
-  [https://auto-offensive.com/login](#)  
+  [https://auto-offensive.vercel.app/login](https://auto-offensive.vercel.app/login)  
   → Access your secure dashboard  
 
 - 📝 **Register**  
-  [https://auto-offensive.com/signup](#)  
+  [https://auto-offensive.vercel.app/register](https://auto-offensive.vercel.app/register)  
   → Create an account for full access  
 
 ---
@@ -185,40 +187,39 @@ Clear and intuitive navigation across **public**, **user**, and **admin** areas 
 ### 🔐 Authenticated User Pages
 
 - 📊 **Dashboard**  
-  https://app.auto-offensive.com/dashboard  
+  https://auto-offensive.vercel.app/userdashboard 
   → View scan history, recent results, and quick actions  
 
 - 🔍 **New Scan**  
-  https://app.auto-offensive.com/scan  
+  https://auto-offensive.vercel.app/userdashboard/scan 
   → Configure and launch automated security workflows  
 
+- 🔍 **Code Scan**  
+  https://auto-offensive.vercel.app/userdashboard/code-scanning
+  → Scan code from your repository in github and gitlab when connect 
+
 - 📄 **Reports**  
-  https://app.auto-offensive.com/reports  
+  https://auto-offensive.vercel.app/userdashboard/reports 
   → Manage, view, and export scan results  
 
 - ⚙️ **Profile Settings**  
-  https://app.auto-offensive.com/profile  
+  https://auto-offensive.vercel.app/userdashboard/profile  
   → Update account details and manage API keys  
 
 ---
 
-### 🛡️ Admin Panel
+### 🛡 Admin Panel
+- 📖 **Admin Dashboard Overview**  
+  https://aof-admin.vercel.app/dashboard
+  → Admin Overview 
 
 - 👥 **User Management**  
-  https://app.auto-offensive.com/admin/users  
+  https://aof-admin.vercel.app/dashboard/users 
   → Monitor, manage, and control user accounts  
 
-- 🛠️ **Tool Management**  
-  https://app.auto-offensive.com/admin/tools  
+- 🛠 **Tool Management**  
+  https://aof-admin.vercel.app/dashboard/tools 
   → Add, update, or remove security tools dynamically  
-
-- 📖 **Documentation Editor**  
-  https://app.auto-offensive.com/admin/docs  
-  → Update and manage knowledge base content in real-time  
-
-- 📈 **Analytics Dashboard**  
-  https://app.auto-offensive.com/admin/analytics  
-  → Track usage metrics and platform performance  
 
 ---
 
@@ -243,12 +244,10 @@ Their technical expertise and strategic guidance were the cornerstones of **Auto
 *Empowering security professionals, developers, and researchers with accessible, automated penetration testing tools — without the infrastructure complexity.*
 
 
-
 ---
 
 <p align="center">
 <strong>🚀 Ready to automate your security workflow?</strong>
 
 
-<a href="#">🌐 Visit Auto-Offensive Today!</a>
-</p># reffensive-frontend
+<a href="https://auto-offensive.vercel.app/">🌐 Visit Auto-Offensive Today!</a>

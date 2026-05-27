@@ -1,4 +1,9 @@
+import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
+
 export default function GuestBanner() {
+  const guest = useOptionalGuestContext();
+  const maxScans = guest?.maxScans ?? 20;
+
   return (
     <div className="rounded-2xl border border-teal-500/30 bg-teal-500/10 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
@@ -7,7 +12,7 @@ export default function GuestBanner() {
         </p>
 
         <h3 className="text-lg font-bold text-white mb-1">
-          Guest scans are limited to 3 per day.
+          Guest scans are limited to {maxScans} per day.
         </h3>
 
         <p className="text-gray-400 text-sm">

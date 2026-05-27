@@ -4,25 +4,20 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { motion } from "framer-motion";
 import {
-  Activity,
   AlertTriangle,
+  ArrowLeft,
   BarChart3,
-  CheckCircle2,
-  Clock3,
   ExternalLink,
   FileCode2,
   FolderGit2,
   GitBranch,
-  Info,
   LoaderCircle,
   RefreshCw,
   ShieldAlert,
-  ShieldCheck,
-  TimerReset,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import type { ComponentType } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   useGetDependencySummaryQuery,
@@ -31,64 +26,35 @@ import {
   useGetScanSummaryQuery,
   useListCurrentUserScansQuery,
   useListDependenciesQuery,
+  useListHotspotsQuery,
   useListIssuesQuery,
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
-import { buildCodeScanningIssueHref, buildCodeScanningProjectHref, isLikelyScanId } from "@/lib/scanner-route";
 import { cn } from "@/lib/utils";
 import type {
-  DependencyResponse,
-  DependencySummaryResponse,
-  IssueResponse,
-  ProjectScanResponse,
   QualityGateStatus,
-  ScanPhaseResponse,
-  ScanStatus,
 } from "@/types/scanner";
 
-type ProjectView = "overview" | "issues" | "dependencies" | "activity" | "info";
+import { CodeScanOverview } from "./code-scan-overview";
+import { CodeScanIssues } from "./code-scan-issues";
+import { CodeScanDependencies } from "./code-scan-dependencies";
+import { CodeScanHotspots } from "./code-scan-hotspots";
+
+const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
+
+type ProjectView = "overview" | "issues" | "dependencies" | "hotspots";
 type GradeTone = "green" | "lime" | "red" | "muted";
 
 type NavItem = {
   id: ProjectView;
   label: string;
-  icon: ComponentType<{ className?: string }>;
-};
-
-type FilterOption = {
-  label: string;
-  value: string;
+  icon: React.ComponentType<{ className?: string }>;
 };
 
 const projectNavItems: NavItem[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "issues", label: "Issues", icon: FileCode2 },
   { id: "dependencies", label: "Dependencies", icon: FolderGit2 },
-  { id: "activity", label: "Activity", icon: Activity },
-  { id: "info", label: "Project information", icon: Info },
-];
-
-const issueTypeOptions: FilterOption[] = [
-  { label: "All", value: "" },
-  { label: "Bugs", value: "BUG" },
-  { label: "Vulnerabilities", value: "VULNERABILITY" },
-  { label: "Code smells", value: "CODE_SMELL" },
-];
-
-const severityOptions: FilterOption[] = [
-  { label: "All severities", value: "" },
-  { label: "Blocker", value: "BLOCKER" },
-  { label: "Critical", value: "CRITICAL" },
-  { label: "Major", value: "MAJOR" },
-  { label: "Minor", value: "MINOR" },
-  { label: "Info", value: "INFO" },
-];
-
-const dependencySeverityOptions: FilterOption[] = [
-  { label: "All severities", value: "" },
-  { label: "Critical", value: "CRITICAL" },
-  { label: "High", value: "HIGH" },
-  { label: "Medium", value: "MEDIUM" },
-  { label: "Low", value: "LOW" },
+  { id: "hotspots", label: "Security Hotspots", icon: ShieldAlert },
 ];
 
 const sectionMotion = {
@@ -97,6 +63,45 @@ const sectionMotion = {
   transition: { duration: 0.24, ease: "easeOut" as const },
 };
 
+// ─── Play notification sound ──────────────────────────────────────────────────
+function playScanCompleteSound(): void {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = "sine";
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  } catch {
+    // Fallback: silent if AudioContext not available
+  }
+}
+
+// ─── New Project Badge Component ────────────────────────────────────────────
+
+function PreviousPageButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
+    >
+      <ArrowLeft className="size-3.5 shrink-0 sm:size-4" />
+      <span>Back to previous page</span>
+    </button>
+  );
+}
+
+// Utility Functions
 function asText(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
@@ -106,7 +111,11 @@ function readPayloadMessage(payload: unknown): string {
     return "";
   }
 
-  const source = payload as { detail?: unknown; message?: unknown; error?: unknown };
+  const source = payload as {
+    detail?: unknown;
+    message?: unknown;
+    error?: unknown;
+  };
   const detail = asText(source.detail).trim();
   if (detail) {
     return detail;
@@ -121,7 +130,10 @@ function readPayloadMessage(payload: unknown): string {
 }
 
 function readErrorMessage(error: unknown, fallback: string): string {
-  const queryError = error as FetchBaseQueryError | { message?: string } | undefined;
+  const queryError = error as
+    | FetchBaseQueryError
+    | { message?: string }
+    | undefined;
   if (!queryError) {
     return fallback;
   }
@@ -136,8 +148,28 @@ function readErrorMessage(error: unknown, fallback: string): string {
     }
   }
 
-  const message = "message" in queryError ? asText(queryError.message).trim() : "";
+  const message =
+    "message" in queryError ? asText(queryError.message).trim() : "";
   return message || fallback;
+}
+
+function formatDate(value: string | null | undefined): string {
+  if (!value) {
+    return "Unavailable";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Unavailable";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function formatRelativeTime(value: string | null | undefined): string {
@@ -165,25 +197,10 @@ function formatRelativeTime(value: string | null | undefined): string {
   return `Last analysis ${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 }
 
-function formatDate(value: string | null | undefined): string {
-  if (!value) {
-    return "Unavailable";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "Unavailable";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
+/**
+ * Check if a project is "newly created"
+ * Consider a project new if created within the last 24 hours
+ */
 function formatPercent(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return "0.0%";
@@ -195,29 +212,17 @@ function formatCount(value: number | null | undefined): string {
   return new Intl.NumberFormat("en").format(value ?? 0);
 }
 
-function formatStatusLabel(value: string | null | undefined): string {
-  if (!value) {
-    return "Unknown";
+function getRepoHost(repoUrl: string): "github" | "gitlab" | "other" {
+  if (!repoUrl) return "other";
+  try {
+    const parsed = new URL(repoUrl);
+    if (parsed.host.includes("github")) return "github";
+    if (parsed.host.includes("gitlab")) return "gitlab";
+  } catch {
+    if (repoUrl.includes("github")) return "github";
+    if (repoUrl.includes("gitlab")) return "gitlab";
   }
-
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function formatLabel(value: string | null | undefined): string {
-  if (!value) {
-    return "Unknown";
-  }
-
-  return value
-    .replace(/[_-]+/g, " ")
-    .split(" ")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
+  return "other";
 }
 
 function getProjectInitial(projectKey: string): string {
@@ -237,7 +242,11 @@ function getRepoPath(repoUrl: string): string {
   }
 }
 
-function getGrade(value: number, warningAt: number, dangerAt: number): { label: string; tone: GradeTone } {
+function getGrade(
+  value: number,
+  warningAt: number,
+  dangerAt: number
+): { label: string; tone: GradeTone } {
   if (value <= warningAt) {
     return { label: "A", tone: "green" };
   }
@@ -247,67 +256,9 @@ function getGrade(value: number, warningAt: number, dangerAt: number): { label: 
   return { label: "E", tone: "red" };
 }
 
-function getIssueSeverityTone(severity: string): string {
-  switch (severity.toUpperCase()) {
-    case "BLOCKER":
-      return "bg-red-600 text-white";
-    case "CRITICAL":
-      return "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300";
-    case "MAJOR":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300";
-    case "MINOR":
-      return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
-    default:
-      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
-  }
-}
-
-function getDependencySeverityTone(severity: string): string {
-  switch (severity.toUpperCase()) {
-    case "CRITICAL":
-      return "bg-red-600 text-white";
-    case "HIGH":
-      return "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300";
-    case "MEDIUM":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300";
-    case "LOW":
-      return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
-    default:
-      return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300";
-  }
-}
-
-function getStatusTone(status: string | null | undefined): string {
-  switch (status) {
-    case "SUCCESS":
-      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
-    case "IN_PROGRESS":
-      return "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20";
-    case "PENDING":
-      return "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20";
-    case "PARTIAL":
-      return "bg-orange-50 text-orange-700 ring-1 ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20";
-    case "FAILED":
-      return "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20";
-    default:
-      return "bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700";
-  }
-}
-
-function getQualityGateTone(status: QualityGateStatus | null | undefined): string {
-  switch (status) {
-    case "OK":
-      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
-    case "WARN":
-      return "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20";
-    case "ERROR":
-      return "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20";
-    default:
-      return "bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700";
-  }
-}
-
-function getQualityGateLabel(status: QualityGateStatus | null | undefined): string {
+function getQualityGateLabel(
+  status: QualityGateStatus | null | undefined
+): string {
   if (!status) {
     return "Unavailable";
   }
@@ -323,557 +274,364 @@ function getQualityGateLabel(status: QualityGateStatus | null | undefined): stri
   return "Failed";
 }
 
-function getCweTag(issue: IssueResponse): string {
-  const matchedTag = issue.tags.find((tag) => /^cwe[-_:]?\d+$/i.test(tag));
-  if (matchedTag) {
-    return matchedTag.toUpperCase().replace(/[_:]/g, "-");
+function formatStatusLabel(value: string | null | undefined): string {
+  if (!value) {
+    return "Unknown";
   }
 
-  const matchedRule = issue.rule_key.match(/cwe[-_:]?(\d+)/i);
-  if (matchedRule) {
-    return `CWE-${matchedRule[1]}`;
-  }
-
-  return issue.tags[0]?.toUpperCase() || issue.rule_key.toUpperCase();
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
-function GradeBadge({ grade }: { grade: { label: string; tone: GradeTone } }) {
+function markProjectAsSeen(projectKey: string): void {
+  if (typeof window === "undefined" || !projectKey.trim()) {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_PROJECTS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    const current = new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === "string")
+        : [],
+    );
+
+    current.add(projectKey);
+    window.localStorage.setItem(
+      SEEN_PROJECTS_STORAGE_KEY,
+      JSON.stringify(Array.from(current)),
+    );
+  } catch {
+    // Ignore storage failures and keep navigation working.
+  }
+}
+
+// GitHub SVG Icon
+function GitHubIcon({ className }: { className?: string }) {
   return (
-    <span
-      className={cn(
-        "inline-flex size-8 items-center justify-center rounded-full text-sm font-bold",
-        grade.tone === "green" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-        grade.tone === "lime" && "bg-lime-100 text-lime-700 dark:bg-lime-500/15 dark:text-lime-300",
-        grade.tone === "red" && "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
-        grade.tone === "muted" && "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
-      )}
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-label="GitHub"
     >
-      {grade.label}
-    </span>
+      <path d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.216.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12z" />
+    </svg>
   );
 }
 
-function EmptyPanel({ message }: { message: string }) {
+// GitLab SVG Icon
+function GitLabIcon({ className }: { className?: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#d7e0ef] bg-white p-8 text-center text-sm text-[#52648f] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
-      {message}
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-label="GitLab"
+    >
+      <path d="M23.955 13.587l-1.342-4.135-2.664-8.189a.455.455 0 0 0-.867 0L16.418 9.45H7.582L4.918 1.263a.455.455 0 0 0-.867 0L1.386 9.452.044 13.587a.924.924 0 0 0 .331 1.023L12 23.054l11.625-8.443a.924.924 0 0 0 .33-1.024" />
+    </svg>
+  );
+}
+
+// Repository Host Icon
+function RepoHostIcon({
+  repoUrl,
+  className,
+}: {
+  repoUrl: string;
+  className?: string;
+}) {
+  const host = getRepoHost(repoUrl);
+  if (host === "github") {
+    return <GitHubIcon className={className} />;
+  }
+  if (host === "gitlab") {
+    return <GitLabIcon className={className} />;
+  }
+  return <FolderGit2 className={className} />;
+}
+
+// Project Avatar using repo host icon or letter fallback
+function ProjectAvatar({
+  projectKey,
+  repoUrl,
+}: {
+  projectKey: string;
+  repoUrl: string;
+}) {
+  const host = getRepoHost(repoUrl);
+
+  if (host === "github") {
+    return (
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-900 sm:size-12 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+        <GitHubIcon className="size-5 sm:size-6" />
+      </div>
+    );
+  }
+
+  if (host === "gitlab") {
+    return (
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#fc6d26] sm:size-12 dark:border-slate-700 dark:bg-slate-900">
+        <GitLabIcon className="size-5 sm:size-6" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-teal-50 to-teal-100 text-sm font-bold text-teal-700 dark:from-teal-500/10 dark:to-teal-500/20 dark:text-teal-300">
+      {getProjectInitial(projectKey)}
     </div>
   );
 }
 
 function StatusPill({ status }: { status: string | null | undefined }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getStatusTone(status))}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+        status === "SUCCESS" &&
+          "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
+        status === "IN_PROGRESS" &&
+          "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20",
+        status === "PENDING" &&
+          "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20",
+        !status &&
+          "bg-slate-100 text-slate-600 ring-1 ring-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-gray-700",
+      )}
+    >
       {formatStatusLabel(status)}
     </span>
   );
 }
 
-function TopStatCard({
-  label,
-  value,
-  helper,
-  accent,
-  icon: Icon,
-}: {
-  label: string;
-  value: string;
-  helper: string;
-  accent: "teal" | "emerald" | "amber" | "slate";
-  icon: ComponentType<{ className?: string }>;
-}) {
-  return (
-    <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7da4] dark:text-gray-500">{label}</p>
-          <p className="mt-3 text-2xl font-bold text-[#071120] dark:text-white">{value}</p>
-          <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">{helper}</p>
-        </div>
-        <div
-          className={cn(
-            "flex size-11 items-center justify-center rounded-xl",
-            accent === "teal" && "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
-            accent === "emerald" && "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-            accent === "amber" && "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
-            accent === "slate" && "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-          )}
-        >
-          <Icon className="size-5" />
-        </div>
-      </div>
-    </div>
-  );
+function getQualityGateTone(
+  status: QualityGateStatus | null | undefined
+): string {
+  switch (status) {
+    case "OK":
+      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20";
+    case "WARN":
+      return "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20";
+    case "ERROR":
+      return "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20";
+    default:
+      return "bg-slate-100 text-slate-600 ring-1 ring-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-gray-700";
+  }
 }
 
-function RingIndicator({ tone }: { tone: "ok" | "bad" | "neutral" }) {
+// ─── Header Component ────────────────────────────────────────────────────────
+
+function PageHeader({
+  projectKey,
+  repoPath,
+  branch,
+  relativeTime,
+  status,
+  qualityGate,
+  repoUrl,
+}: {
+  projectKey: string;
+  repoPath: string;
+  branch: string;
+  relativeTime: string;
+  status: string | null | undefined;
+  qualityGate: QualityGateStatus | null | undefined;
+  repoUrl: string;
+}) {
   return (
-    <span
-      className={cn(
-        "inline-flex size-10 items-center justify-center rounded-full border-4",
-        tone === "ok" && "border-emerald-100 dark:border-emerald-500/20",
-        tone === "bad" && "border-red-700 dark:border-red-500",
-        tone === "neutral" && "border-gray-200 dark:border-gray-700",
-      )}
+    <motion.section
+      {...sectionMotion}
+      className="relative rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
-      {tone === "ok" ? <span className="size-2.5 rounded-full bg-emerald-500" /> : null}
-      {tone === "neutral" ? <TimerReset className="size-4 text-gray-500 dark:text-gray-400" /> : null}
-    </span>
-  );
-}
+      <div className="flex flex-col gap-3 sm:gap-4 md:gap-5">
+        <div className="flex min-w-0 gap-3 sm:gap-4">
+          <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
 
-function OverviewMetricCell({
-  title,
-  value,
-  primaryDetail,
-  secondaryDetail,
-  grade,
-  ring,
-  className,
-}: {
-  title: string;
-  value: string;
-  primaryDetail?: string;
-  secondaryDetail?: string;
-  grade?: { label: string; tone: GradeTone };
-  ring?: "ok" | "bad" | "neutral";
-  className?: string;
-}) {
-  return (
-    <div className={cn("p-5", className)}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h3 className="text-sm font-bold text-[#17233f] dark:text-gray-100">{title}</h3>
-          <div className="mt-4 flex flex-wrap items-baseline gap-1.5">
-            <span className="text-2xl font-bold leading-none text-[#21314f] dark:text-white">{value}</span>
-            {primaryDetail ? <span className="text-sm text-[#4f6290] dark:text-gray-400">{primaryDetail}</span> : null}
-          </div>
-          {secondaryDetail ? (
-            <p className="mt-4 text-sm text-[#4f6290] dark:text-gray-400">{secondaryDetail}</p>
-          ) : null}
-        </div>
-        {grade ? <GradeBadge grade={grade} /> : null}
-        {ring ? <RingIndicator tone={ring} /> : null}
-      </div>
-    </div>
-  );
-}
-
-function PhaseList({ phases }: { phases: ScanPhaseResponse[] }) {
-  if (phases.length === 0) {
-    return <EmptyPanel message="No scan phases were returned for this analysis." />;
-  }
-
-  return (
-    <div className="grid gap-3 lg:grid-cols-2">
-      {phases.map((phase) => (
-        <div
-          key={phase.key}
-          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-[#17233f] dark:text-gray-100">{formatStatusLabel(phase.key)}</p>
-              <p className="mt-1 text-xs text-[#6b7da4] dark:text-gray-500">Scanner phase</p>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">
+              <Link
+                href="/userdashboard/code-scanning"
+                className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
+              >
+                Code scanning
+              </Link>
+              <span>/</span>
+              <span className="truncate">{projectKey}</span>
             </div>
-            <StatusPill status={phase.status} />
+
+            <h1 className="mt-1.5 truncate text-lg font-bold text-slate-900 sm:mt-2 sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl dark:text-white">
+              {projectKey}
+            </h1>
+
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[10px] text-slate-500 sm:mt-3 sm:gap-x-3 sm:gap-y-2 sm:text-xs md:text-sm dark:text-slate-400">
+              <span className="inline-flex items-center gap-1.5">
+                <RepoHostIcon repoUrl={repoUrl} className="size-3 sm:size-3.5" />
+                {repoPath}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <GitBranch className="size-3 sm:size-3.5" />
+                {branch || "main"}
+              </span>
+              <span>{relativeTime}</span>
+            </div>
           </div>
-          {phase.error_message ? (
-            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
-              {phase.error_message}
-            </p>
-          ) : (
-            <p className="mt-3 text-sm text-[#52648f] dark:text-gray-400">No error reported for this phase.</p>
-          )}
         </div>
-      ))}
-    </div>
-  );
-}
 
-function DependencyLanguageList({
-  dependencySummary,
-}: {
-  dependencySummary: DependencySummaryResponse | null;
-}) {
-  if (!dependencySummary?.by_language?.length) {
-    return <EmptyPanel message="Dependency language breakdown is not available for this analysis." />;
-  }
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
-      {dependencySummary.by_language.map((row) => (
-        <div
-          key={row.language}
-          className="grid gap-3 border-b border-[#e4eaf4] px-4 py-4 text-sm last:border-b-0 dark:border-gray-800 md:grid-cols-[minmax(0,1fr)_120px_120px_120px_120px]"
-        >
-          <span className="font-semibold text-[#17233f] dark:text-gray-100">{row.language}</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.total_dependencies)} total</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.vulnerable_dependencies)} vulnerable</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.outdated_dependencies)} outdated</span>
-          <span className="text-[#52648f] dark:text-gray-400">{formatCount(row.license_issues)} license issues</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function FilterChips({
-  label,
-  options,
-  selected,
-  onChange,
-}: {
-  label: string;
-  options: FilterOption[];
-  selected: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => {
-          const active = selected === option.value;
-          return (
-            <button
-              key={option.value || option.label}
-              type="button"
-              onClick={() => onChange(option.value)}
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusPill status={status} />
+          {qualityGate ? (
+            <span
               className={cn(
-                "rounded-full px-3 py-1.5 text-sm font-medium transition",
-                active
-                  ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                  : "bg-white text-[#52648f] ring-1 ring-[#d7e0ef] hover:bg-[#f4f8fd] dark:bg-gray-950 dark:text-gray-400 dark:ring-gray-800 dark:hover:bg-gray-900",
+                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+                getQualityGateTone(qualityGate)
               )}
             >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function IssueList({
-  projectKey,
-  issues,
-  total,
-  isLoading,
-}: {
-  projectKey: string;
-  issues: IssueResponse[];
-  total: number;
-  isLoading: boolean;
-}) {
-  if (isLoading) {
-    return (
-      <div className="flex min-h-56 items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
-        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
-          <LoaderCircle className="size-4 animate-spin text-teal-500" />
-          Loading issues...
-        </div>
-      </div>
-    );
-  }
-
-  if (issues.length === 0) {
-    return <EmptyPanel message="No issues matched the current filters." />;
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="text-sm text-[#52648f] dark:text-gray-400">
-        Showing {issues.length} of {total} issue{total === 1 ? "" : "s"} from the scanner API.
-      </div>
-
-      <div className="space-y-3">
-        {issues.map((issue) => (
-          <motion.div
-            key={issue.key}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
-          >
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0 space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getIssueSeverityTone(issue.severity))}>
-                    {issue.severity}
-                  </span>
-                  <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
-                    {formatStatusLabel(issue.type)}
-                  </span>
-                  <StatusPill status={issue.status} />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{issue.message}</h3>
-                  <p className="mt-1 font-mono text-xs text-[#52648f] dark:text-gray-400">
-                    {issue.file_path}
-                    {issue.line > 0 ? `:${issue.line}` : ""}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
-                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{issue.rule_key}</span>
-                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">{getCweTag(issue)}</span>
-                  {issue.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full bg-[#f3f6fb] px-2.5 py-1 dark:bg-gray-900">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex shrink-0 items-start">
-                <Link
-                  href={buildCodeScanningIssueHref(projectKey, issue.key)}
-                  className="inline-flex items-center justify-center rounded-xl border border-[#d7e0ef] px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
-                >
-                  View detail
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DependencyFlag({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-full px-3 py-1.5 text-sm font-medium transition",
-        active
-          ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-          : "bg-white text-[#52648f] ring-1 ring-[#d7e0ef] hover:bg-[#f4f8fd] dark:bg-gray-950 dark:text-gray-400 dark:ring-gray-800 dark:hover:bg-gray-900",
-      )}
-    >
-      {label}
-    </button>
-  );
-}
-
-function collectDependencyToolOptions(items: DependencyResponse[]): FilterOption[] {
-  const tools = Array.from(new Set(items.map((item) => item.tool).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-  return [{ label: "All checkers", value: "" }, ...tools.map((tool) => ({ label: formatLabel(tool), value: tool }))];
-}
-
-function DependencyList({
-  dependencies,
-  total,
-  isLoading,
-}: {
-  dependencies: DependencyResponse[];
-  total: number;
-  isLoading: boolean;
-}) {
-  if (isLoading) {
-    return (
-      <div className="flex min-h-56 items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
-        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
-          <LoaderCircle className="size-4 animate-spin text-teal-500" />
-          Loading dependencies...
-        </div>
-      </div>
-    );
-  }
-
-  if (dependencies.length === 0) {
-    return <EmptyPanel message="No dependencies matched the current checker filters." />;
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="text-sm text-[#52648f] dark:text-gray-400">
-        Showing {dependencies.length} of {total} dependenc{total === 1 ? "y" : "ies"} from dependency checkers.
-      </div>
-
-      <div className="space-y-3">
-        {dependencies.map((dependency) => (
-          <motion.div
-            key={`${dependency.package_name}-${dependency.installed_version}-${dependency.cve_id}-${dependency.tool}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
-          >
-            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-              <div className="min-w-0 space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", getDependencySeverityTone(dependency.severity))}>
-                    {dependency.severity || "UNKNOWN"}
-                  </span>
-                  <span className="rounded-full bg-[#edf3ff] px-2.5 py-1 text-xs font-semibold text-[#44608c] dark:bg-gray-800 dark:text-gray-300">
-                    {formatLabel(dependency.tool)}
-                  </span>
-                  <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 text-xs text-[#52648f] dark:bg-gray-900 dark:text-gray-400">
-                    {formatLabel(dependency.language)}
-                  </span>
-                  {dependency.is_vulnerable ? (
-                    <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-300">
-                      Vulnerable
-                    </span>
-                  ) : null}
-                  {dependency.is_outdated ? (
-                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-                      Outdated
-                    </span>
-                  ) : null}
-                  {dependency.has_license_issue ? (
-                    <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
-                      License issue
-                    </span>
-                  ) : null}
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-[#071120] dark:text-white">{dependency.package_name}</h3>
-                  <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#52648f] dark:text-gray-400">
-                    <span>Installed: {dependency.installed_version || "Unknown"}</span>
-                    <span>Latest: {dependency.latest_version || "Unknown"}</span>
-                    {dependency.fixed_version ? <span>Fixed: {dependency.fixed_version}</span> : null}
-                    {dependency.license ? <span>License: {dependency.license}</span> : null}
-                    {dependency.ecosystem ? <span>Ecosystem: {dependency.ecosystem}</span> : null}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
-                  {dependency.cve_id ? (
-                    <span className="rounded-full bg-[#f3f6fb] px-2.5 py-1 font-medium dark:bg-gray-900">
-                      {dependency.cve_id}
-                    </span>
-                  ) : null}
-                </div>
-
-                {dependency.description ? (
-                  <p className="text-sm leading-6 text-[#4f6290] dark:text-gray-400">{dependency.description}</p>
-                ) : null}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function HistoryList({ scans }: { scans: ProjectScanResponse[] }) {
-  if (scans.length === 0) {
-    return <EmptyPanel message="No previous analyses were returned for this project." />;
-  }
-
-  return (
-    <div className="space-y-3">
-      {scans.map((scan) => (
-        <div
-          key={scan.scan_id}
-          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
-        >
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill status={scan.status} />
-                <span className="inline-flex items-center gap-1 text-sm text-[#52648f] dark:text-gray-400">
-                  <GitBranch className="size-3.5" />
-                  {scan.branch || "main"}
-                </span>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
-                <span>Started: {formatDate(scan.started_at || scan.created_at)}</span>
-                <span>Finished: {formatDate(scan.finished_at)}</span>
-                <span>Progress: {Math.max(0, Math.min(100, Math.round(scan.progress ?? 0)))}%</span>
-              </div>
-            </div>
-
-            <Link
-              href={buildCodeScanningProjectHref(scan.project_key)}
-              className="inline-flex items-center justify-center rounded-xl border border-[#d7e0ef] px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
+              Quality gate {getQualityGateLabel(qualityGate)}
+            </span>
+          ) : null}
+          {repoUrl ? (
+            <a
+              href={repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-900 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
             >
-              View analysis
-            </Link>
-          </div>
-
-          {scan.error_message ? (
-            <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
-              {scan.error_message}
-            </p>
+              <ExternalLink className="size-3.5 sm:size-4" />
+              Repository
+            </a>
           ) : null}
         </div>
-      ))}
-    </div>
+      </div>
+    </motion.section>
   );
 }
 
-function InfoGrid({
-  projectKey,
-  sonarProjectKey,
-  repoUrl,
-  branch,
-  status,
-  createdAt,
-  startedAt,
-  finishedAt,
+// Alert Component
+function AlertSection({
+  warningMessage,
+  qualityGateMessage,
 }: {
-  projectKey: string;
-  sonarProjectKey: string;
-  repoUrl: string;
-  branch: string;
-  status: ScanStatus | string;
-  createdAt: string | null | undefined;
-  startedAt: string | null | undefined;
-  finishedAt: string | null | undefined;
+  warningMessage: string | null;
+  qualityGateMessage: string | null;
 }) {
-  const items = [
-    { label: "Project key", value: projectKey || "Unavailable" },
-    { label: "Sonar project key", value: sonarProjectKey || "Unavailable" },
-    { label: "Repository", value: repoUrl || "Unavailable" },
-    { label: "Branch", value: branch || "main" },
-    { label: "Status", value: formatStatusLabel(status) },
-    { label: "Created at", value: formatDate(createdAt) },
-    { label: "Started at", value: formatDate(startedAt) },
-    { label: "Finished at", value: formatDate(finishedAt) },
-  ];
-
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="rounded-2xl border border-[#d7e0ef] bg-white p-4 dark:border-gray-800 dark:bg-gray-950"
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6b7da4] dark:text-gray-500">{item.label}</p>
-          <p className="mt-2 break-all text-sm font-medium text-[#17233f] dark:text-gray-100">{item.value}</p>
+  if (warningMessage) {
+    return (
+      <motion.section
+        {...sectionMotion}
+        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+      >
+        <div className="flex items-start gap-2 sm:gap-3">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
+          <span>{warningMessage}</span>
         </div>
-      ))}
-    </div>
+      </motion.section>
+    );
+  }
+
+  if (!warningMessage && qualityGateMessage) {
+    return (
+      <motion.section
+        {...sectionMotion}
+        className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+      >
+        <div className="flex items-start gap-2 sm:gap-3">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
+          <span>{qualityGateMessage}</span>
+        </div>
+      </motion.section>
+    );
+  }
+
+  return null;
+}
+
+// Navigation Tabs
+function ProjectNav({
+  activeView,
+  onViewChange,
+}: {
+  activeView: ProjectView;
+  onViewChange: (view: ProjectView) => void;
+}) {
+  return (
+    <motion.section
+      {...sectionMotion}
+      className="flex gap-1.5 overflow-x-auto rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-1.5 sm:gap-2 sm:rounded-xl sm:p-2 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+    >
+      {projectNavItems.map((item) => {
+        const Icon = item.icon;
+        const active = activeView === item.id;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onViewChange(item.id)}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
+              active
+                ? "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
+                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            )}
+          >
+            <Icon className="size-3.5 sm:size-4" />
+            {item.label}
+          </button>
+        );
+      })}
+    </motion.section>
   );
 }
 
-export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }: { scanId: string }) {
+// Main Component
+export default function CodeScanningDetailPageClient({
+  scanId: routeIdentifier,
+}: {
+  scanId: string;
+}) {
+  const router = useRouter();
+  const hasTriggeredCompletionRefresh = useRef(false);
   const [activeView, setActiveView] = useState<ProjectView>("overview");
   const [typeFilter, setTypeFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
+  const [issuesPage, setIssuesPage] = useState(1);
   const [dependencyToolFilter, setDependencyToolFilter] = useState("");
   const [dependencySeverityFilter, setDependencySeverityFilter] = useState("");
-  const [dependencyVulnerableOnly, setDependencyVulnerableOnly] = useState(false);
+  const [dependencyVulnerableOnly, setDependencyVulnerableOnly] =
+    useState(false);
   const [dependencyOutdatedOnly, setDependencyOutdatedOnly] = useState(false);
-  const routeUsesScanId = isLikelyScanId(routeIdentifier);
+  const [hotspotStatusFilter, setHotspotStatusFilter] = useState("");
+  const [hotspotsPage, setHotspotsPage] = useState(1);
+
+  function handleGoBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/userdashboard/code-scanning");
+  }
+
+  async function handleRefreshPage() {
+    await Promise.allSettled([
+      refetchScanDetail(),
+      refetchScanStatus(),
+      refetchScanSummary(),
+      refetchDependencySummary(),
+      refetchDependencies(),
+      refetchIssues(),
+      refetchHotspots(),
+      routeProjectScansQuery.refetch(),
+    ]);
+    router.refresh();
+  }
+
+  // Check if route identifier is a scan ID
+  const routeUsesScanId = /^[a-f0-9-]+$/i.test(routeIdentifier);
 
   const routeProjectScansQuery = useListCurrentUserScansQuery(
     routeUsesScanId
@@ -885,46 +643,62 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
         },
     {
       refetchOnMountOrArgChange: true,
-    },
+    }
   );
-  const resolvedScanId = routeUsesScanId ? routeIdentifier : routeProjectScansQuery.data?.scans[0]?.scan_id;
+
+  const resolvedScanId = routeUsesScanId
+    ? routeIdentifier
+    : routeProjectScansQuery.data?.scans[0]?.scan_id;
 
   const {
     data: scanDetail,
     isLoading,
     isError,
     error,
+    refetch: refetchScanDetail,
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: liveStatus, isFetching: isStatusFetching } = useGetScanStatusQuery(resolvedScanId ?? skipToken, {
-    pollingInterval: 5000,
-    refetchOnMountOrArgChange: true,
-  });
-  const { data: scanSummary } = useGetScanSummaryQuery(resolvedScanId ?? skipToken, {
-    refetchOnMountOrArgChange: true,
-  });
-  const { data: dependencySummaryResponse } = useGetDependencySummaryQuery(resolvedScanId ?? skipToken, {
-    refetchOnMountOrArgChange: true,
-  });
-  const {
-    data: dependencyListResponse,
-    isFetching: isDependenciesFetching,
-  } = useListDependenciesQuery(
+
+  const { data: liveStatus, refetch: refetchScanStatus } = useGetScanStatusQuery(
+    resolvedScanId ?? skipToken,
     {
-      scan_id: resolvedScanId ?? "",
-      page: 1,
-      page_size: 50,
-      tool: dependencyToolFilter || undefined,
-      severity: dependencySeverityFilter || undefined,
-      vulnerable_only: dependencyVulnerableOnly || undefined,
-      outdated_only: dependencyOutdatedOnly || undefined,
-    },
-    {
-      skip: !resolvedScanId,
+      pollingInterval: 5000,
       refetchOnMountOrArgChange: true,
-    },
+    }
   );
+
+  const { data: scanSummary, refetch: refetchScanSummary } = useGetScanSummaryQuery(
+    resolvedScanId ?? skipToken,
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const { data: dependencySummaryResponse, refetch: refetchDependencySummary } = useGetDependencySummaryQuery(
+    resolvedScanId ?? skipToken,
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const { data: dependencyListResponse, isFetching: isDependenciesFetching, refetch: refetchDependencies } =
+    useListDependenciesQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: 1,
+        page_size: 50,
+        tool: dependencyToolFilter || undefined,
+        severity: dependencySeverityFilter || undefined,
+        vulnerable_only: dependencyVulnerableOnly || undefined,
+        outdated_only: dependencyOutdatedOnly || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
   const { data: allDependenciesResponse } = useListDependenciesQuery(
     {
       scan_id: resolvedScanId ?? "",
@@ -934,24 +708,24 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
     {
       skip: !resolvedScanId,
       refetchOnMountOrArgChange: true,
-    },
+    }
   );
-  const {
-    data: issueResponse,
-    isFetching: isIssuesFetching,
-  } = useListIssuesQuery(
-    {
-      scan_id: resolvedScanId ?? "",
-      page: 1,
-      page_size: 25,
-      type_filter: typeFilter || undefined,
-      severity_filter: severityFilter || undefined,
-    },
-    {
-      skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
-    },
-  );
+
+  const { data: issueResponse, isFetching: isIssuesFetching, refetch: refetchIssues } =
+    useListIssuesQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: issuesPage,
+        page_size: 25,
+        type_filter: typeFilter || undefined,
+        severity_filter: severityFilter || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
   const { data: allIssuesResponse } = useListIssuesQuery(
     {
       scan_id: resolvedScanId ?? "",
@@ -961,8 +735,23 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
     {
       skip: !resolvedScanId,
       refetchOnMountOrArgChange: true,
-    },
+    }
   );
+
+  const { data: hotspotsResponse, isFetching: isHotspotsFetching, refetch: refetchHotspots } =
+    useListHotspotsQuery(
+      {
+        scan_id: resolvedScanId ?? "",
+        page: hotspotsPage,
+        page_size: 25,
+        status_filter: hotspotStatusFilter || undefined,
+      },
+      {
+        skip: !resolvedScanId,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
   const { data: projectHistory } = useListCurrentUserScansQuery(
     scanDetail?.project_key
       ? {
@@ -973,67 +762,138 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
       : skipToken,
     {
       refetchOnMountOrArgChange: true,
-    },
+    }
   );
 
-  const issues = useMemo(() => issueResponse?.issues ?? [], [issueResponse?.issues]);
-  const allIssues = useMemo(() => allIssuesResponse?.issues ?? [], [allIssuesResponse?.issues]);
-  const dependencies = useMemo(() => dependencyListResponse?.dependencies ?? [], [dependencyListResponse?.dependencies]);
+  // Memoized data
+  const issues = useMemo(
+    () => issueResponse?.issues ?? [],
+    [issueResponse?.issues]
+  );
+  const allIssues = useMemo(
+    () => allIssuesResponse?.issues ?? [],
+    [allIssuesResponse?.issues]
+  );
+  const dependencies = useMemo(
+    () => dependencyListResponse?.dependencies ?? [],
+    [dependencyListResponse?.dependencies]
+  );
   const allDependencies = useMemo(
     () => allDependenciesResponse?.dependencies ?? [],
-    [allDependenciesResponse?.dependencies],
+    [allDependenciesResponse?.dependencies]
   );
+
+  const hotspots = useMemo(
+    () => hotspotsResponse?.hotspots ?? [],
+    [hotspotsResponse?.hotspots]
+  );
+  const totalHotspots = hotspotsResponse?.total ?? 0;
+
   const totalIssues = issueResponse?.total ?? 0;
   const totalDependencies = dependencyListResponse?.total ?? 0;
-  const dependencySummary = dependencySummaryResponse ?? scanSummary?.dependency_summary ?? null;
+  const dependencySummary =
+    dependencySummaryResponse ?? scanSummary?.dependency_summary ?? null;
   const status = liveStatus?.status ?? scanDetail?.status;
   const progress = liveStatus?.progress ?? scanDetail?.progress ?? 0;
-  const phases = liveStatus?.phases?.length ? liveStatus.phases : (scanDetail?.phases ?? []);
   const qualityGate = scanSummary?.quality_gate;
-  const projectKey = scanDetail?.project_key || scanDetail?.sonar_project_key || "Project";
+  const projectKey =
+    scanDetail?.project_key || scanDetail?.sonar_project_key || "Project";
   const repoPath = getRepoPath(scanDetail?.repo_url ?? "");
   const scanCount = projectHistory?.total ?? 0;
   const isRunning = status === "PENDING" || status === "IN_PROGRESS";
   const warningMessage = scanDetail?.error_message?.trim() || null;
-  const openIssues = allIssues.filter((issue) => ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())).length;
+  const openIssues = allIssues.filter((issue) =>
+    ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())
+  ).length;
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
-  const dependencyToolOptions = useMemo(() => collectDependencyToolOptions(allDependencies), [allDependencies]);
   const qualityGateMessage =
     qualityGate === "WARN"
       ? "The latest analysis passed with warnings."
       : qualityGate === "ERROR"
         ? "The latest analysis failed the quality gate."
         : null;
-  const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
-  const routeResolutionFailed = !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
 
+  useEffect(() => {
+    if (scanDetail?.project_key) {
+      markProjectAsSeen(scanDetail.project_key);
+    }
+  }, [scanDetail?.project_key]);
+
+  useEffect(() => {
+    const normalizedProgress = Math.max(0, Math.min(100, Math.round(progress)));
+    const isComplete =
+      normalizedProgress >= 100 || status === "SUCCESS";
+
+    if (isRunning) {
+      hasTriggeredCompletionRefresh.current = false;
+      return;
+    }
+
+    if (isComplete && !hasTriggeredCompletionRefresh.current) {
+      hasTriggeredCompletionRefresh.current = true;
+      playScanCompleteSound();
+      // Fast refetch all data when scan completes
+      Promise.all([
+        refetchScanStatus(),
+        refetchScanDetail(),
+        refetchScanSummary(),
+        refetchDependencySummary(),
+      ]).finally(() => {
+        router.refresh();
+      });
+    }
+  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary]);
+
+  const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
+  const routeResolutionFailed =
+    !routeUsesScanId && !routeProjectScansQuery.isLoading && !resolvedScanId;
+
+  // Loading state
   if (isResolvingRoute || isLoading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
-        <div className="flex items-center gap-3 text-sm text-[#52648f] dark:text-gray-400">
-          <LoaderCircle className="size-5 animate-spin text-teal-500" />
+      <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] sm:rounded-xl dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <div className="flex items-center gap-2 text-xs text-slate-500 sm:gap-3 sm:text-sm dark:text-slate-400">
+          <LoaderCircle className="size-4 animate-spin text-teal-500 sm:size-5" />
           Loading project overview...
         </div>
       </div>
     );
   }
 
+  // Error state
   if (routeResolutionFailed || isError || !scanDetail) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 rounded-2xl border border-[#d7e0ef] bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-950">
-        <AlertTriangle className="size-10 text-red-500" />
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-6 text-center sm:gap-4 sm:rounded-xl sm:p-8 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <AlertTriangle className="size-8 text-red-500 sm:size-10" />
         <div>
-          <h1 className="text-xl font-bold text-[#17233f] dark:text-white">Unable to load project overview</h1>
-          <p className="mt-2 max-w-xl text-sm text-[#52648f] dark:text-gray-400">
+          <h1 className="text-lg font-bold text-slate-900 sm:text-xl dark:text-white">
+            Unable to load project overview
+          </h1>
+          <p className="mt-1.5 max-w-xl text-xs text-slate-500 sm:mt-2 sm:text-sm dark:text-slate-400">
             {routeResolutionFailed
               ? "No scan history was found for this project key."
-              : readErrorMessage(error, "The scanner detail endpoint did not return a usable payload.")}
+              : readErrorMessage(
+                  error,
+                  "The scanner detail endpoint did not return a usable payload."
+                )}
           </p>
         </div>
         <Link
           href="/userdashboard/code-scanning"
-          className="rounded-xl border border-[#b9c6df] px-4 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-900"
+          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700 sm:px-5 sm:py-2.5 sm:text-sm dark:bg-teal-500 dark:hover:bg-teal-600"
         >
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="size-4"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+              clipRule="evenodd"
+            />
+          </svg>
           Back to code scanning
         </Link>
       </div>
@@ -1041,371 +901,115 @@ export default function CodeScanningDetailPageClient({ scanId: routeIdentifier }
   }
 
   return (
-    <div className="space-y-5 text-[#17233f] dark:text-gray-100">
-      <motion.section
-        {...sectionMotion}
-        className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950"
-      >
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-          <div className="flex min-w-0 gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-sm font-bold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
-              {getProjectInitial(projectKey)}
-            </div>
-
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#52648f] dark:text-gray-400">
-                <Link href="/userdashboard/code-scanning" className="font-semibold text-teal-600 hover:underline dark:text-teal-300">
-                  Code scanning
-                </Link>
-                <span>/</span>
-                <span className="truncate">{projectKey}</span>
-              </div>
-
-              <h1 className="mt-2 truncate text-2xl font-bold text-[#071120] dark:text-white">{projectKey}</h1>
-
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#52648f] dark:text-gray-400">
-                <span className="inline-flex items-center gap-1">
-                  <FolderGit2 className="size-3.5" />
-                  {repoPath}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <GitBranch className="size-3.5" />
-                  {scanDetail.branch || "main"}
-                </span>
-                <span>{formatRelativeTime(scanDetail.finished_at || scanDetail.started_at || scanDetail.created_at)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusPill status={status} />
-            {scanSummary ? (
-              <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold", getQualityGateTone(qualityGate))}>
-                Quality gate {getQualityGateLabel(qualityGate)}
-              </span>
-            ) : null}
-            {scanDetail.repo_url ? (
-              <a
-                href={scanDetail.repo_url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-[#b9c6df] bg-white px-3 py-2 text-sm font-semibold text-[#253554] transition hover:bg-[#eef3fb] dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900"
-              >
-                <ExternalLink className="size-4" />
-                Repository
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </motion.section>
-
-      {warningMessage ? (
-        <motion.section
-          {...sectionMotion}
-          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
+      <div className="flex items-center justify-between gap-2 sm:gap-3">
+        <PreviousPageButton onClick={handleGoBack} />
+        <button
+          type="button"
+          onClick={handleRefreshPage}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
         >
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-            <span>{warningMessage}</span>
-          </div>
-        </motion.section>
-      ) : null}
+          <RefreshCw className="size-3.5 shrink-0 sm:size-4" />
+          <span>Refresh</span>
+        </button>
+      </div>
 
-      {!warningMessage && (isRunning || qualityGateMessage) ? (
-        <motion.section
-          {...sectionMotion}
-          className={cn(
-            "rounded-2xl px-4 py-3 text-sm",
-            isRunning
-              ? "border border-teal-100 bg-teal-50 text-teal-700 dark:border-teal-500/15 dark:bg-teal-500/10 dark:text-teal-200"
-              : "border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300",
-          )}
-        >
-          <div className="flex items-start gap-3">
-            {isRunning ? <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" /> : <ShieldAlert className="mt-0.5 size-4 shrink-0" />}
-            <span>
-              {isRunning
-                ? `Scan is ${formatStatusLabel(status)}. Progress is ${Math.max(0, Math.min(100, Math.round(progress)))}%.`
-                : qualityGateMessage}
-            </span>
-          </div>
-        </motion.section>
-      ) : null}
+      <PageHeader
+        projectKey={projectKey}
+        repoPath={repoPath}
+        branch={scanDetail.branch || "main"}
+        relativeTime={formatRelativeTime(
+          scanDetail.finished_at ||
+            scanDetail.started_at ||
+            scanDetail.created_at
+        )}
+        status={status}
+        qualityGate={qualityGate}
+        repoUrl={scanDetail.repo_url}
+      />
 
-      <motion.section {...sectionMotion} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <TopStatCard
-          label="Quality Gate"
-          value={getQualityGateLabel(qualityGate)}
-          helper={scanSummary ? "Latest scan summary" : "Waiting for summary"}
-          accent={qualityGate === "OK" ? "emerald" : qualityGate ? "amber" : "slate"}
-          icon={qualityGate === "OK" ? ShieldCheck : ShieldAlert}
+      <AlertSection
+        warningMessage={warningMessage}
+        qualityGateMessage={qualityGateMessage}
+      />
+
+      <ProjectNav activeView={activeView} onViewChange={setActiveView} />
+
+      {activeView === "overview" && (
+        <CodeScanOverview
+          initialScanId={resolvedScanId ?? scanDetail.scan_id ?? ""}
+          scanSummary={scanSummary}
+          dependencySummary={dependencySummary}
+          qualityGate={qualityGate}
+          acceptedIssues={acceptedIssues}
+          scanCount={scanCount}
+          scanStatusLabel={formatStatusLabel(status)}
+          scanProgress={progress}
+          isScanRunning={isRunning}
+          formatCount={formatCount}
+          formatPercent={formatPercent}
+          getGrade={getGrade}
+          getQualityGateLabel={getQualityGateLabel}
         />
-        <TopStatCard
-          label="Scan Status"
-          value={formatStatusLabel(status)}
-          helper={`${Math.max(0, Math.min(100, Math.round(progress)))}% progress`}
-          accent={status === "SUCCESS" ? "emerald" : status === "FAILED" ? "amber" : "teal"}
-          icon={status === "SUCCESS" ? CheckCircle2 : status === "FAILED" ? AlertTriangle : RefreshCw}
+      )}
+
+      {activeView === "issues" && (
+        <CodeScanIssues
+          projectKey={scanDetail.project_key || routeIdentifier}
+          issues={issues}
+          allIssues={allIssues}
+          total={totalIssues}
+          isLoading={isIssuesFetching}
+          typeFilter={typeFilter}
+          severityFilter={severityFilter}
+          onTypeFilterChange={(v) => { setTypeFilter(v); setIssuesPage(1); }}
+          onSeverityFilterChange={(v) => { setSeverityFilter(v); setIssuesPage(1); }}
+          page={issuesPage}
+          pageSize={25}
+          onPageChange={setIssuesPage}
         />
-        <TopStatCard
-          label="Issues"
-          value={formatCount((scanSummary?.bugs ?? 0) + (scanSummary?.vulnerabilities ?? 0) + (scanSummary?.code_smells ?? 0))}
-          helper={scanSummary ? "Bugs, vulnerabilities, and smells" : "Waiting for summary"}
-          accent="teal"
-          icon={FileCode2}
+      )}
+
+      {activeView === "dependencies" && (
+        <CodeScanDependencies
+          dependencies={dependencies}
+          allDependencies={allDependencies}
+          total={totalDependencies}
+          isLoading={isDependenciesFetching}
+          toolFilter={dependencyToolFilter}
+          severityFilter={dependencySeverityFilter}
+          vulnerableOnly={dependencyVulnerableOnly}
+          outdatedOnly={dependencyOutdatedOnly}
+          onToolFilterChange={setDependencyToolFilter}
+          onSeverityFilterChange={setDependencySeverityFilter}
+          onVulnerableOnlyChange={() =>
+            setDependencyVulnerableOnly((prev) => !prev)
+          }
+          onOutdatedOnlyChange={() =>
+            setDependencyOutdatedOnly((prev) => !prev)
+          }
+          formatCount={formatCount}
         />
-        <TopStatCard
-          label="Project History"
-          value={formatCount(scanCount)}
-          helper="Recorded analyses for this project"
-          accent="slate"
-          icon={Clock3}
+      )}
+
+      {activeView === "hotspots" && (
+        <CodeScanHotspots
+          hotspots={hotspots}
+          total={totalHotspots}
+          isLoading={isHotspotsFetching}
+          statusFilter={hotspotStatusFilter}
+          onStatusFilterChange={(v) => { setHotspotStatusFilter(v); setHotspotsPage(1); }}
+          page={hotspotsPage}
+          pageSize={25}
+          onPageChange={setHotspotsPage}
+          onHotspotClick={(hotspotKey) => {
+            router.push(`/userdashboard/code-scanning/${encodeURIComponent(resolvedScanId ?? routeIdentifier)}/hotspots/${encodeURIComponent(hotspotKey)}`);
+          }}
         />
-      </motion.section>
+      )}
 
-      <motion.section
-        {...sectionMotion}
-        className="flex gap-2 overflow-x-auto rounded-2xl border border-[#d7e0ef] bg-white p-2 dark:border-gray-800 dark:bg-gray-950"
-      >
-        {projectNavItems.map((item) => {
-          const Icon = item.icon;
-          const active = activeView === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setActiveView(item.id)}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition",
-                active
-                  ? "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
-                  : "text-[#52648f] hover:bg-[#eef3fb] hover:text-[#253554] dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-100",
-              )}
-            >
-              <Icon className="size-4" />
-              {item.label}
-            </button>
-          );
-        })}
-      </motion.section>
-
-      {activeView === "overview" ? (
-        <motion.div {...sectionMotion} className="space-y-5">
-          <section className="overflow-hidden rounded-2xl border border-[#d7e0ef] bg-white dark:border-gray-800 dark:bg-gray-950">
-            <div className="grid md:grid-cols-3">
-              <OverviewMetricCell
-                title="Security"
-                value={formatCount(scanSummary?.vulnerabilities)}
-                primaryDetail="Open issues"
-                grade={getGrade(scanSummary?.vulnerabilities ?? 0, 0, 2)}
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Reliability"
-                value={formatCount(scanSummary?.bugs)}
-                primaryDetail="Open issues"
-                grade={getGrade(scanSummary?.bugs ?? 0, 0, 5)}
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Maintainability"
-                value={formatCount(scanSummary?.code_smells)}
-                primaryDetail="Open issues"
-                grade={getGrade(scanSummary?.code_smells ?? 0, 10, 50)}
-                className="border-b border-[#d7e0ef] md:border-b-0 dark:border-gray-800"
-              />
-            </div>
-
-            <div className="grid border-t border-[#d7e0ef] md:grid-cols-3 dark:border-gray-800">
-              <OverviewMetricCell
-                title="Accepted issues"
-                value={formatCount(acceptedIssues)}
-                secondaryDetail="Valid issues that were not fixed"
-                ring="neutral"
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Coverage"
-                value={formatPercent(scanSummary?.coverage)}
-                secondaryDetail="Coverage reported by scanner"
-                ring={(scanSummary?.coverage ?? 0) >= 80 ? "ok" : "bad"}
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Duplications"
-                value={formatPercent(scanSummary?.duplications)}
-                secondaryDetail="Duplicated lines percentage"
-                ring={(scanSummary?.duplications ?? 0) <= 3 ? "ok" : "bad"}
-              />
-            </div>
-
-            <div className="grid border-t border-[#d7e0ef] md:grid-cols-3 dark:border-gray-800">
-              <OverviewMetricCell
-                title="Security Hotspots"
-                value={formatCount(scanSummary?.security_hotspots)}
-                grade={getGrade(scanSummary?.security_hotspots ?? 0, 0, 3)}
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Dependency scan"
-                value={formatCount(dependencySummary?.vulnerable)}
-                primaryDetail="Vulnerable packages"
-                secondaryDetail={`${formatCount(dependencySummary?.outdated)} outdated • ${formatCount(dependencySummary?.license_issues)} license issues`}
-                grade={getGrade(dependencySummary?.critical ?? 0, 0, 1)}
-                className="border-b border-[#d7e0ef] md:border-b-0 md:border-r dark:border-gray-800"
-              />
-              <OverviewMetricCell
-                title="Dependency severity"
-                value={`${formatCount(dependencySummary?.critical)} critical`}
-                primaryDetail={`${formatCount(dependencySummary?.high)} high`}
-                secondaryDetail={`${formatCount(dependencySummary?.medium)} medium • ${formatCount(dependencySummary?.low)} low`}
-                ring={(dependencySummary?.critical ?? 0) > 0 ? "bad" : (dependencySummary?.vulnerable ?? 0) > 0 ? "neutral" : "ok"}
-              />
-            </div>
-          </section>
-
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.95fr)]">
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-[#071120] dark:text-white">Scan phases</h2>
-                  <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">Live status comes from the scan status endpoint.</p>
-                </div>
-                {isStatusFetching ? <RefreshCw className="size-4 animate-spin text-teal-500" /> : null}
-              </div>
-              <PhaseList phases={phases} />
-            </section>
-
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-lg font-bold text-[#071120] dark:text-white">Dependency breakdown</h2>
-                <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-                  Language totals are pulled from the dependency summary endpoint.
-                </p>
-              </div>
-              <DependencyLanguageList dependencySummary={dependencySummary} />
-            </section>
-          </div>
-        </motion.div>
-      ) : null}
-
-      {activeView === "issues" ? (
-        <motion.section {...sectionMotion} className="space-y-5">
-          <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
-            <div className="grid gap-5 lg:grid-cols-2">
-              <FilterChips label="Issue type" options={issueTypeOptions} selected={typeFilter} onChange={setTypeFilter} />
-              <FilterChips label="Severity" options={severityOptions} selected={severityFilter} onChange={setSeverityFilter} />
-            </div>
-          </div>
-
-          <IssueList
-            projectKey={scanDetail.project_key || routeIdentifier}
-            issues={issues}
-            total={totalIssues}
-            isLoading={isIssuesFetching}
-          />
-        </motion.section>
-      ) : null}
-
-      {activeView === "dependencies" ? (
-        <motion.section {...sectionMotion} className="space-y-5">
-          <div className="rounded-2xl border border-[#d7e0ef] bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <FilterChips
-                label="Dependency checker"
-                options={dependencyToolOptions}
-                selected={dependencyToolFilter}
-                onChange={setDependencyToolFilter}
-              />
-              <FilterChips
-                label="Severity"
-                options={dependencySeverityOptions}
-                selected={dependencySeverityFilter}
-                onChange={setDependencySeverityFilter}
-              />
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <DependencyFlag
-                active={dependencyVulnerableOnly}
-                label="Vulnerable only"
-                onClick={() => setDependencyVulnerableOnly((current) => !current)}
-              />
-              <DependencyFlag
-                active={dependencyOutdatedOnly}
-                label="Outdated only"
-                onClick={() => setDependencyOutdatedOnly((current) => !current)}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <TopStatCard
-              label="Dependencies"
-              value={formatCount(totalDependencies)}
-              helper="Filtered dependency results"
-              accent="teal"
-              icon={FolderGit2}
-            />
-            <TopStatCard
-              label="Vulnerable"
-              value={formatCount(dependencies.filter((item) => item.is_vulnerable).length)}
-              helper="Current filtered list"
-              accent="amber"
-              icon={ShieldAlert}
-            />
-            <TopStatCard
-              label="Outdated"
-              value={formatCount(dependencies.filter((item) => item.is_outdated).length)}
-              helper="Current filtered list"
-              accent="slate"
-              icon={RefreshCw}
-            />
-            <TopStatCard
-              label="License Issues"
-              value={formatCount(dependencies.filter((item) => item.has_license_issue).length)}
-              helper="Current filtered list"
-              accent="emerald"
-              icon={Info}
-            />
-          </div>
-
-          <DependencyList dependencies={dependencies} total={totalDependencies} isLoading={isDependenciesFetching} />
-        </motion.section>
-      ) : null}
-
-      {activeView === "activity" ? (
-        <motion.section {...sectionMotion} className="space-y-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project activity</h2>
-            <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-              This list comes from the current-user project scans endpoint for the same project key.
-            </p>
-          </div>
-          <HistoryList scans={projectHistory?.scans ?? []} />
-        </motion.section>
-      ) : null}
-
-      {activeView === "info" ? (
-        <motion.section {...sectionMotion} className="space-y-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#071120] dark:text-white">Project information</h2>
-            <p className="mt-1 text-sm text-[#52648f] dark:text-gray-400">
-              This panel is mapped directly from scan detail and scan status responses.
-            </p>
-          </div>
-          <InfoGrid
-            projectKey={scanDetail.project_key}
-            sonarProjectKey={scanDetail.sonar_project_key}
-            repoUrl={scanDetail.repo_url}
-            branch={scanDetail.branch}
-            status={status ?? scanDetail.status}
-            createdAt={scanDetail.created_at}
-            startedAt={liveStatus?.started_at ?? scanDetail.started_at}
-            finishedAt={liveStatus?.finished_at ?? scanDetail.finished_at}
-          />
-        </motion.section>
-      ) : null}
+      </div>
     </div>
   );
 }

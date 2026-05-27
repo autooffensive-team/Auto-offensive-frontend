@@ -9,7 +9,7 @@ import ourTeamImage from "@/public/images/Our-team-image.webp";
 export default function TeamShowcase() {
   const t = useTranslations("homepage.team");
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
@@ -26,15 +26,15 @@ export default function TeamShowcase() {
       <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-12 lg:grid-cols-[1.2fr_1.6fr] lg:gap-20">
         <div className="relative z-10">
           <h3
-            className="mb-2 font-bold uppercase leading-[1.1] text-[#01509e] dark:text-white"
+            className="mb-2 font-bold uppercase leading-[1.1]"
             style={{
               fontFamily: displayFontFamily,
               fontSize: "clamp(32px, 4.5vw, 56px)",
             }}
           >
-            <span className="block whitespace-nowrap">{t("titleLine1")}</span>
+            <span className="block whitespace-nowrap text-[#01509e] dark:text-[#4fa3e5]">{t("titleLine1")}</span>
             <span className="block whitespace-nowrap text-[#00BCA1]">{t("titleLine2")}</span>
-            <span className="block whitespace-nowrap">{t("titleLine3")}</span>
+            <span className="block whitespace-nowrap text-black dark:text-white">{t("titleLine3")}</span>
           </h3>
 
           <div
@@ -162,15 +162,13 @@ export default function TeamShowcase() {
                   height={ourTeamImage.height}
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="h-auto w-full"
-                  priority
-                  unoptimized
                 />
               </div>
             </div>
           </div>
 
           {/* Premium Established Badge */}
-          <div className="absolute -right-3 bottom-10 z-30">
+          {/* <div className="absolute -right-3 bottom-10 z-30">
             <div
               className="rounded-2xl border-2 border-white/90 px-6 py-4 dark:border-white/15"
               style={{
@@ -185,7 +183,7 @@ export default function TeamShowcase() {
                 2026
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Decorative Top Right Accent */}
           <div

@@ -15,7 +15,7 @@ export function SubmitButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-teal-500 px-4 py-3 text-sm font-bold text-white shadow-sm shadow-teal-500/20 hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-teal-500 px-3 py-3 text-xs font-bold text-black hover:bg-teal-600 sm:px-4 sm:text-sm disabled:cursor-not-allowed disabled:opacity-50"
     >
       <Play size={17} />
       {label}

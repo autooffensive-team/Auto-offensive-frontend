@@ -4,6 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import { Download, FileText, Monitor, Lock, Zap, Shield, Cpu, Radio, ClipboardCheck, Terminal, Copy, Check, ArrowRight, ExternalLink } from "lucide-react";
+import { GridBackground } from "@/components/shared/GridBackground";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -128,8 +129,8 @@ function FeatureCard({ card, index }: { card: FeatureCardItem; index: number }) 
     <motion.div
       variants={fadeUp}
       custom={index}
-      whileHover={{ y: -4 }}
-      className="bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:border-[#00BCA1]/40 transition-all duration-300"
+      whileHover={{ }}
+      className="bg-transparent border border-[#E2DDD5] dark:border-white/10 rounded-2xl p-6 hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300"
     >
       <div 
         className="w-10 h-10 rounded-xl border flex items-center justify-center mb-4"
@@ -148,13 +149,18 @@ function FeatureCard({ card, index }: { card: FeatureCardItem; index: number }) 
 export default function CLIFeature() {
   const t = useTranslations("featurePages.cli");
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+  const heroTitleFontFamily = isKhmer
+    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    : displayFontFamily;
+  const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
+  const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";
 
   /* ─── RESPONSIVE FONT SIZING ─────────────────────────────
      Mobile:  16px  (text-[16px])
@@ -225,18 +231,11 @@ export default function CLIFeature() {
         ref={heroRef}
         className="relative w-full bg-white dark:bg-[#111113] px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 transition-colors duration-300"
       >
-        {/* Subtle dot grid background */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.05]"
-          style={{
-            backgroundImage: "radial-gradient(rgba(0,188,161,0.07) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
-          }}
+        {/* Dashed grid background */}
+        <GridBackground
+          variant="dashed"
+          gridSize={22}
         />
-        
-        {/* Glow blobs */}
-        <div className="pointer-events-none absolute -top-40 right-0 w-96 h-96 bg-[#00BCA1]/8 rounded-full blur-3xl dark:bg-[#00BCA1]/4" />
-        <div className="pointer-events-none absolute -bottom-40 -left-40 w-80 h-80 bg-[#01509E]/8 rounded-full blur-3xl dark:bg-[#01509E]/4" />
 
         <div className="relative w-full max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
@@ -250,8 +249,13 @@ export default function CLIFeature() {
               <motion.h1
                 variants={fadeUp}
                 custom={0}
-                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight tracking-tight mb-6 text-[#18181B] dark:text-white max-w-2xl"
-                style={{ fontFamily: displayFontFamily }}
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 text-[#18181B] dark:text-white max-w-2xl"
+                style={{
+                  fontFamily: heroTitleFontFamily,
+                  fontWeight: isKhmer ? 800 : 700,
+                  lineHeight: heroTitleLineHeight,
+                  letterSpacing: heroTitleLetterSpacing,
+                }}
               >
                 {t("hero.titleLine1")}{" "}
                 <span className="text-[#00BCA1] dark:text-[#7CE5D4] block">
@@ -272,15 +276,17 @@ export default function CLIFeature() {
               <motion.div
                 variants={fadeUp}
                 custom={2}
-                className="flex w-full max-w-md flex-row gap-3 sm:gap-4 lg:justify-start"
+                className="flex flex-row gap-3 sm:gap-4 lg:justify-start"
               >
-                <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#00BCA1] text-white hover:bg-[#0AAE98] transition-all duration-300 hover:-translate-y-0.5">
-                  <Download className="w-4 h-4" />
-                  {t("hero.primaryCta")}
+                <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
+                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                    <Download className="w-4 h-4" />
+                    <span className="whitespace-nowrap">{t("hero.primaryCta")}</span>
+                  </span>
                 </button>
-                <button className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-8 py-3 sm:py-3.5 text-[15px] sm:text-base lg:text-[16px] font-semibold bg-[#F7F5F0] text-[#18181B] border border-[#E2DDD5] hover:bg-[#EFE9DE] dark:bg-[#09090B] dark:text-white dark:border-white/10 dark:hover:bg-[#151A18] transition-all duration-300 hover:-translate-y-0.5">
+                <button className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <FileText className="w-4 h-4" />
-                  {t("hero.secondaryCta")}
+                  <span className="whitespace-nowrap">{t("hero.secondaryCta")}</span>
                 </button>
               </motion.div>
             </motion.div>
@@ -334,7 +340,7 @@ export default function CLIFeature() {
           animate={featuresInView ? "visible" : "hidden"}
           className="relative overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             ml-4 md:ml-6 rounded-r-[28px]
-            border-y border-r border-[#E2DDD5] dark:border-white/10
+            border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             p-6 md:p-10"
         >
@@ -383,7 +389,7 @@ export default function CLIFeature() {
           animate={specsInView ? "visible" : "hidden"}
           className="relative overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             mr-4 md:mr-6 rounded-l-[28px]
-            border-y border-l border-[#E2DDD5] dark:border-white/10
+            border-y border-l border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             flex flex-col md:flex-row"
         >
@@ -479,7 +485,7 @@ export default function CLIFeature() {
           animate={workflowInView ? "visible" : "hidden"}
           className="relative overflow-hidden bg-[#F7F5F0] dark:bg-[#09090B]
             ml-4 md:ml-6 rounded-r-[28px]
-            border-y border-r border-[#E2DDD5] dark:border-white/10
+            border-y border-r border-[#00BCA1]/70 dark:border-[#00BCA1]/35
             transition-colors duration-300
             p-6 md:p-10"
         >
@@ -491,7 +497,7 @@ export default function CLIFeature() {
                   key={i}
                   variants={fadeUp}
                   custom={i + 1}
-                  className="flex flex-col items-start p-5 sm:p-6 bg-white dark:bg-[#111113] border border-[#E2DDD5] dark:border-white/10 rounded-xl hover:border-[#00BCA1]/40 hover:shadow-lg transition-all duration-300"
+                  className="flex flex-col items-start p-5 sm:p-6 bg-transparent border border-[#E2DDD5] dark:border-white/10 rounded-xl hover:border-[#00BCA1] hover:shadow-[0_0_12px_rgba(0,188,161,0.15)] transition-all duration-300"
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-[#00BCA1]/10 text-[#00BCA1] border border-[#00BCA1]/20">
                     <Icon className="w-5 h-5" />
@@ -515,60 +521,78 @@ export default function CLIFeature() {
       ════════════════════════════════ */}
       <section
         ref={ctaRef}
-        className="relative px-4 sm:px-8 lg:px-10 py-16 max-w-7xl mx-auto"
+        className="relative px-4 sm:px-6 lg:px-8 py-16 w-full"
       >
         <motion.div
           variants={fadeInScale}
           initial="hidden"
           animate={ctaInView ? "visible" : "hidden"}
-          className="rounded-3xl overflow-hidden border border-[#E2DDD5] dark:border-white/10 bg-[#18181B] relative"
+          className="rounded-3xl overflow-visible border border-transparent dark:border-white/5 bg-[#F7F5F0] dark:bg-[#111113] relative"
         >
-          {/* Dot grid overlay */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-10"
-            style={{
-              backgroundImage: "radial-gradient(rgba(0,188,161,0.15) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-            }}
-          />
-          {/* Glow */}
-          <div className="absolute top-0 left-1/3 w-72 h-72 bg-[#00BCA1]/8 rounded-full blur-3xl pointer-events-none" />
+          {/* Blobs — clipped inside the frame */}
+          <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+            <div className="absolute -left-24 -top-32 h-96 w-80 rounded-full bg-[#01509e] opacity-95 blur-3xl dark:opacity-40" />
+            <div className="absolute right-14 -top-20 h-80 w-80 rounded-full bg-[#00d0b2] opacity-50 blur-3xl dark:opacity-20" />
+            <div className="absolute -bottom-32 -right-10 h-80 w-96 rounded-full bg-[#0194c7] opacity-70 blur-3xl dark:opacity-30" />
+            <div className="absolute left-[42%] top-[20%] h-52 w-64 rounded-full bg-[#00d0b2] opacity-20 blur-3xl dark:opacity-10" />
+            <div className="absolute left-[15%] bottom-[10%] h-56 w-56 rounded-full bg-[#e53e3e] opacity-40 blur-3xl dark:opacity-20" />
+          </div>
 
-          <div className="relative px-8 py-16 sm:px-16 sm:py-20 text-center">
-            <motion.h2
-              variants={fadeUp}
-              initial="hidden"
-              animate={ctaInView ? "visible" : "hidden"}
-              custom={1}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight"
-              style={{ fontFamily: displayFontFamily }}
-            >
-              {t("cta.title")}
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
-              initial="hidden"
-              animate={ctaInView ? "visible" : "hidden"}
-              custom={2}
-              className={`${bodyText} text-[#94A3B8] mb-10 max-w-2xl mx-auto`}
-            >
-              {t("cta.subtitle")}
-            </motion.p>
+          <div className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-6 px-8 py-0 sm:px-12 sm:py-0 lg:px-16 lg:py-0 max-w-7xl mx-auto">
+            {/* Left on desktop, Top on mobile — Content */}
+            <div className="order-1 lg:order-2 flex flex-col items-center text-center lg:items-start lg:text-left">
+              <motion.h2
+                variants={fadeUp}
+                initial="hidden"
+                animate={ctaInView ? "visible" : "hidden"}
+                custom={1}
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#18181B] dark:text-white mb-4 leading-tight"
+                style={{ fontFamily: displayFontFamily }}
+              >
+                {t("cta.title")}
+              </motion.h2>
+              <motion.p
+                variants={fadeUp}
+                initial="hidden"
+                animate={ctaInView ? "visible" : "hidden"}
+                custom={2}
+                className={`${bodyText} text-[#52525B] dark:text-[#A1A1AA] mb-8 max-w-lg`}
+              >
+                {t("cta.subtitle")}
+              </motion.p>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={ctaInView ? "visible" : "hidden"}
+                custom={3}
+                className="flex flex-row gap-3 justify-center lg:justify-start"
+              >
+                <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
+                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                    <Download className="w-4 h-4" />
+                    <span className="whitespace-nowrap">{t("cta.primaryCta")}</span>
+                  </span>
+                </button>
+                <button className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="whitespace-nowrap">{t("cta.secondaryCta")}</span>
+                </button>
+              </motion.div>
+            </div>
+
+            {/* Right on desktop, Bottom on mobile — Image */}
             <motion.div
               variants={fadeUp}
               initial="hidden"
               animate={ctaInView ? "visible" : "hidden"}
-              custom={3}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
+              custom={0}
+              className="order-2 lg:order-1 flex items-end justify-center lg:-mt-20 lg:mb-0 lg:-ml-8 overflow-hidden"
             >
-              <button className="px-8 py-3.5 rounded-lg bg-[#00BCA1] text-white font-bold text-base sm:text-[15px] hover:bg-[#0AAE98] transition-colors duration-300 flex items-center justify-center gap-2">
-                <Download className="w-4 h-4" />
-                {t("cta.primaryCta")}
-              </button>
-              <button className="px-8 py-3.5 rounded-lg border border-white/15 text-white font-semibold text-base sm:text-[15px] hover:bg-white/5 transition-colors duration-300 flex items-center justify-center gap-2">
-                <ExternalLink className="w-4 h-4" />
-                {t("cta.secondaryCta")}
-              </button>
+              <img
+                src="/shadow_isolated_automation.webp"
+                alt="Automation illustration"
+                className="w-full max-w-sm sm:max-w-sm lg:max-w-md xl:max-w-lg object-contain drop-shadow-2xl lg:translate-y-7"
+              />
             </motion.div>
           </div>
         </motion.div>

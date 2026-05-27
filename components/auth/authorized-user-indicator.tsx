@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCheck } from "lucide-react";
+import { ArrowRight, LayoutDashboard } from "lucide-react";
 
 type AuthorizedUserIndicatorProps = {
   href?: string;
@@ -15,17 +15,18 @@ export default function AuthorizedUserIndicator({
   return (
     <Link
       href={href}
-      title="Authorized user"
-      aria-label="Authorized user"
+      title="Dashboard"
+      aria-label="Go to dashboard"
       className={[
-        "inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 transition-colors hover:bg-emerald-500/15 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-300",
+        "inline-flex h-10 items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 text-sm font-semibold text-black dark:text-white transition-all hover:bg-primary hover:text-black dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:border-primary/30 dark:bg-primary/12",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <CheckCheck className="h-4 w-4" />
-      <span className="sr-only">Authorized user</span>
+      <LayoutDashboard className="h-4 w-4" />
+      <span>Dashboard</span>
+      <ArrowRight className="h-3.5 w-3.5 opacity-70" />
     </Link>
   );
 }

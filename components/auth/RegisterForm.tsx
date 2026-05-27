@@ -286,7 +286,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={!agreed || pending}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 py-3.5 font-semibold text-white disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 py-3.5 font-semibold text-black disabled:opacity-50"
         >
           {pending ? "Creating Account..." : "Create Account"} <Rocket size={18} />
         </button>

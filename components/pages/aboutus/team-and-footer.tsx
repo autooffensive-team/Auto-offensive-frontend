@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
+import FocusWord from "@/components/ui/focus-word";
 
 const SOCIAL_LINKS = {
   github: { label: "GitHub", Icon: IconGithub },
   telegram: { label: "Telegram", Icon: IconTelegram },
   linkedin: { label: "LinkedIn", Icon: IconLinkedin },
-
+  portfolio: { label: "Portfolio", Icon: IconPortfolio },
 };
 
 const MENTORS = [
@@ -21,41 +22,43 @@ const MENTORS = [
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
     slogan: "Every problem have solutions.",
-    img: "/images/teacher_Sokpheng.jpg",
+    img: "/images/teacher_Sokpheng.webp",
     social: {
       github: "https://github.com/sokpheng001",
       telegram: "https://t.me/sokpheng001",
       linkedin: "https://www.linkedin.com/in/kim-chansokpheng-6b6513267/",
+      portfolio: "#",
     },
   },
   {
     name: "Sreng Chipor",
     nameKh: "ស្រេង ជីប៉",
-    role: "Exploit Specialist",
+    role: "Offensive Specialist",
     roleKh: "អ្នកជំនាញផ្នែក Exploit",
     badge: "Mentor",
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
     slogan: "Your future self is always\n watching you.",
-    img: "/images/teacher_chipor.png",
+    img: "/images/teacher_chipor.webp",
     social: {
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
       linkedin: "https://www.linkedin.com/in/sreng-chipor-a31346239/",
+      portfolio: "#",
     },
   },
 ];
 
 const TEAM = [
-  { name: "Chheng Panharoth", nameKh: "ឆេង បញ្ញារតន៍", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "/images/panharoth.png", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/" } },
-  { name: "Pech Rathanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/" } },
-  { name: "Kry Sobothty", nameKh: "គ្រី សុបុត្រទី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Every very bug\nhas codex.", img: "/images/bohty.png", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/" } },
-  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/" } },
-  { name: "Ey Channim", nameKh: "អ៊ី ចាន់និម", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Practice make perfect", img: "/images/channim.png", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/" } },
-  { name: "Mom Reaksmey", nameKh: "មុំ រស្មី", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Cyber safety starts with you", img: "/images/reaksmey.png", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/" } },
-  { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "If it hard\nI work harder.", img: "/images/ratha.png", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/" } },
-  { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Process over perfection", img: "/images/loemheng.png", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/" } },
-  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Full Stack Developer", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/" } },
+  { name: "Chheng Panharath", nameKh: "ឆេង បញ្ញារតន៍", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "/images/panharoth.png", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/", portfolio: "https://portfolio-panharoth.vercel.app" } },
+  { name: "Pech Rattanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/", portfolio: "#" } },
+  { name: "Kry Sobothty", nameKh: "គ្រី សុបុត្រទី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Hack it for\ Secure it.", img: "/images/bohty.png", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/", portfolio: "https://www.sobothty.tech/" } },
+  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/", portfolio: "#" } },
+  { name: "Ey Channim", nameKh: "អុី ចាន់នីម", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Practice make perfect", img: "/images/channim.png", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/", portfolio: "https://channim-dev.vercel.app/" } },
+  { name: "Mom Raksmey", nameKh: "មុំ រស្មី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Cyber safety starts with you", img: "/images/reaksmey.png", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/", portfolio: "https://persional-portfolio-sooty.vercel.app/" } },
+  { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "If it hard\nI work harder.", img: "/images/ratha.png", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/", portfolio: "https://h-ratha-portfolio.vercel.app/" } },
+  { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Process over perfection", img: "/images/loemheng.png", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/", portfolio: "https://benloemheng.vercel.app/" } },
+  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/", portfolio: "#" } },
 ];
 
 function IconGithub() {
@@ -80,6 +83,15 @@ function IconLinkedin() {
       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
       <rect x="2" y="9" width="4" height="12" />
       <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function IconPortfolio() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
     </svg>
   );
 }
@@ -151,7 +163,7 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
 
 export default function TeamAndFooter() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFont = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
@@ -161,15 +173,15 @@ export default function TeamAndFooter() {
 
   const copy = isKhmer
     ? {
-        heroLine1: "ក្រុមមនុស្សនៅពីក្រោយ",
-        heroLine2Lead: "វេទិកា",
-        heroLine2Accent: "",
+        heroLine1: "The People Behind",
+        heroLine2Lead: "the",
+        heroLine2Accent: "Platform",
         heroBody:
           "អ្នកស្រាវជ្រាវសុវត្ថិភាព វិស្វករ និងអ្នកបង្កើត ដែលរួមគ្នាក្នុងបេសកកម្មតែមួយ គឺធ្វើឱ្យ offensive security ងាយប្រើសម្រាប់គ្រប់គ្នា។",
-        mentorsLead: "ទីប្រឹក្សា",
-        mentorsAccent: "របស់យើង",
-        teamLead: "ក្រុម",
-        teamAccent: "ស្នូល",
+        mentorsLead: "Our",
+        mentorsAccent: "Mentors",
+        teamLead: "Core",
+        teamAccent: "Team",
         footerPath: ["Scan", "Analyse", "Report"],
         footerLead: "ត្រៀមប្រើស្វ័យប្រវត្តិកម្មសម្រាប់",
         footerAccent: "ការធ្វើតេស្តសុវត្ថិភាពរបស់អ្នកឬនៅ?",
@@ -199,6 +211,37 @@ export default function TeamAndFooter() {
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const bgRef = useRef<HTMLDivElement>(null);
+  const heroTitleRef = useRef<HTMLHeadingElement>(null);
+  const mentorsTitleRef = useRef<HTMLHeadingElement>(null);
+  const teamTitleRef = useRef<HTMLHeadingElement>(null);
+  const [heroAnimStarted, setHeroAnimStarted] = useState(false);
+  const [mentorsAnimStarted, setMentorsAnimStarted] = useState(false);
+  const [teamAnimStarted, setTeamAnimStarted] = useState(false);
+
+  // Trigger FocusWord animations when headings scroll into view
+  useEffect(() => {
+    const entries: [React.RefObject<HTMLHeadingElement | null>, (v: boolean) => void][] = [
+      [heroTitleRef, setHeroAnimStarted],
+      [mentorsTitleRef, setMentorsAnimStarted],
+      [teamTitleRef, setTeamAnimStarted],
+    ];
+    const obs = new IntersectionObserver(
+      (ioEntries) => {
+        ioEntries.forEach((e) => {
+          if (e.isIntersecting) {
+            const match = entries.find(([ref]) => ref.current === e.target);
+            if (match) {
+              match[1](true);
+              obs.unobserve(e.target);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    entries.forEach(([ref]) => { if (ref.current) obs.observe(ref.current); });
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -317,21 +360,23 @@ export default function TeamAndFooter() {
         <div className="relative z-10 w-full h-px bg-linear-to-r from-transparent via-[rgba(0,208,177,0.45)] to-transparent" />
 
         <div className="relative z-10 tf-intro px-[6%] pt-23 pb-10 text-center overflow-hidden">
-          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: titleFont }}>
+          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={heroTitleRef}>
             {copy.heroLine1}<br />
-            {isKhmer ? (
-              <>{copy.heroLine2Lead}</>
-            ) : (
-              <>{copy.heroLine2Lead} <em className="text-primary not-italic">{copy.heroLine2Accent}</em></>
-            )}
+            {copy.heroLine2Lead}{" "}
+            <FocusWord startAnimation={heroAnimStarted}>
+              <em className="text-primary not-italic">{copy.heroLine2Accent}</em>
+            </FocusWord>
           </h2>
           <p className="tf-body-text text-[#4a6e65] dark:text-[#9cb8b1] max-w-115 mx-auto leading-[1.8]">{copy.heroBody}</p>
         </div>
 
         <div className="relative z-10 px-[6%] pt-6 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
-              {copy.mentorsLead} <em className="text-primary not-italic">{copy.mentorsAccent}</em>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={mentorsTitleRef}>
+              {copy.mentorsLead}{" "}
+              <FocusWord startAnimation={mentorsAnimStarted}>
+                <em className="text-primary not-italic">{copy.mentorsAccent}</em>
+              </FocusWord>
             </h2>
           </div>
 
@@ -366,8 +411,11 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-2 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }}>
-              {copy.teamLead} <em className="text-primary not-italic">{copy.teamAccent}</em>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={teamTitleRef}>
+              {copy.teamLead}{" "}
+              <FocusWord startAnimation={teamAnimStarted}>
+                <em className="text-primary not-italic">{copy.teamAccent}</em>
+              </FocusWord>
             </h2>
           </div>
 

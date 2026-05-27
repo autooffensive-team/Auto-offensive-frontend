@@ -1,10 +1,10 @@
 'use client';
 
-import { JSX, useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { JSX, useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion, cubicBezier } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/theme-provider';
-import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
+import dynamic from 'next/dynamic';
 import {
   fetchCategories,
   type Category,
@@ -15,577 +15,46 @@ import {
 } from '@/lib/redux/services/tools-list/tools-list';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   PLASMA WAVE — unchanged
+   DYNAMIC IMPORTS — heavy WebGL components loaded only when needed
 ───────────────────────────────────────────────────────────────────────────── */
-const PLASMA_VERT = /* glsl */ `
-attribute vec2 position;
-void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
-}
-`;
+const HeroBackground = dynamic(
+  () => import('@/components/shared/HeroBackground').then((mod) => ({ default: mod.HeroBackground })),
+  { ssr: false }
+);
 
-const PLASMA_FRAG = /* glsl */ `
-precision mediump float;
-uniform float iTime;
-uniform vec2  iResolution;
-uniform float uFocalLength;
-uniform float uSpeed1;
-uniform float uSpeed2;
-uniform float uDir2;
-uniform float uBend1;
-uniform float uBend2;
-uniform vec3  uColor1;
-uniform vec3  uColor2;
-
-const float lt   = 0.3;
-const float pi   = 3.14159;
-const float pi2  = 6.28318;
-const float pi_2 = 1.5708;
-#define MAX_STEPS 14
-
-void mainImage(out vec4 C, in vec2 U) {
-  float t = iTime * pi;
-  float s = 1.0;
-  float d = 0.0;
-  vec2  R = iResolution;
-  vec3 o = vec3(0.0, 0.0, -7.0);
-  vec3 u = normalize(vec3((U - 0.5 * R) / R.y, uFocalLength));
-  vec2 k = vec2(0.0);
-  vec3 p;
-  float t1 = t * 0.7;
-  float t2 = t * 0.9;
-  float tSpeed1 = t * uSpeed1;
-  float tSpeed2 = t * uSpeed2 * uDir2;
-  for (int i = 0; i < MAX_STEPS; ++i) {
-    p = o + u * d;
-    p.x -= 15.0;
-    float px = p.x;
-    float wob1 = uBend1 + sin(t1 + px * 0.8) * 0.1;
-    float wob2 = uBend2 + cos(t2 + px * 1.1) * 0.1;
-    float px2 = px + pi_2;
-    vec2 sinOffset = sin(vec2(px, px2) + tSpeed1) * wob1;
-    vec2 cosOffset = cos(vec2(px, px2) + tSpeed2) * wob2;
-    vec2 yz = p.yz;
-    float pxLt = px + lt;
-    k.x = max(pxLt, length(yz - sinOffset) - lt);
-    k.y = max(pxLt, length(yz - cosOffset) - lt);
-    float current = min(k.x, k.y);
-    s = min(s, current);
-    if (s < 0.001 || d > 300.0) break;
-    d += s * 0.7;
-  }
-  float sqrtD = sqrt(d);
-  vec3 raw = max(cos(d * pi2) - s * sqrtD - vec3(k, 0.0), 0.0);
-  raw.gb += 0.1;
-  float maxC = max(raw.r, max(raw.g, raw.b));
-  if (maxC < 0.15) discard;
-  raw = raw * 0.4 + raw.brg * 0.6 + raw * raw;
-  float lum = dot(raw, vec3(0.299, 0.587, 0.114));
-  float w1 = max(0.0, 1.0 - k.x * 2.0);
-  float w2 = max(0.0, 1.0 - k.y * 2.0);
-  float wt = w1 + w2 + 0.001;
-  vec3 c = (uColor1 * w1 + uColor2 * w2) / wt * lum * 3.5;
-  C = vec4(c, 1.0);
-}
-
-void main() {
-  vec4 color;
-  mainImage(color, gl_FragCoord.xy);
-  gl_FragColor = color;
-}
-`;
-
-function plasmaHexToRgb(hex: string): [number, number, number] {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  return [r, g, b];
-}
-
-interface PlasmaSideCanvasProps {
-  isDark: boolean;
-  side: 'left' | 'right';
-  timeOffset?: number;
-}
-
-function PlasmaSideCanvas({ isDark, side, timeOffset = 0 }: PlasmaSideCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glRef = useRef<WebGLRenderingContext | null>(null);
-  const rafRef = useRef<number>(0);
-  const roRef = useRef<ResizeObserver | null>(null);
-  const [resetToken, setResetToken] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !canvas.parentElement) return;
-
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    if (roRef.current) roRef.current.disconnect();
-
-    const gl = canvas.getContext('webgl', {
-      alpha: true, premultipliedAlpha: false,
-      antialias: false, depth: false, preserveDrawingBuffer: false,
-    });
-
-    if (!gl) { setUseFallback(true); return; }
-
-    setUseFallback(false);
-    glRef.current = gl;
-
-    const compileShader = (type: number, src: string): WebGLShader | null => {
-      const s = gl.createShader(type);
-      if (!s) { setUseFallback(true); return null; }
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        setUseFallback(true); gl.deleteShader(s); return null;
-      }
-      return s;
-    };
-
-    const vertShader = compileShader(gl.VERTEX_SHADER, PLASMA_VERT);
-    const fragShader = compileShader(gl.FRAGMENT_SHADER, PLASMA_FRAG);
-    if (!vertShader || !fragShader) return;
-
-    const prog = gl.createProgram();
-    if (!prog) {
-      setUseFallback(true);
-      gl.deleteShader(vertShader); gl.deleteShader(fragShader); return;
-    }
-    gl.attachShader(prog, vertShader);
-    gl.attachShader(prog, fragShader);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      setUseFallback(true);
-      gl.deleteProgram(prog); gl.deleteShader(vertShader); gl.deleteShader(fragShader); return;
-    }
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    if (!buf) {
-      setUseFallback(true);
-      gl.deleteProgram(prog); gl.deleteShader(vertShader); gl.deleteShader(fragShader); return;
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const posLoc = gl.getAttribLocation(prog, 'position');
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-    const u: Record<string, WebGLUniformLocation | null> = {};
-    ['iTime','iResolution','uFocalLength','uSpeed1','uSpeed2','uDir2','uBend1','uBend2','uColor1','uColor2']
-      .forEach((n) => { u[n] = gl.getUniformLocation(prog, n); });
-
-    const dir2 = side === 'right' ? -1.0 : 1.0;
-    if (u.uFocalLength) gl.uniform1f(u.uFocalLength, 0.75);
-    if (u.uSpeed1)      gl.uniform1f(u.uSpeed1, 0.035);
-    if (u.uSpeed2)      gl.uniform1f(u.uSpeed2, 0.04);
-    if (u.uDir2)        gl.uniform1f(u.uDir2, dir2);
-    if (u.uBend1)       gl.uniform1f(u.uBend1, 1.3);
-    if (u.uBend2)       gl.uniform1f(u.uBend2, 0.8);
-    if (u.uColor1)      gl.uniform3fv(u.uColor1, plasmaHexToRgb('#00ffe0'));
-    if (u.uColor2)      gl.uniform3fv(u.uColor2, plasmaHexToRgb('#0070ff'));
-
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio, 1.5);
-      const w = rect.width * dpr;
-      const h = rect.height * dpr;
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w; canvas.height = h;
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-      }
-      if (glRef.current) {
-        glRef.current.viewport(0, 0, w, h);
-        if (u.iResolution) glRef.current.uniform2f(u.iResolution, w, h);
-      }
-    };
-
-    resize();
-    roRef.current = new ResizeObserver(resize);
-    roRef.current.observe(canvas.parentElement!);
-
-    const start = performance.now();
-    const to = timeOffset;
-
-    const draw = (now: number) => {
-      if (!glRef.current) return;
-      const ggl = glRef.current;
-      if (u.iTime) ggl.uniform1f(u.iTime, (now - start) * 0.001 + to);
-      ggl.clearColor(0, 0, 0, 0);
-      ggl.clear(ggl.COLOR_BUFFER_BIT);
-      ggl.drawArrays(ggl.TRIANGLES, 0, 3);
-      rafRef.current = requestAnimationFrame(draw);
-    };
-    rafRef.current = requestAnimationFrame(draw);
-
-    const handleContextLoss = (event: Event) => {
-      event.preventDefault();
-      cancelAnimationFrame(rafRef.current);
-    };
-    const handleContextRestore = () => {
-      setResetToken((c) => c + 1);
-    };
-    canvas.addEventListener('webglcontextlost', handleContextLoss);
-    canvas.addEventListener('webglcontextrestored', handleContextRestore);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      if (roRef.current) roRef.current.disconnect();
-      canvas.removeEventListener('webglcontextlost', handleContextLoss);
-      canvas.removeEventListener('webglcontextrestored', handleContextRestore);
-      if (glRef.current === gl) glRef.current = null;
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-      gl.useProgram(null);
-      gl.deleteBuffer(buf);
-      gl.deleteProgram(prog);
-      gl.deleteShader(vertShader);
-      gl.deleteShader(fragShader);
-    };
-  }, [side, timeOffset, resetToken]);
-
-  const maskImage =
-    side === 'left'
-      ? 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.3) 70%, transparent 100%)'
-      : 'linear-gradient(to left,  rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.3) 70%, transparent 100%)';
-
-  return (
-    <>
-      {useFallback ? (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            zIndex: 1, opacity: isDark ? 0.95 : 0.75,
-            WebkitMaskImage: maskImage, maskImage,
-            background:
-              side === 'left'
-                ? 'radial-gradient(circle at 0% 50%, rgba(0,255,224,0.36) 0%, rgba(0,112,255,0.28) 28%, rgba(0,112,255,0.14) 48%, transparent 72%)'
-                : 'radial-gradient(circle at 100% 50%, rgba(0,255,224,0.36) 0%, rgba(0,112,255,0.28) 28%, rgba(0,112,255,0.14) 48%, transparent 72%)',
-            filter: 'blur(14px)',
-          }}
-        />
-      ) : null}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          zIndex: 1,
-          opacity: useFallback ? 0 : isDark ? 0.8 : 0.44,
-          WebkitMaskImage: maskImage, maskImage,
-          display: 'block',
-        }}
-      />
-    </>
-  );
-}
-
-function PlasmaSides({ isDark }: { isDark: boolean }) {
-  return (
-    <>
-      <div className="absolute inset-y-0 left-0 pointer-events-none" style={{ zIndex: 1, width: '40%' }}>
-        <PlasmaSideCanvas isDark={isDark} side="left" timeOffset={0} />
-      </div>
-      <div className="absolute inset-y-0 right-0 pointer-events-none" style={{ zIndex: 1, width: '40%' }}>
-        <PlasmaSideCanvas isDark={isDark} side="right" timeOffset={3.5} />
-      </div>
-    </>
-  );
-}
+const LazyFaultyTerminal = dynamic(
+  () => import('./faulty-terminal').then((mod) => ({ default: mod.FaultyTerminal })),
+  { ssr: false }
+);
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   DOT GRID — unchanged
+   INTERSECTION OBSERVER HOOK — lazy-render sections when visible
 ───────────────────────────────────────────────────────────────────────────── */
-function DotGrid({ isDark }: { isDark: boolean }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -9999, y: -9999 });
-  const dotsRef = useRef<
-    { ox: number; oy: number; x: number; y: number; vx: number; vy: number }[]
-  >([]);
-  const rafRef = useRef<number>(0);
-  const roRef = useRef<ResizeObserver | null>(null);
-  const isDarkRef = useRef(isDark);
+function useInView(options?: IntersectionObserverInit) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
-    isDarkRef.current = isDark;
-  }, [isDark]);
-
-  const GAP = 22;
-  const DOT_SIZE = 1.5;
-  const PROXIMITY = 140;
-  const SHOCK_RADIUS = 270;
-  const SHOCK_STRENGTH = 5.5;
-  const RESISTANCE = 0.87;
-  const RETURN_SPEED = 0.058;
-
-  const buildGrid = useCallback((w: number, h: number) => {
-    const dots: typeof dotsRef.current = [];
-    const cols = Math.ceil(w / GAP) + 2;
-    const rows = Math.ceil(h / GAP) + 2;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const ox = c * GAP;
-        const oy = r * GAP;
-        dots.push({ ox, oy, x: ox, y: oy, vx: 0, vy: 0 });
-      }
-    }
-    dotsRef.current = dots;
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !canvas.parentElement) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let width = 0, height = 0;
-
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      width = rect.width; height = rect.height;
-      const dpr = window.devicePixelRatio;
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr; canvas.height = height * dpr;
-        canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
-        ctx.scale(dpr, dpr);
-        buildGrid(width, height);
-      }
-    };
-
-    resize();
-    roRef.current = new ResizeObserver(resize);
-    roRef.current.observe(canvas.parentElement!);
-
-    const onMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    };
-    const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
-
-    window.addEventListener('mousemove', onMove);
-    canvas.parentElement?.addEventListener('mouseleave', onLeave);
-
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-      const dark = isDarkRef.current;
-
-      for (const d of dotsRef.current) {
-        const dx = d.x - mx;
-        const dy = d.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < SHOCK_RADIUS) {
-          const force = (1 - dist / SHOCK_RADIUS) * SHOCK_STRENGTH;
-          const nx = dx / (dist || 1);
-          const ny = dy / (dist || 1);
-          d.vx += nx * force;
-          d.vy += ny * force;
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect(); // Once visible, stay rendered
         }
+      },
+      { rootMargin: '200px', ...options }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [options]);
 
-        d.vx += (d.ox - d.x) * RETURN_SPEED;
-        d.vy += (d.oy - d.y) * RETURN_SPEED;
-        d.vx *= RESISTANCE;
-        d.vy *= RESISTANCE;
-        d.x += d.vx;
-        d.y += d.vy;
-
-        const proximity = Math.max(0, 1 - dist / PROXIMITY);
-        const size = DOT_SIZE + proximity * 0.6;
-        let dotColor: string;
-
-        if (dark) {
-          if (proximity > 0) {
-            const alpha = 0.45 + proximity * 0.55;
-            const blend = Math.sin(d.ox * 0.02 + d.oy * 0.015) * 0.5 + 0.5;
-            const r = Math.round(blend * 0 + (1 - blend) * 0);
-            const g = Math.round(blend * 255 + (1 - blend) * 112);
-            const b = Math.round(blend * 224 + (1 - blend) * 255);
-            dotColor = `rgba(${r},${g},${b},${alpha})`;
-          } else {
-            dotColor = 'rgba(148,158,172,0.32)';
-          }
-        } else {
-          if (proximity > 0) {
-            const alpha = 0.35 + proximity * 0.65;
-            const blend = Math.sin(d.ox * 0.02 + d.oy * 0.015) * 0.5 + 0.5;
-            const r = Math.round(blend * 0 + (1 - blend) * 0);
-            const g = Math.round(blend * 208 + (1 - blend) * 80);
-            const b = Math.round(blend * 178 + (1 - blend) * 200);
-            dotColor = `rgba(${r},${g},${b},${alpha})`;
-          } else {
-            dotColor = 'rgba(110,118,128,0.38)';
-          }
-        }
-
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = dotColor;
-        ctx.fill();
-      }
-
-      rafRef.current = requestAnimationFrame(draw);
-    };
-
-    rafRef.current = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      if (roRef.current) roRef.current.disconnect();
-      window.removeEventListener('mousemove', onMove);
-      canvas.parentElement?.removeEventListener('mouseleave', onLeave);
-    };
-  }, [buildGrid]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: 2, display: 'block' }}
-    />
-  );
+  return { ref, isInView };
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FAULTY TERMINAL — unchanged
-───────────────────────────────────────────────────────────────────────────── */
-type Vec2 = [number, number];
-interface FaultyTerminalProps extends React.HTMLAttributes<HTMLDivElement> {
-  scale?: number; gridMul?: Vec2; digitSize?: number; timeScale?: number;
-  pause?: boolean; scanlineIntensity?: number; glitchAmount?: number;
-  flickerAmount?: number; noiseAmp?: number; chromaticAberration?: number;
-  dither?: number | boolean; curvature?: number; tint?: string;
-  mouseReact?: boolean; mouseStrength?: number; dpr?: number;
-  pageLoadAnimation?: boolean; brightness?: number;
-}
-const _vertexShader = `attribute vec2 position;attribute vec2 uv;varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,0.0,1.0);}`;
-const _fragmentShader = `precision mediump float;varying vec2 vUv;uniform float iTime;uniform vec3 iResolution;uniform float uScale;uniform vec2 uGridMul;uniform float uDigitSize;uniform float uScanlineIntensity;uniform float uGlitchAmount;uniform float uFlickerAmount;uniform float uNoiseAmp;uniform float uChromaticAberration;uniform float uDither;uniform float uCurvature;uniform vec3 uTint;uniform vec2 uMouse;uniform float uMouseStrength;uniform float uUseMouse;uniform float uPageLoadProgress;uniform float uUsePageLoadAnimation;uniform float uBrightness;float time;float hash21(vec2 p){p=fract(p*234.56);p+=dot(p,p+34.56);return fract(p.x*p.y);}float noise(vec2 p){return sin(p.x*10.0)*sin(p.y*(3.0+sin(time*0.090909)))+0.2;}mat2 rotate(float angle){float c=cos(angle);float s=sin(angle);return mat2(c,-s,s,c);}float fbm(vec2 p){p*=1.1;float f=0.0;float amp=0.5*uNoiseAmp;mat2 m0=rotate(time*0.02);f+=amp*noise(p);p=m0*p*2.0;amp*=0.454545;mat2 m1=rotate(time*0.02);f+=amp*noise(p);p=m1*p*2.0;amp*=0.454545;mat2 m2=rotate(time*0.08);f+=amp*noise(p);return f;}float pattern(vec2 p,out vec2 q,out vec2 r){vec2 o1=vec2(1.0);vec2 o0=vec2(0.0);mat2 r01=rotate(0.1*time);mat2 r1=rotate(0.1);q=vec2(fbm(p+o1),fbm(r01*p+o1));r=vec2(fbm(r1*q+o0),fbm(q+o0));return fbm(p+r);}float digit(vec2 p){vec2 grid=uGridMul*15.0;vec2 s=floor(p*grid)/grid;p=p*grid;vec2 q,r;float intensity=pattern(s*0.1,q,r)*1.3-0.03;if(uUseMouse>0.5){vec2 mw=uMouse*uScale;float d=distance(s,mw);float mi=exp(-d*8.0)*uMouseStrength*10.0;intensity+=mi;float rip=sin(d*20.0-iTime*5.0)*0.1*mi;intensity+=rip;}if(uUsePageLoadAnimation>0.5){float cr=fract(sin(dot(s,vec2(12.9898,78.233)))*43758.5453);float cd=cr*0.8;float cp=clamp((uPageLoadProgress-cd)/0.2,0.0,1.0);float fa=smoothstep(0.0,1.0,cp);intensity*=fa;}p=fract(p);p*=uDigitSize;float px5=p.x*5.0;float py5=(1.0-p.y)*5.0;float x=fract(px5);float y=fract(py5);float i=floor(py5)-2.0;float j=floor(px5)-2.0;float n=i*i+j*j;float f=n*0.0625;float isOn=step(0.1,intensity-f);float b=isOn*(0.2+y*0.8)*(0.75+x*0.25);return step(0.0,p.x)*step(p.x,1.0)*step(0.0,p.y)*step(p.y,1.0)*b;}float onOff(float a,float b,float c){return step(c,sin(iTime+a*cos(iTime*b)))*uFlickerAmount;}float displace(vec2 look){float y=look.y-mod(iTime*0.25,1.0);float window=1.0/(1.0+50.0*y*y);return sin(look.y*20.0+iTime)*0.0125*onOff(4.0,2.0,0.8)*(1.0+cos(iTime*60.0))*window;}vec3 getColor(vec2 p){float bar=step(mod(p.y+time*20.0,1.0),0.2)*0.4+1.0;bar*=uScanlineIntensity;float displacement=displace(p);p.x+=displacement;if(uGlitchAmount!=1.0){float extra=displacement*(uGlitchAmount-1.0);p.x+=extra;}float middle=digit(p);const float off=0.002;float sum=digit(p+vec2(-off,-off))+digit(p+vec2(0.0,-off))+digit(p+vec2(off,-off))+digit(p+vec2(-off,0.0))+digit(p+vec2(0.0,0.0))+digit(p+vec2(off,0.0))+digit(p+vec2(-off,off))+digit(p+vec2(0.0,off))+digit(p+vec2(off,off));vec3 baseColor=vec3(0.9)*middle+sum*0.1*vec3(1.0)*bar;return baseColor;}vec2 barrel(vec2 uv){vec2 c=uv*2.0-1.0;float r2=dot(c,c);c*=1.0+uCurvature*r2;return c*0.5+0.5;}void main(){time=iTime*0.333333;vec2 uv=vUv;if(uCurvature!=0.0){uv=barrel(uv);}vec2 p=uv*uScale;vec3 col=getColor(p);if(uChromaticAberration!=0.0){vec2 ca=vec2(uChromaticAberration)/iResolution.xy;col.r=getColor(p+ca).r;col.b=getColor(p-ca).b;}col*=uTint;col*=uBrightness;if(uDither>0.0){float rnd=hash21(gl_FragCoord.xy);col+=(rnd-0.5)*(uDither*0.003922);}gl_FragColor=vec4(col,1.0);}`;
-function _hexToRgb(hex: string): [number, number, number] {
-  let h = hex.replace('#', '').trim();
-  if (h.length === 3) h = h.split('').map(c => c + c).join('');
-  const num = parseInt(h, 16);
-  return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
-}
-function FaultyTerminal({
-  scale = 1, gridMul = [2, 1] as Vec2, digitSize = 1.5, timeScale = 0.3,
-  pause = false, scanlineIntensity = 0.3, glitchAmount = 1, flickerAmount = 1,
-  noiseAmp = 1, chromaticAberration = 0, dither = 0, curvature = 0.2,
-  tint = '#ffffff', mouseReact = true, mouseStrength = 0.2,
-  dpr = (typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1),
-  pageLoadAnimation = true, brightness = 1, className, style, ...rest
-}: FaultyTerminalProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const programRef = useRef<Program | null>(null);
-  const rendererRef = useRef<Renderer | null>(null);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const smoothMouseRef = useRef({ x: 0.5, y: 0.5 });
-  const frozenTimeRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  const loadAnimationStartRef = useRef<number>(0);
-  const timeOffsetRef = useRef<number>(Math.random() * 100);
-  const tintVec = useMemo(() => _hexToRgb(tint), [tint]);
-  const ditherValue = useMemo(() => (typeof dither === 'boolean' ? (dither ? 1 : 0) : dither), [dither]);
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const ctn = containerRef.current; if (!ctn) return;
-    const rect = ctn.getBoundingClientRect();
-    mouseRef.current = { x: (e.clientX - rect.left) / rect.width, y: 1 - (e.clientY - rect.top) / rect.height };
-  }, []);
-  useEffect(() => {
-    const ctn = containerRef.current; if (!ctn) return;
-    const renderer = new Renderer({ dpr, alpha: true }); rendererRef.current = renderer;
-    const gl = renderer.gl; gl.clearColor(0, 0, 0, 0);
-    const geometry = new Triangle(gl);
-    const program = new Program(gl, {
-      vertex: _vertexShader, fragment: _fragmentShader,
-      uniforms: {
-        iTime: { value: 0 },
-        iResolution: { value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height) },
-        uScale: { value: scale }, uGridMul: { value: new Float32Array(gridMul) },
-        uDigitSize: { value: digitSize }, uScanlineIntensity: { value: scanlineIntensity },
-        uGlitchAmount: { value: glitchAmount }, uFlickerAmount: { value: flickerAmount },
-        uNoiseAmp: { value: noiseAmp }, uChromaticAberration: { value: chromaticAberration },
-        uDither: { value: ditherValue }, uCurvature: { value: curvature },
-        uTint: { value: new Color(tintVec[0], tintVec[1], tintVec[2]) },
-        uMouse: { value: new Float32Array([0.5, 0.5]) },
-        uMouseStrength: { value: mouseStrength }, uUseMouse: { value: mouseReact ? 1 : 0 },
-        uPageLoadProgress: { value: pageLoadAnimation ? 0 : 1 },
-        uUsePageLoadAnimation: { value: pageLoadAnimation ? 1 : 0 },
-        uBrightness: { value: brightness },
-      }
-    });
-    programRef.current = program;
-    const mesh = new Mesh(gl, { geometry, program });
-    function resize() {
-      if (!ctn || !renderer) return;
-      renderer.setSize(ctn.offsetWidth, ctn.offsetHeight);
-      program.uniforms.iResolution.value = new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height);
-    }
-    const ro = new ResizeObserver(() => resize()); ro.observe(ctn); resize();
-    const update = (t: number) => {
-      rafRef.current = requestAnimationFrame(update);
-      if (pageLoadAnimation && loadAnimationStartRef.current === 0) loadAnimationStartRef.current = t;
-      if (!pause) { const elapsed = (t * 0.001 + timeOffsetRef.current) * timeScale; program.uniforms.iTime.value = elapsed; frozenTimeRef.current = elapsed; }
-      else { program.uniforms.iTime.value = frozenTimeRef.current; }
-      if (pageLoadAnimation && loadAnimationStartRef.current > 0) {
-        program.uniforms.uPageLoadProgress.value = Math.min((t - loadAnimationStartRef.current) / 2000, 1);
-      }
-      if (mouseReact) {
-        const sm = smoothMouseRef.current; const m = mouseRef.current;
-        sm.x += (m.x - sm.x) * 0.08; sm.y += (m.y - sm.y) * 0.08;
-        const mu = program.uniforms.uMouse.value as Float32Array; mu[0] = sm.x; mu[1] = sm.y;
-      }
-      renderer.render({ scene: mesh });
-    };
-    rafRef.current = requestAnimationFrame(update);
-    ctn.appendChild(gl.canvas);
-    if (mouseReact) ctn.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      cancelAnimationFrame(rafRef.current); ro.disconnect();
-      if (mouseReact) ctn.removeEventListener('mousemove', handleMouseMove);
-      if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas);
-      programRef.current = null;
-      rendererRef.current = null;
-      loadAnimationStartRef.current = 0; timeOffsetRef.current = Math.random() * 100;
-    };
-  }, [dpr, pause, timeScale, scale, gridMul, digitSize, scanlineIntensity, glitchAmount, flickerAmount, noiseAmp, chromaticAberration, ditherValue, curvature, tintVec, mouseReact, mouseStrength, pageLoadAnimation, brightness, handleMouseMove]);
-  return <div ref={containerRef} className={`w-full h-full relative overflow-hidden ${className ?? ''}`} style={style} {...rest} />;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   CATEGORY HERO BACKGROUND — unchanged
-───────────────────────────────────────────────────────────────────────────── */
-function CategoryHeroBackground({ tint }: { tint: string }) {
-  return (
-    <div className="absolute inset-0 pointer-events-none">
-      <div className="absolute inset-0 opacity-[0.12] dark:opacity-20">
-        <FaultyTerminal
-          tint={tint}
-          brightness={1}
-          scale={3}
-          digitSize={1.8}
-          scanlineIntensity={0.12}
-          glitchAmount={1.05}
-          flickerAmount={0.25}
-          noiseAmp={0.7}
-          mouseReact={false}
-          pageLoadAnimation={false}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ANIMATION VARIANTS — unchanged
+   ANIMATION VARIANTS
 ───────────────────────────────────────────────────────────────────────────── */
 const pageMotion = {
   hidden: { opacity: 0, y: 16 },
@@ -608,10 +77,9 @@ const heroDescriptionTextClass = 'text-base sm:text-lg lg:text-xl text-[#5C5C5C]
 const heroStatTextClass = 'text-xs sm:text-sm font-semibold text-[#9A9A9A]';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   DYNAMIC TOOL ICON — replaces the static icons map
-   Matches on tool_name string so any new tool auto-gets an icon
+   DYNAMIC TOOL ICON
 ───────────────────────────────────────────────────────────────────────────── */
-function ToolIcon({ name }: { name: string }): JSX.Element {
+const ToolIcon = memo(function ToolIcon({ name }: { name: string }): JSX.Element {
   const n = name.toLowerCase();
   if (n.includes('sub') || n.includes('finder') || n.includes('asset')) return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -729,11 +197,10 @@ function ToolIcon({ name }: { name: string }): JSX.Element {
       <path d="M11 3C11 3 8 7 8 11C8 15 11 19 11 19M11 3C11 3 14 7 14 11C14 15 11 19 11 19M3 11H19" stroke="currentColor" strokeWidth="1.2"/>
     </svg>
   );
-}
+});
 
 /* ─────────────────────────────────────────────────────────────────────────────
    CATEGORY THEME CONFIG
-   Maps API category_name → colors used throughout the section
 ───────────────────────────────────────────────────────────────────────────── */
 const PALETTE = [
   {
@@ -836,9 +303,34 @@ const PALETTE = [
 type PaletteEntry = typeof PALETTE[0];
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   CATEGORY HERO BACKGROUND — lazy-loaded WebGL, only renders when in viewport
+───────────────────────────────────────────────────────────────────────────── */
+function CategoryHeroBackground({ tint, isVisible }: { tint: string; isVisible: boolean }) {
+  if (!isVisible) return null;
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 opacity-[0.12] dark:opacity-20">
+        <LazyFaultyTerminal
+          tint={tint}
+          brightness={1}
+          scale={3}
+          digitSize={1.8}
+          scanlineIntensity={0.12}
+          glitchAmount={1.05}
+          flickerAmount={0.25}
+          noiseAmp={0.7}
+          mouseReact={false}
+          pageLoadAnimation={false}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    CATEGORY STAT BAR
 ───────────────────────────────────────────────────────────────────────────── */
-function CategoryStatBar({
+const CategoryStatBar = memo(function CategoryStatBar({
   categories,
   tools,
   palette,
@@ -863,16 +355,16 @@ function CategoryStatBar({
       })}
     </div>
   );
-}
+});
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   LOADING SKELETON — shown while API fetches
+   LOADING SKELETON
 ───────────────────────────────────────────────────────────────────────────── */
 function LoadingSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4 animate-pulse">
             <div className="flex items-start justify-between">
               <div className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-white/5" />
@@ -895,9 +387,9 @@ function LoadingSkeleton() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   TOOL CARD — reusable across all category sections
+   TOOL CARD — memoized to prevent unnecessary re-renders
 ───────────────────────────────────────────────────────────────────────────── */
-function ToolCard({
+const ToolCard = memo(function ToolCard({
   tool,
   p,
   primaryCta,
@@ -912,13 +404,12 @@ function ToolCard({
 }) {
   const presets = tool.scan_config?.basic?.presets ?? [];
   const mediumCount = tool.scan_config?.medium?.options?.length ?? 0;
-  const exampleEntries =
-    tool.examples && typeof tool.examples === "object" && tool.examples[0] && typeof tool.examples[0] === "object"
-      ? Object.entries(tool.examples[0] as Record<string, unknown>)
-      : [];
+  const examples = Array.isArray(tool.examples) ? tool.examples : [];
+  const toolAnchorId = `tool-${tool.tool_name.toLowerCase().replace(/\s+/g, '-')}`;
 
   return (
     <motion.div
+      id={toolAnchorId}
       variants={cardMotion}
       className={`group bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl flex flex-col overflow-hidden ${p.cardHover} transition-all duration-200 cursor-pointer`}
     >
@@ -981,15 +472,15 @@ function ToolCard({
         )}
 
         {/* Example targets */}
-        {exampleEntries.length > 0 && (
+        {examples.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-auto">
-            {exampleEntries.map(([key, val]) => (
+            {examples.map((ex, idx) => (
               <span
-                key={key}
-                title={`${key}: ${String(val)}`}
-                className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono truncate max-w-40"
+                key={idx}
+                title={ex}
+                className="text-[11px] bg-[#F7F5F0] dark:bg-[#1A1A1A] border border-black/9 dark:border-white/9 text-[#5C5C5C] dark:text-[#9A9A9A] px-2 py-0.5 rounded-md font-mono truncate max-w-full"
               >
-                {key}: {String(val)}
+                {ex}
               </span>
             ))}
           </div>
@@ -1007,12 +498,12 @@ function ToolCard({
       </div>
     </motion.div>
   );
-}
+});
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   CATEGORY SECTION — renders hero + tool grid for one category dynamically
+   CATEGORY SECTION — lazy-renders WebGL background via IntersectionObserver
 ───────────────────────────────────────────────────────────────────────────── */
-function CategorySection({
+const CategorySection = memo(function CategorySection({
   category,
   tools,
   palette,
@@ -1029,8 +520,12 @@ function CategorySection({
   descriptionTextClass: string;
   subtitleTextClass: string;
 }) {
+  const { ref, isInView } = useInView();
   const sectionId = `${category.name.toLowerCase().replace(/\s+/g, '-')}-section`;
-  const categoryTools = tools.filter((tool) => tool.category_name === category.name);
+  const categoryTools = useMemo(
+    () => tools.filter((tool) => tool.category_name === category.name),
+    [tools, category.name]
+  );
   const categorySummary =
     category.description?.trim() ||
     (categoryTools.length > 0
@@ -1041,10 +536,10 @@ function CategorySection({
       : "Tool collection loaded from the live catalog.");
 
   return (
-    <div id={sectionId}>
+    <div id={sectionId} ref={ref}>
       {/* Category hero */}
       <div className="relative w-full h-screen overflow-hidden bg-white dark:bg-[#09090B]">
-        <CategoryHeroBackground tint={palette.tint} />
+        <CategoryHeroBackground tint={palette.tint} isVisible={isInView} />
         {/* Glow layers */}
         <div className="absolute inset-0 pointer-events-none">
           <div className={`absolute -left-40 top-1/2 -translate-y-1/2 w-150 h-150 rounded-full ${palette.glowLeft}`} />
@@ -1056,7 +551,7 @@ function CategorySection({
         <div className="relative h-full w-full flex items-center justify-center">
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <motion.div initial="hidden" animate="visible" variants={pageMotion} className="flex flex-col gap-6 z-10">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={pageMotion} className="flex flex-col gap-6 z-10">
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${palette.dot}`} />
                   <span className={`${heroEyebrowTextClass} ${palette.eyebrow}`}>{category.name}</span>
@@ -1076,7 +571,7 @@ function CategorySection({
                 </div>
               </motion.div>
 
-              {/* Decorative SVG — cycles through 3 styles by index */}
+              {/* Decorative SVG */}
               <div className="hidden lg:flex items-center justify-end h-full">
                 <div className="relative w-full max-w-md h-96">
                   {index % 3 === 0 && (
@@ -1118,8 +613,8 @@ function CategorySection({
       </div>
 
       {/* Tool cards grid */}
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8`}>
-        <motion.div initial="hidden" animate="visible" variants={listMotion} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }} variants={listMotion} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {categoryTools.map((tool) => (
             <ToolCard
               key={tool.tool_id}
@@ -1134,6 +629,29 @@ function CategorySection({
       </div>
     </div>
   );
+});
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SERVER DATA HYDRATION — reads data injected by the layout's server component
+───────────────────────────────────────────────────────────────────────────── */
+function useServerData(): { categories: Category[]; tools: Tool[] } | null {
+  const [data, setData] = useState<{ categories: Category[]; tools: Tool[] } | null>(null);
+
+  useEffect(() => {
+    const script = document.getElementById('tools-server-data');
+    if (script?.textContent) {
+      try {
+        const parsed = JSON.parse(script.textContent);
+        if (parsed.categories?.length > 0 || parsed.tools?.length > 0) {
+          setData(parsed);
+        }
+      } catch {
+        // Ignore parse errors, will fall back to client fetch
+      }
+    }
+  }, []);
+
+  return data;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1145,6 +663,9 @@ export default function ToolsPage() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // ── Server-side pre-fetched data ──
+  const serverData = useServerData();
+
   // ── API state ──
   const [categories, setCategories] = useState<Category[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
@@ -1154,6 +675,16 @@ export default function ToolsPage() {
   const isDark = mounted && resolvedTheme === 'dark';
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Use server data immediately if available, skip client fetch
+  useEffect(() => {
+    if (serverData) {
+      setCategories(serverData.categories);
+      setTools(serverData.tools);
+      setLoading(false);
+      setError(null);
+    }
+  }, [serverData]);
 
   const load = useCallback(async () => {
     try {
@@ -1194,18 +725,36 @@ export default function ToolsPage() {
     }
   }, []);
 
+  // Only fetch client-side if server data is not available
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!serverData) {
+      load();
+    }
+  }, [load, serverData]);
 
-  const isKhmer = locale === 'kh';
+  // Scroll to tool card when navigating with a hash anchor (e.g. /tools#tool-subfinder)
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    // Small delay to let DOM render after data loads
+    const timer = setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
   const descriptionTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const subtitleTextClass = 'text-[16px] md:text-[17px] lg:text-[18px]';
 
-  const heroTitle = 'Security tools in one live catalog';
+  const heroTitle = (<><span className="text-[#01509e] dark:text-[#4fa3e5]">Security tools</span> in one live catalog</>);
 
   const heroSubtitle = useMemo(() => {
     if (tools.length === 0) {
@@ -1227,20 +776,7 @@ export default function ToolsPage() {
     return map;
   }, [categories]);
 
-  const gradientStyle = useMemo(() => ({
-    background: isDark
-      ? 'radial-gradient(ellipse 50% 60% at 10% 50%, rgba(0,208,178,0.06) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 90% 50%, rgba(1,80,158,0.06) 0%, transparent 70%)'
-      : 'radial-gradient(ellipse 50% 60% at 10% 50%, rgba(0,208,178,0.05) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 90% 50%, rgba(1,80,158,0.04) 0%, transparent 70%)',
-  }), [isDark]);
-
-  const centerZoneStyle = useMemo(() => ({
-    zIndex: 3 as const,
-    background: isDark
-      ? 'linear-gradient(to right, transparent 0%, rgba(17,17,19,0.0) 28%, rgba(17,17,19,0.55) 42%, rgba(17,17,19,0.55) 58%, rgba(17,17,19,0.0) 72%, transparent 100%)'
-      : 'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.0) 28%, rgba(255,255,255,0.60) 42%, rgba(255,255,255,0.60) 58%, rgba(255,255,255,0.0) 72%, transparent 100%)',
-  }), [isDark]);
-
-  const bottomFadeStyle = useMemo(() => ({
+  const heroBottomFadeStyle = useMemo(() => ({
     zIndex: 4 as const,
     background: isDark
       ? 'linear-gradient(to bottom, transparent, rgba(9,9,11,0.85))'
@@ -1259,20 +795,14 @@ export default function ToolsPage() {
           HERO SECTION
       ══════════════════════════════════════════════════════════════════ */}
       <div className="relative overflow-hidden bg-white dark:bg-[#111113] border-b border-black/9 dark:border-white/8 transition-colors duration-300">
-        <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
-          <div className="absolute inset-0 pointer-events-none transition-colors duration-300" style={gradientStyle} />
-          <PlasmaSides isDark={isDark} />
-          <DotGrid isDark={isDark} />
-          <div className="absolute inset-0 pointer-events-none" style={centerZoneStyle} />
-          <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={bottomFadeStyle} />
-        </div>
+        <HeroBackground isDark={isDark} bottomFadeStyle={heroBottomFadeStyle} />
 
         <div
           className="relative mx-auto flex min-h-[58vh] w-full max-w-7xl flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 sm:py-14 lg:py-16"
           style={{ zIndex: 10 }}
         >
           <div className="flex w-full max-w-4xl flex-col items-center gap-5 text-center">
-            <h1 className="text-3xl sm:text-4xl font-display lg:text-5xl xl:text-6xl font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
+            <h1 className="text-[clamp(2rem,7vw,80px)] font-display font-bold leading-[1.08] tracking-tight text-[#1A1A1A] dark:text-[#EDEDED]">
               {heroTitle}
             </h1>
             <p className={`text-[#5C5C5C] dark:text-[#9A9A9A] max-w-lg ${descriptionTextClass} leading-relaxed`}>

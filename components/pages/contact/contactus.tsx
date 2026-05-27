@@ -2,6 +2,7 @@
 
   import { useRef, useState, useEffect } from "react";
   import { useLocale } from "next-intl";
+  import emailjs from "@emailjs/browser";
 
   /* ─── Info items ─────────────────────────────────── */
   const buildInfoItems = (copy: ContactCopyValue): InfoItem[] => [
@@ -104,7 +105,7 @@
     descRaw?: React.ReactNode;
   };
 
-  const CONTACT_COPY: Record<"en" | "kh", ContactCopyValue> = {
+  const CONTACT_COPY: Record<"en" | "km", ContactCopyValue> = {
     en: {
       eyebrow: "Contact Us",
       title: "Let's Build Something Secure",
@@ -138,7 +139,7 @@
         success: "Message sent successfully! We'll be in touch soon.",
       },
     },
-    kh: {
+    km: {
       eyebrow: "ទំនាក់ទំនងយើង",
       title: "តោះបង្កើតអ្វីមួយដែលមានសុវត្ថិភាព",
       description: "មានសំណួរ? ក្រុមការងាររបស់យើងរីករាយក្នុងការជួយអ្នកការពារប្រព័ន្ធរបស់អ្នកដោយការសាកល្បងសុវត្ថិភាពកម្រិតខ្ពស់។",
@@ -375,12 +376,18 @@
   /* ─── Component ─────────────────────────────────── */
   export default function ContactUs() {
     const locale = useLocale();
-    const copy = CONTACT_COPY[locale === "kh" ? "kh" : "en"];
+    const isKhmer = locale === "km";
+    const copy = CONTACT_COPY[isKhmer ? "km" : "en"];
     const infoItems = buildInfoItems(copy);
     const contactFontClass =
-      locale === "kh"
+      isKhmer
         ? "font-[var(--font-noto-khmer),sans-serif]"
         : "font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif]";
+    const titleFontFamily = isKhmer
+      ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+      : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    const titleLineHeight = isKhmer ? 1.2 : 1.08;
+    const titleLetterSpacing = isKhmer ? "0" : "-0.02em";
     const formRef = useRef<HTMLFormElement>(null);
     const hexLeftRef = useRef<SVGSVGElement>(null);
     const hexRightRef = useRef<SVGSVGElement>(null);
@@ -392,15 +399,26 @@
       setupMagneticHover(hexRightRef.current);
     }, []);
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
       e.preventDefault();
-      setSubmitted(true);
       setDisabled(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setDisabled(false);
+
+      try {
+        await emailjs.sendForm(
+          "service_zhzq1y7",
+          "template_n8kycfr",
+          formRef.current!,
+          "R-0a64Uzx7gTDqO9N"
+        );
+        setSubmitted(true);
         formRef.current?.reset();
-      }, 4000);
+      } catch (error) {
+        console.error("EmailJS error:", error);
+        alert("Failed to send message. Please try again later.");
+      } finally {
+        setDisabled(false);
+        setTimeout(() => setSubmitted(false), 4000);
+      }
     }
 
     return (
@@ -643,12 +661,13 @@
               </div>
 
               <h1
-                className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold leading-[1.08] tracking-[-0.02em] text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5"
-                style={
-                  locale === "kh"
-                    ? { fontFamily: 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif' }
-                    : { fontFamily: 'var(--font-google-sans), var(--font-noto-khmer), sans-serif' }
-                }
+                className="contact-title text-[clamp(2.2rem,5vw,3.8rem)] font-bold text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] mb-5"
+                style={{
+                  fontFamily: titleFontFamily,
+                  fontWeight: isKhmer ? 800 : 700,
+                  lineHeight: titleLineHeight,
+                  letterSpacing: titleLetterSpacing,
+                }}
               >
                 {copy.title}
               </h1>
@@ -679,6 +698,7 @@
                       </label>
                       <input
                         type="text"
+                        name="first_name"
                         placeholder={copy.form.firstNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -690,6 +710,7 @@
                       </label>
                       <input
                         type="text"
+                        name="last_name"
                         placeholder={copy.form.lastNamePlaceholder}
                         required
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -704,6 +725,7 @@
                     </label>
                     <input
                       type="email"
+                      name="email"
                       placeholder={copy.form.emailPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -718,6 +740,7 @@
                       </label>
                       <input
                         type="text"
+                        name="company"
                         placeholder={copy.form.companyPlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
@@ -728,6 +751,7 @@
                       </label>
                       <input
                         type="tel"
+                        name="phone"
                         placeholder={copy.form.phonePlaceholder}
                         className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
                       />
@@ -741,6 +765,7 @@
                     </label>
                     <input
                       type="text"
+                      name="subject"
                       placeholder={copy.form.subjectPlaceholder}
                       required
                       className="contact-input text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"
@@ -753,6 +778,7 @@
                       {copy.form.message}
                     </label>
                     <textarea
+                      name="message"
                       placeholder={copy.form.messagePlaceholder}
                       required
                       className="contact-input contact-textarea text-responsive border rounded-lg px-4 py-3 text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)] font-normal leading-relaxed placeholder:text-[oklch(0.556_0_0)] dark:placeholder:text-[oklch(0.4_0_0)] transition-all duration-200 font-[inherit]"

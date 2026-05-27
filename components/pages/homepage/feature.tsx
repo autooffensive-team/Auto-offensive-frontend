@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import FocusWord from "@/components/ui/focus-word";
 
 // ─── CUSTOMIZATION CONSTANTS ──────────────────────────────────────────────────
 const CONFIG = {
@@ -448,7 +449,7 @@ function DualSpine({
       {sides.map((s, i) => (
         <div
           key={i}
-          className="fixed top-0 h-screen w-px z-90 pointer-events-none"
+          className="fixed top-0 h-screen w-px z-40 pointer-events-none"
           style={{ ...s.style, clipPath }}
         >
           <div
@@ -474,7 +475,7 @@ function DualSpine({
 function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) {
   return (
     <div
-      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-200 pointer-events-none"
+      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none"
       style={{
         opacity: visible ? 1 : 0,
         transition: "opacity 0.4s ease",
@@ -530,7 +531,7 @@ function CenterLogo({ visible, isDark }: { visible: boolean; isDark: boolean }) 
 function ProgressBar({ widthPct }: { widthPct: number }) {
   return (
     <div
-      className="fixed top-0 left-0 h-0.5 z-200 transition-[width] duration-100"
+      className="fixed top-0 left-0 h-0.5 z-40 transition-[width] duration-100"
       style={{
         width: `${widthPct}%`,
         background: "linear-gradient(90deg, #01509e, #00d0b2)",
@@ -543,7 +544,7 @@ function ProgressBar({ widthPct }: { widthPct: number }) {
 
 function Ticker({ colors }: { colors: typeof CONFIG.DARK }) {
   const locale = useLocale();
-  const items = locale === "kh" ? TICKER_ITEMS : EN_TICKER_ITEMS;
+  const items = locale === "km" ? TICKER_ITEMS : EN_TICKER_ITEMS;
   const doubled = [...items, ...items];
   return (
     <div
@@ -601,7 +602,7 @@ function CardRow({
   exploreCapabilityLabel: string;
 }) {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
@@ -842,17 +843,23 @@ function CardRow({
 export default function Features() {
   const locale = useLocale();
   const t = useTranslations("homepage.features");
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km" || locale === "kh";
+  const isEnglish = locale === "en";
+  const sectionTitleLine2 = t("sectionTitleLine2");
+  const sectionTitlePrefix = sectionTitleLine2
+    .replace(/\s*(Auto Offensive|Reffensive)\s*$/i, "")
+    .trim();
   const displayFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
     : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
-  const cards = locale === "kh" ? CARDS : EN_CARDS;
+  const cards = locale === "km" ? CARDS : EN_CARDS;
   // FIX: scrollPct is now used by ProgressBar
   const [scrollPct, setScrollPct] = useState(0);
   const [spineFill, setSpineFill] = useState(0);
   const [spineClip, setSpineClip] = useState("inset(9999px 0 0 0)");
   const [visibleCards, setVisibleCards] = useState<boolean[]>(cards.map(() => false));
   const [logoVisible, setLogoVisible] = useState(false);
+  const [titleFocusStarted, setTitleFocusStarted] = useState(false);
 
   const colors = useTheme();
   const isDark = colors === CONFIG.DARK;
@@ -864,6 +871,23 @@ export default function Features() {
   const lastCardRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const featureSectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+
+  // ─── Title focus animation trigger (when section header enters viewport) ──
+  useEffect(() => {
+    if (!titleRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTitleFocusStarted(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(titleRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   // ─── Scroll: progress bar + spine fill + spine clip ───────────────────────
   useEffect(() => {
@@ -1051,6 +1075,7 @@ export default function Features() {
           }}
         >
           <h2
+            ref={titleRef}
             className="font-bold leading-[1.1]"
             style={{
               fontFamily: displayFontFamily,
@@ -1060,8 +1085,19 @@ export default function Features() {
             }}
           >
             <span className="block">{t("sectionTitleLine1")}</span>
-            <span className="block" style={{ color: colors.accent2 }}>
-              {t("sectionTitleLine2")}
+            <span className="block">
+              {isEnglish || isKhmer ? (
+                <>
+                  {sectionTitlePrefix}
+                  {sectionTitlePrefix ? " " : ""}
+                  <FocusWord startAnimation={titleFocusStarted}>
+                    <span style={{ color: colors.accent2 }}>Auto</span>{" "}
+                    <span style={{ color: colors.accent1 }}>Offensive</span>
+                  </FocusWord>
+                </>
+              ) : (
+                <span style={{ color: colors.accent2 }}>{sectionTitleLine2}</span>
+              )}
             </span>
           </h2>
         </div>

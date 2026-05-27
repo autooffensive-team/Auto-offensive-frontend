@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@xterm/xterm/css/xterm.css";
 
@@ -78,6 +79,42 @@
   to {
     height: 0;
     }
+  }
+}
+
+@keyframes noise-animation {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2%, -3%);
+  }
+  20% {
+    transform: translate(-4%, 2%);
+  }
+  30% {
+    transform: translate(2%, -4%);
+  }
+  40% {
+    transform: translate(-2%, 5%);
+  }
+  50% {
+    transform: translate(-4%, 2%);
+  }
+  60% {
+    transform: translate(3%, 0);
+  }
+  70% {
+    transform: translate(0, 3%);
+  }
+  80% {
+    transform: translate(-3%, 0);
+  }
+  90% {
+    transform: translate(2%, 2%);
+  }
+  100% {
+    transform: translate(1%, 0);
   }
 }
 
@@ -239,23 +276,41 @@
 }
 
 /* Apply Khmer font to body in kh locale */
-html[lang="kh"] body {
+html[lang="km"] body {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif;
 }
 
 /* Keep resource page typography fully Khmer in kh locale */
-html[lang="kh"] .resource-page,
-html[lang="kh"] .resource-page * {
+html[lang="km"] .resource-page,
+html[lang="km"] .resource-page * {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
 }
 
-html[lang="kh"] .resource-page h1,
-html[lang="kh"] .resource-page h2,
-html[lang="kh"] .resource-page h3,
-html[lang="kh"] .resource-page h4,
-html[lang="kh"] .resource-page h5,
-html[lang="kh"] .resource-page h6 {
+html[lang="km"] .resource-page h1,
+html[lang="km"] .resource-page h2,
+html[lang="km"] .resource-page h3,
+html[lang="km"] .resource-page h4,
+html[lang="km"] .resource-page h5,
+html[lang="km"] .resource-page h6 {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", sans-serif !important;
+  letter-spacing: normal;
+}
+
+html[lang="km"] .resource-page .resource-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: normal;
+}
+
+html[lang="km"] .feature-page .feature-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: normal;
+}
+
+html[lang="km"] .about-hero .about-hero-title {
+  font-family: var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif !important;
+  font-weight: 800 !important;
   letter-spacing: normal;
 }
 

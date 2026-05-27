@@ -12,7 +12,7 @@ export default function ScanBox() {
   const handleStartScan = () => {
     if (scanType === "Medium") router.push("/medium-scan");
     else if (scanType === "Basic") router.push("/basic-scan");
-    else router.push("/advance-scan");
+    else router.push("/userdashboard/scan?mode=advanced");
   };
 
   return (

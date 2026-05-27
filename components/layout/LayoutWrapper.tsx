@@ -20,6 +20,8 @@ export default function LayoutWrapper({
   const isAppPage = 
     pathname.startsWith("/live-scans") || 
     pathname.startsWith("/medium-scan") || 
+    pathname.startsWith("/advance-scan") || 
+    pathname.startsWith("/basic-scan") || 
     pathname.startsWith("/live-scan-medium") || 
     pathname.startsWith("/vulnerabilities");
 

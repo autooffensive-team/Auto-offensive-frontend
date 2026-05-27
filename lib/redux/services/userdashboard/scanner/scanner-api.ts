@@ -1,22 +1,19 @@
 import { baseApi } from "@/lib/redux/services/base-api";
 import type {
-  DeleteProjectRequest,
-  ProjectListResponse,
-  RawProject,
-  UpdateProjectRequest,
-  UserProject,
-} from "@/types/project";
-import type {
   DependencyListResponse,
   DependencySummaryResponse,
   GetFileIssuesRequest,
+  GetHotspotDetailRequest,
   GetIssueDetailRequest,
   GetScanLogsRequest,
+  HotspotDetailResponse,
+  HotspotListResponse,
   IssueDetailResponse,
   IssueListResponse,
   ListCurrentUserScanIdsRequest,
   ListCurrentUserScansRequest,
   ListDependenciesRequest,
+  ListHotspotsRequest,
   ListIssuesRequest,
   ListProjectScansRequest,
   ScanDetailResponse,
@@ -30,43 +27,11 @@ import type {
   UserScanTaskRefsResponse,
 } from "@/types/scanner";
 
-export type { UserProject } from "@/types/project";
-
 const SCANNER_PROXY_PATH = "scanner";
 const CSV_QUERY_KEYS = new Set(["phases"]);
 
 type QueryScalar = string | number | boolean | null | undefined;
 type QueryValue = QueryScalar | QueryScalar[];
-
-function normalizeProject(project: RawProject): UserProject {
-  return {
-    project_id: project.project_id ?? project.id ?? "",
-    name: project.name ?? "",
-    description: project.description ?? "",
-    owner_id: project.owner_id ?? project.owner ?? "",
-    created_at: project.created_at ?? "",
-    last_modified:
-      project.last_modified ?? project.last_scan_at ?? project.created_at ?? "",
-  };
-}
-
-function normalizeProjectList(response: ProjectListResponse): UserProject[] {
-  const projects = Array.isArray(response) ? response : (response.projects ?? []);
-  return projects.map(normalizeProject);
-}
-
-async function parseProjectResponse(response: Response): Promise<RawProject> {
-  const text = await response.text();
-  if (!text.trim()) {
-    return {};
-  }
-
-  try {
-    return JSON.parse(text) as RawProject;
-  } catch {
-    return {};
-  }
-}
 
 function buildScannerUrl(pathSegments: string[], query?: Record<string, QueryValue>): string {
   const path = pathSegments.map((segment) => encodeURIComponent(segment)).join("/");
@@ -114,45 +79,6 @@ function buildProxyScannerUrl(pathSegments: string[], query?: Record<string, Que
 
 export const scannerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<UserProject[], void>({
-      query: () => "projects",
-      transformResponse: (response: ProjectListResponse) =>
-        normalizeProjectList(response),
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map((project) => ({
-                type: "Scan" as const,
-                id: project.project_id,
-              })),
-              { type: "Scan" as const, id: "LIST" },
-            ]
-          : [{ type: "Scan" as const, id: "LIST" }],
-    }),
-    updateProject: builder.mutation<UserProject, UpdateProjectRequest>({
-      query: ({ project_id, ...body }) => ({
-        url: `projects/${project_id}`,
-        method: "PATCH",
-        body,
-        responseHandler: parseProjectResponse,
-      }),
-      transformResponse: (response: RawProject) => normalizeProject(response),
-      invalidatesTags: (_result, _error, { project_id }) => [
-        { type: "Scan", id: project_id },
-        { type: "Scan", id: "LIST" },
-      ],
-    }),
-    deleteProject: builder.mutation<void, DeleteProjectRequest>({
-      query: ({ project_id, cascade = true }) => ({
-        url: `projects/${project_id}`,
-        method: "DELETE",
-        params: { cascade },
-      }),
-      invalidatesTags: (_result, _error, { project_id }) => [
-        { type: "Scan", id: project_id },
-        { type: "Scan", id: "LIST" },
-      ],
-    }),
     triggerScan: builder.mutation<TriggerScanResponse, TriggerScanRequest>({
       query: (body) => ({
         url: buildScannerUrl(["scans"]),
@@ -162,6 +88,7 @@ export const scannerApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { project_key }) => [
         { type: "Scan" as const, id: "LIST" },
         { type: "Scan" as const, id: `PROJECT:${project_key}` },
+        { type: "Gateway" as const, id: "JOBS_LIST" },
       ],
     }),
     getScanDetail: builder.query<ScanDetailResponse, string>({
@@ -287,6 +214,26 @@ export const scannerApi = baseApi.injectEndpoints({
         ...(result?.scans.map((scan) => ({ type: "Scan" as const, id: scan.scan_id })) ?? []),
       ],
     }),
+    listHotspots: builder.query<HotspotListResponse, ListHotspotsRequest>({
+      query: ({ scan_id, status_filter, page, page_size }) =>
+        buildScannerUrl(["scans", scan_id, "hotspots"], {
+          status_filter,
+          page,
+          page_size,
+        }),
+      providesTags: (_result, _error, { scan_id }) => [
+        { type: "Scan" as const, id: scan_id },
+        { type: "Report" as const, id: `HOTSPOTS:${scan_id}` },
+      ],
+    }),
+    getHotspotDetail: builder.query<HotspotDetailResponse, GetHotspotDetailRequest>({
+      query: ({ scan_id, hotspot_key }) =>
+        buildScannerUrl(["scans", scan_id, "hotspots", hotspot_key]),
+      providesTags: (_result, _error, { scan_id, hotspot_key }) => [
+        { type: "Scan" as const, id: scan_id },
+        { type: "Report" as const, id: `HOTSPOT:${hotspot_key}` },
+      ],
+    }),
   }),
 });
 
@@ -308,9 +255,6 @@ export function buildScanLogStreamUrl({
 }
 
 export const {
-  useGetProjectsQuery,
-  useUpdateProjectMutation,
-  useDeleteProjectMutation,
   useTriggerScanMutation,
   useGetScanDetailQuery,
   useGetScanStatusQuery,
@@ -324,4 +268,6 @@ export const {
   useListCurrentUserScansQuery,
   useListCurrentUserScanIdsQuery,
   useListProjectScansQuery,
+  useListHotspotsQuery,
+  useGetHotspotDetailQuery,
 } = scannerApi;

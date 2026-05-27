@@ -11,6 +11,7 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import AuthorizedUserIndicator from '@/components/auth/authorized-user-indicator';
 import { authClient } from '@/lib/auth-client';
+import { useSessionHealth } from '@/hooks/use-session-health';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -49,42 +50,44 @@ type ResourceItem = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
+const docsAppUrl = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
+// If NEXT_PUBLIC_DOCS_APP_URL is empty, links go to /docs/... on the same origin (handled by rewrites)
+// If set to an external URL, links go directly to that host
+const toDocsUrl = (path: string) => docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`;
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 const toolLinks: ToolItem[] = [
-  { title: 'Subfinder',    href: '/tools', icon: '/icons/subfinder.webp'    },
-  { title: 'Naabu',        href: '/tools', icon: '/icons/nabuu.webp'        },
-  { title: 'Nmap',         href: '/tools', icon: '/icons/nmap.webp'         },
-  { title: 'Httpx',        href: '/tools', icon: '/icons/httpx.webp'        },
-  { title: 'Katana',       href: '/tools', icon: '/icons/katana.webp'       },
-  { title: 'Gobuster',     href: '/tools', icon: '/icons/gobuster.webp'     },
+  { title: 'Subfinder', href: '/tools#tool-subfinder', icon: '/icons/subfinder.webp' },
+  { title: 'Naabu', href: '/tools#tool-naabu', icon: '/icons/nabuu.webp' },
+  { title: 'Nmap', href: '/tools#tool-nmap', icon: '/icons/nmap.webp' },
+  { title: 'Httpx', href: '/tools#tool-httpx', icon: '/icons/httpx.webp' },
+  { title: 'Katana', href: '/tools#tool-katana', icon: '/icons/katana.webp' },
+  { title: 'Gobuster', href: '/tools#tool-gobuster', icon: '/icons/gobuster.webp' },
 ];
 
 const navbarToolLinks = toolLinks;
 
 const featureLinks: FeatureItem[] = [
-  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines',   href: '/feature/cicd',   icon: '/icons/feature-cicd.webp'       },
-  { title: 'Ai Pentest',        description: 'Accelerate testing with intelligent automation',        href: '/feature/ai',     icon: '/icons/feature-aipentest.webp'  },
-  { title: 'CLI Access',        description: 'Execute tools remotely via terminal',                   href: '/feature/cli',    icon: '/icons/feature-cli.webp'        },
-  { title: 'Automation Tools',  description: 'Run tools instantly from the web UI',                   href: '/feature/webui',  icon: '/icons/feature-automation.webp' },
+  { title: 'Integration CI/CD', description: 'Seamlessly connect with your development pipelines', href: '/feature/cicd', icon: '/icons/feature-cicd.webp' },
+  { title: 'AI Pentest', description: 'Accelerate testing with intelligent automation', href: '/feature/ai', icon: '/icons/feature-aipentest.webp' },
+  { title: 'CLI Access', description: 'Execute tools remotely via terminal', href: '/feature/cli', icon: '/icons/feature-cli.webp' },
+  { title: 'Automation Tools', description: 'Run tools instantly from the web UI', href: '/feature/webui', icon: '/icons/feature-automation.webp' },
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'CLI Documents',   description: 'Guides for using tools via command line',        href: '/resource/cli',   icon: '/icons/res-cli.webp'   },
-  { title: 'API Documents',   description: 'Accelerate testing with intelligent automation', href: '/resource/api',   icon: '/icons/res-api.webp'   },
-  { title: 'Tools Documents', description: 'Instructions for using security tools',          href: '/resource/tool',  icon: '/icons/res-tools.webp' },
-  { title: 'CI/CD Documents', description: 'Setup guides for pipeline integration',          href: '/resource/ci-cd', icon: '/icons/res-cicd.webp'  },
+  { title: 'Document', description: ' All documentation for the platform', href: toDocsUrl('/'), icon: '/icons/res-cli.webp' },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
-  { title: 'About Us',   href: '/about-us',   icon: '/icons/about_us_icon.webp'   },
+  { title: 'About Us', href: '/about-us', icon: '/icons/about_us_icon.webp' },
   { title: 'Contact Us', href: '/contact-us', icon: '/icons/contact_us_icon.webp' },
-  { title: 'FAQ',        href: '/help-center', icon: '/icons/faq.webp'            },
+  { title: 'FAQ', href: '/help-center', icon: '/icons/faq.webp' },
 ];
 
 // ── Shared icon box class ────────────────────────────────────────────────────
 const iconBoxCls =
   'flex shrink-0 items-center justify-center rounded-[8px] ' +
-  'bg-[#F7F5F0] dark:bg-[#1C1C1A] ' +
+  'bg-white dark:bg-[#1C1C1A] ' +
   'border border-black/[0.045] dark:border-white/[0.09] ' +
   'shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)]';
 
@@ -93,13 +96,20 @@ function Logo() {
   const { theme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div style={{ width: 100, height: 40 }} />;
+  if (!mounted) return <div className="h-10 w-25 md:h-auto md:w-25 shrink-0" />;
   const src = theme === 'dark'
     ? '/Auto_Offensive_Dark-mode.png'
     : '/Auto_Offensive_Light-mode.png';
   return (
     <Link href="/" className="cursor-pointer shrink-0">
-      <Image src={src} alt="Auto-Offensive" width={100} height={40} priority style={{ width: 'auto', height: 'auto' }} />
+      <Image
+        src={src}
+        alt="Auto-Offensive"
+        width={100}
+        height={40}
+        priority
+        className="h-10 w-auto md:h-auto md:w-auto"
+      />
     </Link>
   );
 }
@@ -144,14 +154,14 @@ function ThemeToggle() {
   );
 }
 
-type Lang = 'en' | 'kh';
+type Lang = 'en' | 'km';
 
 function LanguageToggle() {
   const [mounted, setMounted] = React.useState(false);
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const currentLocale = useLocale();
-  const nextLocale: Lang = currentLocale === 'en' ? 'kh' : 'en';
+  const nextLocale: Lang = currentLocale === 'en' ? 'km' : 'en';
   const isEnglish = currentLocale === 'en';
 
   React.useEffect(() => setMounted(true), []);
@@ -164,8 +174,8 @@ function LanguageToggle() {
   };
 
   const options: { value: Lang; flagSrc: string; code: string }[] = [
-    { value: 'en', flagSrc: '/flags/en.png', code: 'EN' },
-    { value: 'kh', flagSrc: '/flags/kh.png', code: 'KH' },
+    { value: 'en', flagSrc: '/flags/kh.png', code: 'KH' },
+    { value: 'km', flagSrc: '/flags/en.png', code: 'EN' },
   ];
 
   if (!mounted) return <div className="h-10 w-23 shrink-0 rounded-full" />;
@@ -177,9 +187,9 @@ function LanguageToggle() {
       type="button"
       onClick={handleLocaleChange}
       disabled={isPending}
-      aria-label={`Switch language to ${nextLocale === 'kh' ? 'Khmer' : 'English'}`}
+      aria-label={`Switch language to ${nextLocale === 'km' ? 'Khmer' : 'English'}`}
       aria-pressed={!isEnglish}
-      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-[#F7F5F0]/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
+      className="relative inline-flex h-10 w-23 shrink-0 items-center rounded-full border border-black/9 dark:border-white/9 bg-white/90 dark:bg-[#09090B]/80 text-[#49537B] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white"
     >
       <span
         className={cn(
@@ -269,7 +279,7 @@ function ResourceDocItem({
   asMenuLink = false,
 }: ResourceItem & { asMenuLink?: boolean }) {
   const content = (
-    <Link
+    <a
       href={href}
       onClick={onClick}
       className="flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
@@ -291,7 +301,7 @@ function ResourceDocItem({
           <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{description}</p>
         )}
       </div>
-    </Link>
+    </a>
   );
 
   return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
@@ -359,6 +369,29 @@ function useScroll(threshold: number) {
 }
 
 // ── Mobile Menu ───────────────────────────────────────────────────────────────
+function TryFreeButton({
+  className,
+  children,
+  onClick,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+}) {
+  return (
+    <a
+      href="/api/guest/start"
+      onClick={onClick}
+      className={cn(
+        'btn-try-free relative inline-flex items-center justify-center overflow-visible rounded-full border border-[#FACC15] bg-[#FEF3C7] px-7 py-3 text-[15px] font-medium tracking-wide text-[#B45309] transition-colors duration-300 focus:outline-none',
+        className,
+      )}
+    >
+      <span className="relative z-10">{children}</span>
+    </a>
+  );
+}
+
 type MobileMenuProps = React.ComponentProps<'div'> & { open: boolean };
 
 function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
@@ -367,15 +400,14 @@ function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
     <div
       id="mobile-menu"
       className={cn(
-        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70',
-        'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y md:hidden',
+        'bg-white/80 dark:bg-[#09090B]/80 backdrop-blur-xl backdrop-saturate-150',
+        'fixed top-14 right-0 bottom-0 left-0 z-40 flex flex-col border-y md:hidden',
+        'overflow-y-auto overscroll-contain',
       )}
     >
       <div
-        data-slot={open ? 'open' : 'closed'}
         className={cn(
-          'data-[slot=open]:animate-in data-[slot=open]:zoom-in-97 ease-out',
-          'size-full p-4',
+          'w-full flex-1 px-3 py-3',
           className,
         )}
         {...props}
@@ -393,7 +425,8 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const { data: session, isPending: isSessionPending } = authClient.useSession();
-  const isKhmer = locale === 'kh';
+  const sessionHealthy = useSessionHealth(!!session);
+  const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
     ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
@@ -401,8 +434,27 @@ export function Header() {
   const scrolled = useScroll(10);
 
   React.useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${window.scrollY}px`;
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      }
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
   }, [open]);
 
   React.useEffect(() => {
@@ -420,23 +472,73 @@ export function Header() {
       aria-hidden="true"
       className="h-9 w-9 rounded-full border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
     />
-  ) : session ? (
+  ) : session && sessionHealthy !== false ? (
     <AuthorizedUserIndicator />
   ) : (
-    <Link
-      href="/register"
-      className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-    >
-      {t('signUp')}
-    </Link>
+    <div className="flex items-center gap-2">
+      <TryFreeButton className="px-3 py-1.5 text-xs">
+        Try Free
+      </TryFreeButton>
+      <Link
+        href="/register"
+        className="rounded-md bg-transparent px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+      >
+        {t('signUp')}
+      </Link>
+    </div>
   );
 
   return (
     <header
-      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200', {
-        'bg-[#F7F5F0]/95 dark:bg-[#09090B]/95 [@supports(backdrop-filter:blur(0))]:bg-[#F7F5F0]/70 dark:[@supports(backdrop-filter:blur(0))]:bg-[#09090B]/70 border-black/[0.07] dark:border-white/[0.07]': scrolled,
+      className={cn('sticky top-0 z-50 w-full border-b border-transparent transition-colors duration-200 backdrop-blur-xl', {
+        'bg-white/80 dark:bg-[#09090B]/80 border-black/[0.07] dark:border-white/[0.07]': scrolled,
       })}
     >
+      <style>{`
+        @keyframes try-free-pulse-ring {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(1.5);
+            opacity: 0;
+          }
+        }
+
+        .btn-try-free::before,
+        .btn-try-free::after {
+          content: "";
+          position: absolute;
+          inset: -3px;
+          border-radius: 9999px;
+          border: 2px solid #FACC15;
+          animation: try-free-pulse-ring 1.8s ease-out infinite;
+          pointer-events: none;
+        }
+
+        .btn-try-free::after {
+          border-color: #F59E0B;
+          animation-delay: 0.6s;
+        }
+
+        @media (max-width: 767px) {
+          .btn-try-free::before,
+          .btn-try-free::after {
+            animation: none;
+            opacity: 0;
+            display: none;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .btn-try-free::before,
+          .btn-try-free::after {
+            animation: none;
+            opacity: 0;
+          }
+        }
+      `}</style>
       <nav
         className="mx-auto z-50 flex h-14 w-full max-w-7xl items-center justify-between px-4"
         style={{ fontFamily: bodyFontFamily }}
@@ -506,7 +608,6 @@ export function Header() {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-
               {/* ── Resources ── */}
               <NavigationMenuItem className="flex items-center">
                 <DesktopNavLink href="/resource" label={t('resources')} />
@@ -552,7 +653,8 @@ export function Header() {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle />
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -577,10 +679,9 @@ export function Header() {
           <div className="flex items-center justify-between rounded-xl border border-black/8 dark:border-white/[0.07] bg-white/70 dark:bg-[#111110]/70 p-3 backdrop-blur-md">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferences</p>
-              <p className="text-sm text-foreground">Language and theme</p>
+              <p className="text-sm text-foreground">Theme</p>
             </div>
             <div className="flex items-center gap-2">
-              <LanguageToggle />
               <ThemeToggle />
             </div>
           </div>
@@ -620,6 +721,17 @@ export function Header() {
             ))}
           </div>
 
+          {/* Documentation */}
+          <div className="mt-2">
+            <a
+              href={toDocsUrl('/')}
+              className="flex items-center justify-between rounded-[8px] border border-primary/20 dark:border-primary/30 bg-primary/5 dark:bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 dark:hover:bg-primary/20"
+            >
+              <span>{isKhmer ? 'ឯកសារណែនាំ' : 'Documentation'}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+
           {/* Resources */}
           <div className="mt-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
@@ -643,23 +755,31 @@ export function Header() {
 
         {/* Bottom CTA */}
         <div className="flex flex-col gap-2 pt-2 border-t border-black/[0.07] dark:border-white/6">
-          {session?.session.token ? (
+          {isSessionPending ? (
             <div
               aria-hidden="true"
               className="h-10 w-full rounded-md border border-black/8 bg-black/4 dark:border-white/8 dark:bg-white/6"
             />
-          ) : session ? (
-            <div className="flex justify-center">
-              <AuthorizedUserIndicator className="h-10 w-10" />
-            </div>
+          ) : session && sessionHealthy !== false ? (
+            <AuthorizedUserIndicator
+              className="w-full justify-center rounded-md"
+            />
           ) : (
-            <Link
-              href="/register"
-              onClick={() => setOpen(false)}
-              className="w-full rounded-md border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-            >
-              {t('signUp')}
-            </Link>
+            <div className="flex flex-col gap-2">
+              <TryFreeButton
+                onClick={() => setOpen(false)}
+                className="w-full py-2 text-center"
+              >
+                Try Free (3 scans)
+              </TryFreeButton>
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                className="w-full rounded-xl border border-primary bg-transparent py-2 text-center text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+              >
+                {t('signUp')}
+              </Link>
+            </div>
           )}
         </div>
       </MobileMenu>

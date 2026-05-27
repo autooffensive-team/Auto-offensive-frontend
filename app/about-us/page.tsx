@@ -3,7 +3,7 @@ import { generateMetadata } from "@/lib/metadata";
 export const metadata = generateMetadata({
   title: "About Us",
   description: "Learn about Auto-Offensive - the next-gen PaaS for hackers. Our mission to automate security workflows and make pentesting accessible to all.",
-  image: "/og-about.png",
+  image: "/Auto-Offensive.webp",
   url: "/about-us",
 });
 

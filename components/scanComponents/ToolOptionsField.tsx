@@ -16,10 +16,10 @@ export function ToolOptionField({
 }) {
   if (option.type === "boolean") {
     return (
-      <div className="flex min-h-[72px] items-center justify-between gap-3 rounded-lg border border-input bg-background p-3">
+      <div className="flex min-h-18 items-center justify-between gap-3 rounded-lg border border-input bg-background p-3">
         <div>
-          <p className="text-sm font-semibold text-foreground">{option.key}</p>
-          <p className="text-xs text-muted-foreground">{option.flag} {option.description ?? ""}</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{option.key}</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{option.flag} {option.description ?? ""}</p>
         </div>
         <Switch
           checked={Boolean(value)}

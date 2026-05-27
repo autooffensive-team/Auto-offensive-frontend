@@ -22,18 +22,22 @@ export async function GET(request: NextRequest) {
     })
     .catch(() => null);
 
-  const postLogoutRedirectUrl = new URL("/login?manual=1&prompt=login", appUrl);
-  const keycloakLogoutUrl = new URL(
-    `${keycloakIssuer}/protocol/openid-connect/logout`,
-  );
+  const postLogoutRedirectUrl = new URL("/", appUrl);
+  const redirectUrl = tokenResult?.idToken
+    ? new URL(`${keycloakIssuer}/protocol/openid-connect/logout`)
+    : postLogoutRedirectUrl;
 
   if (tokenResult?.idToken) {
-    keycloakLogoutUrl.searchParams.set("id_token_hint", tokenResult.idToken);
+    redirectUrl.searchParams.set("id_token_hint", tokenResult.idToken);
+    redirectUrl.searchParams.set(
+      "post_logout_redirect_uri",
+      postLogoutRedirectUrl.toString(),
+    );
   }
-  keycloakLogoutUrl.searchParams.set(
-    "post_logout_redirect_uri",
-    postLogoutRedirectUrl.toString(),
-  );
 
-  return NextResponse.redirect(keycloakLogoutUrl);
+  const response = NextResponse.redirect(redirectUrl);
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+  response.headers.set("Pragma", "no-cache");
+
+  return response;
 }

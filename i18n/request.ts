@@ -6,6 +6,10 @@ export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   let locale = cookieStore.get('locale')?.value;
 
+  if (locale === 'kh') {
+    locale = 'km';
+  }
+
   if (!locale || !routing.locales.includes(locale as typeof routing.locales[number])) {
     locale = routing.defaultLocale;
   }

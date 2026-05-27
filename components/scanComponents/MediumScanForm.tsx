@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, Trash2, ChevronsRight } from "lucide-react";
+import { Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
+import { useState } from "react";
 import { Tool, MediumStepState } from "@/types/scan";
 import { Field } from "./Field";
 import { ToolSelector } from "./ToolSelector";
@@ -9,6 +10,12 @@ import { SubmitButton } from "./SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+const MAX_STEPS = 4;
+
+// ─── Default layout order ────────────────────────────────────────────────────
+const DEFAULT_LAYOUT: LayoutKey[] = ["target", "pipeline", "submit"];
+type LayoutKey = "target" | "pipeline" | "submit";
 
 interface MediumScanFormProps {
   target: string;
@@ -35,60 +42,259 @@ export function MediumScanForm({
   disabled,
   onSubmit,
 }: MediumScanFormProps) {
-  return (
-    <div className="space-y-4">
-      <Field label="Target">
-        <Input
-          value={target}
-          onChange={(e) => onTargetChange(e.target.value)}
-          placeholder="example.com or https://example.com"
-          disabled={disabled}
-        />
-      </Field>
+  // ─── Draggable layout state ─────────────────────────────────────────────
+  const [layout, setLayout] = useState<LayoutKey[]>([...DEFAULT_LAYOUT]);
+  const [isDraggingWidget, setIsDraggingWidget] = useState<LayoutKey | null>(null);
+  const [dragOverWidget, setDragOverWidget] = useState<LayoutKey | null>(null);
+  const isCustomLayout = layout.join(",") !== DEFAULT_LAYOUT.join(",");
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">Pipeline Steps</h3>
+  const handleWidgetDragStart = (key: LayoutKey) => setIsDraggingWidget(key);
+
+  const handleWidgetDragOver = (e: React.DragEvent, key: LayoutKey) => {
+    e.preventDefault();
+    if (isDraggingWidget && isDraggingWidget !== key) setDragOverWidget(key);
+  };
+
+  const handleWidgetDrop = (e: React.DragEvent, targetKey: LayoutKey) => {
+    e.preventDefault();
+    if (!isDraggingWidget || isDraggingWidget === targetKey) return;
+    const newLayout = [...layout];
+    const fromIdx = newLayout.indexOf(isDraggingWidget);
+    const toIdx = newLayout.indexOf(targetKey);
+    newLayout.splice(fromIdx, 1);
+    newLayout.splice(toIdx, 0, isDraggingWidget);
+    setLayout(newLayout);
+    setIsDraggingWidget(null);
+    setDragOverWidget(null);
+  };
+
+  const handleWidgetDragEnd = () => {
+    setIsDraggingWidget(null);
+    setDragOverWidget(null);
+  };
+
+  const resetLayout = () => setLayout([...DEFAULT_LAYOUT]);
+
+  const canAddStep = steps.length < MAX_STEPS;
+
+  // ─── Widget render map ──────────────────────────────────────────────────
+  const widgets: Record<LayoutKey, React.ReactNode> = {
+    target: (
+      <DraggableWidget
+        key="target"
+        widgetKey="target"
+        label="Target"
+        isDragging={isDraggingWidget === "target"}
+        isDragOver={dragOverWidget === "target"}
+        onDragStart={handleWidgetDragStart}
+        onDragOver={handleWidgetDragOver}
+        onDrop={handleWidgetDrop}
+        onDragEnd={handleWidgetDragEnd}
+      >
+        <Field label="Target">
+          <Input
+            value={target}
+            onChange={(e) => onTargetChange(e.target.value)}
+            placeholder="example.com or https://example.com"
+            disabled={disabled}
+            className="font-mono text-xs sm:text-sm"
+          />
+        </Field>
+      </DraggableWidget>
+    ),
+
+    pipeline: (
+      <DraggableWidget
+        key="pipeline"
+        widgetKey="pipeline"
+        label="Pipeline Steps"
+        isDragging={isDraggingWidget === "pipeline"}
+        isDragOver={dragOverWidget === "pipeline"}
+        onDragStart={handleWidgetDragStart}
+        onDragOver={handleWidgetDragOver}
+        onDrop={handleWidgetDrop}
+        onDragEnd={handleWidgetDragEnd}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xs sm:text-sm md:text-base font-medium text-gray-900 dark:text-white">Pipeline Steps</h3>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                  steps.length >= MAX_STEPS
+                    ? "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                )}
+              >
+                {steps.length}/{MAX_STEPS}
+              </span>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onAddStep}
+              disabled={disabled || !canAddStep}
+              className={cn(
+                "gap-1.5 text-xs border-teal-500/30 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-500/50",
+                !canAddStep && "cursor-not-allowed opacity-50"
+              )}
+              title={!canAddStep ? `Maximum ${MAX_STEPS} steps allowed` : undefined}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add Step
+              {!canAddStep && (
+                <span className="ml-1 text-[10px] text-gray-500 dark:text-gray-400">(max)</span>
+              )}
+            </Button>
+          </div>
+
+          {steps.length === 0 && (
+            <div className="rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 p-8 text-center">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">No pipeline steps yet. Add a step to begin.</p>
+            </div>
+          )}
+
+          {steps.map((step, index) => (
+            <PipelineStep
+              key={step.id}
+              step={step}
+              index={index}
+              totalSteps={steps.length}
+              tools={tools}
+              onChange={onStepChange}
+              onOptionChange={onOptionChange}
+              onRemove={onRemoveStep}
+              canRemove={steps.length > 1}
+              disabled={disabled}
+            />
+          ))}
+        </div>
+      </DraggableWidget>
+    ),
+
+    submit: (
+      <DraggableWidget
+        key="submit"
+        widgetKey="submit"
+        label="Run Scan"
+        isDragging={isDraggingWidget === "submit"}
+        isDragOver={dragOverWidget === "submit"}
+        onDragStart={handleWidgetDragStart}
+        onDragOver={handleWidgetDragOver}
+        onDrop={handleWidgetDrop}
+        onDragEnd={handleWidgetDragEnd}
+      >
+        <SubmitButton
+          disabled={disabled || !target.trim() || !steps.some((s) => s.toolId)}
+          onClick={onSubmit}
+          label="Start Medium Scan"
+        />
+      </DraggableWidget>
+    ),
+  };
+
+  return (
+    <div className="space-y-2">
+      {/* Layout customization toolbar */}
+      <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
+        <div className="flex items-center gap-2">
+          <LayoutGrid className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+            Drag sections to reorder your layout
+          </span>
+        </div>
+        {isCustomLayout && (
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             size="sm"
-            onClick={onAddStep}
-            disabled={disabled}
-            className="gap-1.5"
+            onClick={resetLayout}
+            className="h-7 gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
-            <Plus className="h-4 w-4" />
-            Add Step
+            <RotateCcw className="h-3 w-3" />
+            Reset layout
           </Button>
-        </div>
-
-        {steps.map((step, index) => (
-          <PipelineStep
-            key={step.id}
-            step={step}
-            index={index}
-            tools={tools}
-            onChange={onStepChange}
-            onOptionChange={onOptionChange}
-            onRemove={onRemoveStep}
-            canRemove={steps.length > 1}
-            disabled={disabled}
-          />
-        ))}
+        )}
       </div>
 
-      <SubmitButton
-        disabled={disabled || !target.trim() || !steps.some((s) => s.toolId)}
-        onClick={onSubmit}
-        label="Start Medium Scan"
-      />
+      {/* Draggable widget sections */}
+      <div className="space-y-3">
+        {layout.map((key) => widgets[key])}
+      </div>
     </div>
   );
 }
 
+// ─── DraggableWidget wrapper ──────────────────────────────────────────────────
+
+interface DraggableWidgetProps {
+  widgetKey: LayoutKey;
+  label: string;
+  children: React.ReactNode;
+  isDragging: boolean;
+  isDragOver: boolean;
+  onDragStart: (key: LayoutKey) => void;
+  onDragOver: (e: React.DragEvent, key: LayoutKey) => void;
+  onDrop: (e: React.DragEvent, key: LayoutKey) => void;
+  onDragEnd: () => void;
+}
+
+function DraggableWidget({
+  widgetKey,
+  label,
+  children,
+  isDragging,
+  isDragOver,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: DraggableWidgetProps) {
+  return (
+    <div
+      draggable
+      onDragStart={() => onDragStart(widgetKey)}
+      onDragOver={(e) => onDragOver(e, widgetKey)}
+      onDrop={(e) => onDrop(e, widgetKey)}
+      onDragEnd={onDragEnd}
+      className={cn(
+        "group relative rounded-xl border bg-white dark:bg-gray-900 transition-all duration-150",
+        isDragging && "opacity-40 scale-[0.98] border-dashed",
+        isDragOver && !isDragging && "border-teal-500/60",
+        !isDragging && !isDragOver && "border-gray-200 dark:border-gray-800"
+      )}
+    >
+      {/* Drag handle header */}
+      <div
+        className={cn(
+          "flex cursor-grab items-center gap-2 border-b border-gray-200/50 dark:border-gray-800/50 px-4 py-2.5",
+          "select-none active:cursor-grabbing",
+          isDragOver && !isDragging && "border-teal-500/30"
+        )}
+      >
+        <GripVertical className="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+        <span className="text-[10px] sm:text-[11px] md:text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          {label}
+        </span>
+        {isDragOver && !isDragging && (
+          <span className="ml-auto text-[10px] font-medium text-teal-600 dark:text-teal-400">Drop here</span>
+        )}
+      </div>
+
+      {/* Widget content */}
+      <div className="p-3 sm:p-4">{children}</div>
+    </div>
+  );
+}
+
+// ─── PipelineStep ─────────────────────────────────────────────────────────────
+
 interface PipelineStepProps {
   step: MediumStepState;
   index: number;
+  totalSteps: number;
   tools: Tool[];
   onChange: (id: string, patch: Partial<MediumStepState>) => void;
   onOptionChange: (stepId: string, key: string, value: string | boolean) => void;
@@ -100,6 +306,7 @@ interface PipelineStepProps {
 function PipelineStep({
   step,
   index,
+  totalSteps,
   tools,
   onChange,
   onOptionChange,
@@ -110,68 +317,99 @@ function PipelineStep({
   const tool = tools.find((t) => t.tool_id === step.toolId);
   const options = tool?.scan_config?.medium?.options ?? [];
 
+  const badgeColors = [
+    "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20",
+    "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:text-emerald-400",
+    "bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:text-amber-400",
+    "bg-rose-500/10 text-rose-600 border border-rose-500/20 dark:text-rose-400",
+  ];
+  const badgeColor = badgeColors[index % badgeColors.length];
+
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span 
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
-            aria-label={`Step ${index + 1}`}
-          >
-            {index + 1}
-          </span>
-          {index > 0 && (
-            <ChevronsRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          )}
-          <span className="text-sm font-medium text-card-foreground">Pipeline Step</span>
-        </div>
-        
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => onRemove(step.id)}
-          disabled={!canRemove || disabled}
-          aria-label={`Remove step ${index + 1}`}
-          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <ToolSelector
-          tools={tools}
-          value={step.toolId}
-          onChange={(value) => onChange(step.id, { toolId: value, options: {} })}
-          disabled={disabled}
-          id={`step-${step.id}-tool`}
-        />
-        
-        <Field label="Timeout seconds">
-          <Input
-            type="number"
-            min={1}
-            value={step.timeout}
-            onChange={(e) => onChange(step.id, { timeout: e.target.value })}
-            placeholder="Optional"
-            disabled={disabled}
-          />
-        </Field>
-      </div>
-
-      {options.length > 0 && (
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {options.map((option) => (
-            <ToolOptionField
-              key={option.key}
-              option={option}
-              value={step.options[option.key]}
-              onChange={(value) => onOptionChange(step.id, option.key, value)}
-            />
-          ))}
+    <div
+      className={cn(
+        "relative rounded-lg border border-gray-200 dark:border-gray-800 bg-background/50 transition-colors",
+        "hover:border-gray-200/80 dark:hover:border-gray-800/80"
+      )}
+    >
+      {index > 0 && (
+        <div className="absolute -top-3.5 left-6 flex items-center gap-1.5">
+          <ChevronsRight className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
         </div>
       )}
+
+      <div className="p-3 sm:p-4">
+        <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span
+              className={cn(
+                "inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold",
+                badgeColor
+              )}
+              aria-label={`Step ${index + 1}`}
+            >
+              {index + 1}
+            </span>
+            <span className="text-xs sm:text-sm font-medium text-gray-900/80 dark:text-white/80">
+              Pipeline Step
+            </span>
+            {totalSteps > 1 && index < totalSteps - 1 && (
+              <span className="text-xs text-gray-400 dark:text-gray-500">→ next</span>
+            )}
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onRemove(step.id)}
+            disabled={!canRemove || disabled}
+            aria-label={`Remove step ${index + 1}`}
+            className={cn(
+              "h-7 w-7 text-gray-400 dark:text-gray-500",
+              "hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400",
+              "disabled:pointer-events-none disabled:opacity-30"
+            )}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ToolSelector
+            tools={tools}
+            value={step.toolId}
+            onChange={(value) => onChange(step.id, { toolId: value, options: {} })}
+            disabled={disabled}
+            id={`step-${step.id}-tool`}
+          />
+
+          <Field label="Timeout (seconds)">
+            <Input
+              type="number"
+              min={1}
+              value={step.timeout}
+              onChange={(e) => onChange(step.id, { timeout: e.target.value })}
+              placeholder="Optional"
+              disabled={disabled}
+              className="font-mono text-xs sm:text-sm"
+            />
+          </Field>
+        </div>
+
+        {options.length > 0 && (
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {options.map((option) => (
+              <ToolOptionField
+                key={option.key}
+                option={option}
+                value={step.options[option.key]}
+                onChange={(value) => onOptionChange(step.id, option.key, value)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
