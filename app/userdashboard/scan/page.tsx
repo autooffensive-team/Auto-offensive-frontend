@@ -11,7 +11,6 @@ import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { useScanController } from "@/hooks/use-scan-controller";
 import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
-import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
@@ -283,8 +282,6 @@ export default function ScanPage() {
     guardedSubmit,
     guestSubmitBasicScan,
     maxScans,
-    showLimitModal,
-    closeLimitModal,
     showLockModal,
     closeLockModal,
     lockedFeature,
@@ -392,14 +389,6 @@ export default function ScanPage() {
           {displayMetaError && (
             <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
               {displayMetaError}
-            </div>
-          )}
-
-          {isGuest && limitReached && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 sm:p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
-              <p className="text-xs sm:text-sm font-medium text-rose-700 dark:text-rose-400">
-                You&apos;ve used all {maxScans} guest scans. Please create an account to continue scanning.
-              </p>
             </div>
           )}
 
@@ -586,7 +575,6 @@ export default function ScanPage() {
       </div>
 
       {/* Guest modals */}
-      <GuestScanLimitModal isOpen={showLimitModal} onClose={closeLimitModal} />
       <GuestLockModal isOpen={showLockModal} onClose={closeLockModal} featureName={lockedFeature} />
     </>
   );

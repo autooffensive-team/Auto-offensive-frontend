@@ -1056,12 +1056,16 @@ export default function CodeScanningNewPageClient() {
                             type="button"
                             onClick={(e) => { e.stopPropagation(); handleConnectProvider(provider); }}
                             disabled={connectingProvider === provider}
-                            className={`mt-4 w-full rounded-xl px-4 py-2 text-[13px] font-semibold transition-colors disabled:opacity-50 ${meta.button}`}
+                            className={`mt-4 w-full rounded-xl px-4 py-2 text-[13px] font-semibold transition-colors disabled:opacity-50 ${
+                              isConnected
+                                ? "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                : meta.button
+                            }`}
                           >
                             {connectingProvider === provider
                               ? "Redirecting..."
                               : isConnected
-                                ? `Reconnect ${meta.label}`
+                                ? `Re-authorize ${meta.label}`
                                 : `Connect ${meta.label}`}
                           </button>
                         </div>

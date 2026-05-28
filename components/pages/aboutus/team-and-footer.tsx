@@ -26,7 +26,7 @@ const MENTORS = [
       github: "https://github.com/sokpheng001",
       telegram: "https://t.me/sokpheng001",
       linkedin: "https://www.linkedin.com/in/kim-chansokpheng-6b6513267/",
-      portfolio: "#",
+      
     },
   },
   {
@@ -43,7 +43,7 @@ const MENTORS = [
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
       linkedin: "https://www.linkedin.com/in/sreng-chipor-a31346239/",
-      portfolio: "#",
+      
     },
   },
 ];
@@ -98,6 +98,7 @@ function IconPortfolio() {
 function CardTraces() {
   return (
     <svg className="tf-traces" viewBox="0 0 300 420" preserveAspectRatio="none">
+      {/* Original traces */}
       <path className="tf-tb" d="M0 80 H24 V68 H48" /><path className="tf-tf tf-c1" d="M0 80 H24 V68 H48" />
       <path className="tf-tb" d="M0 126 H16 V136 H48" /><path className="tf-tf tf-c2" d="M0 126 H16 V136 H48" />
       <path className="tf-tb" d="M0 290 H24 V278 H48" /><path className="tf-tf tf-c3" d="M0 290 H24 V278 H48" />
@@ -106,6 +107,36 @@ function CardTraces() {
       <path className="tf-tb" d="M300 126 H284 V136 H252" /><path className="tf-tf tf-c1" d="M300 126 H284 V136 H252" />
       <path className="tf-tb" d="M300 290 H276 V278 H252" /><path className="tf-tf tf-c4" d="M300 290 H276 V278 H252" />
       <path className="tf-tb" d="M300 336 H284 V346 H252" /><path className="tf-tf tf-c3" d="M300 336 H284 V346 H252" />
+
+      {/* Diagonal corner connectors */}
+      <path className="tf-tb" d="M0 40 L20 40 L35 25 L55 25" /><path className="tf-tf tf-c1" d="M0 40 L20 40 L35 25 L55 25" />
+      <path className="tf-tb" d="M300 380 L280 380 L265 395 L245 395" /><path className="tf-tf tf-c2" d="M300 380 L280 380 L265 395 L245 395" />
+
+      {/* Center horizontal bus lines */}
+      <path className="tf-tb" d="M0 210 H30 L40 200 H70" /><path className="tf-tf tf-c3" d="M0 210 H30 L40 200 H70" />
+      <path className="tf-tb" d="M300 210 H270 L260 200 H230" /><path className="tf-tf tf-c4" d="M300 210 H270 L260 200 H230" />
+
+      {/* Vertical side rails */}
+      <path className="tf-tb" d="M12 150 V170 H24 V190" /><path className="tf-tf tf-c2" d="M12 150 V170 H24 V190" />
+      <path className="tf-tb" d="M288 230 V250 H276 V270" /><path className="tf-tf tf-c1" d="M288 230 V250 H276 V270" />
+
+      {/* Corner-to-center zigzag */}
+      <path className="tf-tb" d="M300 50 H280 V62 H265 V74 H248" /><path className="tf-tf tf-c3" d="M300 50 H280 V62 H265 V74 H248" />
+      <path className="tf-tb" d="M0 370 H20 V358 H35 V346 H52" /><path className="tf-tf tf-c4" d="M0 370 H20 V358 H35 V346 H52" />
+
+      {/* Connection dot nodes */}
+      <circle className="tf-dot" cx="48" cy="68" r="2" />
+      <circle className="tf-dot" cx="48" cy="136" r="2" />
+      <circle className="tf-dot" cx="252" cy="68" r="2" />
+      <circle className="tf-dot" cx="252" cy="136" r="2" />
+      <circle className="tf-dot" cx="55" cy="25" r="2" />
+      <circle className="tf-dot" cx="245" cy="395" r="2" />
+      <circle className="tf-dot" cx="70" cy="200" r="2" />
+      <circle className="tf-dot" cx="230" cy="200" r="2" />
+      <circle className="tf-dot" cx="24" cy="190" r="2" />
+      <circle className="tf-dot" cx="276" cy="270" r="2" />
+      <circle className="tf-dot" cx="248" cy="74" r="2" />
+      <circle className="tf-dot" cx="52" cy="346" r="2" />
     </svg>
   );
 }
@@ -144,7 +175,7 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
           {m.isMentor ? (
             <span className="text-[0.72rem] font-bold tracking-[0.14em] uppercase text-[#8a0000] bg-[rgba(200,10,10,0.05)] border border-[rgba(200,10,10,0.18)] rounded-full px-4 py-1">{badge}</span>
           ) : (
-            <span className={`text-[0.72rem] font-bold tracking-[0.14em] uppercase rounded-full px-4 py-2 ${badge === "Team Leader" || badge === "មេក្រុម" ? "text-[#c97000] bg-[rgba(200,120,0,0.05)] border border-[rgba(200,120,0,0.18)]" : "text-primary bg-[rgba(0,208,178,0.06)] border border-[rgba(0,208,178,0.15)]"}`}>{badge}</span>
+            <span className={`text-[0.72rem] font-bold tracking-[0.14em] uppercase rounded-full px-4 py-2 ${badge === "Team Leader" || badge === "មេក្រុម" ? "text-[#c97000] bg-[rgba(200,120,0,0.05)] border border-[rgba(200,120,0,0.18)]" : "text-secondary-start dark:text-primary bg-[rgba(0,80,158,0.06)] dark:bg-[rgba(0,208,178,0.06)] border border-[rgba(0,80,158,0.15)] dark:border-[rgba(0,208,178,0.15)]"}`}>{badge}</span>
           )}
         </div>
         <div className="flex justify-center gap-3">
@@ -293,18 +324,30 @@ export default function TeamAndFooter() {
         .tf-social-btn:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
         .tf-node-badge { position: absolute; top: 14px; right: 18px; font-size: 9px; font-weight: 700; letter-spacing: .12em; color: rgba(0,208,178,.4); font-family: monospace; z-index: 3; }
         .tf-card--mentor .tf-node-badge { color: rgba(200,80,30,.4); }
-        .tf-traces { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; opacity: .25; }
-        .tf-tb { stroke: rgba(0,208,178,.08); stroke-width: 1; fill: none; }
-        .tf-tf { fill: none; stroke-width: 1; stroke-dasharray: 14 200; stroke-dashoffset: 214; animation: tf-flow 4s cubic-bezier(.4,0,.85,1) infinite; }
-        .tf-c1 { stroke: #00D0B2; }
-        .tf-c2 { stroke: #00cfff; animation-delay: -1.4s; }
-        .tf-c3 { stroke: #00D0B2; animation-delay: -2.6s; }
-        .tf-c4 { stroke: #00cfff; animation-delay: -.8s; }
+        .tf-traces { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; opacity: .45; }
+        .dark .tf-traces { opacity: .25; }
+        .tf-tb { stroke: rgba(0,80,158,.12); stroke-width: 1; fill: none; }
+        .dark .tf-tb { stroke: rgba(0,208,178,.08); }
+        .tf-tf { fill: none; stroke-width: 1.5; stroke-dasharray: 14 200; stroke-dashoffset: 214; animation: tf-flow 4s cubic-bezier(.4,0,.85,1) infinite; }
+        .tf-c1 { stroke: #00509E; }
+        .tf-c2 { stroke: #1675B1; animation-delay: -1.4s; }
+        .tf-c3 { stroke: #00509E; animation-delay: -2.6s; }
+        .tf-c4 { stroke: #1675B1; animation-delay: -.8s; }
+        .dark .tf-c1 { stroke: #00D0B2; }
+        .dark .tf-c2 { stroke: #00cfff; }
+        .dark .tf-c3 { stroke: #00D0B2; }
+        .dark .tf-c4 { stroke: #00cfff; }
+        .tf-dot { fill: rgba(0,80,158,.35); }
+        .dark .tf-dot { fill: rgba(0,208,178,.35); }
         .tf-tick { position: absolute; width: 100px; height: 50px; pointer-events: none; }
-        .tf-tick-tl { top:12px; left:12px; border-top:1px solid rgba(0,208,178,.35); border-left:1px solid rgba(0,208,178,.35); }
-        .tf-tick-tr { top:12px; right:12px; border-top:1px solid rgba(0,207,255,.3); border-right:1px solid rgba(0,207,255,.3); }
-        .tf-tick-bl { bottom:12px; left:12px; border-bottom:1px solid rgba(0,207,255,.3); border-left:1px solid rgba(0,207,255,.3); }
-        .tf-tick-br { bottom:12px; right:12px; border-bottom:1px solid rgba(0,208,178,.35); border-right:1px solid rgba(0,208,178,.35); }
+        .tf-tick-tl { top:12px; left:12px; border-top:1px solid rgba(0,80,158,.4); border-left:1px solid rgba(0,80,158,.4); }
+        .tf-tick-tr { top:12px; right:12px; border-top:1px solid rgba(22,117,177,.35); border-right:1px solid rgba(22,117,177,.35); }
+        .tf-tick-bl { bottom:12px; left:12px; border-bottom:1px solid rgba(22,117,177,.35); border-left:1px solid rgba(22,117,177,.35); }
+        .tf-tick-br { bottom:12px; right:12px; border-bottom:1px solid rgba(0,80,158,.4); border-right:1px solid rgba(0,80,158,.4); }
+        .dark .tf-tick-tl { border-top-color: rgba(0,208,178,.35); border-left-color: rgba(0,208,178,.35); }
+        .dark .tf-tick-tr { border-top-color: rgba(0,207,255,.3); border-right-color: rgba(0,207,255,.3); }
+        .dark .tf-tick-bl { border-bottom-color: rgba(0,207,255,.3); border-left-color: rgba(0,207,255,.3); }
+        .dark .tf-tick-br { border-bottom-color: rgba(0,208,178,.35); border-right-color: rgba(0,208,178,.35); }
         .tf-section-path { position: relative; width: 100%; padding: 0 6%; margin: 12px 0 32px; }
         .tf-section-path-inner { position: relative; height: 24px; display: flex; align-items: center; }
         .tf-section-path-line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0,208,178,.2) 10%, rgba(0,208,178,.35) 50%, rgba(0,208,178,.2) 90%, transparent 100%); }

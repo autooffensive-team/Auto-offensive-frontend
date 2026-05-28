@@ -1,7 +1,7 @@
 "use client";
 
 import { useInView } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 
 import type { DependencySummaryResponse } from "@/types/scanner";
 
@@ -13,11 +13,10 @@ function OperationalRingChart({
   centerValue,
   centerLabel,
 }: {
-  rings: { label: string; percent: number; color: string }[];
+  rings: { label: string; percent: number; color: string; value?: string | number }[];
   centerValue: string;
   centerLabel: string;
 }) {
-  // FIX: use viewBox so chart scales on mobile instead of fixed 320px
   const size = 280;
   const cx = size / 2;
   const cy = size / 2;
@@ -26,6 +25,8 @@ function OperationalRingChart({
   const ref = useRef<SVGSVGElement>(null);
   const inView = useInView(ref, { once: true });
   const [animated, setAnimated] = useState(false);
+  const [hoveredRing, setHoveredRing] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     if (inView) {
@@ -34,74 +35,155 @@ function OperationalRingChart({
     }
   }, [inView]);
 
-  return (
-    <svg
-      ref={ref}
-      viewBox={`0 0 ${size} ${size}`}
-      width="100%"
-      // FIX: cap size so it doesn't grow too large on wide cards
-      style={{ maxWidth: size, display: "block" }}
-      role="img"
-      aria-label="Operational metrics ring chart"
-    >
-      {rings.map((ring, i) => {
-        const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
-        if (radius <= 0) return null;
-        const circumference = 2 * Math.PI * radius;
-        const clamped = Math.max(0, Math.min(100, ring.percent));
-        const filled = animated ? (clamped / 100) * circumference : 0;
-        const unfilled = circumference - filled;
+  const handleMouseMove = useCallback((e: React.MouseEvent<SVGElement>) => {
+    const svgRect = ref.current?.getBoundingClientRect();
+    if (!svgRect) return;
+    setTooltipPos({
+      x: e.clientX - svgRect.left,
+      y: e.clientY - svgRect.top,
+    });
+  }, []);
 
-        return (
-          <g key={ring.label}>
-            <circle
-              cx={cx}
-              cy={cy}
-              r={radius}
-              fill="none"
-              stroke="#E2E8F0"
-              strokeWidth={strokeWidth}
-              className="dark:stroke-gray-700"
-            />
-            <circle
-              cx={cx}
-              cy={cy}
-              r={radius}
-              fill="none"
-              stroke={ring.color}
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={`${filled} ${unfilled}`}
-              strokeDashoffset={circumference * 0.25}
-              style={{
-                transition: `stroke-dasharray 1s cubic-bezier(0.16,1,0.3,1) ${i * 150}ms`,
-              }}
-            />
-          </g>
-        );
-      })}
-      <text
-        x={cx}
-        y={cy - 8}
-        textAnchor="middle"
-        fontSize={28}
-        fontWeight={800}
-        fill="#00d0b2"
-        fontFamily="inherit"
+  return (
+    <div className="relative">
+      <svg
+        ref={ref}
+        viewBox={`0 0 ${size} ${size}`}
+        width="100%"
+        style={{ maxWidth: size, display: "block" }}
+        role="img"
+        aria-label="Operational metrics ring chart"
       >
-        {centerValue}
-      </text>
-      <text
-        x={cx}
-        y={cy + 16}
-        textAnchor="middle"
-        fontSize={11}
-        fill="#94A3B8"
-        fontFamily="inherit"
-      >
-        {centerLabel}
-      </text>
-    </svg>
+        {rings.map((ring, i) => {
+          const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
+          if (radius <= 0) return null;
+          const circumference = 2 * Math.PI * radius;
+          const clamped = Math.max(0, Math.min(100, ring.percent));
+          const filled = animated ? (clamped / 100) * circumference : 0;
+          const unfilled = circumference - filled;
+          const isHovered = hoveredRing === i;
+
+          return (
+            <g key={ring.label}>
+              {/* Background track */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke="#E2E8F0"
+                strokeWidth={strokeWidth}
+                className="dark:stroke-gray-700"
+              />
+              {/* Filled arc */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke={ring.color}
+                strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={`${filled} ${unfilled}`}
+                strokeDashoffset={circumference * 0.25}
+                style={{
+                  transition: `stroke-dasharray 1s cubic-bezier(0.16,1,0.3,1) ${i * 150}ms, stroke-width 0.2s ease`,
+                  filter: isHovered ? `drop-shadow(0 0 6px ${ring.color}40)` : "none",
+                }}
+              />
+              {/* Invisible wider hit area for hover */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke="transparent"
+                strokeWidth={strokeWidth + 12}
+                className="cursor-pointer"
+                onMouseEnter={() => setHoveredRing(i)}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setHoveredRing(null)}
+              />
+              {/* Percentage label at the end of the arc */}
+              {animated && clamped > 0 && (
+                (() => {
+                  const angle = -90 + (clamped / 100) * 360;
+                  const rad = (angle * Math.PI) / 180;
+                  const labelRadius = radius + strokeWidth / 2 + 14;
+                  const lx = cx + labelRadius * Math.cos(rad);
+                  const ly = cy + labelRadius * Math.sin(rad);
+                  return (
+                    <text
+                      x={lx}
+                      y={ly}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize={9}
+                      fontWeight={600}
+                      fill={ring.color}
+                      style={{
+                        opacity: isHovered ? 1 : 0,
+                        transition: "opacity 0.2s ease",
+                      }}
+                    >
+                      {Math.round(clamped)}%
+                    </text>
+                  );
+                })()
+              )}
+            </g>
+          );
+        })}
+        <text
+          x={cx}
+          y={cy - 8}
+          textAnchor="middle"
+          fontSize={28}
+          fontWeight={800}
+          fill="#00d0b2"
+          fontFamily="inherit"
+        >
+          {centerValue}
+        </text>
+        <text
+          x={cx}
+          y={cy + 16}
+          textAnchor="middle"
+          fontSize={11}
+          fill="#94A3B8"
+          fontFamily="inherit"
+        >
+          {centerLabel}
+        </text>
+      </svg>
+
+      {/* Hover tooltip */}
+      {hoveredRing !== null && (
+        <div
+          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          style={{
+            left: tooltipPos.x,
+            top: tooltipPos.y - 50,
+            transform: "translateX(-50%)",
+          }}
+        >
+          <p className="text-[12px] font-semibold text-slate-900 dark:text-white">
+            {rings[hoveredRing].label}
+          </p>
+          <div className="mt-0.5 flex items-center gap-2">
+            <span
+              className="inline-block size-2 rounded-full"
+              style={{ backgroundColor: rings[hoveredRing].color }}
+            />
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              {rings[hoveredRing].value ?? Math.round(rings[hoveredRing].percent)}
+              {" · "}
+              {Math.round(rings[hoveredRing].percent)}%
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -174,10 +256,10 @@ export function CodeScanOperationalMetrics({
         {/* Chart 1: Code Quality */}
         {(() => {
           const qualityRings = [
-            { label: "Security", value: vulnerabilities, percent: securityGraph, color: "#E24B4A", grade: `Grade ${secGrade.label}` },
-            { label: "Vulnerable Deps", value: dependencySummary?.vulnerable ?? 0, percent: Math.min((dependencySummary?.vulnerable ?? 0) * 2, 100), color: "#F59E0B", grade: `${dependencySummary?.vulnerable ?? 0} packages` },
-            { label: "Maintainability", value: codeSmells, percent: maintainabilityGraph, color: "#3B82F6", grade: `Grade ${mntGrade.label}` },
-            { label: "Accepted issues", value: acceptedIssues, percent: acceptedGraph, color: "#8B5CF6", grade: "Tracked" },
+            { label: "Security", value: String(vulnerabilities), percent: securityGraph, color: "#E24B4A", grade: `Grade ${secGrade.label}` },
+            { label: "Vulnerable Deps", value: String(dependencySummary?.vulnerable ?? 0), percent: Math.min((dependencySummary?.vulnerable ?? 0) * 2, 100), color: "#F59E0B", grade: `${dependencySummary?.vulnerable ?? 0} packages` },
+            { label: "Maintainability", value: String(codeSmells), percent: maintainabilityGraph, color: "#3B82F6", grade: `Grade ${mntGrade.label}` },
+            { label: "Accepted issues", value: String(acceptedIssues), percent: acceptedGraph, color: "#8B5CF6", grade: "Tracked" },
           ];
 
           return (

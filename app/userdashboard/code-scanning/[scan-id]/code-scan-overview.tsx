@@ -628,13 +628,14 @@ function DonutChart({
               cx={cx} cy={cy} r={r}
               fill="none"
               stroke={a.seg.color}
-              strokeWidth={thickness}
+              strokeWidth={hovered === a.seg ? thickness + 4 : thickness}
               strokeDasharray={`${a.dash} ${a.gap}`}
               strokeDashoffset={a.offset}
               strokeLinecap="butt"
               style={{
-                transition: `stroke-dasharray 0.9s cubic-bezier(0.16,1,0.3,1) ${a.delay}ms`,
+                transition: `stroke-dasharray 0.9s cubic-bezier(0.16,1,0.3,1) ${a.delay}ms, stroke-width 0.2s ease`,
                 cursor: "pointer",
+                filter: hovered === a.seg ? `drop-shadow(0 0 4px ${a.seg.color}50)` : "none",
               }}
               onMouseEnter={() => setHovered(a.seg)}
             />
@@ -648,6 +649,9 @@ function DonutChart({
             </span>
             <span className="mt-0.5 max-w-15 text-[8px] font-semibold leading-tight text-[#52648f] dark:text-slate-400">
               {hovered.label}
+            </span>
+            <span className="mt-0.5 text-[10px] font-bold text-[#00d0b2]">
+              {total > 0 ? Math.round((hovered.count / total) * 100) : 0}%
             </span>
           </>
         ) : (
@@ -862,6 +866,7 @@ function DependencyRiskChart({
   medium: number;
   low: number;
 }) {
+  const [hoveredArc, setHoveredArc] = useState<{ label: string; value: number; color: string } | null>(null);
   const total = critical + high + medium + low;
   const categories = [
     { label: "Critical", value: critical, color: "#DC2626" },
@@ -1042,6 +1047,7 @@ function DependencyRiskChart({
             width={donutSize}
             height={donutSize}
             style={{ transform: "rotate(-90deg)" }}
+            onMouseLeave={() => setHoveredArc(null)}
           >
             <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E2E8F0" strokeWidth={thickness} className="dark:stroke-gray-700" />
             {total > 0 &&
@@ -1051,16 +1057,37 @@ function DependencyRiskChart({
                   cx={cx} cy={cy} r={r}
                   fill="none"
                   stroke={a.color}
-                  strokeWidth={thickness}
+                  strokeWidth={hoveredArc?.color === a.color ? thickness + 4 : thickness}
                   strokeDasharray={`${a.dash} ${a.gap}`}
                   strokeDashoffset={a.offset}
                   strokeLinecap="butt"
+                  style={{
+                    cursor: "pointer",
+                    transition: "stroke-width 0.2s ease",
+                    filter: hoveredArc?.color === a.color ? `drop-shadow(0 0 4px ${a.color}50)` : "none",
+                  }}
+                  onMouseEnter={() => {
+                    const cat = categories.find(c => c.color === a.color);
+                    if (cat) setHoveredArc(cat);
+                  }}
                 />
               ))}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{total}</span>
-            <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-slate-400">total</span>
+            {hoveredArc ? (
+              <>
+                <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{hoveredArc.value}</span>
+                <span className="mt-0.5 text-[9px] font-medium text-[#52648f] dark:text-slate-400">{hoveredArc.label}</span>
+                <span className="text-[10px] font-bold text-[#00d0b2]">
+                  {total > 0 ? Math.round((hoveredArc.value / total) * 100) : 0}%
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{total}</span>
+                <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-slate-400">total</span>
+              </>
+            )}
           </div>
         </div>
       </div>

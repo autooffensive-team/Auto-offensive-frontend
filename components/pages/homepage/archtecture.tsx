@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { useLocale } from 'next-intl'
 import { Brain, Cpu, Database, Globe, Server, Shield, Zap } from 'lucide-react'
 
 type NodeTone = 'primary' | 'secondary'
@@ -111,27 +110,36 @@ function ArchitectureNode({
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.45, delay }}
-      whileHover={{ y: -6 }}
-      className={`absolute z-20 w-45.5 rounded-[22px] border p-4 ${palette.wrapper} ${className}`}
+      className={`absolute z-20 w-45.5 rounded-[22px] p-0.5 overflow-hidden ${className}`}
+      style={{ background: 'transparent' }}
     >
-      <div
-        className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${palette.iconWrap}`}
-      >
-        <div className={palette.icon}>{icon}</div>
+      {/* Animated rotating border */}
+      <div className={`arch-node-border-spin absolute inset-0 rounded-[22px] overflow-hidden z-0 ${tone === 'primary' ? 'arch-node-border-primary' : 'arch-node-border-secondary'}`}>
+        <div className="arch-node-border-ray" />
       </div>
+      {/* Static fallback border underneath */}
+      <div className={`absolute inset-0 rounded-[22px] z-0 ${tone === 'primary' ? 'bg-[rgba(0,208,178,0.25)]' : 'bg-[rgba(0,80,158,0.2)]'}`} />
+      {/* Card content */}
+      <div className={`relative z-10 rounded-[20px] p-4 bg-[#F7F5F0] dark:bg-[#09090B] ${palette.wrapper}`}>
+        <div
+          className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${palette.iconWrap}`}
+        >
+          <div className={palette.icon}>{icon}</div>
+        </div>
 
-      <p
-        className="mb-1 text-[0.95rem] font-bold leading-tight text-slate-900 dark:text-white"
-        style={{ fontFamily: displayFontFamily }}
-      >
-        {label}
-      </p>
-      <p
-        className="text-[0.78rem] leading-relaxed text-slate-600 dark:text-slate-300"
-        style={{ fontFamily: bodyFontFamily }}
-      >
-        {sub}
-      </p>
+        <p
+          className="mb-1 text-[0.95rem] font-bold leading-tight text-slate-900 dark:text-white"
+          style={{ fontFamily: displayFontFamily }}
+        >
+          {label}
+        </p>
+        <p
+          className="text-[0.78rem] leading-relaxed text-slate-600 dark:text-slate-300"
+          style={{ fontFamily: bodyFontFamily }}
+        >
+          {sub}
+        </p>
+      </div>
     </motion.div>
   )
 }
@@ -214,45 +222,9 @@ function PathBadge({
 }
 
 export function Architecture() {
-  const locale = useLocale()
-  const isKhmer = locale === 'km'
-  const bodyFontFamily =
-    isKhmer
-      ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
-      : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
-  const displayFontFamily =
-    isKhmer
-      ? 'var(--font-noto-khmer), var(--font-hackdaddy), sans-serif'
-      : 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
-  const copy = isKhmer
-    ? {
-      
-        titleLine1: 'Branded Data Paths និង',
-        titleLine2: 'Real-Time System Flow',
-        description:
-          'Web app, gateway, scanner engine, AI service និង storage layer ទាំងអស់ ត្រូវបានភ្ជាប់ទៅកាន់ core control plane តែមួយ។ វាប្រើ circuit-style paths ដើម្បីបង្ហាញពីលំហូរទិន្នន័យ និងការវិភាគ ដែលធ្វើដំណើរនៅលើវេទិកា ក្នុងពេលវេលាជាក់ស្តែង។',
-        coreEyebrow: 'Auto Offensive',
-        coreTitle: 'Core Control Plane',
-        coreBody:
-          'ការគ្រប់គ្រង gateway, scan events, AI jobs និង persistence ទាំងអស់ ប្រមូលផ្តុំគ្នានៅទីនេះ។',
-        nodes: {
-          webApp: ['Web App', 'Dashboard UI និង analyst workflows'],
-          gateway: ['FastAPI Gateway', 'Authentication, request routing និង SSE delivery'],
-          aiService: ['AI Service', 'ការសង្ខេប (summaries), reports និង findings ដំណើរការជា parallel'],
-          grpc: ['gRPC Go Services', 'scanner engine និង task execution'],
-          storage: ['PostgreSQL + Redis', 'persistent state, queues និង cache'],
-          sonar: ['SonarQube', 'សម្រាប់ static analysis នៃ security កូដ'],
-        },
-        badges: {
-          rest: 'REST / SSE',
-          auth: 'Auth / Routing',
-          ai: 'AI Reporting',
-          grpc: 'gRPC',
-          pubsub: 'Pub / Sub',
-          sast: 'SAST',
-        },
-      }
-    : {
+  const bodyFontFamily = 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
+  const displayFontFamily = 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
+  const copy = {
         titleLine1: 'Branded Data Paths,',
         titleLine2: 'Real-Time System Flow',
         description:
@@ -285,6 +257,51 @@ export function Architecture() {
       className="relative overflow-hidden border-t border-slate-200/80 bg-[#F7F5F0] py-16 dark:border-white/10 dark:bg-[#09090B] md:py-24"
       style={{ fontFamily: bodyFontFamily }}
     >
+      <style>{`
+        @keyframes arch-border-spin {
+          to { transform: rotate(360deg); }
+        }
+        .arch-node-border-spin {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          border-radius: 22px;
+          z-index: 0;
+        }
+        .arch-node-border-ray {
+          position: absolute;
+          inset: -50%;
+          width: 200%;
+          height: 200%;
+          animation: arch-border-spin 3s linear infinite;
+        }
+        .arch-node-border-primary .arch-node-border-ray {
+          background: conic-gradient(
+            from 0deg,
+            transparent,
+            #00D0B2,
+            #00cfff,
+            transparent,
+            transparent,
+            #00D0B2,
+            #00cfff,
+            transparent
+          );
+        }
+        .arch-node-border-secondary .arch-node-border-ray {
+          background: conic-gradient(
+            from 0deg,
+            transparent,
+            #00509E,
+            #1675B1,
+            transparent,
+            transparent,
+            #00509E,
+            #28CCE7,
+            transparent
+          );
+        }
+      `}</style>
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-8%] top-[-8%] h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,208,178,0.14)_0%,transparent_70%)] blur-3xl" />
         <div className="absolute bottom-[-10%] right-[-6%] h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(1,80,158,0.16)_0%,transparent_70%)] blur-3xl" />
@@ -326,9 +343,9 @@ export function Architecture() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.55 }}
-              className="absolute left-1/2 top-0 h-170 w-275 origin-top -translate-x-1/2 scale-[0.36] overflow-hidden rounded-[34px] border border-[rgba(0,208,178,0.14)] bg-[linear-gradient(135deg,rgba(0,208,178,0.05),rgba(247,245,240,0.98)_36%,rgba(1,80,158,0.06))] backdrop-blur-md sm:scale-[0.46] md:scale-[0.63] lg:scale-[0.82] xl:scale-100 dark:border-[rgba(255,255,255,0.08)] dark:bg-[linear-gradient(135deg,rgba(0,208,178,0.08),rgba(9,9,11,0.98)_36%,rgba(1,80,158,0.12))]"
+              className="absolute left-1/2 top-0 h-170 w-275 origin-top -translate-x-1/2 scale-[0.36] overflow-hidden rounded-[34px] sm:scale-[0.46] md:scale-[0.63] lg:scale-[0.82] xl:scale-100"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.08),transparent_30%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(0,208,178,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(1,80,158,0.14),transparent_32%)]" />
+              <div className="absolute inset-0" />
               <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[rgba(0,208,178,0.35)] to-transparent" />
 
               <svg viewBox="0 0 1100 680" className="absolute inset-0 h-full w-full" aria-hidden="true">
@@ -339,13 +356,30 @@ export function Architecture() {
                   </linearGradient>
                 </defs>
 
-                <TracePath d="M118 120 H260 V246 H456" tone="secondary" />
-                <TracePath d="M96 300 H230 V298 H456" tone="primary" delay={0.08} />
-                <TracePath d="M118 564 H278 V386 H456" tone="primary" delay={0.16} />
-                <TracePath d="M982 118 H846 V246 H644" tone="secondary" delay={0.24} />
-                <TracePath d="M1004 302 H862 V336 H644" tone="primary" delay={0.32} />
-                <TracePath d="M982 564 H834 V386 H644" tone="secondary" delay={0.4} />
+                <TracePath d="M118 120 H200 V160 H260 V246 H380 V246 H456" tone="secondary" />
+                <TracePath d="M118 140 H180 V200 H240 V260 H320 V246 H456" tone="primary" delay={0.06} />
+                <TracePath d="M96 300 H170 V280 H230 V298 H360 V298 H456" tone="primary" delay={0.08} />
+                <TracePath d="M96 320 H150 V310 H210 V305 H300 V298 H456" tone="secondary" delay={0.14} />
+                <TracePath d="M118 564 H200 V520 H278 V440 H340 V386 H456" tone="primary" delay={0.16} />
+                <TracePath d="M118 544 H180 V490 H258 V420 H320 V386 H456" tone="secondary" delay={0.22} />
+                <TracePath d="M982 118 H900 V160 H846 V246 H720 V246 H644" tone="secondary" delay={0.24} />
+                <TracePath d="M982 138 H920 V200 H866 V260 H780 V246 H644" tone="primary" delay={0.3} />
+                <TracePath d="M1004 302 H930 V320 H862 V336 H740 V336 H644" tone="primary" delay={0.32} />
+                <TracePath d="M1004 322 H950 V330 H882 V340 H760 V336 H644" tone="secondary" delay={0.38} />
+                <TracePath d="M982 564 H900 V520 H834 V440 H760 V386 H644" tone="secondary" delay={0.4} />
+                <TracePath d="M982 542 H920 V490 H854 V420 H780 V386 H644" tone="primary" delay={0.46} />
 
+                {/* Junction nodes along paths */}
+                <circle cx="200" cy="160" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="260" cy="246" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="230" cy="298" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="278" cy="440" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="846" cy="246" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="862" cy="336" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="900" cy="160" r="3" fill="url(#arch-grid-glow)" />
+                <circle cx="834" cy="440" r="3" fill="url(#arch-grid-glow)" />
+
+                {/* Endpoint nodes at center card */}
                 <circle cx="456" cy="246" r="5" fill="url(#arch-grid-glow)" />
                 <circle cx="456" cy="298" r="5" fill="url(#arch-grid-glow)" />
                 <circle cx="456" cy="386" r="5" fill="url(#arch-grid-glow)" />
@@ -363,18 +397,18 @@ export function Architecture() {
                 body={copy.coreBody}
               />
 
-              <SceneDot className="left-[10.73%] top-[17.65%]" side="right" />
-              <SceneDot className="left-[8.73%] top-[44.12%]" side="right" />
-              <SceneDot className="left-[10.73%] top-[82.94%]" side="right" />
+              <SceneDot className="left-[10.50%] top-[23.35%]" side="right" />
+              <SceneDot className="left-[8.65%] top-[44.59%]" side="right" />
+              <SceneDot className="left-[10.95%] top-[72.25%]" side="right" />
               <SceneDot className="left-[41.45%] top-[36.18%]" dark={false} />
               <SceneDot className="left-[41.45%] top-[43.82%]" dark={false} />
               <SceneDot className="left-[41.45%] top-[56.76%]" dark={false} />
               <SceneDot className="left-[58.55%] top-[36.18%]" dark={false} />
               <SceneDot className="left-[58.55%] top-[49.41%]" dark={false} />
               <SceneDot className="left-[58.55%] top-[56.76%]" dark={false} />
-              <SceneDot className="left-[89.27%] top-[17.35%]" side="left" />
-              <SceneDot className="left-[91.27%] top-[44.41%]" side="left" />
-              <SceneDot className="left-[89.27%] top-[82.94%]" side="left" />
+              <SceneDot className="left-[89.27%] top-[23.82%]" side="left" />
+              <SceneDot className="left-[91.27%] top-[46.88%]" side="left" />
+              <SceneDot className="left-[88.50%] top-[76.47%]" side="left" />
 
               <ArchitectureNode
                 icon={<Globe className="h-5 w-5" />}
