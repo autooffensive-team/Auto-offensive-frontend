@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import FocusWord from "@/components/ui/focus-word";
+import { GridBackground } from "@/components/shared/GridBackground";
 
 const VALUES_EN = [
   {
@@ -122,23 +123,19 @@ export default function Values() {
   }, []);
 
   useEffect(() => {
-    const drum = drumRef.current;
-    if (drum) drum.innerHTML = "";
-    facesBuilt.current = false;
-  }, [locale]);
-
-  useEffect(() => {
     const section = sectionRef.current;
     const drum = drumRef.current;
     const vw = drumWrapRef.current;
     if (!section || !drum || !vw) return;
 
+    // Clear any previously built faces (handles React Strict Mode double-invoke)
+    drum.innerHTML = "";
+    facesBuilt.current = false;
+
     const isMobile = window.innerWidth <= 768;
     const totalFaces = values.length;
 
     if (isMobile) {
-      if (facesBuilt.current) return;
-      facesBuilt.current = true;
       vw.style.cssText = "height:auto;overflow:visible;";
       drum.style.cssText = "height:auto;transform:none;display:flex;flex-direction:column;gap:10px;";
       values.forEach((value, i) => {
@@ -155,9 +152,6 @@ export default function Values() {
       });
       return;
     }
-
-    if (facesBuilt.current) return;
-    facesBuilt.current = true;
 
     const faceHeight = 320;
     const radius = Math.round(faceHeight / (2 * Math.tan(Math.PI / totalFaces)));
@@ -201,7 +195,7 @@ export default function Values() {
       if (!drum) return;
       currentAngle += (targetAngle - currentAngle) * 0.08;
       drum.style.transform = `rotateX(${currentAngle}deg)`;
-      const norm = ((-currentAngle) % 360 + 360) % 360;
+      const norm = (currentAngle % 360 + 360) % 360;
       const faceIndex = Math.round(norm / (360 / totalFaces)) % totalFaces;
       activate(faceIndex);
       rafId = requestAnimationFrame(tick);
@@ -213,7 +207,7 @@ export default function Values() {
       const total = section.offsetHeight - window.innerHeight;
       if (total <= 0) return;
       const p = Math.max(0, Math.min(1, -rect.top / total));
-      targetAngle = -(p * (totalFaces - 0.001) * (360 / totalFaces));
+      targetAngle = p * (totalFaces - 0.001) * (360 / totalFaces);
     }
 
     rafId = requestAnimationFrame(tick);
@@ -433,6 +427,10 @@ export default function Values() {
           padding: 40px 10%;
           border-top: 1px solid var(--border);
           border-bottom: 1px solid var(--border);
+          box-shadow: 0 8px 32px rgba(0,80,158,.06), 0 2px 8px rgba(0,0,0,.04);
+        }
+        .dark .vs-drum-face {
+          box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 2px 8px rgba(0,208,178,.04);
         }
         .vdf-tag {
           font-size: .62rem;
@@ -507,14 +505,15 @@ export default function Values() {
           font-size: clamp(8rem, 15vw, 13rem);
           font-weight: 700;
           letter-spacing: -.06em;
-          color: rgba(10,31,26,.03);
+          color: rgba(0,80,158,.06);
           line-height: 1;
           user-select: none;
           pointer-events: none;
           transition: color .6s ease;
         }
         .dark .vdf-bg-num { color: rgba(255,255,255,.03); }
-        .vs-drum-face.is-active .vdf-bg-num { color: rgba(0,208,178,.07); }
+        .vs-drum-face.is-active .vdf-bg-num { color: rgba(0,80,158,.12); }
+        .dark .vs-drum-face.is-active .vdf-bg-num { color: rgba(0,208,178,.07); }
         @media (max-width: 768px) {
           .vs-outer { height: auto !important; }
           .vs-drum-sticky { position: relative !important; height: auto !important; overflow: visible; }
@@ -562,6 +561,7 @@ export default function Values() {
           <div className="vs-shell">
             <div className="vs-grid">
               <div className="vs-left">
+                <GridBackground variant="dashed" gridSize={22} lineColor="rgba(0,80,158,0.18)" />
                 <div className="vs-left-inner">
                   <h2 className="vs-title" style={{ fontFamily: titleFont }} ref={titleRef}>
                     {ui.titleTop}{" "}
