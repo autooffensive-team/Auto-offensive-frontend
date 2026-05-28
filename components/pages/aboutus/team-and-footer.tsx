@@ -26,7 +26,7 @@ const MENTORS = [
       github: "https://github.com/sokpheng001",
       telegram: "https://t.me/sokpheng001",
       linkedin: "https://www.linkedin.com/in/kim-chansokpheng-6b6513267/",
-      portfolio: "#",
+      
     },
   },
   {
@@ -43,7 +43,7 @@ const MENTORS = [
       github: "https://github.com/jiporCK",
       telegram: "https://t.me/jiporsreng",
       linkedin: "https://www.linkedin.com/in/sreng-chipor-a31346239/",
-      portfolio: "#",
+      
     },
   },
 ];

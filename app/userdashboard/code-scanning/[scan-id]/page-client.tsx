@@ -67,20 +67,29 @@ const sectionMotion = {
 function playScanCompleteSound(): void {
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    // Two-tone success chime (more noticeable)
+    const playTone = (frequency: number, startTime: number, duration: number) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
 
-    oscillator.frequency.value = 800;
-    oscillator.type = "sine";
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      oscillator.frequency.value = frequency;
+      oscillator.type = "sine";
 
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+
+    const now = audioContext.currentTime;
+    playTone(660, now, 0.15);        // First note (E5)
+    playTone(880, now + 0.15, 0.3);  // Second note (A5) — higher, longer
   } catch {
     // Fallback: silent if AudioContext not available
   }
@@ -832,17 +841,20 @@ export default function CodeScanningDetailPageClient({
     if (isComplete && !hasTriggeredCompletionRefresh.current) {
       hasTriggeredCompletionRefresh.current = true;
       playScanCompleteSound();
-      // Fast refetch all data when scan completes
+      // Refetch ALL data when scan completes — including issues and hotspots
       Promise.all([
         refetchScanStatus(),
         refetchScanDetail(),
         refetchScanSummary(),
         refetchDependencySummary(),
+        refetchDependencies(),
+        refetchIssues(),
+        refetchHotspots(),
       ]).finally(() => {
         router.refresh();
       });
     }
-  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary]);
+  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary, refetchDependencies, refetchIssues, refetchHotspots]);
 
   const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
   const routeResolutionFailed =

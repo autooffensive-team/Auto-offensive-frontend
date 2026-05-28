@@ -816,7 +816,6 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             toast.error(errorMsg);
             appendErrorForMode("medium", errorMsg);
             setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
-            onQuotaExceededRef.current?.();
             setIsSubmitting(false);
             return;
           }
