@@ -3,7 +3,6 @@ import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
 import { Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -294,24 +293,6 @@ export default function ScanPage() {
   // Grab refreshSession so we can re-sync the quota bar after a 429
   const guestCtx = useOptionalGuestContext();
   const refreshGuestSession = guestCtx?.refreshSession;
-
-  // Show toast when guest limit is already reached on page load
-  useEffect(() => {
-    if (isGuest && limitReached) {
-      toast.error(
-        "You've used all 3 guest scans. Please create an account to continue scanning.",
-        {
-          duration: 5000,
-          action: {
-            label: "Register",
-            onClick: () => {
-              window.location.href = "/register";
-            },
-          },
-        },
-      );
-    }
-  }, [isGuest, limitReached]);
 
   // If guest tries to access advanced mode, allow it (uses guest API endpoints)
   const handleTabChange = useCallback((mode: ScanMode) => {
