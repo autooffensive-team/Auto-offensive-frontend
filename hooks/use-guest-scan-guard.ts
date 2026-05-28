@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
 
 /**
@@ -44,14 +45,36 @@ export function useGuestScanGuard() {
 
       // Guest user — check limit
       if (guest.scansRemaining <= 0) {
-        setShowLimitModal(true);
+        toast.error(
+          "You've used all 3 guest scans. Please create an account to continue scanning.",
+          {
+            duration: 5000,
+            action: {
+              label: "Register",
+              onClick: () => {
+                window.location.href = "/register";
+              },
+            },
+          },
+        );
         return;
       }
 
       // Validate with server (increments count)
       const allowed = await guest.validateScan();
       if (!allowed) {
-        setShowLimitModal(true);
+        toast.error(
+          "You've used all 3 guest scans. Please create an account to continue scanning.",
+          {
+            duration: 5000,
+            action: {
+              label: "Register",
+              onClick: () => {
+                window.location.href = "/register";
+              },
+            },
+          },
+        );
         return;
       }
 
