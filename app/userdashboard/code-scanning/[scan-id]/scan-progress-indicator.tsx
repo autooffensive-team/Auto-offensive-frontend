@@ -59,60 +59,91 @@ function useAnimatedCounter(target: number, duration = 600): number {
   return display;
 }
 
-function ScanPulseAnimation() {
+/** Pixel ghost character that runs at the front of the progress bar */
+function PixelGhost({ progress }: { progress: number }) {
   return (
-    <div className="relative mx-auto my-6 flex h-20 w-full max-w-xs items-center justify-center">
-      {/* Orbiting rings */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        className="absolute h-20 w-20 rounded-full border border-teal-400/20 dark:border-teal-400/10"
-      />
-      <motion.div
-        animate={{ rotate: -360 }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-        className="absolute h-14 w-14 rounded-full border border-dashed border-teal-500/30 dark:border-teal-400/20"
-      />
-
-      {/* Center shield icon with pulse */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 shadow-lg shadow-teal-500/20"
-      >
-        <Shield className="h-5 w-5 text-white" strokeWidth={2} />
-      </motion.div>
-
-      {/* Floating particles */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -12, 0],
-            x: [0, (i % 2 === 0 ? 6 : -6), 0],
-            opacity: [0, 0.8, 0],
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            delay: i * 0.4,
-            ease: "easeInOut",
-          }}
-          className="absolute h-1 w-1 rounded-full bg-teal-400"
+    <motion.div
+      className="absolute z-20 pointer-events-none -translate-x-1/2 -translate-y-1/2"
+      style={{ top: "50%", left: `${Math.min(progress, 98)}%` }}
+      animate={{ left: `${Math.min(progress, 98)}%` }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      <div className="relative" style={{ transform: "scale(0.18)", transformOrigin: "center center" }}>
+        {/* Ghost body using CSS grid pixel art */}
+        <div
+          className="relative animate-[ghostBounce_0.5s_infinite]"
           style={{
-            left: `${20 + i * 12}%`,
-            top: `${30 + (i % 3) * 15}%`,
+            width: 140,
+            height: 140,
+            display: "grid",
+            gridTemplateColumns: "repeat(14, 1fr)",
+            gridTemplateRows: "repeat(14, 1fr)",
+            gridTemplateAreas: `
+              "a1  a2  a3  a4  a5  top0 top0 top0 top0 a10 a11 a12 a13 a14"
+              "b1  b2  b3  top1 top1 top1 top1 top1 top1 top1 top1 b12 b13 b14"
+              "c1  c2  top2 top2 top2 top2 top2 top2 top2 top2 top2 top2 c13 c14"
+              "d1  top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 d14"
+              "e1  top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 e14"
+              "f1  top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 f14"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+              "st0  st0  an4  st1  an7  st2  an10 an10 st3  an13 st4  an16 st5  st5"
+              "an1  an2  an3  an5  an6  an8  an9  an9  an11 an12 an14 an15 an17 an18"
+            `,
           }}
-        />
-      ))}
+        >
+          {/* Body segments - teal colored to match theme */}
+          <div style={{ gridArea: "top0", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "top1", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "top2", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "top3", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "top4", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st0", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st1", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st2", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st3", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st4", backgroundColor: "#14b8a6" }} />
+          <div style={{ gridArea: "st5", backgroundColor: "#14b8a6" }} />
 
-      {/* Scanning line sweep */}
-      <motion.div
-        animate={{ x: ["-100%", "100%"] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/2 h-[1px] w-full -translate-y-1/2 bg-gradient-to-r from-transparent via-teal-400/60 to-transparent"
-      />
-    </div>
+          {/* Animated tentacles - flicker group 0 */}
+          {["an1", "an18", "an6", "an12", "an7", "an13", "an8", "an11"].map((area) => (
+            <div key={area} className="animate-[flicker0_0.5s_infinite]" style={{ gridArea: area }} />
+          ))}
+          {/* Animated tentacles - flicker group 1 */}
+          {["an2", "an3", "an4", "an10", "an9", "an5", "an15", "an16", "an17"].map((area) => (
+            <div key={area} className="animate-[flicker1_0.5s_infinite]" style={{ gridArea: area }} />
+          ))}
+          <div style={{ gridArea: "an14" }} />
+
+          {/* Eyes */}
+          <div className="absolute" style={{ left: 20, top: 30, width: 40, height: 50 }}>
+            <div className="absolute" style={{ width: 20, height: 50, transform: "translateX(10px)", backgroundColor: "#14b8a6" }} />
+            <div className="absolute" style={{ width: 40, height: 30, transform: "translateY(10px)", backgroundColor: "#14b8a6" }} />
+          </div>
+          <div className="absolute" style={{ right: 20, top: 30, width: 40, height: 50 }}>
+            <div className="absolute" style={{ width: 20, height: 50, transform: "translateX(10px)", backgroundColor: "#14b8a6" }} />
+            <div className="absolute" style={{ width: 40, height: 30, transform: "translateY(10px)", backgroundColor: "#14b8a6" }} />
+          </div>
+
+          {/* Pupils */}
+          <div className="absolute z-10" style={{ left: 30, top: 50, width: 20, height: 20, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ right: 30, top: 50, width: 20, height: 20, backgroundColor: "#fff" }} />
+
+          {/* Mouth */}
+          <div className="absolute z-10" style={{ left: 10, top: 100, width: 10, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 20, top: 90, width: 20, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 40, top: 100, width: 20, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 60, top: 90, width: 20, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 80, top: 100, width: 20, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 100, top: 90, width: 20, height: 10, backgroundColor: "#fff" }} />
+          <div className="absolute z-10" style={{ left: 120, top: 100, width: 10, height: 10, backgroundColor: "#fff" }} />
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -207,11 +238,8 @@ export function ScanProgressIndicator({
           </motion.p>
         </div>
 
-        {/* Animated scan visual */}
-        <ScanPulseAnimation />
-
         {/* 3-Step Progress */}
-        <div className="mb-6 w-full">
+        <div className="mb-6 mt-4 w-full">
           <div className="flex w-full items-center">
             {STEPS.map((step, idx) => {
               const isCompleted = currentStep > idx;
@@ -330,7 +358,7 @@ export function ScanProgressIndicator({
           </div>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar with Ghost Runner */}
         <div className="mb-3">
           <div className="mb-1.5 flex items-center justify-between">
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -340,26 +368,31 @@ export function ScanProgressIndicator({
               {animatedPercent}%
             </p>
           </div>
-          <div className="relative h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/[0.06]">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${normalizedProgress}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className={cn(
-                "absolute inset-y-0 left-0 rounded-full transition-colors duration-300",
-                normalizedProgress >= 100
-                  ? "bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400"
-                  : "bg-gradient-to-r from-teal-500 via-cyan-400 to-teal-400"
-              )}
-            />
-            {/* Shimmer effect on progress bar */}
-            {normalizedProgress < 100 && (
+          <div className="relative">
+            {/* Progress bar track */}
+            <div className="relative h-3 overflow-visible rounded-full bg-slate-100 dark:bg-white/[0.06]">
               <motion.div
-                animate={{ x: ["-100%", "300%"] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                initial={{ width: 0 }}
+                animate={{ width: `${normalizedProgress}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className={cn(
+                  "absolute inset-y-0 left-0 rounded-full transition-colors duration-300",
+                  normalizedProgress >= 100
+                    ? "bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400"
+                    : "bg-gradient-to-r from-teal-500 via-cyan-400 to-teal-400"
+                )}
               />
-            )}
+              {/* Shimmer effect on progress bar */}
+              {normalizedProgress < 100 && (
+                <motion.div
+                  animate={{ x: ["-100%", "300%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                />
+              )}
+              {/* Ghost running at the front of the progress */}
+              <PixelGhost progress={normalizedProgress} />
+            </div>
           </div>
         </div>
 
