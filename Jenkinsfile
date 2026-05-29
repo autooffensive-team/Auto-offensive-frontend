@@ -24,6 +24,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID          = 'DOKCERHUB-ID-CREDENTIALS'
+        APP_ENV_CREDENTIALS_ID         = 'auto-offensive-frontend-env'
         BUILDER_NAME                   = 'jenkins-builder'
         PRODUCTION_DEPLOYMENT_HOST     = credentials('production-deployment-host')
         DEPLOYMENT_USER                = credentials('deployment-user')
@@ -52,41 +53,40 @@ pipeline {
         stage('Validate') {
         // ─────────────────────────────────────────────
             steps {
-                sh '''#!/bin/bash
-                    set -euo pipefail
+                withCredentials([
+                    file(
+                        credentialsId: env.APP_ENV_CREDENTIALS_ID,
+                        variable: 'APP_ENV_FILE'
+                    )
+                ]) {
+                    sh '''#!/bin/bash
+                        set -euo pipefail
 
-                    : "${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}"
-                    : "${FASTAPI_GATEWAY_URL:?FASTAPI_GATEWAY_URL is required}"
-                    : "${KEYCLOAK_ISSUER:?KEYCLOAK_ISSUER is required}"
-                    : "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}"
-                    : "${KEYCLOAK_WEB_CLIENT_ID:?KEYCLOAK_WEB_CLIENT_ID is required}"
-                    : "${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}"
-                    : "${NEXT_PUBLIC_EMAILJS_SERVICE_ID:?NEXT_PUBLIC_EMAILJS_SERVICE_ID is required}"
-                    : "${NEXT_PUBLIC_EMAILJS_TEMPLATE_ID:?NEXT_PUBLIC_EMAILJS_TEMPLATE_ID is required}"
-                    : "${NEXT_PUBLIC_EMAILJS_PUBLIC_KEY:?NEXT_PUBLIC_EMAILJS_PUBLIC_KEY is required}"
+                        set -a
+                        . "$APP_ENV_FILE"
+                        set +a
 
-                    APP_URL="${NEXT_PUBLIC_APP_URL}"
-                    GATEWAY_URL="${BACKEND_URL:-${FASTAPI_GATEWAY_URL}}"
+                        : "${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}"
+                        : "${FASTAPI_GATEWAY_URL:?FASTAPI_GATEWAY_URL is required}"
+                        : "${KEYCLOAK_ISSUER:?KEYCLOAK_ISSUER is required}"
+                        : "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}"
+                        : "${KEYCLOAK_WEB_CLIENT_ID:?KEYCLOAK_WEB_CLIENT_ID is required}"
+                        : "${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}"
+                        : "${NEXT_PUBLIC_EMAILJS_SERVICE_ID:?NEXT_PUBLIC_EMAILJS_SERVICE_ID is required}"
+                        : "${NEXT_PUBLIC_EMAILJS_TEMPLATE_ID:?NEXT_PUBLIC_EMAILJS_TEMPLATE_ID is required}"
+                        : "${NEXT_PUBLIC_EMAILJS_PUBLIC_KEY:?NEXT_PUBLIC_EMAILJS_PUBLIC_KEY is required}"
 
-                    docker run --rm \
-                        --user "$(id -u):$(id -g)" \
-                        --env HOME=/tmp \
-                        --env NEXT_TELEMETRY_DISABLED=1 \
-                        --env NEXT_PUBLIC_APP_URL="$APP_URL" \
-                        --env BACKEND_URL="${BACKEND_URL:-}" \
-                        --env FASTAPI_GATEWAY_URL="$GATEWAY_URL" \
-                        --env KEYCLOAK_ISSUER="$KEYCLOAK_ISSUER" \
-                        --env BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
-                        --env KEYCLOAK_WEB_CLIENT_ID="$KEYCLOAK_WEB_CLIENT_ID" \
-                        --env KEYCLOAK_WEB_CLIENT_SECRET="$KEYCLOAK_WEB_CLIENT_SECRET" \
-                        --env NEXT_PUBLIC_EMAILJS_SERVICE_ID="$NEXT_PUBLIC_EMAILJS_SERVICE_ID" \
-                        --env NEXT_PUBLIC_EMAILJS_TEMPLATE_ID="$NEXT_PUBLIC_EMAILJS_TEMPLATE_ID" \
-                        --env NEXT_PUBLIC_EMAILJS_PUBLIC_KEY="$NEXT_PUBLIC_EMAILJS_PUBLIC_KEY" \
-                        --volume "$PWD:/app" \
-                        --workdir /app \
-                        node:24-alpine \
-                        sh -lc 'npm ci && npm run build'
-                '''
+                        docker run --rm \
+                            --user "$(id -u):$(id -g)" \
+                            --env HOME=/tmp \
+                            --env NEXT_TELEMETRY_DISABLED=1 \
+                            --env-file "$APP_ENV_FILE" \
+                            --volume "$PWD:/app" \
+                            --workdir /app \
+                            node:24-alpine \
+                            sh -lc 'npm ci && npm run build'
+                    '''
+                }
             }
         }
 
@@ -95,6 +95,10 @@ pipeline {
         // ─────────────────────────────────────────────
             steps {
                 withCredentials([
+                    file(
+                        credentialsId: env.APP_ENV_CREDENTIALS_ID,
+                        variable: 'APP_ENV_FILE'
+                    ),
                     usernamePassword(
                         credentialsId: env.DOCKER_CREDENTIALS_ID,
                         usernameVariable: 'DOCKER_USER',
@@ -104,6 +108,10 @@ pipeline {
                     script {
                         sh '''#!/bin/bash
                             set -euo pipefail
+
+                            set -a
+                            . "$APP_ENV_FILE"
+                            set +a
 
                             : "${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}"
                             : "${FASTAPI_GATEWAY_URL:?FASTAPI_GATEWAY_URL is required}"
@@ -128,27 +136,21 @@ pipeline {
 
                             echo "▶ Building frontend → $IMAGE_REF:$TAG"
 
-                            APP_URL="${NEXT_PUBLIC_APP_URL}"
-                            GATEWAY_URL="${BACKEND_URL:-${FASTAPI_GATEWAY_URL}}"
-                            EMAILJS_SERVICE_ID="${NEXT_PUBLIC_EMAILJS_SERVICE_ID}"
-                            EMAILJS_TEMPLATE_ID="${NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}"
-                            EMAILJS_PUBLIC_KEY="${NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}"
-
                             EXTRA_TAGS=""
                             [ "$BRANCH" = "main" ] && EXTRA_TAGS="--tag $IMAGE_REF:latest"
 
                             if ! docker buildx build \
                                 --file Dockerfile \
-                                --build-arg NEXT_PUBLIC_APP_URL="$APP_URL" \
+                                --build-arg NEXT_PUBLIC_APP_URL="$NEXT_PUBLIC_APP_URL" \
                                 --build-arg BACKEND_URL="${BACKEND_URL:-}" \
-                                --build-arg FASTAPI_GATEWAY_URL="$GATEWAY_URL" \
+                                --build-arg FASTAPI_GATEWAY_URL="${BACKEND_URL:-${FASTAPI_GATEWAY_URL}}" \
                                 --build-arg KEYCLOAK_ISSUER="$KEYCLOAK_ISSUER" \
                                 --build-arg BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
                                 --build-arg KEYCLOAK_WEB_CLIENT_ID="$KEYCLOAK_WEB_CLIENT_ID" \
                                 --build-arg KEYCLOAK_WEB_CLIENT_SECRET="$KEYCLOAK_WEB_CLIENT_SECRET" \
-                                --build-arg NEXT_PUBLIC_EMAILJS_SERVICE_ID="$EMAILJS_SERVICE_ID" \
-                                --build-arg NEXT_PUBLIC_EMAILJS_TEMPLATE_ID="$EMAILJS_TEMPLATE_ID" \
-                                --build-arg NEXT_PUBLIC_EMAILJS_PUBLIC_KEY="$EMAILJS_PUBLIC_KEY" \
+                                --build-arg NEXT_PUBLIC_EMAILJS_SERVICE_ID="$NEXT_PUBLIC_EMAILJS_SERVICE_ID" \
+                                --build-arg NEXT_PUBLIC_EMAILJS_TEMPLATE_ID="$NEXT_PUBLIC_EMAILJS_TEMPLATE_ID" \
+                                --build-arg NEXT_PUBLIC_EMAILJS_PUBLIC_KEY="$NEXT_PUBLIC_EMAILJS_PUBLIC_KEY" \
                                 --cache-from "type=registry,ref=$IMAGE_REF:cache" \
                                 --cache-to   "type=registry,ref=$IMAGE_REF:cache,mode=max" \
                                 --push \
@@ -171,6 +173,10 @@ pipeline {
         // ─────────────────────────────────────────────
             steps {
                 withCredentials([
+                    file(
+                        credentialsId: env.APP_ENV_CREDENTIALS_ID,
+                        variable: 'APP_ENV_FILE'
+                    ),
                     usernamePassword(
                         credentialsId: env.DOCKER_CREDENTIALS_ID,
                         usernameVariable: 'DOCKER_USER',
@@ -179,6 +185,10 @@ pipeline {
                 ]) {
                         sh '''#!/bin/bash
                             set -euo pipefail
+
+                            set -a
+                            . "$APP_ENV_FILE"
+                            set +a
 
                             : "${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}"
                             : "${FASTAPI_GATEWAY_URL:?FASTAPI_GATEWAY_URL is required}"
@@ -214,72 +224,18 @@ REMOTE
                         scp $SSH_OPTS \
                             docker-compose.prod.yml \
                             "$DEPLOYMENT_USER@$PRODUCTION_DEPLOYMENT_HOST:$DEPLOY_DIR/docker-compose.prod.yml"
+                        scp $SSH_OPTS \
+                            "$APP_ENV_FILE" \
+                            "$DEPLOYMENT_USER@$PRODUCTION_DEPLOYMENT_HOST:$DEPLOY_DIR/.env.production"
 
-                        # ── Write compose image ref and runtime env ─────────────────────────
+                        # ── Write compose image ref ──────────────────────────────────────────
                         ssh $SSH_OPTS \
-                            "$DEPLOYMENT_USER@$PRODUCTION_DEPLOYMENT_HOST" bash -s \
-                            "$DEPLOY_DIR" "$IMAGE_REF" \
-                            "${NEXT_PUBLIC_APP_URL}" \
-                            "${BACKEND_URL:-}" \
-                            "${FASTAPI_GATEWAY_URL}" \
-                            "${KEYCLOAK_ISSUER}" \
-                            "${BETTER_AUTH_SECRET}" \
-                            "${KEYCLOAK_WEB_CLIENT_ID}" \
-                            "${KEYCLOAK_WEB_CLIENT_SECRET}" \
-                            "${NEXT_PUBLIC_EMAILJS_SERVICE_ID}" \
-                            "${NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}" \
-                            "${NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}" \
-                            "${SCAN_API_BASE_URL:-}" \
-                            "${SCAN_API_URL:-}" \
-                            "${SCAN_API_TOKEN:-}" \
-                            "${AUTO_OFFENSIVE_API_KEY:-}" \
-                            "${SCAN_API_KEY:-}" \
-                            "${NEXT_PUBLIC_SCAN_API_URL:-}" \
-                            "${NEXT_PUBLIC_FASTAPI_GATEWAY_URL:-}" \
-                            "${NEXT_PUBLIC_SCAN_API_TOKEN:-}" <<'REMOTE'
+                            "$DEPLOYMENT_USER@$PRODUCTION_DEPLOYMENT_HOST" bash -s "$DEPLOY_DIR" "$IMAGE_REF" <<'REMOTE'
 set -eu
 DEPLOY_DIR="$1"
 IMAGE_REF="$2"
-NEXT_PUBLIC_APP_URL="$3"
-BACKEND_URL="$4"
-FASTAPI_GATEWAY_URL="$5"
-KEYCLOAK_ISSUER="$6"
-BETTER_AUTH_SECRET="$7"
-KEYCLOAK_WEB_CLIENT_ID="$8"
-KEYCLOAK_WEB_CLIENT_SECRET="$9"
-NEXT_PUBLIC_EMAILJS_SERVICE_ID="${10}"
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID="${11}"
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY="${12}"
-SCAN_API_BASE_URL="${13}"
-SCAN_API_URL="${14}"
-SCAN_API_TOKEN="${15}"
-AUTO_OFFENSIVE_API_KEY="${16}"
-SCAN_API_KEY="${17}"
-NEXT_PUBLIC_SCAN_API_URL="${18}"
-NEXT_PUBLIC_FASTAPI_GATEWAY_URL="${19}"
-NEXT_PUBLIC_SCAN_API_TOKEN="${20}"
 cat > "$DEPLOY_DIR/.env" <<EOF
 FRONTEND_IMAGE=$IMAGE_REF
-EOF
-cat > "$DEPLOY_DIR/.env.production" <<EOF
-NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-BACKEND_URL=$BACKEND_URL
-FASTAPI_GATEWAY_URL=$FASTAPI_GATEWAY_URL
-KEYCLOAK_ISSUER=$KEYCLOAK_ISSUER
-BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
-KEYCLOAK_WEB_CLIENT_ID=$KEYCLOAK_WEB_CLIENT_ID
-KEYCLOAK_WEB_CLIENT_SECRET=$KEYCLOAK_WEB_CLIENT_SECRET
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=$NEXT_PUBLIC_EMAILJS_SERVICE_ID
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=$NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=$NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-SCAN_API_BASE_URL=$SCAN_API_BASE_URL
-SCAN_API_URL=$SCAN_API_URL
-SCAN_API_TOKEN=$SCAN_API_TOKEN
-AUTO_OFFENSIVE_API_KEY=$AUTO_OFFENSIVE_API_KEY
-SCAN_API_KEY=$SCAN_API_KEY
-NEXT_PUBLIC_SCAN_API_URL=$NEXT_PUBLIC_SCAN_API_URL
-NEXT_PUBLIC_FASTAPI_GATEWAY_URL=$NEXT_PUBLIC_FASTAPI_GATEWAY_URL
-NEXT_PUBLIC_SCAN_API_TOKEN=$NEXT_PUBLIC_SCAN_API_TOKEN
 EOF
 REMOTE
 
