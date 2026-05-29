@@ -18,6 +18,7 @@ import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
+import { ScanLoadingHelix } from "@/components/scanComponents/ScanLoadingHelix";
 
 type BasicPreset = {
   name: string;
@@ -805,12 +806,16 @@ export default function MediumScanPage() {
                   onReset={resetToDefault}
                   className="mb-3"
                 />
-                {logs.length === 0 ? (
+                {logs.length === 0 && !isSubmitting ? (
                   <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-slate-400">
                     Submit a scan to populate the SSE event stream here.
                   </div>
                 ) : (
-                  logs.map((entry) => (
+                  <>
+                    {isSubmitting && logs.length === 0 && (
+                      <ScanLoadingHelix color={logTheme.html.asciiColor} />
+                    )}
+                    {logs.map((entry) => (
                     <div
                       key={entry.id}
                       className={`rounded-2xl border px-4 py-3 ${
@@ -829,7 +834,8 @@ export default function MediumScanPage() {
                       </div>
                       <p className="mt-2 whitespace-pre-wrap break-words font-mono leading-6" style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}>{entry.message}</p>
                     </div>
-                  ))
+                  ))}
+                  </>
                 )}
               </div>
             </div>

@@ -32,6 +32,8 @@ export type LogThemeColors = {
   muted: string;
   /** ASCII art color — must be visible on the bg */
   asciiColor: string;
+  /** Whether this is a light background theme (affects colorizeLogText) */
+  isLight: boolean;
 };
 
 export type XtermThemeColors = {
@@ -74,6 +76,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-gray-200",
       muted: "text-gray-500",
       asciiColor: "#2dd4bf",
+      isLight: false,
     },
     xterm: {
       background: "#0a0a0a",
@@ -107,6 +110,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-green-300",
       muted: "text-green-800",
       asciiColor: "#00ff41",
+      isLight: false,
     },
     xterm: {
       background: "#000000",
@@ -140,6 +144,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-[#f8f8f2]",
       muted: "text-[#6272a4]",
       asciiColor: "#bd93f9",
+      isLight: false,
     },
     xterm: {
       background: "#282a36",
@@ -173,6 +178,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-[#93a1a1]",
       muted: "text-[#586e75]",
       asciiColor: "#2aa198",
+      isLight: false,
     },
     xterm: {
       background: "#002b36",
@@ -206,6 +212,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-[#d8dee9]",
       muted: "text-[#4c566a]",
       asciiColor: "#88c0d0",
+      isLight: false,
     },
     xterm: {
       background: "#2e3440",
@@ -239,6 +246,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-[#f8f8f2]",
       muted: "text-[#75715e]",
       asciiColor: "#66d9ef",
+      isLight: false,
     },
     xterm: {
       background: "#272822",
@@ -274,6 +282,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-gray-800",
       muted: "text-gray-400",
       asciiColor: "#0f766e",
+      isLight: true,
     },
     xterm: {
       background: "#f8fafc",
@@ -307,6 +316,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       text: "text-[#657b83]",
       muted: "text-[#93a1a1]",
       asciiColor: "#268bd2",
+      isLight: true,
     },
     xterm: {
       background: "#fdf6e3",
