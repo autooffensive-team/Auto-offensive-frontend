@@ -61,7 +61,7 @@ pipeline {
                         --volume "$PWD:/app" \
                         --workdir /app \
                         node:24-alpine \
-                        sh -lc 'npm ci && npm run lint'
+                        sh -lc 'npm ci && npm run build'
                 '''
             }
         }
