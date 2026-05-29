@@ -219,7 +219,7 @@ REMOTE
             sh '''#!/bin/bash
                 set -euo pipefail
                 SSH_OPTS="-i $DEPLOYMENT_KEY -o StrictHostKeyChecking=no -o BatchMode=yes"
-                DEPLOY_DIR="/home/rattanakmony.pech.mit18/reffensive-frontend/production"
+                DEPLOY_DIR="/home/brotherkhode/auto-offensive-frontend"
 
                 echo "▶ Deployment failed — attempting rollback..."
 
