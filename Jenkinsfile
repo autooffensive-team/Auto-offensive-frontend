@@ -23,7 +23,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_CREDENTIALS_ID          = 'DOKCERHUB-ID-CREDENTIALS'
+        DOCKER_CREDENTIALS_ID          = 'DOCKERHUB-ID'
         APP_ENV_CREDENTIALS_ID         = 'auto-offensive-frontend-env'
         BUILDER_NAME                   = 'jenkins-builder'
         PRODUCTION_DEPLOYMENT_HOST     = credentials('production-deployment-host')
