@@ -52,7 +52,17 @@ pipeline {
         stage('Validate') {
         // ─────────────────────────────────────────────
             steps {
-                sh 'npm ci && npm run lint'
+                sh '''#!/bin/bash
+                    set -euo pipefail
+
+                    docker run --rm \
+                        --user "$(id -u):$(id -g)" \
+                        --env HOME=/tmp \
+                        --volume "$PWD:/app" \
+                        --workdir /app \
+                        node:24-alpine \
+                        sh -lc 'npm ci && npm run lint'
+                '''
             }
         }
 
