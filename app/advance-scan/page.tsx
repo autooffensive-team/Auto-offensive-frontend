@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
+import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 
 type BasicFinding = {
   finding_id: string;
@@ -160,6 +162,7 @@ export default function AdvanceScanPage() {
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
   const logStreamAbortRef = useRef<AbortController | null>(null);
+  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [command, setCommand] = useState("");
   const [stepId, setStepId] = useState("");
@@ -659,6 +662,14 @@ export default function AdvanceScanPage() {
               <div className="max-h-[600px] overflow-y-auto p-5">
                 {activeTab === "logs" ? (
                   <div className="space-y-1">
+                    <LogToolbar
+                      themeKey={themeKey}
+                      sizeKey={sizeKey}
+                      onThemeChange={setTheme}
+                      onSizeChange={setSize}
+                      onReset={resetToDefault}
+                      className="mb-3"
+                    />
                     {logs.length === 0 ? (
                       <p className="text-center text-sm text-gray-500">
                         Logs will appear here after you start a scan.
@@ -667,7 +678,7 @@ export default function AdvanceScanPage() {
                       logs.map((entry) => (
                         <div
                           key={entry.id}
-                          className={`rounded-lg border px-3 py-1.5 text-[11px] sm:text-[12.5px] leading-snug font-bold font-[Consolas,monospace] ${
+                          className={`rounded-lg border px-3 py-1.5 leading-snug font-bold font-[Consolas,monospace] ${
                             entry.tone === "danger"
                               ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
                               : entry.tone === "success"
@@ -676,6 +687,7 @@ export default function AdvanceScanPage() {
                                   ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
                                   : "border-white/5 bg-white/5 text-gray-300"
                           }`}
+                          style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}
                         >
                           <span className="mr-2 text-gray-500">[{entry.createdAt}]</span>
                           <span className="font-semibold text-violet-300">{entry.event}</span>

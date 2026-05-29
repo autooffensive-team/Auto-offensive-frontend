@@ -5,7 +5,8 @@ import { Loader2, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
-import { useTheme } from "@/components/theme-provider";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
+import { LogToolbar } from "./LogToolbar";
 
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
@@ -41,9 +42,10 @@ export function AdvancedTerminalPanel({
   onSubmit: (command: string) => void;
   onReset: () => void;
 }) {
-  const { resolvedTheme } = useTheme();
+  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
+  const fitAddonRef = useRef<{ fit: () => void } | null>(null);
 
   // ── Input state ──────────────────────────────────────────────────────────
   // We maintain a full line buffer + cursor position so arrow keys, Home/End,
@@ -62,45 +64,7 @@ export function AdvancedTerminalPanel({
   const prevStatusRef = useRef("idle");
   const prevErrorsLenRef = useRef(0);
 
-  const terminalTheme = useMemo(
-    () =>
-      resolvedTheme === "dark"
-        ? {
-          background: "#080d14",
-          foreground: "#e2e8f0",
-          cursor: "#2dd4bf",
-          cursorAccent: "#080d14",
-          selectionBackground: "#134e4a",
-          black: "#1e293b",
-          red: "#f87171",
-          green: "#4ade80",
-          yellow: "#facc15",
-          blue: "#60a5fa",
-          magenta: "#c084fc",
-          cyan: "#2dd4bf",
-          white: "#e2e8f0",
-          brightBlack: "#94a3b8",  // was #475569 (slate-600) — now slate-400, readable on dark bg
-          brightCyan: "#5eead4",
-        }
-        : {
-          background: "#f8fafc",
-          foreground: "#0f172a",
-          cursor: "#0f766e",
-          cursorAccent: "#f8fafc",
-          selectionBackground: "#bfdbfe",
-          black: "#1e293b",       // was #334155 — darker for better contrast
-          red: "#b91c1c",         // was #dc2626 — slightly deeper red
-          green: "#166534",       // was #15803d — deeper green
-          yellow: "#92400e",      // was #ca8a04 — amber-800, much more readable
-          blue: "#1d4ed8",        // was #2563eb — slightly deeper blue
-          magenta: "#7e22ce",     // was #9333ea — deeper purple
-          cyan: "#0f766e",        // was #0f766e — teal-700, unchanged (good)
-          white: "#334155",       // was #e2e8f0 — slate-700 so "white" text is dark
-          brightBlack: "#475569", // was #64748b — slate-600, much more readable on light bg
-          brightCyan: "#0d9488",  // was #0d9488 — unchanged (good)
-        },
-    [resolvedTheme],
-  );
+  const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
 
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
@@ -152,7 +116,7 @@ export function AdvancedTerminalPanel({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
         fontFamily: "Consolas, 'Courier New', monospace",
-        fontSize: 17,
+        fontSize: logSize.xtermFontSize,
         fontWeight: "bold",
         fontWeightBold: "bold",
         lineHeight: 1.4,
@@ -164,6 +128,7 @@ export function AdvancedTerminalPanel({
       term.loadAddon(fitAddon);
       term.open(containerRef.current);
       fitAddon.fit();
+      fitAddonRef.current = fitAddon;
 
       // Show fastfetch splash on first boot
       showSplash(term);
@@ -368,6 +333,15 @@ export function AdvancedTerminalPanel({
     }
   }, [terminalTheme]);
 
+  // ── Font size hot-swap ─────────────────────────────────────────────────
+  useEffect(() => {
+    if (termRef.current?.options) {
+      termRef.current.options.fontSize = logSize.xtermFontSize;
+      // Re-fit the terminal to recalculate cols/rows for new font size
+      fitAddonRef.current?.fit();
+    }
+  }, [logSize.xtermFontSize]);
+
   // ── Stream logs ──────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
@@ -473,6 +447,16 @@ export function AdvancedTerminalPanel({
           ⚠ Select a project above before running a scan.
         </div>
       )}
+
+      {/* ── Theme & Size Toolbar ── */}
+      <LogToolbar
+        themeKey={themeKey}
+        sizeKey={sizeKey}
+        onThemeChange={setTheme}
+        onSizeChange={setSize}
+        onReset={resetToDefault}
+        className="mx-4 mt-3"
+      />
 
       {/* ── Full-width xterm ── */}
       <div

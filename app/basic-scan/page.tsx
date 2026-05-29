@@ -9,7 +9,9 @@ import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanCo
 import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
 import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
+import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 import { useScanController } from "@/hooks/use-scan-controller";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
 import AISuggestionPanel from "@/components/AiSuggestion/AISuggestionPanel";
 import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import type { ScanMode } from "@/types/scan";
@@ -173,6 +175,7 @@ export default function BasicScanPage() {
   const initialMode = (searchParams.get("mode") as ScanMode) || "basic";
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
+  const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // ── Responsive ASCII ──────────────────────────────────────────────────────
   const asciiRef = useRef<HTMLDivElement>(null);
@@ -404,8 +407,26 @@ export default function BasicScanPage() {
                 </button>
               </div>
             </div>
+
+            {/* Log Preferences Toolbar */}
+            <LogToolbar
+              themeKey={themeKey}
+              sizeKey={sizeKey}
+              onThemeChange={setTheme}
+              onSizeChange={setSize}
+              onReset={resetToDefault}
+              className="mx-3 mt-3 sm:mx-4 sm:mt-4"
+            />
+
             <div className="p-3 sm:p-4">
-              <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
+              <div
+                className={cn(
+                  "h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg font-[Consolas,monospace]",
+                  theme.html.bg,
+                  size.className,
+                  size.lineHeight
+                )}
+              >
                 {isIdle ? (
                   <div className="flex flex-col items-center h-full">
                     <div ref={asciiRef} className="w-full overflow-x-auto" aria-hidden="true">
@@ -416,7 +437,8 @@ export default function BasicScanPage() {
                           lineHeight: "1.2",
                           letterSpacing: "0.01em",
                           whiteSpace: "pre",
-                          color: "hsl(var(--primary) / 0.3)",
+                          color: theme.html.asciiColor,
+                          opacity: 0.85,
                           margin: "0 auto",
                           display: "table",
                         }}
@@ -424,7 +446,7 @@ export default function BasicScanPage() {
                         {ASCII_ART}
                       </pre>
                     </div>
-                    <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[14px] sm:text-[17px] shrink-0">
+                    <p className={cn("py-3 text-center shrink-0", theme.html.muted, size.className)}>
                       Logs will appear here when a scan starts.
                     </p>
                   </div>
@@ -432,17 +454,17 @@ export default function BasicScanPage() {
                   <div className="p-2 sm:p-3">
                     {activeLogs.map((line) => (
                       <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
-                        <span className="shrink-0 text-gray-400 dark:text-gray-500">
+                        <span className={cn("shrink-0", theme.html.timestamp)}>
                           {new Date(line.timestamp).toLocaleTimeString()}
                         </span>
-                        <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
+                        <span className={cn("shrink-0", theme.html.source)}>[{line.source}]</span>
                         <span
                           className={cn(
                             "shrink-0 font-semibold",
-                            line.level === "ERROR" && "text-red-600 dark:text-red-400",
-                            line.level === "WARN" && "text-amber-500 dark:text-amber-400",
-                            line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                            !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
+                            line.level === "ERROR" && theme.html.error,
+                            line.level === "WARN" && theme.html.warn,
+                            line.level === "INFO" && theme.html.info,
+                            !["ERROR", "WARN", "INFO"].includes(line.level) && theme.html.muted
                           )}
                         >
                           {line.level}
