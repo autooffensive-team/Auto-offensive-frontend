@@ -135,11 +135,11 @@ export default function UserDashboardShell({
   const initials = isGuest
     ? "G"
     : (displayName
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? "")
-        .join("") || "U");
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("") || "U");
 
   const closeOverlays = () => {
     setMobileMenuOpen(false);
@@ -208,9 +208,8 @@ export default function UserDashboardShell({
       </AnimatePresence>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${
-          mobileMenuOpen ? "translate-x-0" : ""
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${mobileMenuOpen ? "translate-x-0" : ""
+          }`}
       >
         <div className={`relative border-b border-black/10 px-4 py-5 dark:border-white/10 ${collapsed ? "md:px-2 md:py-4" : ""}`}>
           <div className={`flex items-center ${collapsed ? "md:flex-col md:gap-2" : "justify-between"}`}>
@@ -228,6 +227,7 @@ export default function UserDashboardShell({
                       alt="Auto Offensive Logo"
                       width={120}
                       height={120}
+                      priority
                       className={`transition-all ${collapsed ? "md:hidden" : "block"}`}
                       style={{ width: "auto", height: "auto" }}
                     />
@@ -321,18 +321,16 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${
-                      active
+                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 shadow-inner shadow-black/5 dark:bg-white/10 dark:text-white dark:shadow-white/5"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition ${
-                        active
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition ${active
                           ? "border-primary text-primary dark:text-primary"
                           : "border-slate-200 text-slate-400 group-hover:border-primary group-hover:text-primary dark:border-white/10 dark:text-slate-400 dark:group-hover:border-primary dark:group-hover:text-primary"
-                      }`}
+                        }`}
                     >
                       <item.icon size={16} strokeWidth={active ? 2.2 : 1.8} />
                     </div>
@@ -386,11 +384,10 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${
-                      active
+                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 dark:bg-white/10 dark:text-white"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition group-hover:border-primary group-hover:text-primary dark:border-white/10 dark:text-slate-400 dark:group-hover:border-primary dark:group-hover:text-primary">
                       <item.icon size={16} strokeWidth={1.8} />

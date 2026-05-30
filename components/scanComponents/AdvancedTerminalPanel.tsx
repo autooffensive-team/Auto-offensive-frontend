@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Loader2, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "./LogToolbar";
+import { useGraphStore } from "@/components/scanning/graph.store";
 
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
@@ -22,6 +23,51 @@ const SPLASH_LINES = [
 ];
 
 const SPLASH = SPLASH_LINES.join("\r\n");
+
+// ─── Help text ────────────────────────────────────────────────────────────────
+const HELP_LINES = [
+  "",
+  "  \x1b[1m\x1b[36mAuto-Offensive Advanced Scan — Help\x1b[0m",
+  "  \x1b[90m────────────────────────────────────────────────────────\x1b[0m",
+  "",
+  "  \x1b[1m\x1b[33mSingle Tool:\x1b[0m",
+  "    \x1b[36m<tool>\x1b[0m [flags]",
+  "    Example: \x1b[32mnuclei -u https://example.com\x1b[0m",
+  "    Example: \x1b[32mnmap -sV -p 80,443 target.com\x1b[0m",
+  "    Example: \x1b[32msubfinder -d example.com -silent\x1b[0m",
+  "",
+  "  \x1b[1m\x1b[33mPipeline (chain tools with |):\x1b[0m",
+  "    \x1b[36m<tool>\x1b[0m [flags] \x1b[90m|\x1b[0m \x1b[36m<tool>\x1b[0m [flags] \x1b[90m|\x1b[0m ...",
+  "    Example: \x1b[32msubfinder -d example.com | httpx\x1b[0m",
+  "    Example: \x1b[32msubfinder -d example.com | httpx | nuclei\x1b[0m",
+  "",
+  "  \x1b[1m\x1b[33mAvailable Tools:\x1b[0m",
+  "    \x1b[36msubfinder\x1b[0m    Subdomain discovery",
+  "    \x1b[36mhttpx\x1b[0m        HTTP probing & tech detection",
+  "    \x1b[36mnuclei\x1b[0m       Vulnerability scanning",
+  "    \x1b[36mnmap\x1b[0m         Port scanning & service detection",
+  "    \x1b[36mnaabu\x1b[0m        Fast port scanning",
+  "    \x1b[36mkatana\x1b[0m       Web crawling",
+  "    \x1b[36mffuf\x1b[0m         Web fuzzing",
+  "    \x1b[36mamass\x1b[0m        Attack surface mapping",
+  "",
+  "  \x1b[1m\x1b[33mCommands:\x1b[0m",
+  "    \x1b[36mclear\x1b[0m        Clear terminal and reset graph",
+  "    \x1b[36mhelp\x1b[0m         Show this help message",
+  "    \x1b[36mCtrl+C\x1b[0m       Cancel running scan",
+  "",
+  "  \x1b[1m\x1b[33mKeyboard Shortcuts:\x1b[0m",
+  "    \x1b[90m↑/↓\x1b[0m          Browse command history",
+  "    \x1b[90mCtrl+A\x1b[0m       Move cursor to start",
+  "    \x1b[90mCtrl+E\x1b[0m       Move cursor to end",
+  "    \x1b[90mCtrl+U\x1b[0m       Clear line before cursor",
+  "    \x1b[90mCtrl+K\x1b[0m       Clear line after cursor",
+  "",
+  "  \x1b[90m────────────────────────────────────────────────────────\x1b[0m",
+  "",
+];
+
+const HELP_TEXT = HELP_LINES.join("\r\n");
 
 export function AdvancedTerminalPanel({
   projectId,
@@ -46,6 +92,9 @@ export function AdvancedTerminalPanel({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<{ fit: () => void } | null>(null);
+
+  // ── Cancel confirmation modal state ──────────────────────────────────────
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // ── Input state ──────────────────────────────────────────────────────────
   // We maintain a full line buffer + cursor position so arrow keys, Home/End,
@@ -137,13 +186,18 @@ export function AdvancedTerminalPanel({
       term.onData((data) => {
         // ── Ctrl+C ──────────────────────────────────────────────────────
         if (data === "\x03") {
+          // If a scan is running, show confirmation modal instead of immediately cancelling
+          const isRunning = !isInputActiveRef.current;
+          if (isRunning) {
+            setShowCancelModal(true);
+            return;
+          }
+          // If no scan running, just clear the line
           lineRef.current = "";
           cursorRef.current = 0;
           histIdxRef.current = -1;
-          isInputActiveRef.current = true;
           term.write("^C");
           term.write(getPrompt());
-          onResetRef.current();
           return;
         }
 
@@ -158,7 +212,16 @@ export function AdvancedTerminalPanel({
 
           if (cmd === "clear") {
             histIdxRef.current = -1;
-            showSplash(term);
+            // Use xterm's native reset to fully clear scrollback and screen
+            term.reset();
+            term.write(getPrompt());
+            // Also reset the graph visualization state
+            useGraphStore.getState().reset();
+            return;
+          }
+
+          if (cmd === "help") {
+            term.write(HELP_TEXT);
             term.write(getPrompt());
             return;
           }
@@ -407,63 +470,117 @@ export function AdvancedTerminalPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.status, run.findings]);
 
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
-    >
-      {/* ── Title bar ── */}
-      <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-red-500" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400" />
-            <span className="h-3 w-3 rounded-full bg-green-500" />
-          </div>
-          <span className="font-mono text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs">
-            {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {isSubmitting && (
-            <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
-              <Loader2 size={11} className="animate-spin" /> Running
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={onReset}
-            className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-          >
-            <RotateCcw size={12} />
-            Reset
-          </button>
-        </div>
-      </div>
+  // ── Cancel confirmation handlers ──────────────────────────────────────────
+  const handleConfirmCancel = useCallback(() => {
+    setShowCancelModal(false);
+    const term = termRef.current;
+    if (term) {
+      term.write("\r\n\x1b[1m\x1b[33m⚠ Scan cancelled by user.\x1b[0m\r\n");
+    }
+    lineRef.current = "";
+    cursorRef.current = 0;
+    histIdxRef.current = -1;
+    isInputActiveRef.current = true;
+    onResetRef.current();
+    useGraphStore.getState().reset();
+    if (term) {
+      term.write(getPrompt());
+    }
+  }, [getPrompt]);
 
-      {!projectId && (
-        <div className="rounded-lg border border-red-200/25 dark:border-red-900/25 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-600 dark:text-red-400 m-4">
-          ⚠ Select a project above before running a scan.
+  const handleDismissCancel = useCallback(() => {
+    setShowCancelModal(false);
+  }, []);
+
+  return (
+    <>
+      <motion.section
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+      >
+        {/* ── Title bar ── */}
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-red-500" />
+              <span className="h-3 w-3 rounded-full bg-yellow-400" />
+              <span className="h-3 w-3 rounded-full bg-green-500" />
+            </div>
+            <span className="font-mono text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs">
+              {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {isSubmitting && (
+              <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
+                <Loader2 size={11} className="animate-spin" /> Running
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+            >
+              <RotateCcw size={12} />
+              Reset
+            </button>
+          </div>
+        </div>
+
+        {!projectId && (
+          <div className="rounded-lg border border-red-200/25 dark:border-red-900/25 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-600 dark:text-red-400 m-4">
+            ⚠ Select a project above before running a scan.
+          </div>
+        )}
+
+        {/* ── Theme & Size Toolbar ── */}
+        <LogToolbar
+          themeKey={themeKey}
+          sizeKey={sizeKey}
+          onThemeChange={setTheme}
+          onSizeChange={setSize}
+          onReset={resetToDefault}
+          className="mx-4 mt-3"
+        />
+
+        {/* ── Full-width xterm ── */}
+        <div
+          ref={containerRef}
+          className="h-144 w-full overflow-hidden"
+          style={{ backgroundColor: terminalTheme.background }}
+        />
+      </motion.section>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Cancel Scan?
+            </h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              A scan is currently running. Are you sure you want to cancel it? This action cannot be undone.
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleDismissCancel}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Continue Scan
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmCancel}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+              >
+                Cancel Scan
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      {/* ── Theme & Size Toolbar ── */}
-      <LogToolbar
-        themeKey={themeKey}
-        sizeKey={sizeKey}
-        onThemeChange={setTheme}
-        onSizeChange={setSize}
-        onReset={resetToDefault}
-        className="mx-4 mt-3"
-      />
-
-      {/* ── Full-width xterm ── */}
-      <div
-        ref={containerRef}
-        className="h-144 w-full overflow-hidden"
-        style={{ backgroundColor: terminalTheme.background }}
-      />
-    </motion.section>
+    </>
   );
 }
