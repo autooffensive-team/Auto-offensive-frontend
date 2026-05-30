@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
+import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 
 type BasicPreset = {
   name: string;
@@ -226,6 +228,7 @@ export default function MediumScanPage() {
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
+  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [projectId, setProjectId] = useState("");
   const [target, setTarget] = useState("scanme.nmap.org");
@@ -793,6 +796,15 @@ export default function MediumScanPage() {
               </div>
 
               <div className="max-h-[32rem] space-y-3 overflow-y-auto px-5 py-5">
+                {/* Log Preferences Toolbar */}
+                <LogToolbar
+                  themeKey={themeKey}
+                  sizeKey={sizeKey}
+                  onThemeChange={setTheme}
+                  onSizeChange={setSize}
+                  onReset={resetToDefault}
+                  className="mb-3"
+                />
                 {logs.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-slate-400">
                     Submit a scan to populate the SSE event stream here.
@@ -812,10 +824,10 @@ export default function MediumScanPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] opacity-75">{entry.event}</p>
-                        <p className="text-[11px] opacity-60">{entry.createdAt}</p>
+                        <p className="font-semibold uppercase tracking-[0.18em] opacity-75" style={{ fontSize: `${Math.max(logSize.xtermFontSize - 6, 10)}px` }}>{entry.event}</p>
+                        <p className="opacity-60" style={{ fontSize: `${Math.max(logSize.xtermFontSize - 7, 9)}px` }}>{entry.createdAt}</p>
                       </div>
-                      <p className="mt-2 whitespace-pre-wrap break-words font-mono text-xs leading-6">{entry.message}</p>
+                      <p className="mt-2 whitespace-pre-wrap break-words font-mono leading-6" style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}>{entry.message}</p>
                     </div>
                   ))
                 )}

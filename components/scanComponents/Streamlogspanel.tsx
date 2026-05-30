@@ -4,6 +4,8 @@ import { Bot, RotateCcw } from "lucide-react";
 import { useRef, useEffect } from "react";
 import type { LogLine } from "@/types/scan";
 import { cn } from "@/lib/utils";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
+import { LogToolbar } from "./LogToolbar";
 
 interface StreamLogsPanelProps {
   logs: LogLine[];
@@ -17,6 +19,7 @@ export function StreamLogsPanel({
   title = "auto-offensive - stream logs",
 }: StreamLogsPanelProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
+  const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
@@ -24,7 +27,7 @@ export function StreamLogsPanel({
   }, [logs]);
 
   return (
-    <div className="flex h-96 flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 shrink-0">
         <div className="flex items-center gap-3">
@@ -57,32 +60,49 @@ export function StreamLogsPanel({
         </div>
       </div>
 
+      {/* Toolbar */}
+      <LogToolbar
+        themeKey={themeKey}
+        sizeKey={sizeKey}
+        onThemeChange={setTheme}
+        onSizeChange={setSize}
+        onReset={resetToDefault}
+        className="mx-3 mt-3 sm:mx-4 sm:mt-4"
+      />
+
       {/* Logs Container */}
-      <div className="m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2 sm:p-3 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
+      <div
+        className={cn(
+          "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-[20rem]",
+          theme.html.bg,
+          size.className,
+          size.lineHeight
+        )}
+      >
         {!logs.length ? (
-          <p className="text-gray-400 dark:text-gray-500 py-2 text-center text-[14px] sm:text-[17px]">
+          <p className={cn("py-2 text-center", theme.html.muted, size.className)}>
             Logs will appear here when a scan starts.
           </p>
         ) : (
           <>
             {logs.map((line) => (
               <div key={line.id} className="flex gap-2 wrap-break-word py-0.5">
-                <span className="shrink-0 text-gray-400 dark:text-gray-500">
+                <span className={cn("shrink-0", theme.html.timestamp)}>
                   {new Date(line.timestamp).toLocaleTimeString()}
                 </span>
-                <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
+                <span className={cn("shrink-0", theme.html.source)}>[{line.source}]</span>
                 <span
                   className={cn(
                     "shrink-0 font-semibold",
-                    line.level === "ERROR" && "text-red-600 dark:text-red-400",
-                    line.level === "WARN" && "text-amber-500 dark:text-amber-400",
-                    line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                    !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
+                    line.level === "ERROR" && theme.html.error,
+                    line.level === "WARN" && theme.html.warn,
+                    line.level === "INFO" && theme.html.info,
+                    !["ERROR", "WARN", "INFO"].includes(line.level) && theme.html.muted
                   )}
                 >
                   {line.level}
                 </span>
-                <span className="text-gray-900/75 dark:text-white/75">{line.text}</span>
+                <span className={theme.html.text}>{line.text}</span>
               </div>
             ))}
             <div ref={logEndRef} />
