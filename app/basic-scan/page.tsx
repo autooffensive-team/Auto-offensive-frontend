@@ -10,7 +10,6 @@ import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
 import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
-import { ScanLoadingHelix } from "@/components/scanComponents/ScanLoadingHelix";
 import { useScanController } from "@/hooks/use-scan-controller";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import AISuggestionPanel from "@/components/AiSuggestion/AISuggestionPanel";
@@ -476,11 +475,6 @@ export default function BasicScanPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col h-full">
-                    {/* Show DNA helix loading when scan is running but no logs yet */}
-                    {isScanRunning && isIdle && (
-                      <ScanLoadingHelix color={theme.html.asciiColor} className="flex-1 justify-center" />
-                    )}
-                    {/* Log lines */}
                     {!isIdle && (
                       <div className="p-2 sm:p-3 flex-1 overflow-y-auto">
                         {activeLogs.map((line) => (

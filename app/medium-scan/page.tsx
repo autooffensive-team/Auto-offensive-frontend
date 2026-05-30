@@ -18,7 +18,6 @@ import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
-import { ScanLoadingHelix } from "@/components/scanComponents/ScanLoadingHelix";
 
 type BasicPreset = {
   name: string;
@@ -229,7 +228,7 @@ export default function MediumScanPage() {
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
-  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
+  const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [projectId, setProjectId] = useState("");
   const [target, setTarget] = useState("scanme.nmap.org");
@@ -812,9 +811,6 @@ export default function MediumScanPage() {
                   </div>
                 ) : (
                   <>
-                    {isSubmitting && logs.length === 0 && (
-                      <ScanLoadingHelix color={logTheme.html.asciiColor} />
-                    )}
                     {logs.map((entry) => (
                     <div
                       key={entry.id}

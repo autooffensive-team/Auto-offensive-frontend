@@ -16,7 +16,6 @@ import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
-import { ScanLoadingHelix } from "@/components/scanComponents/ScanLoadingHelix";
 
 type BasicFinding = {
   finding_id: string;
@@ -163,7 +162,7 @@ export default function AdvanceScanPage() {
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
   const logStreamAbortRef = useRef<AbortController | null>(null);
-  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
+  const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [command, setCommand] = useState("");
   const [stepId, setStepId] = useState("");
@@ -677,9 +676,6 @@ export default function AdvanceScanPage() {
                       </p>
                     ) : (
                       <>
-                        {(isSubmitting || isStreaming) && logs.length === 0 && (
-                          <ScanLoadingHelix color={logTheme.html.asciiColor} />
-                        )}
                         {logs.map((entry) => (
                           <div
                             key={entry.id}
