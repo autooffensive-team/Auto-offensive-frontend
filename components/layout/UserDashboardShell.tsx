@@ -15,7 +15,6 @@ import {
   Radar,
   Scan,
   Code,
-  ShieldAlert,
   FileText,
   User,
   Settings,
@@ -70,7 +69,6 @@ const mainNavItems: NavItem[] = [
   { label: "Projects", path: "/userdashboard/projects", icon: FolderGit2, description: "Engagement tracking", guestAllowed: false },
   { label: "Tools Scan", path: "/userdashboard/scan", icon: Radar, description: "Run assessments", guestAllowed: true },
   { label: "Code Scan", path: "/userdashboard/code-scanning", icon: Code, description: "Repository analysis", guestAllowed: false },
-  { label: "Findings", path: "/userdashboard/findings", icon: ShieldAlert, description: "Risk triage", guestAllowed: false },
   { label: "Reports", path: "/userdashboard/reports", icon: FileText, description: "Evidence exports", guestAllowed: false },
 ];
 
