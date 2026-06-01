@@ -5,6 +5,7 @@ import type {
   ListJobsParams,
   JobDetails,
   JobParsedDataResponse,
+  StepParsedDataResponse,
 } from "@/types/assets";
 
 function buildQueryString(
@@ -25,12 +26,12 @@ export const assetsApi = baseApi.injectEndpoints({
       providesTags: (result, _err, projectId) =>
         result
           ? [
-              ...result.map((t) => ({
-                type: "Gateway" as const,
-                id: `TARGET:${t.target_id}`,
-              })),
-              { type: "Gateway" as const, id: `TARGETS:${projectId}` },
-            ]
+            ...result.map((t) => ({
+              type: "Gateway" as const,
+              id: `TARGET:${t.target_id}`,
+            })),
+            { type: "Gateway" as const, id: `TARGETS:${projectId}` },
+          ]
           : [{ type: "Gateway" as const, id: `TARGETS:${projectId}` }],
     }),
 
@@ -55,12 +56,12 @@ export const assetsApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.jobs.map((j) => ({
-                type: "Gateway" as const,
-                id: `JOB:${j.job_id}`,
-              })),
-              { type: "Gateway" as const, id: "JOBS_LIST" },
-            ]
+            ...result.jobs.map((j) => ({
+              type: "Gateway" as const,
+              id: `JOB:${j.job_id}`,
+            })),
+            { type: "Gateway" as const, id: "JOBS_LIST" },
+          ]
           : [{ type: "Gateway" as const, id: "JOBS_LIST" }],
     }),
 
@@ -77,6 +78,21 @@ export const assetsApi = baseApi.injectEndpoints({
         { type: "Gateway" as const, id: `JOB_PARSED:${jobId}` },
       ],
     }),
+
+    getStepParsedData: builder.query<
+      StepParsedDataResponse,
+      { stepId: string; page?: number; page_size?: number; search?: string }
+    >({
+      query: ({ stepId, page, page_size, search }) =>
+        `scans/steps/${stepId}/parsed-data${buildQueryString({
+          page,
+          page_size,
+          search,
+        })}`,
+      providesTags: (_result, _err, { stepId }) => [
+        { type: "Gateway" as const, id: `STEP_PARSED:${stepId}` },
+      ],
+    }),
   }),
 });
 
@@ -86,4 +102,5 @@ export const {
   useListJobsQuery,
   useGetJobDetailsQuery,
   useGetJobParsedDataQuery,
+  useGetStepParsedDataQuery,
 } = assetsApi;
