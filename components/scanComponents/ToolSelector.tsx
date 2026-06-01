@@ -51,6 +51,7 @@ export function ToolSelector({
             id={id}
             placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
             showTrigger
+            openOnClick
             className={cn(
               "w-full [&_button[data-slot=combobox-trigger]:hover]:bg-teal-50 dark:[&_button[data-slot=combobox-trigger]:hover]:bg-teal-500/10 [&_button[data-slot=combobox-trigger]:hover]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover]:text-teal-400 [&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-400",
               isEmpty && "text-gray-500 dark:text-gray-400"

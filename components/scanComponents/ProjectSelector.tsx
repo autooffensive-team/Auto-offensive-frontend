@@ -49,6 +49,7 @@ export function ProjectSelector({
             id="project-selector"
             placeholder={loading ? "Loading projects..." : isEmpty ? "No projects available" : "Select a project"}
             showTrigger
+            openOnClick
             className={cn("w-full", isEmpty && "text-gray-500 dark:text-gray-400")}
             value={selectedProject?.name ?? ""}
             readOnly
