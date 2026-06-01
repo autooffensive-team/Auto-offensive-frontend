@@ -118,6 +118,43 @@
   }
 }
 
+/* --- Ghost Runner Keyframes (scan progress) --- */
+@keyframes ghostBounce {
+  0%, 49% {
+    transform: translateY(0px);
+  }
+  50%, 100% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes flicker0 {
+  0%, 49% {
+    background-color: #14b8a6;
+  }
+  50%, 100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes flicker1 {
+  0%, 49% {
+    background-color: transparent;
+  }
+  50%, 100% {
+    background-color: #14b8a6;
+  }
+}
+
+@keyframes shadowPulse {
+  0%, 49% {
+    opacity: 0.4;
+  }
+  50%, 100% {
+    opacity: 0.15;
+  }
+}
+
 /* --- Theme Variables --- */
 :root {
   /* Light Mode */ 

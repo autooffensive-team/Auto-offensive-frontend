@@ -817,14 +817,6 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             toast.error(errorMsg);
             appendErrorForMode("medium", errorMsg);
             setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
-            const rlLimit = response.headers.get("x-ratelimit-limit");
-            const rlRemaining = response.headers.get("x-ratelimit-remaining");
-            const rlReset = response.headers.get("x-ratelimit-reset");
-            onGuestScanConsumed?.({
-              limit: rlLimit ? Number(rlLimit) : undefined,
-              remaining: rlRemaining ? Number(rlRemaining) : 0,
-              reset: rlReset ? Number(rlReset) : undefined,
-            });
             setIsSubmitting(false);
             return;
           }

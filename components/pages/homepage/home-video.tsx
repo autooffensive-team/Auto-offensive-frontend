@@ -135,7 +135,7 @@ export default function HomeVideo() {
       eyebrow={t('eyebrow')}
       playLabel={t('playLabel')}
       fontFamily={fontFamily}
-      thumbnailUrl="https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=1600&h=900&fit=crop"
+      thumbnailUrl="/Thumnail.webp"
       videoUrl="https://www.youtube.com/embed/4LSkSDirDD0"
     />
   );

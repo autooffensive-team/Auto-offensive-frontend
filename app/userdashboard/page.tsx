@@ -18,7 +18,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import {
@@ -881,6 +881,10 @@ function RadialChart({
   totalCodeScans: number;
   totalIssues: number;
 }) {
+  const [hoveredRing, setHoveredRing] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Responsive size
   const getSize = () => {
     if (typeof window === "undefined") return 340;
@@ -897,94 +901,168 @@ function RadialChart({
   const gap = size < 280 ? 5 : 7;
   const totalIssuesColor = rings[0]?.color ?? "#6366F1";
 
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      role="img"
-      aria-label="Radial chart showing scan metrics"
-      style={{ maxWidth: "100%", height: "auto" }}
-    >
-      {rings.map((ring, i) => {
-        const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
-        if (radius <= 0) return null;
-        const circumference = 2 * Math.PI * radius;
-        const filled = (ring.percent / 100) * circumference;
-        const unfilled = circumference - filled;
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setTooltipPos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
-        return (
-          <g key={ring.label}>
-            {/* Background track */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={radius}
-              fill="none"
-              stroke="currentColor"
-              strokeOpacity={0.06}
-              strokeWidth={strokeWidth}
+  return (
+    <div className="relative" ref={containerRef} onMouseMove={handleMouseMove}>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        role="img"
+        aria-label="Radial chart showing scan metrics"
+        style={{ maxWidth: "100%", height: "auto" }}
+        onMouseLeave={() => setHoveredRing(null)}
+      >
+        {rings.map((ring, i) => {
+          const radius = cx - strokeWidth / 2 - i * (strokeWidth + gap);
+          if (radius <= 0) return null;
+          const circumference = 2 * Math.PI * radius;
+          const filled = (ring.percent / 100) * circumference;
+          const unfilled = circumference - filled;
+          const isHovered = hoveredRing === i;
+
+          return (
+            <g key={ring.label}>
+              {/* Background track */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke="currentColor"
+                strokeOpacity={0.06}
+                strokeWidth={strokeWidth}
+              />
+              {/* Filled arc */}
+              <motion.circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke={ring.color}
+                strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={`${filled} ${unfilled}`}
+                strokeDashoffset={circumference * 0.25}
+                initial={{ strokeDasharray: `0 ${circumference}` }}
+                animate={{ strokeDasharray: `${filled} ${unfilled}` }}
+                transition={{ duration: 1, ease: "easeOut", delay: i * 0.15 }}
+                style={{
+                  filter: isHovered ? `drop-shadow(0 0 6px ${ring.color}50)` : "none",
+                  transition: "stroke-width 0.2s ease, filter 0.2s ease",
+                }}
+              />
+              {/* Invisible wider hit area for hover */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill="none"
+                stroke="transparent"
+                strokeWidth={strokeWidth + 12}
+                className="cursor-pointer"
+                onMouseEnter={() => setHoveredRing(i)}
+              />
+              {/* Percentage label at arc end on hover */}
+              {isHovered && ring.percent > 0 && (() => {
+                const angle = -90 + (ring.percent / 100) * 360;
+                const rad = (angle * Math.PI) / 180;
+                const labelRadius = radius + strokeWidth / 2 + 14;
+                const lx = cx + labelRadius * Math.cos(rad);
+                const ly = cy + labelRadius * Math.sin(rad);
+                return (
+                  <text
+                    x={lx}
+                    y={ly}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={size < 280 ? 9 : 11}
+                    fontWeight={700}
+                    fill={ring.color}
+                  >
+                    {ring.percent}%
+                  </text>
+                );
+              })()}
+            </g>
+          );
+        })}
+        {/* Center content */}
+        <text
+          x={cx}
+          y={cy - (size < 280 ? 8 : 12)}
+          textAnchor="middle"
+          fontSize={size < 280 ? 24 : 30}
+          fontWeight={800}
+          fill={totalIssuesColor}
+          fontFamily="inherit"
+        >
+          {hoveredRing !== null ? rings[hoveredRing]?.percent + "%" : totalIssues}
+        </text>
+        <line
+          x1={cx - (size < 280 ? 15 : 20)}
+          y1={cy + 2}
+          x2={cx + (size < 280 ? 15 : 20)}
+          y2={cy + 2}
+          stroke="#CBD5E1"
+          strokeWidth={1}
+        />
+        <text
+          x={cx}
+          y={cy + (size < 280 ? 14 : 20)}
+          textAnchor="middle"
+          fontSize={size < 280 ? 14 : 18}
+          fontWeight={700}
+          fill="currentColor"
+          className="text-slate-700 dark:text-slate-200"
+        >
+          {hoveredRing !== null ? "" : totalCodeScans}
+        </text>
+        <text
+          x={cx}
+          y={cy + (size < 280 ? 26 : 36)}
+          textAnchor="middle"
+          fontSize={size < 280 ? 8 : 10}
+          fill="#94A3B8"
+          fontFamily="inherit"
+        >
+          {hoveredRing !== null ? rings[hoveredRing]?.label : "issues / scans"}
+        </text>
+      </svg>
+
+      {/* Hover tooltip */}
+      {hoveredRing !== null && (
+        <div
+          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          style={{
+            left: tooltipPos.x,
+            top: tooltipPos.y - 54,
+            transform: "translateX(-50%)",
+          }}
+        >
+          <p className="text-[12px] font-semibold text-slate-900 dark:text-white">
+            {rings[hoveredRing].label}
+          </p>
+          <div className="mt-0.5 flex items-center gap-2">
+            <span
+              className="inline-block size-2 rounded-full"
+              style={{ backgroundColor: rings[hoveredRing].color }}
             />
-            {/* Filled arc */}
-            <motion.circle
-              cx={cx}
-              cy={cy}
-              r={radius}
-              fill="none"
-              stroke={ring.color}
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={`${filled} ${unfilled}`}
-              strokeDashoffset={circumference * 0.25}
-              initial={{ strokeDasharray: `0 ${circumference}` }}
-              animate={{ strokeDasharray: `${filled} ${unfilled}` }}
-              transition={{ duration: 1, ease: "easeOut", delay: i * 0.15 }}
-            />
-          </g>
-        );
-      })}
-      {/* Center content */}
-      <text
-        x={cx}
-        y={cy - (size < 280 ? 8 : 12)}
-        textAnchor="middle"
-        fontSize={size < 280 ? 24 : 30}
-        fontWeight={800}
-        fill={totalIssuesColor}
-        fontFamily="inherit"
-      >
-        {totalIssues}
-      </text>
-      <line
-        x1={cx - (size < 280 ? 15 : 20)}
-        y1={cy + 2}
-        x2={cx + (size < 280 ? 15 : 20)}
-        y2={cy + 2}
-        stroke="#CBD5E1"
-        strokeWidth={1}
-      />
-      <text
-        x={cx}
-        y={cy + (size < 280 ? 14 : 20)}
-        textAnchor="middle"
-        fontSize={size < 280 ? 14 : 18}
-        fontWeight={700}
-        fill="currentColor"
-        className="text-slate-700 dark:text-slate-200"
-      >
-        {totalCodeScans}
-      </text>
-      <text
-        x={cx}
-        y={cy + (size < 280 ? 26 : 36)}
-        textAnchor="middle"
-        fontSize={size < 280 ? 8 : 10}
-        fill="#94A3B8"
-        fontFamily="inherit"
-      >
-        issues / scans
-      </text>
-    </svg>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              {rings[hoveredRing].percent}%
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

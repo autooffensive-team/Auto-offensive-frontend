@@ -58,6 +58,25 @@ export type JobDetails = {
   steps: StepSummary[];
 };
 
+// Pagination metadata shared by parsed-data responses
+type ParsedPaginationMeta = {
+  total_rows: number;
+  total_pages: number;
+  page: number;
+  page_size: number;
+};
+
+// Per-step endpoint response (new)
+export type StepParsedDataResponse = {
+  step_id: string;
+  job_id: string;
+  tool_name: string;
+  columns: string[];
+  rows: Record<string, unknown>[];
+  discovered_columns: Record<string, string>;
+} & ParsedPaginationMeta;
+
+// Job-level response: each step now carries pagination metadata
 export type ParsedStepData = {
   step_id: string;
   tool_name: string;
@@ -65,7 +84,7 @@ export type ParsedStepData = {
   columns: string[];
   rows: Record<string, unknown>[];
   discovered_columns: Record<string, string>;
-};
+} & ParsedPaginationMeta;
 
 export type JobParsedDataResponse = {
   job_id: string;

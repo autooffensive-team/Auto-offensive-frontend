@@ -9,9 +9,11 @@ import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanCo
 import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
 import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
+import ScanExecutionGraph from "@/components/scanning/ScanExecutionGraph";
+import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 import { useScanController } from "@/hooks/use-scan-controller";
+import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { useGuestScanGuard } from "@/hooks/use-guest-scan-guard";
-import { GuestScanLimitModal } from "@/components/guest/GuestScanLimitModal";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import { GuestScanTour, TourTriggerButton } from "@/components/tour/GuestScanTour";
 import { AuthUserScanTour, AuthTourTriggerButton } from "@/components/tour/AuthUserScanTour";
@@ -190,31 +192,39 @@ function useStableAsciiScale() {
 
 // ─── Log text colorizer ───────────────────────────────────────────────────────
 // Highlights meaningful parts of scan output so users can quickly parse results.
-function colorizeLogText(text: string): React.ReactNode {
-  const patterns: { regex: RegExp; className: string }[] = [
-    // URLs
-    { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400 dark:text-blue-400" },
-    // IP addresses
-    { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-500 dark:text-violet-400" },
-    // Port entries like "80/tcp"
-    { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-500 dark:text-cyan-400" },
-    // "open" state
-    { regex: /\bopen\b/g, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    // "closed" or "filtered" state
-    { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400 dark:text-rose-400" },
-    // Service names (http, nginx, ssl, ssh, etc.)
-    { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-500 dark:text-amber-400" },
-    // Timing/duration like "41.92 seconds"
-    { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400 dark:text-sky-400" },
-    // Key success words
-    { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    // Key failure words
-    { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-500 dark:text-red-400 font-semibold" },
-    // Scan action keywords
-    { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-500 dark:text-teal-400" },
-    // File paths
-    { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400 dark:text-orange-400" },
-  ];
+// NOTE: Terminal always uses a dark background regardless of website light/dark mode,
+// so all colors here must be bright/light to be readable on dark backgrounds.
+// For light themes, use dark colors instead.
+function colorizeLogText(text: string, isLightTheme = false): React.ReactNode {
+  const patterns: { regex: RegExp; className: string }[] = isLightTheme
+    ? [
+        { regex: /https?:\/\/[^\s]+/g, className: "text-blue-700" },
+        { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-700" },
+        { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-700" },
+        { regex: /\bopen\b/g, className: "text-emerald-700 font-semibold" },
+        { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-700" },
+        { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-700" },
+        { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-700" },
+        { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-700 font-semibold" },
+        { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-700 font-semibold" },
+        { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-700" },
+        { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-700" },
+      ]
+    : [
+        { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400" },
+        { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-400" },
+        { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-400" },
+        { regex: /\bopen\b/g, className: "text-emerald-400 font-semibold" },
+        { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400" },
+        { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-400" },
+        { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400" },
+        { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-400 font-semibold" },
+        { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-400 font-semibold" },
+        { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-400" },
+        { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400" },
+      ];
+
+  const defaultTextClass = isLightTheme ? "text-gray-800" : "text-gray-300";
 
   type Match = { start: number; end: number; className: string };
   const matches: Match[] = [];
@@ -235,7 +245,7 @@ function colorizeLogText(text: string): React.ReactNode {
   }
 
   if (matches.length === 0) {
-    return <span className="text-gray-700 dark:text-gray-300">{text}</span>;
+    return <span className={defaultTextClass}>{text}</span>;
   }
 
   matches.sort((a, b) => a.start - b.start);
@@ -246,7 +256,7 @@ function colorizeLogText(text: string): React.ReactNode {
   matches.forEach((match, i) => {
     if (cursor < match.start) {
       fragments.push(
-        <span key={`t-${i}`} className="text-gray-700 dark:text-gray-300">
+        <span key={`t-${i}`} className={defaultTextClass}>
           {text.slice(cursor, match.start)}
         </span>
       );
@@ -261,7 +271,7 @@ function colorizeLogText(text: string): React.ReactNode {
 
   if (cursor < text.length) {
     fragments.push(
-      <span key="tail" className="text-gray-700 dark:text-gray-300">
+      <span key="tail" className={defaultTextClass}>
         {text.slice(cursor)}
       </span>
     );
@@ -275,6 +285,7 @@ export default function ScanPage() {
   const initialMode = (searchParams.get("mode") as ScanMode) || "basic";
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
+  const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // ── Guest scan guard ──────────────────────────────────────────────────────
   const {
@@ -283,8 +294,6 @@ export default function ScanPage() {
     guardedSubmit,
     guestSubmitBasicScan,
     maxScans,
-    showLimitModal,
-    closeLimitModal,
     showLockModal,
     closeLockModal,
     lockedFeature,
@@ -349,44 +358,49 @@ export default function ScanPage() {
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
 
-  const activeRun = activeTab === "basic" ? basicRun : mediumRun;
-  const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;
-  const activeErrors = activeTab === "basic" ? basicErrors : mediumErrors;
+  const activeRun = activeTab === "basic" ? basicRun : activeTab === "medium" ? mediumRun : advancedRun;
+  const activeLogs = activeTab === "basic" ? basicLogs : activeTab === "medium" ? mediumLogs : advancedLogs;
+  const activeErrors = activeTab === "basic" ? basicErrors : activeTab === "medium" ? mediumErrors : advancedErrors;
 
   const isIdle = activeLogs.length === 0;
+  // Show loading until scan reaches a terminal state (completed/failed/cancelled/partial)
+  const isScanRunning = isSubmitting || (
+    activeRun.status !== "idle" &&
+    !/completed|failed|cancelled|partial/i.test(activeRun.status)
+  );
 
   return (
     <>
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
 
-        {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
-        {isGuest && <GuestScanTour />}
-        {!isGuest && <AuthUserScanTour />}
+          {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
+          {isGuest && <GuestScanTour />}
+          {!isGuest && <AuthUserScanTour />}
 
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
-            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-              {isGuest ? (
-                <>
-                  Launch Basic, Medium, or Advanced scans and watch live logs as they run.
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                    <Lock size={10} />
-                    Limited to {maxScans} scans in guest mode
-                  </span>
-                </>
-              ) : (
-                "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
-              )}
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+              <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                {isGuest ? (
+                  <>
+                    Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                      <Lock size={10} />
+                      Limited to {maxScans} scans in guest mode
+                    </span>
+                  </>
+                ) : (
+                  "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
+                )}
+              </p>
+            </div>
+
+            {/* Tour replay button */}
+            <div className="shrink-0 pt-1">
+              {isGuest ? <TourTriggerButton /> : <AuthTourTriggerButton />}
+            </div>
           </div>
-
-          {/* Tour replay button */}
-          <div className="shrink-0 pt-1">
-            {isGuest ? <TourTriggerButton /> : <AuthTourTriggerButton />}
-          </div>
-        </div>
 
           {displayMetaError && (
             <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-700 dark:text-red-400">
@@ -394,35 +408,27 @@ export default function ScanPage() {
             </div>
           )}
 
-          {isGuest && limitReached && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 sm:p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
-              <p className="text-xs sm:text-sm font-medium text-rose-700 dark:text-rose-400">
-                You&apos;ve used all {maxScans} guest scans. Please create an account to continue scanning.
-              </p>
-            </div>
-          )}
-
-        <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
-          {isGuest ? (
-            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-              <Scan size={16} className="text-teal-500" />
-              <span>Guest Scan Session</span>
-              <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                Guest Mode
-              </span>
-            </div>
-          ) : loadingMeta ? (
-            <ProjectSelectorSkeleton />
-          ) : (
-            <ProjectSelector
-              projects={projects}
-              value={projectId}
-              onChange={setProjectId}
-              disabled={loadingMeta}
-              loading={loadingMeta}
-            />
-          )}
-        </div>
+          <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+            {isGuest ? (
+              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                <Scan size={16} className="text-teal-500" />
+                <span>Guest Scan Session</span>
+                <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                  Guest Mode
+                </span>
+              </div>
+            ) : loadingMeta ? (
+              <ProjectSelectorSkeleton />
+            ) : (
+              <ProjectSelector
+                projects={projects}
+                value={projectId}
+                onChange={setProjectId}
+                disabled={loadingMeta}
+                loading={loadingMeta}
+              />
+            )}
+          </div>
 
           <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
             <div className="space-y-3 sm:space-y-4 md:space-y-5">
@@ -468,62 +474,96 @@ export default function ScanPage() {
               </ScanModePanel>
 
               {activeTab === "advanced" && (
-                <AdvancedTerminalPanel
-                  projectId={isGuest ? "guest-advanced-scan" : projectId}
-                  selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
-                  logs={advancedLogs}
-                  run={advancedRun}
-                  errors={advancedErrors}
-                  isSubmitting={isSubmitting}
-                  onSubmit={submitAdvanced}
-                  onReset={() => resetRun("advanced")}
-                />
+                <>
+                  <ScanExecutionGraph
+                    run={advancedRun}
+                    logs={advancedLogs}
+                    errors={advancedErrors}
+                  />
+                  <AdvancedTerminalPanel
+                    projectId={isGuest ? "guest-advanced-scan" : projectId}
+                    selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
+                    logs={advancedLogs}
+                    run={advancedRun}
+                    errors={advancedErrors}
+                    isSubmitting={isSubmitting}
+                    onSubmit={submitAdvanced}
+                    onReset={() => resetRun("advanced")}
+                  />
+                </>
               )}
             </div>
 
-          {activeTab !== "advanced" && (
-            <div id="tour-terminal">
-              <LiveConsole
-                run={activeRun}
-                errors={activeErrors}
-              />
-            </div>
-          )}
-        </div>
+            {activeTab !== "advanced" && (
+              <div id="tour-terminal">
+                <LiveConsole
+                  run={activeRun}
+                  errors={activeErrors}
+                />
+              </div>
+            )}
+          </div>
 
-        {/* BOTTOM SECTION: Full-width stream logs terminal */}
-        {activeTab !== "advanced" && (
-          <div id="tour-stream-logs" className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500" />
-                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400" />
-                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500" />
-                </div>
-                <span className="font-mono text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
-                  {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                {activeLogs.length > 0 && (
-                  <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
-                    {activeLogs.length} lines
+          {/* FULL-WIDTH: Scan Execution Graph (React Flow) — basic/medium only (advanced has it inline above terminal) */}
+          {activeTab !== "advanced" && (
+            <ScanExecutionGraph
+              run={activeRun}
+              logs={activeLogs}
+              errors={activeErrors}
+            />
+          )}
+
+          {/* BOTTOM SECTION: Full-width stream logs terminal */}
+          {activeTab !== "advanced" && (
+            <div id="tour-stream-logs" className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex gap-1.5">
+                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500" />
+                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400" />
+                    <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500" />
+                  </div>
+                  <span className="font-mono text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
+                    {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} - {activeTab} stream logs
                   </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => resetRun(activeTab)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-                >
-                  <RotateCcw size={12} />
-                  Reset
-                </button>
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  {activeLogs.length > 0 && (
+                    <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400">
+                      {activeLogs.length} lines
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => resetRun(activeTab)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    <RotateCcw size={12} />
+                    Reset
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="p-3 sm:p-4">
-              <div className="h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg bg-gray-50 dark:bg-gray-800/50 text-[14px] sm:text-[17px] leading-relaxed font-[Consolas,monospace]">
-                {isIdle ? (
+
+                    {/* Log Preferences Toolbar */}
+            <LogToolbar
+              themeKey={themeKey}
+              sizeKey={sizeKey}
+              onThemeChange={setTheme}
+              onSizeChange={setSize}
+              onReset={resetToDefault}
+              className="mx-3 mt-3 sm:mx-4 sm:mt-4"
+            />
+
+              <div className="p-3 sm:p-4">
+                <div
+                className={cn(
+                  "h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg font-[Consolas,monospace]",
+                  theme.html.bg,
+                  size.className,
+                  size.lineHeight
+                )}
+              >
+                {isIdle && !isScanRunning ? (
                   <div className="flex flex-col items-center h-full">
 
                       {/* ── Responsive ASCII container ─────────────────────────── */}
@@ -539,7 +579,8 @@ export default function ScanPage() {
                             lineHeight: "1.2",
                             letterSpacing: "0.01em",
                             whiteSpace: "pre",
-                            color: "hsl(var(--primary) / 0.3)",
+                            color: theme.html.asciiColor,
+                            opacity: 0.85,
                             margin: "0 auto",
                             display: "table", // shrinks to content width so auto margins work
                           }}
@@ -549,32 +590,36 @@ export default function ScanPage() {
                       </div>
                       {/* ── End responsive ASCII ───────────────────────────────── */}
 
-                      <p className="text-gray-400 dark:text-gray-500 py-3 text-center text-[14px] sm:text-[17px] shrink-0">
+                      <p className={cn("py-3 text-center shrink-0", theme.html.muted, size.className)}>
                         Logs will appear here when a scan starts.
                       </p>
                     </div>
                   ) : (
-                    <div className="p-2 sm:p-3">
-                      {activeLogs.map((line) => (
-                        <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
-                          <span className="shrink-0 text-gray-400 dark:text-gray-500">
-                            {new Date(line.timestamp).toLocaleTimeString()}
-                          </span>
-                          <span className="shrink-0 text-teal-600 dark:text-teal-400">[{line.source}]</span>
-                          <span
-                            className={cn(
-                              "shrink-0 font-semibold",
-                              line.level === "ERROR" && "text-red-600 dark:text-red-400",
-                              line.level === "WARN" && "text-amber-500 dark:text-amber-400",
-                              line.level === "INFO" && "text-emerald-500 dark:text-emerald-400",
-                              !["ERROR", "WARN", "INFO"].includes(line.level) && "text-gray-400 dark:text-gray-500"
-                            )}
-                          >
-                            {line.level}
-                          </span>
-                          {colorizeLogText(line.text)}
+                    <div className="flex flex-col h-full">
+                      {!isIdle && (
+                        <div className="p-2 sm:p-3 flex-1 overflow-y-auto">
+                          {activeLogs.map((line) => (
+                            <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
+                              <span className={cn("shrink-0", theme.html.timestamp)}>
+                                {new Date(line.timestamp).toLocaleTimeString()}
+                              </span>
+                              <span className={cn("shrink-0", theme.html.source)}>[{line.source}]</span>
+                              <span
+                                className={cn(
+                                  "shrink-0 font-semibold",
+                                  line.level === "ERROR" && theme.html.error,
+                                  line.level === "WARN" && theme.html.warn,
+                                  line.level === "INFO" && theme.html.info,
+                                  !["ERROR", "WARN", "INFO"].includes(line.level) && theme.html.muted
+                                )}
+                              >
+                                {line.level}
+                              </span>
+                              {colorizeLogText(line.text, theme.html.isLight)}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
                 </div>
@@ -585,7 +630,6 @@ export default function ScanPage() {
       </div>
 
       {/* Guest modals */}
-      <GuestScanLimitModal isOpen={showLimitModal} onClose={closeLimitModal} />
       <GuestLockModal isOpen={showLockModal} onClose={closeLockModal} featureName={lockedFeature} />
     </>
   );
