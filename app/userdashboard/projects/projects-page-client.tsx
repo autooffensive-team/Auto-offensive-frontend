@@ -12,7 +12,6 @@ import {
   RefreshCw,
   LoaderCircle,
   X,
-  Layers,
 } from "lucide-react";
 import { useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -576,8 +575,8 @@ export default function ProjectsPageClient({
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -585,13 +584,7 @@ export default function ProjectsPageClient({
         className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Layers size={13} className="text-teal-500 dark:text-teal-400" />
-            <span className="text-xs sm:text-sm md:text-sm lg:text-base font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
-              Repository Scanner
-            </span>
-          </div>
-          <h1 className="mt-1.5 sm:mt-2 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
             Projects
           </h1>
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">

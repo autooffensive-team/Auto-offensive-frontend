@@ -13,8 +13,8 @@ export default function AssetsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
       {/* Header */}
       <motion.div

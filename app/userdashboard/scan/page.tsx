@@ -372,8 +372,8 @@ export default function ScanPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="min-h-screen">
+        <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
           {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
           {isGuest && <GuestScanTour />}
@@ -431,8 +431,8 @@ export default function ScanPage() {
             )}
           </div>
 
-          <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
-            <div className="space-y-3 sm:space-y-4 md:space-y-5">
+          <div className={cn("grid gap-3 sm:gap-4", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
+            <div className="space-y-3 sm:space-y-4">
               <ScanModeTabs value={activeTab} onChange={handleTabChange} />
 
               <ScanModePanel mode="basic" isActive={activeTab === "basic"}>

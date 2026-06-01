@@ -463,7 +463,7 @@ export default function UserDashboardShell({
 
       <div className={`transition-all duration-300 ${desktopContentOffset}`}>
         <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
-          <div className="mx-auto flex max-w-400 items-center justify-between gap-4 px-4 py-4 md:px-8">
+          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-3 sm:px-4 md:px-5 md:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -584,7 +584,7 @@ export default function UserDashboardShell({
           </div>
         </header>
 
-        <main className={`mx-auto max-w-400 px-4 py-6 md:px-8 md:py-8 ${isGuest ? "pb-20" : ""}`}>
+        <main className={`mx-auto max-w-400 px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
           {children}
         </main>
       </div>

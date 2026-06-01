@@ -9,13 +9,13 @@ import RecentScans from "@/components/GuestDashboard/RecentScans";
 function MainContent() {
   return (
     <div className="flex-1 flex flex-col bg-gray-50 text-gray-900 dark:bg-Linear-to-br dark:from-[#0b1220] dark:to-[#0d1117] dark:text-white transition-colors">
-      <main className="flex-1 overflow-y-auto py-10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+      <main className="flex-1 overflow-y-auto py-5 sm:py-6 lg:py-7">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           {/* HEADER */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5 lg:mb-6">
             {/* TITLE */}
             <div className="max-w-2xl">
-              <h1 className="display-font text-4xl lg:text-5xl font-bold tracking-tight mb-3 mt-6 text-gray-900 dark:text-white">
+              <h1 className="display-font text-4xl lg:text-5xl font-bold tracking-tight mb-2 text-gray-900 dark:text-white">
                 BASIC SCAN
               </h1>
 
@@ -45,20 +45,20 @@ function MainContent() {
           </div>
 
           {/* SECTIONS */}
-          <div className="space-y-10">
-            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm dark:shadow-md transition-colors">
+          <div className="space-y-5 lg:space-y-6">
+            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm dark:shadow-md transition-colors">
               <ScanSection />
             </div>
 
-            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm dark:shadow-md transition-colors">
+            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm dark:shadow-md transition-colors">
               <ToolLibrary />
             </div>
 
-            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm dark:shadow-md transition-colors">
+            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm dark:shadow-md transition-colors">
               <FeatureCards />
             </div>
 
-            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm dark:shadow-md transition-colors">
+            <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm dark:shadow-md transition-colors">
               <RecentScans />
             </div>
           </div>
