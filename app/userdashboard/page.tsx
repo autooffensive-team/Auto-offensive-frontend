@@ -322,7 +322,7 @@ function AuthenticatedDashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
+      <div className="mx-auto space-y-2.5 sm:space-y-3 md:space-y-3 lg:space-y-4">
 
         {/* ── Header ─────────────────────────────────────────────── */}
         <motion.div
@@ -366,14 +366,14 @@ function AuthenticatedDashboard() {
         )}
 
         {/* ── Metric Cards ─────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-3 lg:grid-cols-6">
           {scannedAssetMetrics.map((metric, index) => (
             <MetricCard key={metric.label} metric={metric} index={index} />
           ))}
         </div>
 
         {/* ── Main 2-col grid ──────────────────────────────────────── */}
-        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:grid-cols-2">
+        <div className="grid gap-2.5 sm:gap-3 md:gap-4 lg:grid-cols-2">
 
           {/* Vulnerability Distribution */}
           <motion.div

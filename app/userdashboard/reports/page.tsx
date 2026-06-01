@@ -255,10 +255,10 @@ export default function ReportsPage() {
 
       <div className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 dark:text-white">Reports</h1>
-            <p className="text-[16px] text-gray-500 dark:text-gray-400 mt-1">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">Reports</h1>
+            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
               Generate and download security scan reports in multiple formats
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
           <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-teal-500/10 flex items-center justify-center">
@@ -323,7 +323,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Format Tabs */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-2 overflow-x-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max">
             {formatTabs.map((tab) => (
               <button
@@ -478,7 +478,7 @@ export default function ReportsPage() {
 
           {/* Pagination */}
           {!isLoading && !isError && totalPages > 1 && (
-            <div className="px-6 py-5 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="px-4 py-4 sm:px-6 sm:py-5 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-[14px] text-gray-500 dark:text-gray-400">
                 Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
                 {Math.min(currentPage * ITEMS_PER_PAGE, filteredReports.length)} of{" "}

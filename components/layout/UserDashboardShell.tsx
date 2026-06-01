@@ -263,7 +263,7 @@ export default function UserDashboardShell({
           </div>
         </div>
 
-        <div className={`px-4 py-3 ${collapsed ? "md:px-1.5" : ""}`}>
+        <div className={`px-4 py-2.5 ${collapsed ? "md:px-1.5" : ""}`}>
           <Link
             href="/userdashboard/scan"
             onClick={closeOverlays}
@@ -276,7 +276,7 @@ export default function UserDashboardShell({
         </div>
 
         <nav className={`flex-1 overflow-y-auto px-3 pb-4 ${collapsed ? "md:px-1.5" : ""}`}>
-          <div className={`mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
+          <div className={`mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
             Workspace
           </div>
           <ul className="space-y-1">
@@ -292,15 +292,15 @@ export default function UserDashboardShell({
                       type="button"
                       onClick={() => handleLockedClick(item.label)}
                       title={collapsed ? `${item.label} (Locked)` : undefined}
-                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
                     >
                       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
                         <item.icon size={16} strokeWidth={1.8} />
                         <Lock size={8} className="absolute -right-1 -top-1 text-amber-500" />
                       </div>
                       <div className={collapsed ? "md:hidden" : ""}>
-                        <p className="font-medium text-left">{item.label}</p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-600 text-left">
+                        <p className="font-medium leading-tight text-left">{item.label}</p>
+                        <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-600 text-left">
                           {item.description}
                         </p>
                       </div>
@@ -319,7 +319,7 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
+                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 shadow-inner shadow-black/5 dark:bg-white/10 dark:text-white dark:shadow-white/5"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
                       }`}
@@ -333,8 +333,8 @@ export default function UserDashboardShell({
                       <item.icon size={16} strokeWidth={active ? 2.2 : 1.8} />
                     </div>
                     <div className={collapsed ? "md:hidden" : ""}>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                      <p className="font-medium leading-tight">{item.label}</p>
+                      <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-500">
                         {item.description}
                       </p>
                     </div>
@@ -344,7 +344,7 @@ export default function UserDashboardShell({
             })}
           </ul>
 
-          <div className={`mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
+          <div className={`mb-2 mt-5 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
             Account
           </div>
           <ul className="space-y-1">
@@ -359,7 +359,7 @@ export default function UserDashboardShell({
                       type="button"
                       onClick={() => handleLockedClick(item.label)}
                       title={collapsed ? `${item.label} (Locked)` : undefined}
-                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
                     >
                       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
                         <item.icon size={16} strokeWidth={1.8} />
@@ -382,7 +382,7 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
+                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 dark:bg-white/10 dark:text-white"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
                       }`}
@@ -406,7 +406,7 @@ export default function UserDashboardShell({
                   onClick={handleLogoutClick}
                   disabled={isLoggingOut}
                   title={collapsed ? "Logout" : undefined}
-                  className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-rose-600 hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10`}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-rose-600 hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10`}
                 >
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-rose-200 text-rose-500 dark:border-rose-800 dark:text-rose-400">
                     <LogOut size={16} strokeWidth={1.8} />

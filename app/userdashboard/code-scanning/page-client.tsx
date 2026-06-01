@@ -217,7 +217,7 @@ function HexStatCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4.5 lg:px-5.5 lg:py-4.5 dark:border-slate-800 dark:bg-slate-900"
+      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4 lg:px-5 lg:py-4 dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Subtle corner gradient */}
       <span
@@ -659,7 +659,7 @@ export default function CodeScanningPageClient() {
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
       >
         <div>
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
@@ -718,7 +718,7 @@ export default function CodeScanningPageClient() {
       ) : null}
 
       {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet+ ── */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-3">
         <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
         <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
         <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
@@ -780,7 +780,7 @@ export default function CodeScanningPageClient() {
       </AnimatePresence>
 
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop / 4 col wide ── */}
-      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
+      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && scanProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
             <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />

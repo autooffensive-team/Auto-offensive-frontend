@@ -581,7 +581,7 @@ export default function ProjectsPageClient({
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
       >
         <div className="flex-1 min-w-0">
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
@@ -671,7 +671,7 @@ export default function ProjectsPageClient({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && projects.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />
