@@ -123,6 +123,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
   // Tracks job ids that have already triggered a completion toast so we don't
   // double-fire if polling produces another terminal-status response.
   const notifiedJobsRef = useRef<Set<string>>(new Set());
+  const onQuotaExceededRef = useRef<(() => void) | undefined>(undefined);
 
   const router = useRouter();
 
@@ -945,6 +946,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
     appendLogForMode,
     mediumSteps,
     mediumTarget,
+    onGuestScanConsumed,
     projectId,
     resetRun,
     setRunForMode,

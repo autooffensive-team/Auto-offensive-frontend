@@ -21,8 +21,16 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  if (!upstream.ok) {
-    // Backend unavailable — return nulls so the UI falls back to defaults
+  const limit = upstream.headers.get("x-ratelimit-limit");
+  const remaining = upstream.headers.get("x-ratelimit-remaining");
+  const reset = upstream.headers.get("x-ratelimit-reset");
+
+  // If we got rate limit headers, return them regardless of status code
+  if (limit != null || remaining != null) {
+    const maxScans = limit != null ? Number(limit) : null;
+    const scansRemaining = remaining != null ? Number(remaining) : null;
+    const scansUsed = maxScans != null && scansRemaining != null ? maxScans - scansRemaining : null;
+
     return NextResponse.json({
       maxScans: null,
       scansUsed: null,

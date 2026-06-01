@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, RefreshCw, FileX2, Search } from "lucide-react";
+import { AlertCircle, RefreshCw, FileX2, Search, Loader2 } from "lucide-react";
 import {
   useGetJobDetailsQuery,
   useGetJobParsedDataQuery,
+  useGetStepParsedDataQuery,
 } from "@/lib/redux/services/userdashboard/assets/assets-api";
-import type { ParsedStepData } from "@/types/assets";
+import type { StepSummary, StepParsedDataResponse } from "@/types/assets";
 import PaginationControls from "./PaginationControls";
 import ScanResultsViewSkeleton from "./ScanResultsViewSkeleton";
 import GenerateReportButton from "@/components/report/GenerateReportButton";
@@ -16,6 +17,26 @@ type ScanResultsViewProps = {
   jobId: string;
   hideReportButton?: boolean;
 };
+
+/**
+ * Formats a column key into a human-readable label.
+ * Checks discovered_columns map first, then applies title-case conversion.
+ * Examples: "status_code" → "Status Code", "_extra" → "Extra Fields",
+ *           "host" → "Host", "content_type" → "Content Type"
+ */
+function formatColumnLabel(key: string, discoveredColumns?: Record<string, string>): string {
+  // Use server-provided label if available
+  if (discoveredColumns?.[key]) {
+    return discoveredColumns[key];
+  }
+  // Strip leading underscore and convert to title case
+  const cleaned = key.startsWith("_") ? key.slice(1) : key;
+  if (cleaned === "extra") return "Extra Fields";
+  return cleaned
+    .split(/[-_]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 /**
  * Formats a cell value for display.
@@ -50,49 +71,89 @@ function formatDuration(start: Date, end: Date): string {
   return `${seconds}s`;
 }
 
-function StepSection({ step }: { step: ParsedStepData }) {
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
+
+/**
+ * Server-driven section for a single scan step. Each instance maintains its own
+ * pagination/search state and fetches only the current page from the server via
+ * `useGetStepParsedDataQuery`, so independent steps never affect one another.
+ */
+function StepSection({ step }: { step: StepSummary }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce search by 200ms
+  // Debounce search by 300ms; reset to page 1 whenever a new value settles.
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput);
       setCurrentPage(1);
-    }, 200);
+    }, 300);
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // Sort columns so that any column starting with "_extra" is always last
-  const sortedColumns = [...step.columns].sort((a, b) => {
-    const aIsExtra = a.startsWith("_extra");
-    const bIsExtra = b.startsWith("_extra");
-    if (aIsExtra && !bIsExtra) return 1;
-    if (!aIsExtra && bIsExtra) return -1;
-    return 0;
+  const { data, isFetching, isError, refetch } = useGetStepParsedDataQuery({
+    stepId: step.step_id,
+    page: currentPage,
+    page_size: pageSize,
+    search: debouncedSearch || undefined,
   });
 
-  // Filter rows by search query across all columns
+  // RTK Query drops `data` when the cache key changes (new page/size/search), so
+  // retain the last successful response to keep the table + controls mounted with
+  // their current values while the next page is loading.
+  const lastDataRef = useRef<StepParsedDataResponse | undefined>(undefined);
+  if (data) {
+    lastDataRef.current = data;
+  }
+  const effectiveData = data ?? lastDataRef.current;
+
+  // Sort columns so that any column starting with "_extra" is always last.
+  const sortedColumns = useMemo(() => {
+    const columns = effectiveData?.columns ?? [];
+    return [...columns].sort((a, b) => {
+      const aIsExtra = a.startsWith("_extra");
+      const bIsExtra = b.startsWith("_extra");
+      if (aIsExtra && !bIsExtra) return 1;
+      if (!aIsExtra && bIsExtra) return -1;
+      return 0;
+    });
+  }, [effectiveData?.columns]);
+
+  const allRows = effectiveData?.rows ?? [];
+  // Detect whether the server actually paginated: if total_rows is present in
+  // the response, the server handled pagination; otherwise the server returned
+  // the full dataset and we paginate/filter client-side.
+  const serverPaginated = effectiveData?.total_rows != null;
+
+  // Client-side search filter (only when server doesn't handle it).
   const filteredRows = useMemo(() => {
-    if (!debouncedSearch.trim()) return step.rows;
-    const query = debouncedSearch.toLowerCase();
-    return step.rows.filter((row) =>
-      sortedColumns.some((col) => {
-        const val = row[col];
-        if (val == null) return false;
-        return String(val).toLowerCase().includes(query);
-      }),
+    if (serverPaginated || !debouncedSearch) return allRows;
+    const needle = debouncedSearch.toLowerCase();
+    return allRows.filter((row) =>
+      Object.values(row).some(
+        (val) => val != null && String(val).toLowerCase().includes(needle),
+      ),
     );
-  }, [step.rows, sortedColumns, debouncedSearch]);
+  }, [allRows, debouncedSearch, serverPaginated]);
 
-  const hasData = sortedColumns.length > 0 && step.rows.length > 0;
-  const totalPages = hasData ? Math.ceil(filteredRows.length / pageSize) : 0;
+  const totalRows = serverPaginated ? effectiveData.total_rows : filteredRows.length;
+  const totalPages = serverPaginated
+    ? (effectiveData?.total_pages ?? Math.ceil(totalRows / pageSize))
+    : (totalRows > 0 ? Math.ceil(totalRows / pageSize) : 0);
 
-  const paginatedRows = hasData
-    ? filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-    : [];
+  // When server-paginated, rows are already the correct page slice. When
+  // client-side, slice the filtered dataset ourselves.
+  const rows = serverPaginated
+    ? allRows
+    : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // The step has no data at all only when there is no active search, the settled
+  // count is 0, and we are not currently fetching.
+  const noResultsAtAll = !debouncedSearch && totalRows === 0 && allRows.length === 0 && !isFetching;
+  const noSearchMatches = !!debouncedSearch && totalRows === 0 && allRows.length === 0 && !isFetching;
+  const showSearchUI = !noResultsAtAll;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -110,7 +171,7 @@ function StepSection({ step }: { step: ParsedStepData }) {
         <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white shrink-0">
           Step {step.step_order} — {step.tool_name}
         </h3>
-        {hasData && (
+        {showSearchUI && (
           <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
             <div className="relative flex-1 sm:w-64">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
@@ -125,23 +186,34 @@ function StepSection({ step }: { step: ParsedStepData }) {
               />
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap shrink-0">
-              {debouncedSearch
-                ? `${filteredRows.length} / ${step.rows.length}`
-                : step.rows.length}{" "}
-              rows
+              {totalRows} {totalRows === 1 ? "row" : "rows"}
             </span>
           </div>
         )}
       </div>
 
-      {!hasData ? (
+      {isError ? (
+        <div className="px-4 py-10 flex flex-col items-center justify-center gap-3">
+          <AlertCircle size={28} className="text-red-500" />
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">
+            Failed to load results. Please try again.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+          >
+            <RefreshCw size={16} />
+            Retry
+          </button>
+        </div>
+      ) : noResultsAtAll ? (
         <div className="px-4 py-10 flex flex-col items-center justify-center gap-2">
           <FileX2 size={28} className="text-slate-400 dark:text-slate-500" />
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
             No results available
           </p>
         </div>
-      ) : filteredRows.length === 0 ? (
+      ) : noSearchMatches ? (
         <div className="px-4 py-10 flex flex-col items-center justify-center gap-2">
           <Search size={28} className="text-slate-400 dark:text-slate-500" />
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -150,7 +222,14 @@ function StepSection({ step }: { step: ParsedStepData }) {
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div
+            className={`relative overflow-x-auto ${rows.length === 0 ? "min-h-40" : ""}`}
+          >
+            {isFetching && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 dark:bg-slate-900/60">
+                <Loader2 size={28} className="animate-spin text-teal-500" />
+              </div>
+            )}
             <table className="w-full">
               <thead className="bg-slate-50 dark:bg-slate-800/50">
                 <tr>
@@ -159,13 +238,13 @@ function StepSection({ step }: { step: ParsedStepData }) {
                       key={col}
                       className="px-4 py-3 text-left text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap"
                     >
-                      {col}
+                      {formatColumnLabel(col, effectiveData?.discovered_columns)}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {paginatedRows.map((row, rowIndex) => (
+                {rows.map((row, rowIndex) => (
                   <motion.tr
                     key={rowIndex}
                     initial={{ opacity: 0 }}
@@ -192,10 +271,10 @@ function StepSection({ step }: { step: ParsedStepData }) {
             currentPage={currentPage}
             totalPages={totalPages}
             pageSize={pageSize}
-            pageSizeOptions={[10, 25, 50]}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
-            totalItems={filteredRows.length}
+            totalItems={totalRows}
           />
         </>
       )}
@@ -206,20 +285,16 @@ function StepSection({ step }: { step: ParsedStepData }) {
 export default function ScanResultsView({ jobId, hideReportButton }: ScanResultsViewProps) {
   const {
     data: jobDetails,
-    isLoading: isLoadingDetails,
-    isError: isErrorDetails,
-    refetch: refetchDetails,
+    isLoading,
+    isError,
+    refetch,
   } = useGetJobDetailsQuery(jobId);
 
-  const {
-    data: parsedData,
-    isLoading: isLoadingParsed,
-    isError: isErrorParsed,
-    refetch: refetchParsed,
-  } = useGetJobParsedDataQuery(jobId);
-
-  const isLoading = isLoadingDetails || isLoadingParsed;
-  const isError = isErrorDetails || isErrorParsed;
+  // Only fetch the full parsed dataset for the (optional) in-view report button.
+  // The per-step tables are server-paginated and do not rely on this query.
+  const { data: parsedData } = useGetJobParsedDataQuery(jobId, {
+    skip: hideReportButton,
+  });
 
   if (isLoading) {
     return <ScanResultsViewSkeleton />;
@@ -233,10 +308,7 @@ export default function ScanResultsView({ jobId, hideReportButton }: ScanResults
           Failed to load scan results. Please try again.
         </p>
         <button
-          onClick={() => {
-            refetchDetails();
-            refetchParsed();
-          }}
+          onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
         >
           <RefreshCw size={16} />
@@ -246,7 +318,7 @@ export default function ScanResultsView({ jobId, hideReportButton }: ScanResults
     );
   }
 
-  const sortedSteps = [...(parsedData?.steps ?? [])].sort(
+  const sortedSteps = [...(jobDetails?.steps ?? [])].sort(
     (a, b) => b.step_order - a.step_order
   );
 

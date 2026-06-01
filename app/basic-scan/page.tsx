@@ -8,6 +8,7 @@ import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanCompo
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
 import { BasicScanForm } from "@/components/scanComponents/BasicScanForm";
 import { MediumScanForm } from "@/components/scanComponents/MediumScanForm";
+import ScanExecutionGraph from "@/components/scanning/ScanExecutionGraph";
 import { LiveConsole } from "@/components/scanComponents/LiveConsole";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 import { useScanController } from "@/hooks/use-scan-controller";
@@ -393,8 +394,9 @@ export default function BasicScanPage() {
 
           {activeTab !== "advanced" && (
             <div id="tour-terminal">
-              <LiveConsole
+              <ScanExecutionGraph
                 run={activeRun}
+                logs={activeLogs}
                 errors={activeErrors}
               />
             </div>
