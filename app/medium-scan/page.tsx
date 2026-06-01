@@ -228,7 +228,7 @@ export default function MediumScanPage() {
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
-  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
+  const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [projectId, setProjectId] = useState("");
   const [target, setTarget] = useState("scanme.nmap.org");
@@ -805,12 +805,13 @@ export default function MediumScanPage() {
                   onReset={resetToDefault}
                   className="mb-3"
                 />
-                {logs.length === 0 ? (
+                {logs.length === 0 && !isSubmitting ? (
                   <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-slate-400">
                     Submit a scan to populate the SSE event stream here.
                   </div>
                 ) : (
-                  logs.map((entry) => (
+                  <>
+                    {logs.map((entry) => (
                     <div
                       key={entry.id}
                       className={`rounded-2xl border px-4 py-3 ${
@@ -829,7 +830,8 @@ export default function MediumScanPage() {
                       </div>
                       <p className="mt-2 whitespace-pre-wrap break-words font-mono leading-6" style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}>{entry.message}</p>
                     </div>
-                  ))
+                  ))}
+                  </>
                 )}
               </div>
             </div>

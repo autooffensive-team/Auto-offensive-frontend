@@ -102,20 +102,38 @@ const ASCII_ART = `                                                             
                                                                                                               x~~`;
 
 // ─── Log text colorizer ───────────────────────────────────────────────────────
-function colorizeLogText(text: string): React.ReactNode {
-  const patterns: { regex: RegExp; className: string }[] = [
-    { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400 dark:text-blue-400" },
-    { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-500 dark:text-violet-400" },
-    { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-500 dark:text-cyan-400" },
-    { regex: /\bopen\b/g, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400 dark:text-rose-400" },
-    { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-500 dark:text-amber-400" },
-    { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400 dark:text-sky-400" },
-    { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-500 dark:text-emerald-400 font-semibold" },
-    { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-500 dark:text-red-400 font-semibold" },
-    { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-500 dark:text-teal-400" },
-    { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400 dark:text-orange-400" },
-  ];
+// NOTE: Terminal always uses a dark background regardless of website light/dark mode,
+// so all colors here must be bright/light to be readable on dark backgrounds.
+function colorizeLogText(text: string, isLightTheme = false): React.ReactNode {
+  const patterns: { regex: RegExp; className: string }[] = isLightTheme
+    ? [
+        { regex: /https?:\/\/[^\s]+/g, className: "text-blue-700" },
+        { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-700" },
+        { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-700" },
+        { regex: /\bopen\b/g, className: "text-emerald-700 font-semibold" },
+        { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-700" },
+        { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-700" },
+        { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-700" },
+        { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-700 font-semibold" },
+        { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-700 font-semibold" },
+        { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-700" },
+        { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-700" },
+      ]
+    : [
+        { regex: /https?:\/\/[^\s]+/g, className: "text-blue-400" },
+        { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{1,2})?\b/g, className: "text-violet-400" },
+        { regex: /\b\d{1,5}\/(?:tcp|udp)\b/g, className: "text-cyan-400" },
+        { regex: /\bopen\b/g, className: "text-emerald-400 font-semibold" },
+        { regex: /\b(?:closed|filtered)\b/g, className: "text-rose-400" },
+        { regex: /\b(?:http|https|nginx|apache|ssh|ftp|smtp|dns|mysql|postgres|redis|tcpwrapped|ssl)\b/gi, className: "text-amber-400" },
+        { regex: /\b\d+\.\d+\s*(?:seconds?|ms|s)\b/g, className: "text-sky-400" },
+        { regex: /\b(?:completed|done|success|finished|saved)\b/gi, className: "text-emerald-400 font-semibold" },
+        { regex: /\b(?:failed|error|timeout)\b/gi, className: "text-red-400 font-semibold" },
+        { regex: /\b(?:Starting|submitted|scanning|scanned)\b/gi, className: "text-teal-400" },
+        { regex: /\/[\w\-./]+\.(?:json|xml|txt|csv|html|log)\b/g, className: "text-orange-400" },
+      ];
+
+  const defaultTextClass = isLightTheme ? "text-gray-800" : "text-gray-300";
 
   type Match = { start: number; end: number; className: string };
   const matches: Match[] = [];
@@ -136,7 +154,7 @@ function colorizeLogText(text: string): React.ReactNode {
   }
 
   if (matches.length === 0) {
-    return <span className="text-gray-700 dark:text-gray-300">{text}</span>;
+    return <span className={defaultTextClass}>{text}</span>;
   }
 
   matches.sort((a, b) => a.start - b.start);
@@ -147,7 +165,7 @@ function colorizeLogText(text: string): React.ReactNode {
   matches.forEach((match, i) => {
     if (cursor < match.start) {
       fragments.push(
-        <span key={`t-${i}`} className="text-gray-700 dark:text-gray-300">
+        <span key={`t-${i}`} className={defaultTextClass}>
           {text.slice(cursor, match.start)}
         </span>
       );
@@ -162,7 +180,7 @@ function colorizeLogText(text: string): React.ReactNode {
 
   if (cursor < text.length) {
     fragments.push(
-      <span key="tail" className="text-gray-700 dark:text-gray-300">
+      <span key="tail" className={defaultTextClass}>
         {text.slice(cursor)}
       </span>
     );
@@ -266,6 +284,11 @@ export default function BasicScanPage() {
   const activeErrors = activeTab === "basic" ? basicErrors : mediumErrors;
   const isIdle = activeLogs.length === 0;
   const jobId = activeRun?.jobId || "";
+  // Show loading until scan reaches a terminal state (completed/failed/cancelled/partial)
+  const isScanRunning = isSubmitting || (
+    activeRun.status !== "idle" &&
+    !/completed|failed|cancelled|partial/i.test(activeRun.status)
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -429,7 +452,7 @@ export default function BasicScanPage() {
                   size.lineHeight
                 )}
               >
-                {isIdle ? (
+                {isIdle && !isScanRunning ? (
                   <div className="flex flex-col items-center h-full">
                     <div ref={asciiRef} className="w-full overflow-x-auto" aria-hidden="true">
                       <pre
@@ -453,27 +476,31 @@ export default function BasicScanPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="p-2 sm:p-3">
-                    {activeLogs.map((line) => (
-                      <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
-                        <span className={cn("shrink-0", theme.html.timestamp)}>
-                          {new Date(line.timestamp).toLocaleTimeString()}
-                        </span>
-                        <span className={cn("shrink-0", theme.html.source)}>[{line.source}]</span>
-                        <span
-                          className={cn(
-                            "shrink-0 font-semibold",
-                            line.level === "ERROR" && theme.html.error,
-                            line.level === "WARN" && theme.html.warn,
-                            line.level === "INFO" && theme.html.info,
-                            !["ERROR", "WARN", "INFO"].includes(line.level) && theme.html.muted
-                          )}
-                        >
-                          {line.level}
-                        </span>
-                        {colorizeLogText(line.text)}
+                  <div className="flex flex-col h-full">
+                    {!isIdle && (
+                      <div className="p-2 sm:p-3 flex-1 overflow-y-auto">
+                        {activeLogs.map((line) => (
+                          <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
+                            <span className={cn("shrink-0", theme.html.timestamp)}>
+                              {new Date(line.timestamp).toLocaleTimeString()}
+                            </span>
+                            <span className={cn("shrink-0", theme.html.source)}>[{line.source}]</span>
+                            <span
+                              className={cn(
+                                "shrink-0 font-semibold",
+                                line.level === "ERROR" && theme.html.error,
+                                line.level === "WARN" && theme.html.warn,
+                                line.level === "INFO" && theme.html.info,
+                                !["ERROR", "WARN", "INFO"].includes(line.level) && theme.html.muted
+                              )}
+                            >
+                              {line.level}
+                            </span>
+                            {colorizeLogText(line.text, theme.html.isLight)}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
               </div>

@@ -162,7 +162,7 @@ export default function AdvanceScanPage() {
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
   const logStreamAbortRef = useRef<AbortController | null>(null);
-  const { themeKey, sizeKey, theme: logTheme, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
+  const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   const [command, setCommand] = useState("");
   const [stepId, setStepId] = useState("");
@@ -670,31 +670,33 @@ export default function AdvanceScanPage() {
                       onReset={resetToDefault}
                       className="mb-3"
                     />
-                    {logs.length === 0 ? (
+                    {logs.length === 0 && !(isSubmitting || isStreaming) ? (
                       <p className="text-center text-sm text-gray-500">
                         Logs will appear here after you start a scan.
                       </p>
                     ) : (
-                      logs.map((entry) => (
-                        <div
-                          key={entry.id}
-                          className={`rounded-lg border px-3 py-1.5 leading-snug font-bold font-[Consolas,monospace] ${
-                            entry.tone === "danger"
-                              ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
-                              : entry.tone === "success"
-                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-                                : entry.tone === "warning"
-                                  ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-                                  : "border-white/5 bg-white/5 text-gray-300"
-                          }`}
-                          style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}
-                        >
-                          <span className="mr-2 text-gray-500">[{entry.createdAt}]</span>
-                          <span className="font-semibold text-violet-300">{entry.event}</span>
-                          {" — "}
-                          {entry.message}
-                        </div>
-                      ))
+                      <>
+                        {logs.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className={`rounded-lg border px-3 py-1.5 leading-snug font-bold font-[Consolas,monospace] ${
+                              entry.tone === "danger"
+                                ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
+                                : entry.tone === "success"
+                                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                                  : entry.tone === "warning"
+                                    ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+                                    : "border-white/5 bg-white/5 text-gray-300"
+                            }`}
+                            style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}
+                          >
+                            <span className="mr-2 text-gray-500">[{entry.createdAt}]</span>
+                            <span className="font-semibold text-violet-300">{entry.event}</span>
+                            {" — "}
+                            {entry.message}
+                          </div>
+                        ))}
+                      </>
                     )}
                     {isStreaming ? (
                       <div className="flex items-center gap-2 text-xs text-violet-300">

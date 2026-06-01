@@ -405,6 +405,59 @@ export function AdvancedTerminalPanel({
     }
   }, [logSize.xtermFontSize]);
 
+  // ── Terminal spinner while waiting for logs ───────────────────────────────
+  const spinnerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const spinnerLineRef = useRef(false); // whether we've written a spinner line
+
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+
+    const isWaiting = isSubmitting && logs.length === 0;
+
+    if (isWaiting && !spinnerRef.current) {
+      const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+      const messages = [
+        "Initializing scan engine",
+        "Establishing connection",
+        "Negotiating protocol",
+        "Probing target surface",
+        "Enumerating services",
+        "Waiting for scan output",
+      ];
+      let frameIdx = 0;
+      let msgIdx = 0;
+      let tick = 0;
+
+      spinnerLineRef.current = true;
+      spinnerRef.current = setInterval(() => {
+        frameIdx = (frameIdx + 1) % frames.length;
+        tick++;
+        if (tick % 30 === 0) msgIdx = (msgIdx + 1) % messages.length;
+
+        // Overwrite current line with spinner
+        term.write(`\r\x1b[K\x1b[36m  ${frames[frameIdx]} \x1b[0m\x1b[90m${messages[msgIdx]}...\x1b[0m`);
+      }, 80);
+    }
+
+    if (!isWaiting && spinnerRef.current) {
+      clearInterval(spinnerRef.current);
+      spinnerRef.current = null;
+      if (spinnerLineRef.current) {
+        // Clear the spinner line
+        term.write(`\r\x1b[K`);
+        spinnerLineRef.current = false;
+      }
+    }
+
+    return () => {
+      if (spinnerRef.current) {
+        clearInterval(spinnerRef.current);
+        spinnerRef.current = null;
+      }
+    };
+  }, [isSubmitting, logs.length]);
+
   // ── Stream logs ──────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
