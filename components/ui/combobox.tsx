@@ -168,16 +168,26 @@ function ComboboxInput({
 }) {
   const context = useComboboxContext("ComboboxInput")
   const isDisabled = disabled || context.disabled
-  const handleInputClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    props.onClick?.(event)
-    if (!event.defaultPrevented && openOnClick && !isDisabled) {
-      context.setOpen((current) => !current)
+  const handleGroupMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!openOnClick || isDisabled) {
+      return
     }
+
+    const target = event.target as HTMLElement
+    if (
+      target.closest("[data-slot='combobox-trigger']") ||
+      target.closest("[data-slot='combobox-clear']")
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    context.setOpen((current) => !current)
   }
 
   return (
-    <InputGroup className={cn("w-auto", className)}>
-      <InputGroupInput disabled={isDisabled} {...props} onClick={handleInputClick} />
+    <InputGroup className={cn("w-auto", className)} onMouseDown={handleGroupMouseDown}>
+      <InputGroupInput disabled={isDisabled} {...props} />
       <InputGroupAddon align="inline-end">
         {showTrigger ? <ComboboxTrigger disabled={isDisabled} /> : null}
         {showClear ? <ComboboxClear disabled={isDisabled} /> : null}
