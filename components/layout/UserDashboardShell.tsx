@@ -30,7 +30,6 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
-import GoToTop from "@/components/ui/go-to-top";
 import { MobileScreenWarning } from "@/components/shared/MobileScreenWarning";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import { GuestScanLimitBar } from "@/components/guest/GuestScanLimitBar";
@@ -648,8 +647,6 @@ export default function UserDashboardShell({
           </>
         )}
       </AnimatePresence>
-
-      <GoToTop />
     </div>
   );
 }

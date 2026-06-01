@@ -217,6 +217,17 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
     return "/userdashboard/assets";
   }, [projects]);
 
+  const openJobReport = useCallback(
+    (jobId?: string) => {
+      if (jobId) {
+        void resolveJobReportRoute(jobId).then((path) => router.push(path));
+      } else {
+        router.push("/userdashboard/assets");
+      }
+    },
+    [resolveJobReportRoute, router],
+  );
+
   const modeLabel = (mode: ScanMode) =>
     mode === "basic" ? "Basic" : mode === "medium" ? "Medium" : "Advanced";
 
@@ -1409,6 +1420,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
 
     // Actions
     resetRun,
+    openJobReport,
     submitBasic,
     submitMedium,
     submitAdvanced,

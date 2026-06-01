@@ -73,28 +73,28 @@ function PipelineNodeComponent({ data }: NodeProps) {
     return (
         <div
             className={`
-                relative flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2
+                relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border-2
                 bg-gray-900/90 backdrop-blur-sm
-                text-xs font-semibold
+                text-[9px] font-semibold
                 transition-all duration-300
                 ${isDimmed ? "opacity-40" : "opacity-100"}
             `}
             style={{
                 borderColor,
-                minWidth: 130,
-                minHeight: 44,
+                minWidth: 100,
+                minHeight: 34,
             }}
         >
             {/* Subtle pulse ring for RUNNING state */}
             {isRunning && (
                 <span
-                    className="absolute inset-0 rounded-lg animate-ping opacity-15"
+                    className="absolute inset-0 rounded-md animate-ping opacity-15"
                     style={{ border: `1px solid ${borderColor}` }}
                 />
             )}
 
             <Icon
-                size={15}
+                size={12}
                 className={`shrink-0 ${textClass}`}
             />
 

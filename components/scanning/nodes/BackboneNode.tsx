@@ -80,19 +80,19 @@ function BackboneNodeComponent({ data }: NodeProps) {
     return (
         <div
             className={`
-                flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border
+                flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border
                 bg-gray-900/90 backdrop-blur-sm
-                text-[11px] font-medium
+                text-[9px] font-medium
                 transition-all duration-300
                 ${isActive
                     ? "border-[#00D0B2]/40 shadow-[0_0_12px_rgba(0,208,178,0.12)]"
                     : "border-gray-700/40"
                 }
             `}
-            style={{ minWidth: 130 }}
+            style={{ minWidth: 100 }}
         >
             <Icon
-                size={16}
+                size={12}
                 className={`shrink-0 ${isActive ? config.activeColor : config.color}`}
             />
             <span className={isActive ? "text-gray-100" : "text-gray-400"}>
