@@ -67,6 +67,9 @@ type StatusItem = {
   lastAudit: string
 }
 
+const docsAppUrl = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '')
+const toDocsUrl = (path: string) => docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`
+
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
@@ -123,307 +126,307 @@ export default function ResourceComponent() {
 
   const sectionLabels = isKhmer
     ? {
-        heroBadge: '',
-        heroTitleLine1: (<>ឯកសារ និង <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
-        heroTitleLine2: '',
-        heroSubtitle:
-          'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
-        quickStart: 'ផ្លូវចាប់ផ្តើមរហ័ស (Quick Start Paths)',
-        technical: 'Technical Deep Dives',
-        technicalSubtitle: 'បណ្ណាល័យឯកសារបច្ចេកទេសសម្រាប់ scanner និង tools សំខាន់ៗ។',
-        technicalCta: 'មើលឧបករណ៍ទាំងអស់',
-        workflowSteps: 'ដំណាក់កាលការងារ Pentest (Workflow)',
-        what: 'តើវាជាអ្វី?',
-        why: 'ហេតុអ្វីត្រូវប្រើ?',
-        how: 'របៀបប្រើ',
-        systemStatus: 'ស្ថានភាពប្រព័ន្ធ (System Status)',
-        systemStatusSubtitle: 'ស្ថានភាពពេលវេលាជាក់ស្តែង នៃសេវាកម្មទាំងអស់',
-        component: 'Component',
-        version: 'Version',
-        status: 'ស្ថានភាព',
-        lastAudit: 'Last Audit',
-        operational: 'ដំណើរការធម្មតា',
-        degraded: 'ដំណើរការខ្សោយ',
-        maintenance: 'កំពុងថែទាំ',
-        mobileTableHint: 'អាចអូសឆ្វេង ឬស្ដាំ ដើម្បីមើលតារាងទាំងមូល។',
-        featureCards: 'ឯកសារ និង Resources',
-      }
+      heroBadge: '',
+      heroTitleLine1: 'ឯកសារ និង Resources',
+      heroTitleLine2: '',
+      heroSubtitle:
+        'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
+      quickStart: 'ផ្លូវចាប់ផ្តើមរហ័ស (Quick Start Paths)',
+      technical: 'Technical Deep Dives',
+      technicalSubtitle: 'បណ្ណាល័យឯកសារបច្ចេកទេសសម្រាប់ scanner និង tools សំខាន់ៗ។',
+      technicalCta: 'មើលឧបករណ៍ទាំងអស់',
+      workflowSteps: 'ដំណាក់កាលការងារ Pentest (Workflow)',
+      what: 'តើវាជាអ្វី?',
+      why: 'ហេតុអ្វីត្រូវប្រើ?',
+      how: 'របៀបប្រើ',
+      systemStatus: 'ស្ថានភាពប្រព័ន្ធ (System Status)',
+      systemStatusSubtitle: 'ស្ថានភាពពេលវេលាជាក់ស្តែង នៃសេវាកម្មទាំងអស់',
+      component: 'Component',
+      version: 'Version',
+      status: 'ស្ថានភាព',
+      lastAudit: 'Last Audit',
+      operational: 'ដំណើរការធម្មតា',
+      degraded: 'ដំណើរការខ្សោយ',
+      maintenance: 'កំពុងថែទាំ',
+      mobileTableHint: 'អាចអូសឆ្វេង ឬស្ដាំ ដើម្បីមើលតារាងទាំងមូល។',
+      featureCards: 'ឯកសារ និង Resources',
+    }
     : {
-        heroBadge: '',
-        heroTitleLine1: (<>Docs & <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
-        heroTitleLine2: '',
-        heroSubtitle:
-          'Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.',
-        quickStart: 'Quick Start Paths',
-        technical: 'Technical Deep Dives',
-        technicalSubtitle: 'Library of technical scanner guides and core tool documentation.',
-        technicalCta: 'Browse all tools',
-        workflowSteps: 'Pentest Workflow',
-        what: 'What',
-        why: 'Why',
-        how: 'How',
-        systemStatus: 'System Status',
-        systemStatusSubtitle: 'Real-time service health across the platform',
-        component: 'Component',
-        version: 'Version',
-        status: 'Status',
-        lastAudit: 'Last Audit',
-        operational: 'Operational',
-        degraded: 'Degraded',
-        maintenance: 'Maintenance',
-        mobileTableHint: 'Swipe left or right to view the full table.',
-        featureCards: 'Docs & Integrations',
-      }
+      heroBadge: '',
+      heroTitleLine1: 'Docs & Resources',
+      heroTitleLine2: '',
+      heroSubtitle:
+        'Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.',
+      quickStart: 'Quick Start Paths',
+      technical: 'Technical Deep Dives',
+      technicalSubtitle: 'Library of technical scanner guides and core tool documentation.',
+      technicalCta: 'Browse all tools',
+      workflowSteps: 'Pentest Workflow',
+      what: 'What',
+      why: 'Why',
+      how: 'How',
+      systemStatus: 'System Status',
+      systemStatusSubtitle: 'Real-time service health across the platform',
+      component: 'Component',
+      version: 'Version',
+      status: 'Status',
+      lastAudit: 'Last Audit',
+      operational: 'Operational',
+      degraded: 'Degraded',
+      maintenance: 'Maintenance',
+      mobileTableHint: 'Swipe left or right to view the full table.',
+      featureCards: 'Docs & Integrations',
+    }
 
   const quickCards: QuickCard[] = isKhmer
     ? [
-        {
-          title: 'ឯកសារ CLI',
-          what: 'កម្មវិធី binary តែមួយ សម្រាប់គ្រប់គ្រងការងារ offensive security នៅលើម៉ាស៊ីនរបស់អ្នក។',
-          why: 'អាចពង្រីកការធ្វើ pentest បានងាយស្រួល ដោយមិនចាំបាច់ចាកចេញពី terminal។',
-          how: 'curl -sSfL guardian.sh | sh',
-          icon: TerminalSquare,
-        },
-        {
-          title: 'ឯកសារ API',
-          what: 'REST API សម្រាប់គ្រប់គ្រង និងដំណើរការការស្កេនសុវត្ថិភាពតាមកម្មវិធី។',
-          why: 'អាចបង្កើត workflow សុវត្ថិភាព និងរបាយការណ៍ដោយស្វ័យប្រវត្តិ។',
-          how: 'GET /v2/scans/{id}/report',
-          icon: Cpu,
-        },
-        {
-          title: 'ការភ្ជាប់ CI/CD',
-          what: 'Plugin ដែលភ្ជាប់ជាមួយ GitHub Actions, GitLab និង Jenkins។',
-          why: 'ជួយទប់ស្កាត់កូដដែលមានបញ្ហាសុវត្ថិភាព មុនពេលដាក់ចូល production។',
-          how: 'uses: guardian/scan-action@v1',
-          icon: GitBranch,
-        },
-      ]
+      {
+        title: 'ឯកសារ CLI',
+        what: 'កម្មវិធី binary តែមួយ សម្រាប់គ្រប់គ្រងការងារ offensive security នៅលើម៉ាស៊ីនរបស់អ្នក។',
+        why: 'អាចពង្រីកការធ្វើ pentest បានងាយស្រួល ដោយមិនចាំបាច់ចាកចេញពី terminal។',
+        how: 'curl -sSfL guardian.sh | sh',
+        icon: TerminalSquare,
+      },
+      {
+        title: 'ឯកសារ API',
+        what: 'REST API សម្រាប់គ្រប់គ្រង និងដំណើរការការស្កេនសុវត្ថិភាពតាមកម្មវិធី។',
+        why: 'អាចបង្កើត workflow សុវត្ថិភាព និងរបាយការណ៍ដោយស្វ័យប្រវត្តិ។',
+        how: 'GET /v2/scans/{id}/report',
+        icon: Cpu,
+      },
+      {
+        title: 'ការភ្ជាប់ CI/CD',
+        what: 'Plugin ដែលភ្ជាប់ជាមួយ GitHub Actions, GitLab និង Jenkins។',
+        why: 'ជួយទប់ស្កាត់កូដដែលមានបញ្ហាសុវត្ថិភាព មុនពេលដាក់ចូល production។',
+        how: 'uses: guardian/scan-action@v1',
+        icon: GitBranch,
+      },
+    ]
     : [
-        {
-          title: 'CLI Documents',
-          what: 'The unified binary for local orchestration of offensive operations.',
-          why: 'Scale your pentesting without leaving the terminal environment.',
-          how: 'curl -sSfL guardian.sh | sh',
-          icon: TerminalSquare,
-        },
-        {
-          title: 'API Documents',
-          what: 'RESTful endpoints for programmatic vulnerability management.',
-          why: 'Build custom security workflows and automated reporting loops.',
-          how: 'GET /v2/scans/{id}/report',
-          icon: Cpu,
-        },
-        {
-          title: 'CI/CD Integration',
-          what: 'Native plugins for GitHub Actions, GitLab, and Jenkins.',
-          why: 'Stop vulnerable code before it reaches your production clusters.',
-          how: 'uses: guardian/scan-action@v1',
-          icon: GitBranch,
-        },
-      ]
+      {
+        title: 'CLI Documents',
+        what: 'The unified binary for local orchestration of offensive operations.',
+        why: 'Scale your pentesting without leaving the terminal environment.',
+        how: 'curl -sSfL guardian.sh | sh',
+        icon: TerminalSquare,
+      },
+      {
+        title: 'API Documents',
+        what: 'RESTful endpoints for programmatic vulnerability management.',
+        why: 'Build custom security workflows and automated reporting loops.',
+        how: 'GET /v2/scans/{id}/report',
+        icon: Cpu,
+      },
+      {
+        title: 'CI/CD Integration',
+        what: 'Native plugins for GitHub Actions, GitLab, and Jenkins.',
+        why: 'Stop vulnerable code before it reaches your production clusters.',
+        how: 'uses: guardian/scan-action@v1',
+        icon: GitBranch,
+      },
+    ]
 
   const miniCards: MiniCard[] = isKhmer
     ? [
-        {
-          title: 'Nmap Integration',
-          description: 'សម្រាប់ស្វែងរក network និង auditing',
-          version: 'V2.4',
-          level: 2,
-          icon: Search,
-        },
-        {
-          title: 'Subfinder Core',
-          description: 'ស្វែងរក subdomain (passive)',
-          version: 'V1.9',
-          level: 1,
-          icon: FolderOpen,
-        },
-        {
-          title: 'Nuclei Engine',
-          description: 'ស្កេន vulnerability តាម template',
-          version: 'V3.0',
-          level: 3,
-          icon: Shield,
-        },
-        {
-          title: 'Payload DB',
-          description: 'បណ្ណាល័យ exploit និង payload',
-          version: 'V2.1',
-          level: 2,
-          icon: Database,
-        },
-      ]
+      {
+        title: 'Nmap Integration',
+        description: 'សម្រាប់ស្វែងរក network និង auditing',
+        version: 'V2.4',
+        level: 2,
+        icon: Search,
+      },
+      {
+        title: 'Subfinder Core',
+        description: 'ស្វែងរក subdomain (passive)',
+        version: 'V1.9',
+        level: 1,
+        icon: FolderOpen,
+      },
+      {
+        title: 'Nuclei Engine',
+        description: 'ស្កេន vulnerability តាម template',
+        version: 'V3.0',
+        level: 3,
+        icon: Shield,
+      },
+      {
+        title: 'Payload DB',
+        description: 'បណ្ណាល័យ exploit និង payload',
+        version: 'V2.1',
+        level: 2,
+        icon: Database,
+      },
+    ]
     : [
-        {
-          title: 'Nmap Integration',
-          description: 'Advanced network discovery and security auditing protocols.',
-          version: 'V2.4',
-          level: 2,
-          icon: Search,
-        },
-        {
-          title: 'Subfinder Core',
-          description: 'Passive subdomain discovery engine for surface mapping.',
-          version: 'V1.9',
-          level: 1,
-          icon: FolderOpen,
-        },
-        {
-          title: 'Nuclei Engine',
-          description: 'Template-based vulnerability scanner for large scale testing.',
-          version: 'V3.0',
-          level: 3,
-          icon: Shield,
-        },
-        {
-          title: 'Payload DB',
-          description: 'Extensive library of verified exploits and payloads.',
-          version: 'V2.1',
-          level: 2,
-          icon: Database,
-        },
-      ]
+      {
+        title: 'Nmap Integration',
+        description: 'Advanced network discovery and security auditing protocols.',
+        version: 'V2.4',
+        level: 2,
+        icon: Search,
+      },
+      {
+        title: 'Subfinder Core',
+        description: 'Passive subdomain discovery engine for surface mapping.',
+        version: 'V1.9',
+        level: 1,
+        icon: FolderOpen,
+      },
+      {
+        title: 'Nuclei Engine',
+        description: 'Template-based vulnerability scanner for large scale testing.',
+        version: 'V3.0',
+        level: 3,
+        icon: Shield,
+      },
+      {
+        title: 'Payload DB',
+        description: 'Extensive library of verified exploits and payloads.',
+        version: 'V2.1',
+        level: 2,
+        icon: Database,
+      },
+    ]
 
   const featureCards: FeatureCard[] = isKhmer
     ? [
-        {
-          title: 'ឯកសារ CLI',
-          description:
-            'រៀនប្រើ command line សម្រាប់ automation, កំណត់ parameter និង stealth execution។',
-          href: '/resource/cli',
-          cta: 'មើល CLI Reference',
-          meta: 'បានអាប់ដេត 2 ម៉ោងមុន',
-          icon: TerminalSquare,
-          imageSide: 'left',
-          imageSrc: '/images/cli-illustration.png',
-          imageAlt: 'CLI illustration',
-        },
-        {
-          title: 'ឯកសារ API',
-          description:
-            'ឯកសារ REST API សម្រាប់ដំណើរការ penetration testing ដោយស្វ័យប្រវត្តិ។',
-          href: '/resource/api',
-          cta: 'Explore Endpoints',
-          icon: Cpu,
-          imageSide: 'right',
-          imageSrc: '/images/api-illustration.png',
-          imageAlt: 'API illustration',
-        },
-        {
-          title: 'ឯកសារ Tools',
-          description:
-            'ពន្យល់លម្អិតអំពីរបៀបដំណើរការនៃ fuzzing និង exploitation tools។',
-          href: '/resource/tool',
-          cta: 'Access Toolkits',
-          badge: 'HOT',
-          icon: Wrench,
-          imageSide: 'left',
-          imageSrc: '/images/tools-illustration.png',
-          imageAlt: 'Tools illustration',
-        },
-        {
-          title: 'ការភ្ជាប់ CI/CD',
-          description:
-            'ភ្ជាប់ Auto-Offensive ទៅក្នុង GitHub, GitLab ឬ Jenkins ដើម្បីធ្វើ security scan ដោយស្វ័យប្រវត្តិ។',
-          href: '/resource/ci-cd',
-          cta: 'មើលឯកសារ CI/CD',
-          tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
-          icon: GitBranch,
-          imageSide: 'right',
-          imageSrc: '/images/cicd-illustration.png',
-          imageAlt: 'CI/CD illustration',
-        },
-      ]
+      {
+        title: 'ឯកសារ CLI',
+        description:
+          'រៀនប្រើ command line សម្រាប់ automation, កំណត់ parameter និង stealth execution។',
+        href: toDocsUrl('/cli'),
+        cta: 'មើល CLI Reference',
+        meta: 'បានអាប់ដេត 2 ម៉ោងមុន',
+        icon: TerminalSquare,
+        imageSide: 'left',
+        imageSrc: '/images/cli-illustration.png',
+        imageAlt: 'CLI illustration',
+      },
+      {
+        title: 'ឯកសារ API',
+        description:
+          'ឯកសារ REST API សម្រាប់ដំណើរការ penetration testing ដោយស្វ័យប្រវត្តិ។',
+        href: toDocsUrl('/api'),
+        cta: 'Explore Endpoints',
+        icon: Cpu,
+        imageSide: 'right',
+        imageSrc: '/images/api-illustration.png',
+        imageAlt: 'API illustration',
+      },
+      {
+        title: 'ឯកសារ Tools',
+        description:
+          'ពន្យល់លម្អិតអំពីរបៀបដំណើរការនៃ fuzzing និង exploitation tools។',
+        href: toDocsUrl('/tools'),
+        cta: 'Access Toolkits',
+        badge: 'HOT',
+        icon: Wrench,
+        imageSide: 'left',
+        imageSrc: '/images/tools-illustration.png',
+        imageAlt: 'Tools illustration',
+      },
+      {
+        title: 'ការភ្ជាប់ CI/CD',
+        description:
+          'ភ្ជាប់ Auto-Offensive ទៅក្នុង GitHub, GitLab ឬ Jenkins ដើម្បីធ្វើ security scan ដោយស្វ័យប្រវត្តិ។',
+        href: toDocsUrl('/ci-cd'),
+        cta: 'មើលឯកសារ CI/CD',
+        tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
+        icon: GitBranch,
+        imageSide: 'right',
+        imageSrc: '/images/cicd-illustration.png',
+        imageAlt: 'CI/CD illustration',
+      },
+    ]
     : [
-        {
-          title: 'CLI Documents',
-          description:
-            'Master the command line interface. Detailed documentation on automated offensive scripts, parameter tuning, and stealth execution modes.',
-          href: '/resource/cli',
-          cta: 'View CLI Reference',
-          meta: 'Updated 2h ago',
-          icon: TerminalSquare,
-          imageSide: 'left',
-          imageSrc: '/images/cli-illustration.png',
-          imageAlt: 'CLI illustration',
-        },
-        {
-          title: 'API Documents',
-          description:
-            'Full RESTful API endpoints for orchestrating automated penetration testing at scale.',
-          href: '/resource/api',
-          cta: 'Explore Endpoints',
-          icon: Cpu,
-          imageSide: 'right',
-          imageSrc: '/images/api-illustration.png',
-          imageAlt: 'API illustration',
-        },
-        {
-          title: 'Tools Documents',
-          description:
-            'Deep dives into the internal logic of our proprietary fuzzing and exploitation toolsets.',
-          href: '/resource/tool',
-          cta: 'Access Toolkits',
-          badge: 'HOT',
-          icon: Wrench,
-          imageSide: 'left',
-          imageSrc: '/images/tools-illustration.png',
-          imageAlt: 'Tools illustration',
-        },
-        {
-          title: 'CI/CD Integration',
-          description:
-            'Seamlessly inject Auto-Offensive audits into your GitLab, GitHub, or Jenkins pipelines. Ensure security remains continuous.',
-          href: '/resource/ci-cd',
-          cta: 'Open CI/CD Docs',
-          tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
-          icon: GitBranch,
-          imageSide: 'right',
-          imageSrc: '/images/cicd-illustration.png',
-          imageAlt: 'CI/CD illustration',
-        },
-      ]
+      {
+        title: 'CLI Documents',
+        description:
+          'Master the command line interface. Detailed documentation on automated offensive scripts, parameter tuning, and stealth execution modes.',
+        href: toDocsUrl('/cli'),
+        cta: 'View CLI Reference',
+        meta: 'Updated 2h ago',
+        icon: TerminalSquare,
+        imageSide: 'left',
+        imageSrc: '/images/cli-illustration.png',
+        imageAlt: 'CLI illustration',
+      },
+      {
+        title: 'API Documents',
+        description:
+          'Full RESTful API endpoints for orchestrating automated penetration testing at scale.',
+        href: toDocsUrl('/api'),
+        cta: 'Explore Endpoints',
+        icon: Cpu,
+        imageSide: 'right',
+        imageSrc: '/images/api-illustration.png',
+        imageAlt: 'API illustration',
+      },
+      {
+        title: 'Tools Documents',
+        description:
+          'Deep dives into the internal logic of our proprietary fuzzing and exploitation toolsets.',
+        href: toDocsUrl('/tools'),
+        cta: 'Access Toolkits',
+        badge: 'HOT',
+        icon: Wrench,
+        imageSide: 'left',
+        imageSrc: '/images/tools-illustration.png',
+        imageAlt: 'Tools illustration',
+      },
+      {
+        title: 'CI/CD Integration',
+        description:
+          'Seamlessly inject Auto-Offensive audits into your GitLab, GitHub, or Jenkins pipelines. Ensure security remains continuous.',
+        href: toDocsUrl('/ci-cd'),
+        cta: 'Open CI/CD Docs',
+        tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
+        icon: GitBranch,
+        imageSide: 'right',
+        imageSrc: '/images/cicd-illustration.png',
+        imageAlt: 'CI/CD illustration',
+      },
+    ]
 
   const workflowSteps = isKhmer
     ? [
-        { no: '1', title: 'Reconnaissance', desc: 'ស្វែងរក ports និង services ដោយស្វ័យប្រវត្តិ' },
-        { no: '2', title: 'Vulnerability Mapping', desc: 'ប្រើ AI ដើម្បីភ្ជាប់ទៅ CVE និងរកបញ្ហា' },
-        { no: '3', title: 'Exploitation', desc: 'សាកល្បងបញ្ហាដោយសុវត្ថិភាព' },
-      ]
+      { no: '1', title: 'Reconnaissance', desc: 'ស្វែងរក ports និង services ដោយស្វ័យប្រវត្តិ' },
+      { no: '2', title: 'Vulnerability Mapping', desc: 'ប្រើ AI ដើម្បីភ្ជាប់ទៅ CVE និងរកបញ្ហា' },
+      { no: '3', title: 'Exploitation', desc: 'សាកល្បងបញ្ហាដោយសុវត្ថិភាព' },
+    ]
     : [
-        { no: '1', title: 'Reconnaissance Phase', desc: 'Automated port & service discovery' },
-        { no: '2', title: 'Vulnerability Mapping', desc: 'AI-driven template matching' },
-        { no: '3', title: 'Exploitation Logic', desc: 'Safe verification of vulnerabilities' },
-      ]
+      { no: '1', title: 'Reconnaissance Phase', desc: 'Automated port & service discovery' },
+      { no: '2', title: 'Vulnerability Mapping', desc: 'AI-driven template matching' },
+      { no: '3', title: 'Exploitation Logic', desc: 'Safe verification of vulnerabilities' },
+    ]
 
   const workflowCopy = isKhmer
     ? {
-        titleLine1: 'Autonomous Penetration',
-        titleLine2: 'Testing Workflow',
-        whatTitle: 'វាជាអ្វី?',
-        whatBody:
-          'ប្រព័ន្ធស្កេនច្រើនជំហាន ដែលដើរតាមលក្ខណៈគិតរបស់ pentester ប៉ុន្តែលឿន និងមានប្រសិទ្ធភាពខ្ពស់ជាង។',
-        whyTitle: 'ហេតុអ្វីសំខាន់?',
-        whyBody:
-          'scanner ធម្មតា រកបានតែ bug ប៉ុណ្ណោះ ប៉ុន្តែនេះអាចរក attack path និងបង្ហាញហានិភ័យពិតប្រាកដ។',
-        howTitle: 'របៀបប្រើ',
-        howBody:
-          'គ្រាន់តែកំណត់ scope → ប្រព័ន្ធនឹងដំណើរការដោយស្វ័យប្រវត្តិរហូតដល់ report ចុងក្រោយ។',
-      }
+      titleLine1: 'Autonomous Penetration',
+      titleLine2: 'Testing Workflow',
+      whatTitle: 'វាជាអ្វី?',
+      whatBody:
+        'ប្រព័ន្ធស្កេនច្រើនជំហាន ដែលដើរតាមលក្ខណៈគិតរបស់ pentester ប៉ុន្តែលឿន និងមានប្រសិទ្ធភាពខ្ពស់ជាង។',
+      whyTitle: 'ហេតុអ្វីសំខាន់?',
+      whyBody:
+        'scanner ធម្មតា រកបានតែ bug ប៉ុណ្ណោះ ប៉ុន្តែនេះអាចរក attack path និងបង្ហាញហានិភ័យពិតប្រាកដ។',
+      howTitle: 'របៀបប្រើ',
+      howBody:
+        'គ្រាន់តែកំណត់ scope → ប្រព័ន្ធនឹងដំណើរការដោយស្វ័យប្រវត្តិរហូតដល់ report ចុងក្រោយ។',
+    }
     : {
-        titleLine1: 'Autonomous Penetration',
-        titleLine2: 'Testing Workflow',
-        whatTitle: 'What is the Workflow?',
-        whatBody:
-          'A multi-staged recursive engine that mimics human pentester logic but at machine speed and scale, ensuring no corner of your infrastructure is left unchecked.',
-        whyTitle: 'Why does it matter?',
-        whyBody:
-          'Traditional scanners find bugs; the Autonomous Workflow finds attack paths. It correlates findings across multiple vectors to demonstrate real business risk.',
-        howTitle: 'How do I activate it?',
-        howBody:
-          'Simply define your scope and confidence level. Guardian handles the rest, from initial discovery to finalized remediation reports.',
-      }
+      titleLine1: 'Autonomous Penetration',
+      titleLine2: 'Testing Workflow',
+      whatTitle: 'What is the Workflow?',
+      whatBody:
+        'A multi-staged recursive engine that mimics human pentester logic but at machine speed and scale, ensuring no corner of your infrastructure is left unchecked.',
+      whyTitle: 'Why does it matter?',
+      whyBody:
+        'Traditional scanners find bugs; the Autonomous Workflow finds attack paths. It correlates findings across multiple vectors to demonstrate real business risk.',
+      howTitle: 'How do I activate it?',
+      howBody:
+        'Simply define your scope and confidence level. Guardian handles the rest, from initial discovery to finalized remediation reports.',
+    }
 
   const statusRows: StatusItem[] = [
     {
@@ -686,10 +689,10 @@ export default function ResourceComponent() {
                 {sectionLabels.technicalSubtitle}
               </p>
             </div>
-            <Link href="/resource/tool" className="inline-flex items-center gap-2 text-[15px] font-bold text-[#008C83]">
+            <a href={toDocsUrl('/tools')} className="inline-flex items-center gap-2 text-[15px] font-bold text-[#008C83]">
               {sectionLabels.technicalCta}
               <ArrowRight size={16} />
-            </Link>
+            </a>
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -764,85 +767,15 @@ export default function ResourceComponent() {
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-[#18181B] dark:text-white">{sectionLabels.workflowSteps}</h2>
               </div>
-
-              {/* Roadmap with winding path */}
-              <div className="relative w-full" style={{ height: '540px' }}>
-                {/* Animated road CSS */}
-                <style jsx>{`
-                  @keyframes dashFlow {
-                    0% { stroke-dashoffset: 0; }
-                    100% { stroke-dashoffset: -40; }
-                  }
-                  @keyframes dotPulse {
-                    0%, 100% { opacity: 0.4; r: 3; }
-                    50% { opacity: 1; r: 5; }
-                  }
-                  @keyframes travelDot {
-                    0% { offset-distance: 0%; opacity: 0; }
-                    5% { opacity: 1; }
-                    95% { opacity: 1; }
-                    100% { offset-distance: 100%; opacity: 0; }
-                  }
-                  .road-dashes {
-                    animation: dashFlow 1.5s linear infinite;
-                  }
-                  .dot-pulse {
-                    animation: dotPulse 2s ease-in-out infinite;
-                  }
-                  .travel-dot {
-                    offset-path: path("M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510");
-                    animation: travelDot 4s ease-in-out infinite;
-                  }
-                `}</style>
-
-                {/* Winding road SVG */}
-                <svg
-                  className="absolute inset-0 h-full w-full pointer-events-none"
-                  viewBox="0 0 500 540"
-                  fill="none"
-                  preserveAspectRatio="xMidYMid meet"
-                  aria-hidden="true"
-                >
-                  {/* Road body (wide, light) */}
-                  <path
-                    d="M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510"
-                    stroke="#d1e8e3"
-                    strokeWidth="34"
-                    strokeLinecap="round"
-                    fill="none"
-                    className="dark:opacity-20"
-                  />
-                  {/* Road center dashes — animated flow */}
-                  <path
-                    d="M 100 60 C 100 60, 200 90, 320 140 S 450 210, 400 270 S 250 320, 200 350 S 100 390, 150 440 S 300 490, 350 510"
-                    stroke="#00BCA1"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeDasharray="12 8"
-                    fill="none"
-                    className="road-dashes dark:opacity-60"
-                  />
-                  {/* Glowing travel dot along the path */}
-                  <circle r="6" fill="#00BCA1" className="travel-dot" opacity="0.9">
-                    <animate attributeName="r" values="4;7;4" dur="4s" repeatCount="indefinite" />
-                  </circle>
-                  {/* Small dot markers along the road — with pulse */}
-                  <circle cx="170" cy="95" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0s' }} />
-                  <circle cx="290" cy="125" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.3s' }} />
-                  <circle cx="380" cy="170" r="4" fill="none" stroke="#00BCA1" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.6s' }} />
-                  <circle cx="430" cy="230" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '0.9s' }} />
-                  <circle cx="310" cy="310" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.2s' }} />
-                  <circle cx="160" cy="380" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.5s' }} />
-                  <circle cx="230" cy="460" r="4" fill="none" stroke="#01509e" strokeWidth="1.5" className="dot-pulse dark:opacity-60" style={{ animationDelay: '1.8s' }} />
-                </svg>
-
-                {/* Step 1 — Top left */}
-                <div className="absolute top-[16px] left-[4%] flex items-center gap-3 z-10">
-                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
-                    <div className="h-[14px] w-[14px] rounded-full bg-[#00BCA1]" />
-                  </div>
-                  <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
-                    <div className="h-9 w-[3px] rounded-full bg-[#00BCA1]" />
+              <div className="space-y-4">
+                {workflowSteps.map((step, index) => (
+                  <div key={step.no} className="flex items-center gap-4 rounded-xl bg-[#F8FAF6] p-4 dark:bg-[#151A18]">
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${index === 0 ? 'bg-[#0A6A69] text-white' : 'bg-[#BEE3DA] text-[#0A6A69]'
+                        }`}
+                    >
+                      <span className="text-sm font-bold">{step.no}</span>
+                    </div>
                     <div>
                       <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#00BCA1] mr-1.5">1.</span>{workflowSteps[0].title}</p>
                       <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[0].desc}</p>
