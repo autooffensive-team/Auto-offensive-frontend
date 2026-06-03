@@ -262,20 +262,14 @@ export default function ReportsPage() {
               Generate and download security scan reports in multiple formats
             </p>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-black text-[14px] sm:text-[15px] font-semibold shadow-sm transition-colors hover:bg-primary/80 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white text-[15px] font-semibold rounded-xl transition shadow-lg shadow-teal-500/20 shrink-0 disabled:opacity-60"
           >
-            <motion.span
-              animate={isFetching ? { rotate: 360 } : { rotate: 0 }}
-              transition={isFetching ? { duration: 0.8, ease: "linear", repeat: Infinity } : { duration: 0.2 }}
-            >
-              <RefreshCw size={18} />
-            </motion.span>
+            {isFetching ? <Loader2 size={18} className="animate-spin" /> : <RefreshCw size={18} />}
             Refresh
-          </motion.button>
+          </button>
         </div>
 
         {/* Summary Stats */}
