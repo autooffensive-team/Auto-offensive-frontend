@@ -735,8 +735,8 @@ function VulnerabilityBarChart({ data }: { data: VulnItem[] }) {
       preserveAspectRatio="none"
     >
       {/* Grid lines */}
-      {gridLines.map(({ y, label }) => (
-        <g key={label}>
+      {gridLines.map(({ y, label }, index) => (
+        <g key={`grid-line-${index}-${y}`}>
           <line
             x1={paddingLeft}
             y1={y}

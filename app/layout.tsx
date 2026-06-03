@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanuman, Noto_Sans_Khmer, Geist } from "next/font/google"; 
+import { Hanuman, Noto_Sans_Khmer, Geist, Fira_Code } from "next/font/google"; 
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -41,6 +41,12 @@ const hanuman = Hanuman({
   weight: ["800"],
 });
 
+const firaCode = Fira_Code({
+  subsets: ["latin"],
+  variable: "--font-fira-code",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Auto-Offensive | Next-Gen PaaS for Hackers",
   description: "Automated Security Workflows and Pentesting Platform",
@@ -51,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   const messages = await getMessages();
   return (
-    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, notoKhmer.variable, hanuman.variable, "font-sans", geist.variable)}
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, notoKhmer.variable, hanuman.variable, firaCode.variable, "font-sans", geist.variable)}
     >
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>

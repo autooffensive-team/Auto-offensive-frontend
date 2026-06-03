@@ -12,11 +12,11 @@ import { useGraphStore } from "@/components/scanning/graph.store";
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
   "",
-  "  \x1b[1m\x1b[36mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
+  "  \x1b[1m\x1b[32mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
   "  \x1b[90m────────────────────────────────────────\x1b[0m",
   "  \x1b[33mUsage   \x1b[0m  <tool> [flags] [| <tool> ...]",
-  "  \x1b[33mExample \x1b[0m  \x1b[36mnuclei -u https://example.com\x1b[0m",
-  "  \x1b[33mPipeline\x1b[0m  \x1b[36msubfinder -d example.com | httpx\x1b[0m",
+  "  \x1b[33mExample \x1b[0m  \x1b[32mnuclei -u https://example.com\x1b[0m",
+  "  \x1b[33mPipeline\x1b[0m  \x1b[32msubfinder -d example.com | httpx\x1b[0m",
   "  \x1b[33mHelp    \x1b[0m  \x1b[90mCtrl+C to cancel  ·  clear to reset\x1b[0m",
   "  \x1b[90m────────────────────────────────────────\x1b[0m",
   "",
@@ -164,11 +164,11 @@ export function AdvancedTerminalPanel({
       const term = new Terminal({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
-        fontFamily: "Consolas, 'Courier New', monospace",
+        fontFamily: "var(--font-fira-code), 'Fira Code', Consolas, 'Courier New', monospace",
         fontSize: logSize.xtermFontSize,
-        fontWeight: "bold",
-        fontWeightBold: "bold",
-        lineHeight: 1.4,
+        fontWeight: 300,
+        fontWeightBold: 700,
+        lineHeight: 1.9,
         scrollback: 5000,
         theme: terminalTheme,
       });
