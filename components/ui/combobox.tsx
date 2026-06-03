@@ -250,7 +250,7 @@ function ComboboxItem({
       data-slot="combobox-item"
       data-selected={selected || undefined}
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors hover:bg-primary/10 hover:text-primary data-[selected=true]:bg-primary/12 data-[selected=true]:text-primary disabled:pointer-events-none disabled:opacity-50",
+        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm font-normal outline-hidden select-none transition-colors hover:bg-primary/10 hover:text-black data-[selected=true]:bg-primary/12 data-[selected=true]:text-black data-[selected=true]:font-bold disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       disabled={disabled}
