@@ -159,10 +159,12 @@ function ComboboxInput({
   disabled = false,
   showTrigger = true,
   showClear = false,
+  openOnClick = false,
   ...props
 }: React.ComponentProps<typeof InputGroupInput> & {
   showTrigger?: boolean
   showClear?: boolean
+  openOnClick?: boolean
 }) {
   const context = useComboboxContext("ComboboxInput")
   const isDisabled = disabled || context.disabled
