@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import {
   Activity,
   AlertCircle,
+  ArrowRight,
   CheckCircle2,
   Clock3,
   Database,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 
@@ -223,6 +225,7 @@ function normalizeLogPayload(event: string, payload: unknown): Pick<LogEntry, "m
 
 export default function MediumScanPage() {
   const locale = useLocale();
+  const router = useRouter();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
@@ -834,6 +837,20 @@ export default function MediumScanPage() {
                   </>
                 )}
               </div>
+
+              {/* ── View Scan Results button (Floating) ── */}
+              {/completed|failed|cancelled|partial/i.test(status) && (
+                <div className="fixed bottom-8 right-8 z-50 animate-bounce">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/userdashboard/assets")}
+                    className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-all hover:bg-teal-700 hover:scale-105 active:scale-95 border-2 border-white/20"
+                  >
+                    View Scan Results
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
+              )}
             </div>
           </section>
 

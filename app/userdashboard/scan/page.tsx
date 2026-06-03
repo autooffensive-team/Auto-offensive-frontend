@@ -1,6 +1,6 @@
 "use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
-import { Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
+import { ArrowRight, Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
@@ -344,6 +344,7 @@ export default function ScanPage() {
     advancedErrors,
     selectedProject,
     resetRun,
+    openJobReport,
     submitBasic,
     submitMedium,
     submitAdvanced,
@@ -369,6 +370,9 @@ export default function ScanPage() {
     activeRun.status !== "idle" &&
     !/completed|failed|cancelled|partial/i.test(activeRun.status)
   );
+  const showViewResults =
+    activeRun.status !== "idle" &&
+    /completed|failed|cancelled|partial/i.test(activeRun.status);
 
   return (
     <>
@@ -628,6 +632,19 @@ export default function ScanPage() {
             </div>
           )}
         </div>
+
+        {showViewResults && (
+          <div className="fixed bottom-8 right-8 z-[60] pointer-events-none">
+            <button
+              type="button"
+              onClick={() => openJobReport(activeRun.jobId)}
+              className="pointer-events-auto inline-flex animate-bounce cursor-pointer items-center gap-2 rounded-full border-2 border-white/20 bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-colors hover:bg-teal-700 active:scale-95 dark:border-white/10"
+            >
+              View Scan Results
+              <ArrowRight size={20} className="pointer-events-none" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Guest modals */}

@@ -1,8 +1,8 @@
 "use client";
 
-import { RotateCcw, ScanLine, Wrench } from "lucide-react";
+import { ArrowRight, RotateCcw, ScanLine, Wrench } from "lucide-react";
 import React, { useState, useRef, useLayoutEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -191,6 +191,7 @@ function colorizeLogText(text: string, isLightTheme = false): React.ReactNode {
 
 export default function BasicScanPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialMode = (searchParams.get("mode") as ScanMode) || "basic";
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
@@ -390,6 +391,20 @@ export default function BasicScanPage() {
                 onReset={() => resetRun("advanced")}
               />
             )}
+
+            {/* ── Advanced tab: View Results button (Floating) ── */}
+            {activeTab === "advanced" && /completed|failed|cancelled|partial/i.test(advancedRun.status) && (
+              <div className="fixed bottom-8 right-8 z-50 animate-bounce">
+                <button
+                  type="button"
+                  onClick={() => router.push("/userdashboard/assets")}
+                  className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-all hover:bg-teal-700 hover:scale-105 active:scale-95 border-2 border-white/20"
+                >
+                  View Scan Results
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+            )}
           </div>
 
           {activeTab !== "advanced" && (
@@ -505,6 +520,20 @@ export default function BasicScanPage() {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── View Scan Results button (Floating) ── */}
+        {activeTab !== "advanced" && /completed|failed|cancelled|partial/i.test(activeRun.status) && (
+          <div className="fixed bottom-8 right-8 z-50 animate-bounce">
+            <button
+              type="button"
+              onClick={() => router.push("/userdashboard/assets")}
+              className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-all hover:bg-teal-700 hover:scale-105 active:scale-95 border-2 border-white/20"
+            >
+              View Scan Results
+              <ArrowRight size={20} />
+            </button>
           </div>
         )}
       </div>
