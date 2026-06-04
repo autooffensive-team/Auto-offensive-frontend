@@ -1,10 +1,12 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
+import { motion } from "framer-motion";
 import {
   Activity,
   AlertCircle,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Database,
   FileJson,
@@ -513,36 +515,35 @@ export default function AdvanceScanPage() {
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 py-8 sm:py-10 lg:py-12">
           {/* Header */}
-          <section className="rounded-[2rem] border border-white/70 bg-white/80 p-8 shadow-[0_25px_80px_-45px_rgba(15,23,42,0.45)] backdrop-blur dark:border-white/10 dark:bg-slate-950/70">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <section className="rounded-2xl sm:rounded-3xl border border-white/70 bg-white/80 p-6 sm:p-8 lg:p-10 shadow-[0_25px_80px_-45px_rgba(15,23,42,0.45)] backdrop-blur dark:border-white/10 dark:bg-slate-950/70">
+            <div className="flex flex-col gap-6 lg:gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
-                  <Terminal size={14} />
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200 border border-emerald-200/50 dark:border-emerald-500/20">
+                  <Terminal size={16} />
                   Advanced Scan
                 </div>
-                <h1 className="mt-4 text-4xl font-semibold tracking-tight text-gray-950 dark:text-white">
-                  Run any command and stream results in real time.
+                <h1 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-950 dark:text-white leading-tight">
+                  Execute any command with real-time results.
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-600 dark:text-gray-300">
-                  Submit a raw command for advanced scanning. The backend executes it in a sandboxed
-                  environment and streams logs and findings back via SSE.
+                <p className="mt-4 max-w-2xl text-sm sm:text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Submit a raw command for advanced scanning. The backend executes it in a sandboxed environment and streams live logs and findings back via SSE.
                 </p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-4 dark:border-gray-800 dark:bg-gray-900/80">
-                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">Step</p>
-                  <p className="mt-2 truncate text-sm font-medium">{stepId || "Waiting"}</p>
+              <div className="grid gap-3 sm:gap-4 sm:grid-cols-3 w-full lg:w-auto">
+                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Step ID</p>
+                  <p className="mt-3 truncate text-sm font-mono font-semibold text-gray-900 dark:text-emerald-200">{stepId || "—"}</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-4 dark:border-gray-800 dark:bg-gray-900/80">
-                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">Findings</p>
-                  <p className="mt-2 text-2xl font-semibold">{findings.length}</p>
+                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Findings</p>
+                  <p className="mt-3 text-3xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{findings.length}</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-4 dark:border-gray-800 dark:bg-gray-900/80">
-                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">State</p>
-                  <div className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusTone(status)}`}>
+                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                  <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Status</p>
+                  <div className={`mt-3 inline-flex rounded-full px-3 py-1.5 text-xs font-bold capitalize ${statusTone(status)}`}>
                     {humanizeStatus(status)}
                   </div>
                 </div>
@@ -551,71 +552,74 @@ export default function AdvanceScanPage() {
           </section>
 
           {/* Main content */}
-          <section className="grid gap-6 xl:grid-cols-[1.05fr_1.45fr]">
+          <section className="grid gap-6 lg:gap-8 xl:grid-cols-[1.1fr_1.4fr]">
             {/* Left: Submit form */}
             <form
               onSubmit={handleSubmit}
-              className="space-y-5 rounded-[1.75rem] border border-white/70 bg-white/85 p-6 shadow-sm backdrop-blur dark:border-emerald-400/10 dark:bg-[#031008]/85"
+              className="space-y-6 rounded-2xl sm:rounded-3xl border border-white/70 bg-white/85 p-6 sm:p-8 lg:p-10 shadow-sm backdrop-blur dark:border-emerald-400/10 dark:bg-[#031008]/85"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium uppercase tracking-[0.22em] text-violet-600 dark:text-emerald-300">
-                    Submit Command
+                  <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-400">
+                    Command Entry
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold">Enter a scan command</h2>
+                  <h2 className="mt-3 text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Execute Scan</h2>
                 </div>
-                <div className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
-                  POST /scans/advanced/try
+                <div className="rounded-full border border-gray-300 bg-gray-50 px-4 py-1.5 text-xs font-mono font-bold text-gray-700 dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-300 whitespace-nowrap">
+                  POST
                 </div>
               </div>
 
-              <label className="block space-y-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Command</span>
+              <div className="space-y-3">
+                <label className="block space-y-2">
+                  <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Command</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Enter a scan command to execute</p>
+                </label>
                 <textarea
                   value={command}
                   onChange={(event) => setCommand(event.target.value)}
                   placeholder="nmap -sV -sC scanme.nmap.org"
-                  rows={4}
-                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm outline-none transition focus:border-emerald-400 focus:bg-white dark:border-emerald-900/60 dark:bg-[#07130b] dark:text-emerald-100 dark:placeholder:text-emerald-800 dark:focus:border-emerald-400"
+                  rows={5}
+                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 font-mono text-sm outline-none transition duration-200 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-400/20 dark:border-emerald-900/60 dark:bg-[#07130b] dark:text-emerald-100 dark:placeholder:text-emerald-800 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
                 />
-              </label>
+              </div>
 
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/80 p-4 text-sm dark:border-emerald-900/60 dark:bg-[#07130b]/80">
+              <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/80 p-4 sm:p-5 text-sm dark:border-amber-600/40 dark:bg-amber-950/20">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="mt-0.5 text-violet-600 dark:text-emerald-300" size={18} />
+                  <AlertCircle className="mt-1 text-amber-700 dark:text-amber-500 flex-shrink-0" size={20} />
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-emerald-100">
-                      Guest mode — limited scans available
+                    <p className="font-bold text-amber-900 dark:text-amber-100">
+                      Guest Mode — Limited Scans
                     </p>
-                    <p className="mt-1 text-gray-600 dark:text-emerald-300/70">
-                      Commands run in a sandboxed environment. Create an account for unlimited access
-                      and project-based scan management.
+                    <p className="mt-2 text-xs text-amber-800 dark:text-amber-200/80 leading-relaxed">
+                      You're in guest mode with limited scans. Commands execute in a sandboxed environment. Create an account for unlimited access and project management.
                     </p>
                   </div>
                 </div>
               </div>
 
               {pageError ? (
-                <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
-                  {pageError}
+                <div className="rounded-2xl border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 flex items-start gap-3">
+                  <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
+                  <p>{pageError}</p>
                 </div>
               ) : null}
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 pt-4">
                 <button
                   type="submit"
                   disabled={isSubmitting || !command.trim()}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center gap-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/50 px-6 py-3 text-sm font-bold text-white transition duration-200 disabled:cursor-not-allowed disabled:opacity-70 shadow-lg hover:shadow-emerald-500/30"
                 >
-                  {isSubmitting ? <LoaderCircle size={16} className="animate-spin" /> : <Radio size={16} />}
-                  {isSubmitting ? "Streaming..." : "Start Advanced Scan"}
+                  {isSubmitting ? <LoaderCircle size={18} className="animate-spin" /> : <Radio size={18} />}
+                  {isSubmitting ? "Streaming..." : "Start Scan"}
                 </button>
 
                 <button
                   type="button"
                   onClick={stopStream}
                   disabled={!isSubmitting && !isStreaming}
-                  className="rounded-2xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-900/60 dark:text-emerald-100 dark:hover:bg-[#07130b]"
+                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 disabled:opacity-40 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 disabled:cursor-not-allowed dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
                 >
                   Stop Stream
                 </button>
@@ -624,7 +628,7 @@ export default function AdvanceScanPage() {
                   <button
                     type="button"
                     onClick={() => void fetchParsedData(stepId)}
-                    className="rounded-2xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-900/60 dark:text-emerald-100 dark:hover:bg-[#07130b]"
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
                   >
                     Refresh Results
                   </button>
@@ -633,49 +637,50 @@ export default function AdvanceScanPage() {
             </form>
 
             {/* Right: Results panel */}
-            <div className={`rounded-[1.75rem] border border-white/70 bg-[#04110a] p-0 ${cyberGlow} dark:border-emerald-400/20`}>
+            <div className={`rounded-2xl sm:rounded-3xl border border-white/70 bg-[#04110a] p-0 ${cyberGlow} dark:border-emerald-400/20 flex flex-col overflow-hidden`}>
               {/* Tab bar */}
-              <div className="flex items-center gap-1 border-b border-emerald-500/10 px-5 py-3">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      type="button"
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
-                        isActive
-                          ? "bg-emerald-500/20 text-emerald-200 shadow-[0_0_0_1px_rgba(16,185,129,0.15)]"
-                          : "text-emerald-400/70 hover:bg-white/5 hover:text-emerald-100"
-                      }`}
-                    >
-                      <Icon size={14} />
-                      {tab.label}
-                      {tab.key === "findings" && findings.length > 0 ? (
-                        <span className="ml-1 rounded-full bg-emerald-500/30 px-2 py-0.5 text-[10px] text-emerald-50">
-                          {findings.length}
-                        </span>
-                      ) : null}
-                    </button>
-                  );
-                })}
+              <div className="flex items-center gap-2 border-b border-emerald-500/10 px-4 sm:px-6 py-4 bg-gradient-to-r from-transparent via-emerald-950/20 to-transparent dark:from-transparent dark:via-emerald-950/30 dark:to-transparent">
+                <div className="flex flex-wrap items-center gap-2">
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActiveTab(tab.key)}
+                        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition duration-200 ${
+                          isActive
+                            ? "bg-emerald-500/30 text-emerald-100 shadow-[0_0_0_2px_rgba(16,185,129,0.25)] border border-emerald-400/40"
+                            : "text-emerald-400/70 hover:bg-white/5 hover:text-emerald-100 border border-transparent hover:border-emerald-400/20"
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-xs">{tab.label}</span>
+                        {tab.key === "findings" && findings.length > 0 ? (
+                          <span className="ml-1 rounded-full bg-emerald-500/40 px-2.5 py-0.5 text-[10px] font-bold text-emerald-50 border border-emerald-400/30">
+                            {findings.length}
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Tab content */}
-              <div className="max-h-[600px] overflow-y-auto bg-[#06150d] p-5">
-                {activeTab === "logs" ? (
-                  <div className="space-y-1">
+              <div className="flex-1 overflow-y-auto bg-[#06150d] p-5 sm:p-6 space-y-4 max-h-[600px] sm:max-h-[700px]">{activeTab === "logs" ? (
+                  <div className="space-y-3">
                     <LogToolbar
                       themeKey={themeKey}
                       sizeKey={sizeKey}
                       onThemeChange={setTheme}
                       onSizeChange={setSize}
                       onReset={resetToDefault}
-                      className="mb-3"
+                      className="mb-4"
                     />
                     {logs.length === 0 && !(isSubmitting || isStreaming) ? (
-                      <p className="text-center text-sm text-emerald-300/50">
+                      <p className="text-center text-sm text-emerald-300/50 py-8">
                         Logs will appear here after you start a scan.
                       </p>
                     ) : (
@@ -683,29 +688,29 @@ export default function AdvanceScanPage() {
                         {logs.map((entry) => (
                           <div
                             key={entry.id}
-                            className={`rounded-lg border px-3 py-1.5 leading-snug font-bold font-[Consolas,monospace] ${
+                            className={`rounded-lg border px-3.5 py-2 leading-snug font-bold font-[Consolas,monospace] text-xs sm:text-sm transition-all duration-200 ${
                               entry.tone === "danger"
-                                ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
+                                ? "border-red-500/40 bg-red-500/10 text-red-200"
                                 : entry.tone === "success"
-                                ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
+                                ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-100"
                                   : entry.tone === "warning"
-                                    ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-                                    : "border-emerald-400/10 bg-emerald-950/30 text-emerald-100/80"
+                                    ? "border-amber-500/40 bg-amber-500/15 text-amber-200"
+                                    : "border-emerald-400/20 bg-emerald-950/40 text-emerald-100/90"
                             }`}
-                            style={{ fontSize: `${logSize.xtermFontSize - 4}px` }}
+                            style={{ fontSize: `${logSize.xtermFontSize - 3}px` }}
                           >
-                            <span className="mr-2 text-emerald-500/55">[{entry.createdAt}]</span>
-                            <span className="font-semibold text-emerald-300">{entry.event}</span>
+                            <span className="mr-2 text-emerald-500/60">[{entry.createdAt}]</span>
+                            <span className="font-bold text-emerald-300">{entry.event}</span>
                             {" — "}
-                            {entry.message}
+                            <span className="text-emerald-100/85">{entry.message}</span>
                           </div>
                         ))}
                       </>
                     )}
                     {isStreaming ? (
-                      <div className="flex items-center gap-2 text-xs text-emerald-300">
-                        <LoaderCircle size={12} className="animate-spin" />
-                        Streaming...
+                      <div className="flex items-center gap-2 text-xs text-emerald-300 pt-4 animate-pulse">
+                        <LoaderCircle size={14} className="animate-spin" />
+                        <span className="font-semibold">Streaming in progress...</span>
                       </div>
                     ) : null}
                   </div>
@@ -714,37 +719,39 @@ export default function AdvanceScanPage() {
                 {activeTab === "findings" ? (
                   <div className="space-y-3">
                     {findings.length === 0 ? (
-                      <p className="text-center text-sm text-emerald-300/50">
-                        No findings yet. They will appear after the scan completes.
+                      <p className="text-center text-sm text-emerald-300/50 py-8">
+                        No findings yet. Discoveries will appear after the scan completes.
                       </p>
                     ) : (
                       findings.map((finding) => (
                         <div
                           key={finding.finding_id}
-                          className="rounded-xl border border-emerald-400/10 bg-emerald-950/25 p-4"
+                          className="rounded-xl border border-emerald-400/20 bg-emerald-950/35 p-4 hover:bg-emerald-950/50 transition-colors duration-200"
                         >
                           <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <h4 className="text-sm font-semibold text-emerald-50">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-bold text-emerald-50">
                                 {finding.title || finding.fingerprint || "Untitled Finding"}
                               </h4>
-                              <p className="mt-1 text-xs text-emerald-300/60">
+                              <p className="mt-2 text-xs text-emerald-300/70 font-mono">
                                 {finding.host}
                                 {finding.port ? `:${finding.port}` : ""}
                                 {finding.protocol ? ` (${finding.protocol})` : ""}
                               </p>
                             </div>
-                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${severityTone(finding.severity)}`}>
+                            <span className={`rounded-full px-3 py-1 text-[11px] font-bold whitespace-nowrap ${severityTone(finding.severity)}`}>
                               {finding.severity}
                             </span>
                           </div>
                           {finding.description ? (
-                            <p className="mt-3 text-xs text-emerald-100/80">{finding.description}</p>
+                            <p className="mt-3 text-xs text-emerald-100/80 leading-relaxed">{finding.description}</p>
                           ) : null}
                           {finding.remediation ? (
-                            <p className="mt-2 text-xs text-emerald-300/80">
-                              <span className="font-semibold">Fix:</span> {finding.remediation}
-                            </p>
+                            <div className="mt-3 pt-3 border-t border-emerald-400/10">
+                              <p className="text-xs text-emerald-300/80">
+                                <span className="font-bold">Remediation:</span> {finding.remediation}
+                              </p>
+                            </div>
                           ) : null}
                         </div>
                       ))
@@ -755,25 +762,25 @@ export default function AdvanceScanPage() {
                 {activeTab === "parsed" ? (
                   <div>
                     {!parsedData ? (
-                      <p className="text-center text-sm text-emerald-300/50">
+                      <p className="text-center text-sm text-emerald-300/50 py-8">
                         Parsed data will appear after the scan completes.
                       </p>
                     ) : (
                       <div className="space-y-4">
                         {parsedData.tool_name ? (
-                          <p className="text-xs text-emerald-300/60">
-                            Tool: <span className="font-semibold text-emerald-100">{parsedData.tool_name}</span>
-                            {parsedData.parse_method ? ` • Method: ${parsedData.parse_method}` : ""}
+                          <p className="text-xs text-emerald-300/70">
+                            <span className="font-bold text-emerald-200">Tool:</span> <span className="font-mono text-emerald-100">{parsedData.tool_name}</span>
+                            {parsedData.parse_method ? ` • <span className="font-bold">Method:</span> ${parsedData.parse_method}` : ""}
                           </p>
                         ) : null}
 
                         {parsedColumns.length > 0 && parsedData.data && parsedData.data.length > 0 ? (
-                          <div className="overflow-x-auto rounded-xl border border-emerald-400/10">
+                          <div className="overflow-x-auto rounded-xl border border-emerald-400/20 bg-emerald-950/30">
                             <table className="w-full text-left text-xs">
-                              <thead className="border-b border-emerald-400/10 bg-emerald-950/20">
+                              <thead className="border-b border-emerald-400/20 bg-emerald-950/40">
                                 <tr>
                                   {parsedColumns.map((col) => (
-                                    <th key={col.key} className="px-3 py-2 font-semibold text-emerald-200">
+                                    <th key={col.key} className="px-3 py-3 font-bold text-emerald-200">
                                       {col.label || col.key}
                                     </th>
                                   ))}
@@ -781,9 +788,9 @@ export default function AdvanceScanPage() {
                               </thead>
                               <tbody>
                                 {parsedData.data.map((row, index) => (
-                                  <tr key={index} className="border-b border-emerald-400/5">
+                                  <tr key={index} className="border-b border-emerald-400/10 hover:bg-emerald-950/50 transition-colors">
                                     {parsedColumns.map((col) => (
-                                      <td key={col.key} className="px-3 py-2 text-emerald-100/80">
+                                      <td key={col.key} className="px-3 py-2.5 text-emerald-100/80 font-mono text-xs">
                                         {String(row[col.key] ?? "")}
                                       </td>
                                     ))}
@@ -793,7 +800,7 @@ export default function AdvanceScanPage() {
                             </table>
                           </div>
                         ) : parsedData.lines && parsedData.lines.length > 0 ? (
-                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/10 bg-emerald-950/25 p-3 text-[11px] sm:text-[12.5px] leading-snug font-bold font-[Consolas,monospace] text-emerald-100/85">
+                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 whitespace-pre-wrap break-words">
                             {parsedData.lines.join("\n")}
                           </pre>
                         ) : (
@@ -807,11 +814,11 @@ export default function AdvanceScanPage() {
                 {activeTab === "raw" ? (
                   <div>
                     {rawLines.length === 0 ? (
-                      <p className="text-center text-sm text-emerald-300/50">
+                      <p className="text-center text-sm text-emerald-300/50 py-8">
                         Raw output will appear here during the scan.
                       </p>
                     ) : (
-                      <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/10 bg-emerald-950/25 p-3 text-[11px] sm:text-[12.5px] leading-snug font-bold font-[Consolas,monospace] text-emerald-100/85">
+                      <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 break-words">
                         {rawLines.join("\n")}
                       </pre>
                     )}
@@ -821,16 +828,29 @@ export default function AdvanceScanPage() {
 
               {/* ── View Scan Results button (Floating) ── */}
               {/completed|failed|cancelled|partial/i.test(status) && (
-                <div className="fixed bottom-8 right-8 z-50 animate-bounce">
-                  <button
+                <motion.div 
+                  className="fixed bottom-8 right-8 z-50"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.button
                     type="button"
                     onClick={() => router.push("/userdashboard/assets")}
-                    className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-700 hover:scale-105 active:scale-95 border-2 border-white/10"
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(16, 185, 129, 0.8)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center gap-3 rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-950 to-emerald-950/80 px-6 py-3.5 text-sm font-bold text-emerald-300 shadow-lg hover:shadow-emerald-500/40 transition-all duration-300"
+                    style={{
+                      boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)",
+                    }}
                   >
-                    View Scan Results
-                    <ArrowRight size={20} />
-                  </button>
-                </div>
+                    <BarChart3 size={20} />
+                    View Results
+                    <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                      <ArrowRight size={20} />
+                    </motion.div>
+                  </motion.button>
+                </motion.div>
               )}
             </div>
           </section>

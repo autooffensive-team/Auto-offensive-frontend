@@ -1,13 +1,220 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2, RotateCcw, Zap } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
+
+// ─── ASCII Art Background - Epic Mountain Landscape ────────────────────────────
+const ASCII_BACKGROUND = `
+                                                                                                                            ::::::                                                                                                                        ::...::                                                                                                                     ::...::::                                                                                                                 ::....:::-                                                                                                              ::.....::::                                                                                                           :...:::::::::           ::                                                                                          :::::::::::::::         :...                                                                                       -:::::::::::::::.       -:::                                                                                      =-::::::::::::::::::::::::::::::::::::      :...:                                                                                    -:::::::::::::::::::::::::::::::::::::::::::::::::::::::    :....:                                                                                  =::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   :....:-                                                                                -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::..:::    .:::::=                                                                    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::-   :::::.::::::.                                                             -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   ::::::::::::::::-                                                       .::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-   ::::::::::::::::::::::                                                 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::  :::::::::::::::::::::::::-                                            ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::                                       -::::::::::::::::::::::::::::::::::::::::::::::::::::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    -::::..::::::::::::::::::::::::                                   ::::....::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::         *::::::::::::::::::::::::::::-                             -::....:::::::::::::::::::::::::::::::::::::::::::::    **=:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..               -:::::::::::::::::::::::::                          ::::::-              :::::::::::::::::::::::::::::    ***=::::::::::::::::::::::::::::.:::::::::::::::::::::::::::::::::.::.:::...:                   :::::::::::::::::::::::                        ::::::::::::::::::::::::    +***+::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::::::::.  :::::::                       ::::::::::::::::::                        ::::::::::::::::::::    ****+-::::::::::::::::::::::::::::: ::::::::::::::::::::::::::::::::::::::::::. ::::::                          ::::::::::::::                        :::::::::::::::::    ****+-::::::::::::::::::::::::::::: :::::::::::::::::::::::::::::::::::::::::::::::::::::::                           -::::::::::                        ::::::::::::::-    *****=:::::::::::::::::::::::::::::. @+::::::::::::::::::::::::::::::::::::::::::::::::::::::::                          :::::::::.:                        :::::::::::+    *****+-::::::::::::::::::::::::::::.. **-::::::::::::::....  :::::::::::::::::::::::::::::::::::::::                        .::::::::::                        =::::::::=     *****+::::::::::::::::::::::::::::..  **+:.::::::::::::::     ::...:::-:..--:::::::::::::::::::::::::::                       :::::::::::                        ::....::-    ******=::::::::::::::::::::::::::::..  ***=:::::::::::::..      :..:=               =-:::::::::::::::::::::::                    :::::::::.-                        -:...:-     ******=:::::::::::::::::::::::::::::.   **+:::::::..:::.::                                  -::::::::::::::::..:                   ::::::::::=                        ::.::    =******=:::::::::::::::::::::::::::::..  ***+:::::::::......                                      ::::::::::::::..:                   ::::::::::                         ::::    *******=:::::::::::::::::::::::::::::.:  ****-::::::::::::..                                           ::::::::::::::                   ::::::::::                         :::    #******=::::::::::::::::::::::::::::::.  *****-:::::::::::::.:                                             .::::::...:                    ::::::::::                         ::    *******=:::::::::::::::::::::::::::::::   *****:::::::::::::...                                                :::...:                      ::::::::.:                         +******+::::::::::::::::::::::::::::::::  *****+:::::::::::::...                                                  :::::                      *::::::::::                         *******-....:::::::::::::::::::::::::::+  *****+::::::::::::::..:                                                                             -::::::::::                         *******=:..:::::::::::::::::::::::::::::  ******+:::::::::::::::..=                                                                             :::::::..::                         ********=:-          ::::::::::::::::::::  ******+::::::::::::::::::                                                                             ::::::::.::                          #******                 ::::::::::::::::   #*****+:::::::::::::::::..                                                                             ::::::::..:                          *****                     ::::::::::::::- #******+::::::::::::::::::..                                                                            :::::::::..-                          ***                         ::::::::::::  ********-:::::::::::::::::::.                                                                           -:::::::::::                           -*                            :::::::::-   *******-:::::::::::::::::::::                                                                           :::::::::::-                           :::::::::  ********=::::::::::::::::::::::                                                                           :::::::::::                            -::::::-  ********+::::::::::::::::::::::.:                                                                         -:::::::::::                            ::::::   ********-::::::::::::::::::::::::                                                                        ::::::::::::                             :::.:   ********=:::::::::::::::::::::::.:-                                                                      -::::::::::::                             :.::-  *********:::::::::::::::::::::::::::                                                                      ::::::::::::-                             #::-  *********-::::::::::::::::::::::::::::                                                                    ::::::::::..:                              :-  *********+:::::::::::::::::::::::::::::                                                                   :::::::::::.:                               =   *********-::::::::::::::::::::::::::::::                                                                 :::::::::::::                                #********+:::::::::::::::::::::::::::::::=                                                               ::::::::::::::                                *********=::::::::::::::::::::::::::::::::-                                                             ::::::::::::::                                 **********           :-:::::::::::::::::::::                                                           ::::::::::::::::                                 ******      *--::-=*     -:::::::::::::::::::                                                         ::::::::::::::::                                  +****       :::::::::::-     ::::::::::::::::::                                                       ::::::::::::::.:                                   ***         :::::::::...::     ::::::::::::::.::                                                    ::::::::::::::::.                                    ::::::::::::::     :::::::::::::..:                                                  :::::::::::::::::                                     ::::::::::::::.     ::::::::::::::::                                               ::::::::::::::::::                                      ::::::::::::..:      ::::::::::::::::                                           ::::::::::::::::::.                                       .:::::::::::::::      :::::::::::::::                                        -:::::::::::::::::..                                        ::::::::::::::::      ::::::::::::::-                                    -:::::::::::::::::::.                                         ::::::::::::::::       ::::::::::::::                                 ::::::::::::::::::::::                                          :::::::::::::::::       :::::::::.:::-                             :::::::::::::::::::::::                                             .::::::::::::::::::.       =::::.....::*                    :::::::::::::::::::::::::                                              :::::::::::::::::::..        -::.....::-               :::::::::::::::::::::::::.:                                               .::::::::::::::::::::.          ::::::::-          -:::::::::::::::::::::::::::                                                 ::::::::::::::::::::::::              @      :::::::::::::::::::::::::::::::                                                  =:::::::::::::::::::::::::.              ::::::::::::::::::::::::::::::..                                                    -::::::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::...                                                      -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::...:                                                        -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::..:                                                          :::::::::::::::::::::::::::::::::::::::::::::::::::::::..                                                            -::::::::::::::::::::::::::::::::::::::::::::::::..:.                                                              :::::::::::::::::::::::::::::::::::::::::::::::                                                                 ::::::::::::::::::::::::::::::::::::::::..:                                                                   ::::::::::::::::::::::::::::::::::::.                                                                      -::::::::::::::::::::::::::.:::.                                                                        @::::::::::::::::::::::::::                                                                           =::::::::::::::::::                                                                               -::::::::::::
+`;
+
+// ─── Hacker Vibe Animations ───────────────────────────────────────────────────
+const GLITCH_CHARS = ['█', '▓', '▒', '░', '▀', '▄', '─', '│', '┌', '┐', '└', '┘', '', '◆', '●'];
+const MATRIX_CHARS = '░▒▓█▀▄║═╬┤┬┴├└┘┐┌◆●';
+
+const glitchAnimation = `
+  @keyframes glitch {
+    0% {
+      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 10px #00ff00;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    }
+    20% {
+      clip-path: polygon(0 20%, 100% 20%, 100% 65%, 0 65%);
+      text-shadow: -2px 0 #ff00ff, 2px 0 #00ff00, 0 0 10px #ff00ff;
+    }
+    40% {
+      clip-path: polygon(0 35%, 100% 35%, 100% 80%, 0 80%);
+      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 15px #00ffff;
+    }
+    60% {
+      clip-path: polygon(0 50%, 100% 50%, 100% 95%, 0 95%);
+      text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff, 0 0 10px #00ff00;
+    }
+    100% {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      text-shadow: 0 0 20px #00ff00, 0 0 10px #00ffff;
+    }
+  }
+
+  @keyframes scanlines {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 0 10px;
+    }
+  }
+
+  @keyframes neon-flicker {
+    0% {
+      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+      opacity: 1;
+    }
+    50% {
+      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+      opacity: 0.8;
+    }
+    100% {
+      text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 40px #00ff00;
+      opacity: 1;
+    }
+  }
+
+  @keyframes matrix-rain {
+    0% {
+      transform: translateY(-100%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), inset 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+  }
+
+  @keyframes cyber-border {
+    0%, 100% {
+      border-color: rgba(0, 255, 0, 0.3);
+      box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+    }
+    50% {
+      border-color: rgba(0, 255, 0, 0.8);
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.1);
+    }
+  }
+
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      opacity: 0.5;
+    }
+  }
+
+  .glitch-text {
+    animation: glitch 0.3s ease-in-out infinite;
+    position: relative;
+  }
+
+  .neon-text {
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    animation: neon-flicker 3s infinite;
+  }
+
+  .scanline-bg {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    animation: scanlines 8s linear infinite;
+  }
+
+  .cyber-pulse {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .cyber-border {
+    animation: cyber-border 2s ease-in-out infinite;
+  }
+
+  .flicker-effect {
+    animation: flicker 0.15s infinite;
+  }
+
+  .terminal-glow {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .hacker-gradient {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
+  }
+
+  @keyframes data-corruption {
+    0%, 100% {
+      transform: translate(0);
+    }
+    25% {
+      transform: translate(-2px, -2px);
+    }
+    50% {
+      transform: translate(2px, 2px);
+    }
+    75% {
+      transform: translate(-2px, 2px);
+    }
+  }
+
+  .data-glitch {
+    animation: data-corruption 0.1s infinite;
+  }
+
+  .ascii-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 7px;
+    line-height: 1.05;
+    color: rgba(0, 255, 0, 0.25);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 5;
+    animation: float 25s ease-in-out infinite;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.1);
+  }
+
+  @keyframes float {
+    0%, 100% {
+      opacity: 0.08;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 0.12;
+      transform: translateY(-10px);
+    }
+  }
+
+  .ascii-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    background-image: 
+      linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .terminal-content {
+    position: relative;
+    z-index: 10;
+  }
+`;
 
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
@@ -165,12 +372,13 @@ export function AdvancedTerminalPanel({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
         fontFamily: "var(--font-fira-code), 'Fira Code', Consolas, 'Courier New', monospace",
-        fontSize: logSize.xtermFontSize,
+        fontSize: Math.max(12, logSize.xtermFontSize - 2),  // Slightly smaller for more output
         fontWeight: 300,
         fontWeightBold: 700,
-        lineHeight: 1.9,
-        scrollback: 5000,
+        lineHeight: 1.9,  // Reduced from 1.9 for tighter display
+        scrollback: 10000,  // Increased from 5000 for more history
         theme: terminalTheme,
+        cols: 200,  // Force more columns for wider output
       });
 
       const fitAddon = new FitAddon();
@@ -547,92 +755,337 @@ export function AdvancedTerminalPanel({
 
   return (
     <>
+      <style>{glitchAnimation}</style>
       <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="relative rounded-xl overflow-hidden border-2 bg-black cyber-border"
+        style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
       >
-        {/* ── Title bar ── */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-red-500" />
-              <span className="h-3 w-3 rounded-full bg-yellow-400" />
-              <span className="h-3 w-3 rounded-full bg-green-500" />
-            </div>
-            <span className="font-mono text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs">
-              {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {isSubmitting && (
-              <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
-                <Loader2 size={11} className="animate-spin" /> Running
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={onReset}
-              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-            >
-              <RotateCcw size={12} />
-              Reset
-            </button>
-          </div>
+        {/* ── Animated background glow ── */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
+
+        {/* ── Scanlines overlay ── */}
+        <div className="absolute inset-0 pointer-events-none scanline-bg opacity-20 mix-blend-overlay" />
+
+        {/* ── Black Top Bar - PURE BLACK ── */}
+        <motion.div 
+          className="relative z-20 border-b-2 px-6 py-3.5 backdrop-blur-sm bg-black flex items-center justify-center cyber-pulse"
+          style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="w-full flex items-center justify-between">
+            {/* Left side - Window controls + Title */}
+            <div className="flex items-center gap-4 flex-1">
+              {/* Hacker-style window controls */}
+              <motion.div 
+                className="flex gap-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+              >
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-red-500 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #ff0000", "0 0 5px #ff0000"] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-yellow-400 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #ffff00", "0 0 5px #ffff00"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                />
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-green-500 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #00ff00", "0 0 5px #00ff00"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                />
+              </motion.div>
+
+              {/* Title with glitch effect - CENTERED */}
+              <div className="flex items-center gap-2 flex-1 justify-center">
+                <motion.div 
+                  className="h-2 w-2 rounded-full bg-green-500 neon-text"
+                  animate={{ opacity: [1, 0.5], boxShadow: ["0 0 5px #00ff00", "0 0 10px #00ff00"] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                />
+                <motion.span 
+                  className="font-mono text-xs sm:text-sm font-bold neon-text tracking-wider"
+                  animate={{ textShadow: ["0 0 10px #00ff00, 0 0 20px #00ff00", "0 0 5px #00ff00"] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {selectedProject ? `⚡ ${selectedProject.name}@auto-offensive` : "⚡ auto-offensive"} :: ADVANCED_SCAN
+                </motion.span>
+              </div>
+            </div>
+
+            {/* Right side - Status and Controls */}
+            <div className="flex items-center gap-3 ml-4">
+              {isSubmitting && (
+                <motion.span 
+                  className="rounded-md border-2 border-green-500/60 bg-green-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold neon-text flex items-center gap-2 whitespace-nowrap"
+                  animate={{ boxShadow: ["0 0 10px #00ff00", "0 0 20px #00ff00"] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Zap size={11} />
+                  </motion.div>
+                  RUNNING
+                </motion.span>
+              )}
+
+              <motion.button
+                type="button"
+                onClick={onReset}
+                whileHover={{ scale: 1.08, boxShadow: "0 0 15px rgba(0, 255, 0, 0.6)" }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-green-500/60 bg-black hover:bg-green-500/15 px-3 py-1 text-[10px] sm:text-xs font-bold neon-text transition-all duration-300 whitespace-nowrap"
+              >
+                <RotateCcw size={11} />
+                RESET
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
 
         {!projectId && (
-          <div className="rounded-lg border border-red-200/25 dark:border-red-900/25 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-600 dark:text-red-400 m-4">
-            ⚠ Select a project above before running a scan.
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs sm:text-sm font-mono"
+            style={{ boxShadow: "0 0 15px rgba(255, 0, 0, 0.3)" }}
+          >
+            <span className="text-red-400 font-bold">⚠ ERROR:</span> <span className="text-red-300">Select a project above before running a scan.</span>
+          </motion.div>
         )}
 
-        {/* ── Theme & Size Toolbar ── */}
-        <LogToolbar
-          themeKey={themeKey}
-          sizeKey={sizeKey}
-          onThemeChange={setTheme}
-          onSizeChange={setSize}
-          onReset={resetToDefault}
-          className="mx-4 mt-3"
-        />
+        {/* ── Theme & Size Toolbar - STYLED HACKER ── */}
+        <motion.div 
+          className="relative z-15 border-t border-b border-green-500/30 px-4 py-2 bg-black/50 backdrop-blur flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          <LogToolbar
+            themeKey={themeKey}
+            sizeKey={sizeKey}
+            onThemeChange={setTheme}
+            onSizeChange={setSize}
+            onReset={resetToDefault}
+            className="bg-transparent! border-0!"
+          />
+        </motion.div>
 
-        {/* ── Full-width xterm ── */}
-        <div
-          ref={containerRef}
-          className="h-144 w-full overflow-hidden"
-          style={{ backgroundColor: terminalTheme.background }}
-        />
+        {/* ── Full-width xterm with cyber effects ── */}
+        <div className="relative flex-1 w-full bg-black overflow-hidden flex">
+          {/* Background Image Layer */}
+          <div 
+            className="absolute inset-0 opacity-15 pointer-events-none z-0"
+            style={{
+              backgroundImage: "url('/ascii.png')",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundAttachment: "fixed"
+            }}
+          />
+          
+          {/* xterm Container - MAXIMIZED ── */}
+          <div
+            ref={containerRef}
+            className="terminal-content flex-1 overflow-hidden terminal-glow scanline-bg relative z-10"
+            style={{ 
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
+              borderRight: "2px solid rgba(0, 255, 0, 0.2)",
+              borderTop: "2px solid rgba(0, 255, 0, 0.2)",
+              minHeight: "calc(100vh - 300px)"
+            }}
+          />
+
+          {/* Cyberpunk Side Panel - Real Data Display */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="w-56 border-l-2 border-green-500/40 bg-black/40 backdrop-blur p-3 flex flex-col gap-3 z-10 overflow-y-auto"
+            style={{ borderColor: "rgba(0, 255, 0, 0.3)" }}
+          >
+            {/* Header */}
+            <motion.div 
+              className="text-xs font-mono neon-text"
+              animate={{ textShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              ▸▸▸ SCAN_ANALYTICS
+            </motion.div>
+
+            {/* Scan Status */}
+            <div className="space-y-1.5 border-b border-green-500/20 pb-2">
+              <div className="text-[9px] font-mono text-green-400/70">PROJECT</div>
+              <div className="text-xs font-mono text-green-300">
+                {selectedProject?.name || "no_project"}
+              </div>
+              <div className="text-[9px] font-mono text-green-400/70 mt-1">STATUS</div>
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  className="w-2 h-2 rounded-full bg-green-500"
+                  animate={{ boxShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span className="text-[9px] font-mono text-green-300">
+                  {isSubmitting ? "◆ SCANNING..." : "◆ IDLE"}
+                </span>
+              </div>
+            </div>
+
+            {/* Findings Stats */}
+            <div className="space-y-1 border-b border-green-500/20 pb-2">
+              <div className="text-[9px] font-mono text-green-400/70">FINDINGS</div>
+              <div className="text-xl font-mono text-green-400">
+                {run.findings || 0}
+              </div>
+              <div className="text-[8px] font-mono text-green-300/60">
+                vulnerabilities
+              </div>
+            </div>
+
+            {/* Logs Stats */}
+            <div className="space-y-1 border-b border-green-500/20 pb-2">
+              <div className="text-[9px] font-mono text-green-400/70">LOG_ENTRIES</div>
+              <motion.div 
+                className="text-lg font-mono text-green-400"
+                animate={{ opacity: [0.8, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                {logs.length}
+              </motion.div>
+              <div className="text-[8px] font-mono text-green-300/60">
+                records
+              </div>
+            </div>
+
+            {/* Error Count */}
+            {errors.length > 0 && (
+              <div className="space-y-1 border-b border-red-500/20 pb-2">
+                <div className="text-[9px] font-mono text-red-400/70">SCAN_FAIL</div>
+                <motion.div 
+                  className="text-base font-mono text-red-400"
+                  animate={{ textShadow: ["0 0 5px #ff0000", "0 0 10px #ff0000"] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  {errors.length}
+                </motion.div>
+              </div>
+            )}
+
+            {/* Recent Activity */}
+            <div className="space-y-1">
+              <div className="text-[9px] font-mono text-green-400/70 mb-1">RECENT</div>
+              {logs.slice(-3).map((log, idx) => (
+                <motion.div 
+                  key={idx}
+                  className="text-[7px] font-mono text-green-300/60 line-clamp-1"
+                  animate={{ opacity: [0.5, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.2 }}
+                >
+                  ▸ {log.text.substring(0, 20)}...
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Footer Stats */}
+            <div className="mt-auto pt-2 border-t border-green-500/20 space-y-0.5">
+              <motion.div 
+                className="text-[7px] font-mono text-green-500/30 flex justify-between"
+                animate={{ opacity: [0.3, 0.7] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <span>CONNECTION</span>
+                <span>ACTIVE</span>
+              </motion.div>
+              <div className="text-[7px] font-mono text-green-500/30">
+                v7.2.1-advanced
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+        </div>
       </motion.section>
 
-      {/* Cancel Confirmation Modal */}
+      {/* Cancel Confirmation Modal - Hacker Themed */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Cancel Scan?
-            </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              A scan is currently running. Are you sure you want to cancel it? This action cannot be undone.
-            </p>
-            <div className="mt-5 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleDismissCancel}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+        <motion.div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div 
+            className="w-full max-w-sm rounded-lg border-2 border-red-500/60 bg-black/80 p-6 shadow-2xl cyber-pulse relative overflow-hidden"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+          >
+            {/* Background glow */}
+            <div className="absolute inset-0 opacity-10 bg-linear-to-br from-red-500 to-purple-500 pointer-events-none" />
+            
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-red-500 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-red-500 pointer-events-none" />
+
+            <div className="relative z-10">
+              <motion.h3 
+                className="text-lg font-bold font-mono text-red-400 tracking-wider"
+                animate={{ textShadow: ["0 0 10px #ff0000", "0 0 20px #ff0000"] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
               >
-                Continue Scan
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmCancel}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-              >
-                Cancel Scan
-              </button>
+                ⚠ CRITICAL_ACTION
+              </motion.h3>
+              
+              <p className="mt-3 text-sm font-mono text-red-300/80">
+                Scan termination requested. This operation is {' '}
+                <span className="text-red-400 font-bold animate-pulse">IRREVERSIBLE</span>.
+                <br />
+                <span className="text-xs text-red-300/60 block mt-2">[CONFIRM_REQUIRED]</span>
+              </p>
+
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <motion.button
+                  type="button"
+                  onClick={handleDismissCancel}
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-4 py-2 text-sm font-bold font-mono text-blue-400 transition-all hover:border-blue-500/80"
+                >
+                  [ABORT]
+                </motion.button>
+                
+                <motion.button
+                  type="button"
+                  onClick={handleConfirmCancel}
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255, 0, 0, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-4 py-2 text-sm font-bold font-mono text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
+                >
+                  [CONFIRM_TERMINATION]
+                </motion.button>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

@@ -1,6 +1,7 @@
 "use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
-import { ArrowRight, Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
+import { motion } from "framer-motion";
+import { AlertCircle, ArrowRight, BarChart3, Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
@@ -480,11 +481,14 @@ export default function ScanPage() {
 
               {activeTab === "advanced" && (
                 <>
-                  <ScanExecutionGraph
-                    run={advancedRun}
-                    logs={advancedLogs}
-                    errors={advancedErrors}
-                  />
+                  {/* Info banner about 4-tool limit */}
+                  <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
+                    <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
+                      Advanced scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
+                    </p>
+                  </div>
+
                   <AdvancedTerminalPanel
                     projectId={isGuest ? "guest-advanced-scan" : projectId}
                     selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
@@ -494,6 +498,12 @@ export default function ScanPage() {
                     isSubmitting={isSubmitting}
                     onSubmit={submitAdvanced}
                     onReset={() => resetRun("advanced")}
+                  />
+
+                  <ScanExecutionGraph
+                    run={advancedRun}
+                    logs={advancedLogs}
+                    errors={advancedErrors}
                   />
                 </>
               )}
@@ -634,16 +644,41 @@ export default function ScanPage() {
         </div>
 
         {showViewResults && (
-          <div className="fixed bottom-8 right-8 z-[60] pointer-events-none">
-            <button
+          <motion.div 
+            className="fixed bottom-8 right-8 z-[60] pointer-events-none"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.button
               type="button"
               onClick={() => openJobReport(activeRun.jobId)}
-              className="pointer-events-auto inline-flex animate-bounce cursor-pointer items-center gap-2 rounded-full border-2 border-white/20 bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-colors hover:bg-teal-700 active:scale-95 dark:border-white/10"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "12px",
+                borderRadius: "8px",
+                border: "2px solid #00ff00",
+                backgroundColor: "#000000",
+                padding: "12px 24px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                color: "#00ff00",
+                textShadow: "0 0 10px #00ff00",
+                boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
             >
-              View Scan Results
-              <ArrowRight size={20} className="pointer-events-none" />
-            </button>
-          </div>
+              <BarChart3 size={20} className="pointer-events-none" />
+              View Results
+              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                <ArrowRight size={20} className="pointer-events-none" />
+              </motion.div>
+            </motion.button>
+          </motion.div>
         )}
       </div>
 
