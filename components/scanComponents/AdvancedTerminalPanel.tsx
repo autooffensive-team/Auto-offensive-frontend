@@ -10,6 +10,16 @@ import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
 import { LOG_SIZES } from "@/lib/log-themes";
 
+type NavigatorWithExtras = Navigator & {
+  userAgentData?: {
+    platform?: string;
+    brands?: Array<{ brand: string; version: string }>;
+  };
+  connection?: {
+    effectiveType?: string;
+  };
+};
+
 // ─── ASCII Art Background - Epic Mountain Landscape ────────────────────────────
 const ASCII_BACKGROUND = `
                                                                                                                             ::::::                                                                                                                        ::...::                                                                                                                     ::...::::                                                                                                                 ::....:::-                                                                                                              ::.....::::                                                                                                           :...:::::::::           ::                                                                                          :::::::::::::::         :...                                                                                       -:::::::::::::::.       -:::                                                                                      =-::::::::::::::::::::::::::::::::::::      :...:                                                                                    -:::::::::::::::::::::::::::::::::::::::::::::::::::::::    :....:                                                                                  =::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   :....:-                                                                                -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::..:::    .:::::=                                                                    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::-   :::::.::::::.                                                             -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   ::::::::::::::::-                                                       .::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-   ::::::::::::::::::::::                                                 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::  :::::::::::::::::::::::::-                                            ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::                                       -::::::::::::::::::::::::::::::::::::::::::::::::::::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    -::::..::::::::::::::::::::::::                                   ::::....::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::         *::::::::::::::::::::::::::::-                             -::....:::::::::::::::::::::::::::::::::::::::::::::    **=:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..               -:::::::::::::::::::::::::                          ::::::-              :::::::::::::::::::::::::::::    ***=::::::::::::::::::::::::::::.:::::::::::::::::::::::::::::::::.::.:::...:                   :::::::::::::::::::::::                        ::::::::::::::::::::::::    +***+::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::::::::.  :::::::                       ::::::::::::::::::                        ::::::::::::::::::::    ****+-::::::::::::::::::::::::::::: ::::::::::::::::::::::::::::::::::::::::::. ::::::                          ::::::::::::::                        :::::::::::::::::    ****+-::::::::::::::::::::::::::::: :::::::::::::::::::::::::::::::::::::::::::::::::::::::                           -::::::::::                        ::::::::::::::-    *****=:::::::::::::::::::::::::::::. @+::::::::::::::::::::::::::::::::::::::::::::::::::::::::                          :::::::::.:                        :::::::::::+    *****+-::::::::::::::::::::::::::::.. **-::::::::::::::....  :::::::::::::::::::::::::::::::::::::::                        .::::::::::                        =::::::::=     *****+::::::::::::::::::::::::::::..  **+:.::::::::::::::     ::...:::-:..--:::::::::::::::::::::::::::                       :::::::::::                        ::....::-    ******=::::::::::::::::::::::::::::..  ***=:::::::::::::..      :..:=               =-:::::::::::::::::::::::                    :::::::::.-                        -:...:-     ******=:::::::::::::::::::::::::::::.   **+:::::::..:::.::                                  -::::::::::::::::..:                   ::::::::::=                        ::.::    =******=:::::::::::::::::::::::::::::..  ***+:::::::::......                                      ::::::::::::::..:                   ::::::::::                         ::::    *******=:::::::::::::::::::::::::::::.:  ****-::::::::::::..                                           ::::::::::::::                   ::::::::::                         :::    #******=::::::::::::::::::::::::::::::.  *****-:::::::::::::.:                                             .::::::...:                    ::::::::::                         ::    *******=:::::::::::::::::::::::::::::::   *****:::::::::::::...                                                :::...:                      ::::::::.:                         +******+::::::::::::::::::::::::::::::::  *****+:::::::::::::...                                                  :::::                      *::::::::::                         *******-....:::::::::::::::::::::::::::+  *****+::::::::::::::..:                                                                             -::::::::::                         *******=:..:::::::::::::::::::::::::::::  ******+:::::::::::::::..=                                                                             :::::::..::                         ********=:-          ::::::::::::::::::::  ******+::::::::::::::::::                                                                             ::::::::.::                          #******                 ::::::::::::::::   #*****+:::::::::::::::::..                                                                             ::::::::..:                          *****                     ::::::::::::::- #******+::::::::::::::::::..                                                                            :::::::::..-                          ***                         ::::::::::::  ********-:::::::::::::::::::.                                                                           -:::::::::::                           -*                            :::::::::-   *******-:::::::::::::::::::::                                                                           :::::::::::-                           :::::::::  ********=::::::::::::::::::::::                                                                           :::::::::::                            -::::::-  ********+::::::::::::::::::::::.:                                                                         -:::::::::::                            ::::::   ********-::::::::::::::::::::::::                                                                        ::::::::::::                             :::.:   ********=:::::::::::::::::::::::.:-                                                                      -::::::::::::                             :.::-  *********:::::::::::::::::::::::::::                                                                      ::::::::::::-                             #::-  *********-::::::::::::::::::::::::::::                                                                    ::::::::::..:                              :-  *********+:::::::::::::::::::::::::::::                                                                   :::::::::::.:                               =   *********-::::::::::::::::::::::::::::::                                                                 :::::::::::::                                #********+:::::::::::::::::::::::::::::::=                                                               ::::::::::::::                                *********=::::::::::::::::::::::::::::::::-                                                             ::::::::::::::                                 **********           :-:::::::::::::::::::::                                                           ::::::::::::::::                                 ******      *--::-=*     -:::::::::::::::::::                                                         ::::::::::::::::                                  +****       :::::::::::-     ::::::::::::::::::                                                       ::::::::::::::.:                                   ***         :::::::::...::     ::::::::::::::.::                                                    ::::::::::::::::.                                    ::::::::::::::     :::::::::::::..:                                                  :::::::::::::::::                                     ::::::::::::::.     ::::::::::::::::                                               ::::::::::::::::::                                      ::::::::::::..:      ::::::::::::::::                                           ::::::::::::::::::.                                       .:::::::::::::::      :::::::::::::::                                        -:::::::::::::::::..                                        ::::::::::::::::      ::::::::::::::-                                    -:::::::::::::::::::.                                         ::::::::::::::::       ::::::::::::::                                 ::::::::::::::::::::::                                          :::::::::::::::::       :::::::::.:::-                             :::::::::::::::::::::::                                             .::::::::::::::::::.       =::::.....::*                    :::::::::::::::::::::::::                                              :::::::::::::::::::..        -::.....::-               :::::::::::::::::::::::::.:                                               .::::::::::::::::::::.          ::::::::-          -:::::::::::::::::::::::::::                                                 ::::::::::::::::::::::::              @      :::::::::::::::::::::::::::::::                                                  =:::::::::::::::::::::::::.              ::::::::::::::::::::::::::::::..                                                    -::::::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::...                                                      -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::...:                                                        -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::..:                                                          :::::::::::::::::::::::::::::::::::::::::::::::::::::::..                                                            -::::::::::::::::::::::::::::::::::::::::::::::::..:.                                                              :::::::::::::::::::::::::::::::::::::::::::::::                                                                 ::::::::::::::::::::::::::::::::::::::::..:                                                                   ::::::::::::::::::::::::::::::::::::.                                                                      -::::::::::::::::::::::::::.:::.                                                                        @::::::::::::::::::::::::::                                                                           =::::::::::::::::::                                                                               -::::::::::::
@@ -326,20 +336,61 @@ export function AdvancedTerminalPanel({
     const base = logSize.xtermFontSize;
     if (base >= LOG_SIZES.xxl.xtermFontSize) return base + 1;
     if (base >= LOG_SIZES.xl.xtermFontSize) return base + 1;
-    if (base >= LOG_SIZES.lg.xtermFontSize) return base;
-    if (base >= LOG_SIZES.md.xtermFontSize) return base;
-    return base;
+    if (base >= LOG_SIZES.lg.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.md.xtermFontSize) return base + 1;
+    return base + 1;
   }, [logSize.xtermFontSize]);
 
   const terminalLetterSpacing = useMemo(() => {
-    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 4;
-    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 3;
-    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1;
-    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 1;
-    return 1;
+    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3.5;
+    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 2.75;
+    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1.9;
+    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 0.25;
+    return 0.2;
   }, [logSize.xtermFontSize]);
 
   const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
+  const systemProfile = useMemo(
+    () => [
+      {
+        label: "Browser",
+        value: (() => {
+          if (typeof navigator === "undefined") return "Browser";
+          const nav = navigator as NavigatorWithExtras;
+          const agent = nav.userAgent;
+          const match = agent.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
+          if (match?.[1] && match[2]) return `${match[1]} ${match[2]}`;
+          const brand = nav.userAgentData?.brands?.find((item: { brand: string; version: string }) => !/not/i.test(item.brand));
+          return brand ? `${brand.brand} ${brand.version}` : "Browser";
+        })(),
+        tone: "text-green-300",
+      },
+      {
+        label: "OS",
+        value:
+          typeof navigator !== "undefined"
+            ? ((navigator as NavigatorWithExtras).userAgentData?.platform ?? navigator.platform ?? "Unknown OS")
+            : "Unknown OS",
+        tone: "text-green-300",
+      },
+      {
+        label: "CPU Cores",
+        value:
+          typeof navigator !== "undefined" && Number.isFinite(navigator.hardwareConcurrency)
+            ? `${navigator.hardwareConcurrency} cores`
+            : "unknown",
+        tone: "text-green-300",
+      },
+      {
+        label: "Network",
+        value: typeof navigator !== "undefined" && (navigator as NavigatorWithExtras).connection
+          ? `${(navigator as NavigatorWithExtras).connection?.effectiveType?.toUpperCase() ?? "ONLINE"}`
+          : "Online",
+        tone: "text-emerald-300",
+      },
+    ],
+    [],
+  );
 
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
@@ -348,7 +399,7 @@ export function AdvancedTerminalPanel({
   // ── Prompt ───────────────────────────────────────────────────────────────
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m  `;
+    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m `;
   }, []);
 
   // ── Redraw current input line after cursor moves ─────────────────────────
@@ -359,7 +410,7 @@ export function AdvancedTerminalPanel({
     const buf = lineRef.current;
     const cur = cursorRef.current;
     // Move to column 0, clear line, reprint prompt + buffer
-    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m  ${buf}`);
+    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m ${buf}`);
     // Move cursor back to correct position
     const charsAfterCursor = buf.length - cur;
     if (charsAfterCursor > 0) {
@@ -951,37 +1002,86 @@ export function AdvancedTerminalPanel({
 
             {/* Scan Status */}
             <div className="space-y-1.5 border-b border-green-500/20 pb-2">
-              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">PROJECT</div>
-              <div className="text-sm font-mono text-green-300">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">PROJECT</div>
+              <div className="text-base font-mono text-green-300 tracking-wide">
                 {selectedProject?.name || "no_project"}
               </div>
-              <div className="text-[11px] font-mono text-green-400/70 mt-1 tracking-wide">STATUS</div>
+              <div className="text-[12px] font-mono text-green-400/70 mt-1 tracking-[0.18em]">STATUS</div>
               <div className="flex items-center gap-2">
                 <motion.div 
                   className="w-2 h-2 rounded-full bg-green-500"
                   animate={{ boxShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 />
-                <span className="text-sm font-mono text-green-300">
+                <span className="text-base font-mono text-green-300 tracking-wide">
                   {isSubmitting ? "◆ SCANNING..." : "◆ IDLE"}
                 </span>
               </div>
             </div>
 
+            {/* Environment Profile */}
+            <div className="space-y-2 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">ENVIRONMENT</div>
+              <div className="space-y-1.5">
+                {systemProfile.map((item) => (
+                  <div key={item.label} className="flex items-baseline justify-between gap-3 font-mono">
+                    <span className="text-[11px] text-green-400/65 tracking-[0.14em] uppercase">
+                      {item.label}
+                    </span>
+                    <span className={`text-sm font-semibold ${item.tone} tracking-wide text-right`}>
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Radar Scan */}
+            <div className="space-y-2 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">RADAR_SCAN</div>
+              <div className="relative mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-green-500/30 bg-[radial-gradient(circle_at_center,rgba(0,255,0,0.12),rgba(0,0,0,0.04)_55%,rgba(0,0,0,0.85)_100%)]">
+                <div className="absolute inset-3 rounded-full border border-green-500/20" />
+                <div className="absolute inset-6 rounded-full border border-green-500/15" />
+                <div className="absolute inset-9 rounded-full border border-green-500/10" />
+                <motion.div
+                  className="absolute inset-0 rounded-full border-l-2 border-t-2 border-green-400/80"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.div
+                  className="absolute h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_16px_rgba(34,197,94,0.95)]"
+                  animate={{
+                    x: [-20, 18, 0, -12, 14, 0],
+                    y: [18, -18, -22, 6, 14, 18],
+                    opacity: [0.7, 1, 0.85, 1, 0.8, 0.7],
+                  }}
+                  transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute h-20 w-20 rounded-full border border-emerald-400/20"
+                  animate={{ scale: [0.85, 1.1, 0.85], opacity: [0.25, 0.55, 0.25] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-mono text-green-300/70 tracking-[0.16em]">
+                  BUG RADAR
+                </div>
+              </div>
+            </div>
+
             {/* Findings Stats */}
             <div className="space-y-1 border-b border-green-500/20 pb-2">
-              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">FINDINGS</div>
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">FINDINGS</div>
               <div className="text-2xl font-mono text-green-400">
                 {run.findings || 0}
               </div>
-              <div className="text-[10px] font-mono text-green-300/60">
+              <div className="text-[11px] font-mono text-green-300/60 tracking-wide">
                 vulnerabilities
               </div>
             </div>
 
             {/* Logs Stats */}
             <div className="space-y-1 border-b border-green-500/20 pb-2">
-              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">LOG_ENTRIES</div>
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">LOG_ENTRIES</div>
               <motion.div 
                 className="text-xl font-mono text-green-400"
                 animate={{ opacity: [0.8, 1] }}
@@ -989,7 +1089,7 @@ export function AdvancedTerminalPanel({
               >
                 {logs.length}
               </motion.div>
-              <div className="text-[10px] font-mono text-green-300/60">
+              <div className="text-[11px] font-mono text-green-300/60 tracking-wide">
                 records
               </div>
             </div>
@@ -997,7 +1097,7 @@ export function AdvancedTerminalPanel({
             {/* Error Count */}
             {errors.length > 0 && (
               <div className="space-y-1 border-b border-red-500/20 pb-2">
-                <div className="text-[11px] font-mono text-red-400/70 tracking-wide">SCAN_FAIL</div>
+                <div className="text-[12px] font-mono text-red-400/70 tracking-[0.18em]">SCAN_FAIL</div>
                 <motion.div 
                   className="text-lg font-mono text-red-400"
                   animate={{ textShadow: ["0 0 5px #ff0000", "0 0 10px #ff0000"] }}
@@ -1010,11 +1110,11 @@ export function AdvancedTerminalPanel({
 
             {/* Recent Activity */}
             <div className="space-y-1">
-              <div className="text-[11px] font-mono text-green-400/70 mb-1 tracking-wide">RECENT</div>
+              <div className="text-[12px] font-mono text-green-400/70 mb-1 tracking-[0.18em]">RECENT</div>
               {logs.slice(-3).map((log, idx) => (
                 <motion.div 
                   key={idx}
-                  className="text-[10px] font-mono text-green-300/60 line-clamp-1"
+                  className="text-[11px] font-mono text-green-300/60 line-clamp-1 tracking-wide"
                   animate={{ opacity: [0.5, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.2 }}
                 >
@@ -1026,14 +1126,14 @@ export function AdvancedTerminalPanel({
             {/* Footer Stats */}
             <div className="mt-auto pt-2 border-t border-green-500/20 space-y-0.5">
               <motion.div 
-                className="text-[9px] font-mono text-green-500/30 flex justify-between tracking-wide"
+                className="text-[10px] font-mono text-green-500/30 flex justify-between tracking-[0.16em]"
                 animate={{ opacity: [0.3, 0.7] }}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 <span>CONNECTION</span>
                 <span>ACTIVE</span>
               </motion.div>
-              <div className="text-[9px] font-mono text-green-500/30">
+              <div className="text-[10px] font-mono text-green-500/30 tracking-wide">
                 v7.2.1-advanced
               </div>
             </div>
