@@ -370,10 +370,17 @@ export function AdvancedTerminalPanel({
       },
       {
         label: "OS",
-        value:
-          typeof navigator !== "undefined"
-            ? ((navigator as NavigatorWithExtras).userAgentData?.platform ?? navigator.platform ?? "Unknown OS")
-            : "Unknown OS",
+        value: (() => {
+          if (typeof navigator === "undefined") return "Unknown OS";
+          const nav = navigator as NavigatorWithExtras;
+          const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
+          if (platformHint.includes("iphone") || platformHint.includes("ipad") || platformHint.includes("ipod")) return "iOS";
+          if (platformHint.includes("mac")) return "macOS";
+          if (platformHint.includes("android")) return "Android";
+          if (platformHint.includes("win")) return "Windows";
+          if (platformHint.includes("linux")) return "Linux";
+          return "Unknown OS";
+        })(),
         tone: "text-green-300",
       },
       {
@@ -386,8 +393,8 @@ export function AdvancedTerminalPanel({
       },
       {
         label: "Network",
-        value: typeof navigator !== "undefined" && (navigator as NavigatorWithExtras).connection
-          ? `${(navigator as NavigatorWithExtras).connection?.effectiveType?.toUpperCase() ?? "ONLINE"}`
+        value: typeof navigator !== "undefined"
+          ? (navigator.onLine ? "Online" : "Offline")
           : "Online",
         tone: "text-emerald-300",
       },

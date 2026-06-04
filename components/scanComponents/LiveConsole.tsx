@@ -93,9 +93,20 @@ function getBrowserProfile(): EnvCard[] {
       ? `${browserBrand.brand} ${browserBrand.version.split(".")[0]}`
       : "Browser";
 
-  const os = nav.userAgentData?.platform ?? nav.platform ?? "Unknown OS";
+  const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
+  const os = platformHint.includes("iphone") || platformHint.includes("ipad") || platformHint.includes("ipod")
+    ? "iOS"
+    : platformHint.includes("mac")
+      ? "macOS"
+      : platformHint.includes("android")
+        ? "Android"
+        : platformHint.includes("win")
+          ? "Windows"
+          : platformHint.includes("linux")
+            ? "Linux"
+            : "Unknown OS";
   const cpu = Number.isFinite(nav.hardwareConcurrency) ? `${nav.hardwareConcurrency} cores` : "Unknown";
-  const network = nav.connection?.effectiveType ? nav.connection.effectiveType.toUpperCase() : "Online";
+  const network = nav.onLine ? "Online" : "Offline";
 
   return [
     { label: "Browser", value: browser, tone: "text-emerald-600 dark:text-emerald-300" },
