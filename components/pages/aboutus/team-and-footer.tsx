@@ -20,7 +20,7 @@ const MENTORS = [
     badge: "Mentor",
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
-    slogan: "Every problem have solutions.",
+    slogan: "Every Solution has Problem.",
     img: "/images/teacher_Sokpheng.webp",
     social: {
       github: "https://github.com/sokpheng001",
