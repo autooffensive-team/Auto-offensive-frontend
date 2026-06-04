@@ -332,8 +332,8 @@ export function AdvancedTerminalPanel({
   }, [logSize.xtermFontSize]);
 
   const terminalLetterSpacing = useMemo(() => {
-    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3;
-    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 2;
+    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 4;
+    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 3;
     if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1;
     if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 1;
     return 1;
@@ -942,7 +942,7 @@ export function AdvancedTerminalPanel({
           >
             {/* Header */}
             <motion.div 
-              className="text-xs font-mono neon-text"
+              className="text-sm font-mono neon-text tracking-wide"
               animate={{ textShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
@@ -951,18 +951,18 @@ export function AdvancedTerminalPanel({
 
             {/* Scan Status */}
             <div className="space-y-1.5 border-b border-green-500/20 pb-2">
-              <div className="text-[9px] font-mono text-green-400/70">PROJECT</div>
-              <div className="text-xs font-mono text-green-300">
+              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">PROJECT</div>
+              <div className="text-sm font-mono text-green-300">
                 {selectedProject?.name || "no_project"}
               </div>
-              <div className="text-[9px] font-mono text-green-400/70 mt-1">STATUS</div>
+              <div className="text-[11px] font-mono text-green-400/70 mt-1 tracking-wide">STATUS</div>
               <div className="flex items-center gap-2">
                 <motion.div 
                   className="w-2 h-2 rounded-full bg-green-500"
                   animate={{ boxShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 />
-                <span className="text-[9px] font-mono text-green-300">
+                <span className="text-sm font-mono text-green-300">
                   {isSubmitting ? "◆ SCANNING..." : "◆ IDLE"}
                 </span>
               </div>
@@ -970,26 +970,26 @@ export function AdvancedTerminalPanel({
 
             {/* Findings Stats */}
             <div className="space-y-1 border-b border-green-500/20 pb-2">
-              <div className="text-[9px] font-mono text-green-400/70">FINDINGS</div>
-              <div className="text-xl font-mono text-green-400">
+              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">FINDINGS</div>
+              <div className="text-2xl font-mono text-green-400">
                 {run.findings || 0}
               </div>
-              <div className="text-[8px] font-mono text-green-300/60">
+              <div className="text-[10px] font-mono text-green-300/60">
                 vulnerabilities
               </div>
             </div>
 
             {/* Logs Stats */}
             <div className="space-y-1 border-b border-green-500/20 pb-2">
-              <div className="text-[9px] font-mono text-green-400/70">LOG_ENTRIES</div>
+              <div className="text-[11px] font-mono text-green-400/70 tracking-wide">LOG_ENTRIES</div>
               <motion.div 
-                className="text-lg font-mono text-green-400"
+                className="text-xl font-mono text-green-400"
                 animate={{ opacity: [0.8, 1] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
               >
                 {logs.length}
               </motion.div>
-              <div className="text-[8px] font-mono text-green-300/60">
+              <div className="text-[10px] font-mono text-green-300/60">
                 records
               </div>
             </div>
@@ -997,9 +997,9 @@ export function AdvancedTerminalPanel({
             {/* Error Count */}
             {errors.length > 0 && (
               <div className="space-y-1 border-b border-red-500/20 pb-2">
-                <div className="text-[9px] font-mono text-red-400/70">SCAN_FAIL</div>
+                <div className="text-[11px] font-mono text-red-400/70 tracking-wide">SCAN_FAIL</div>
                 <motion.div 
-                  className="text-base font-mono text-red-400"
+                  className="text-lg font-mono text-red-400"
                   animate={{ textShadow: ["0 0 5px #ff0000", "0 0 10px #ff0000"] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
@@ -1010,11 +1010,11 @@ export function AdvancedTerminalPanel({
 
             {/* Recent Activity */}
             <div className="space-y-1">
-              <div className="text-[9px] font-mono text-green-400/70 mb-1">RECENT</div>
+              <div className="text-[11px] font-mono text-green-400/70 mb-1 tracking-wide">RECENT</div>
               {logs.slice(-3).map((log, idx) => (
                 <motion.div 
                   key={idx}
-                  className="text-[7px] font-mono text-green-300/60 line-clamp-1"
+                  className="text-[10px] font-mono text-green-300/60 line-clamp-1"
                   animate={{ opacity: [0.5, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.2 }}
                 >
@@ -1026,14 +1026,14 @@ export function AdvancedTerminalPanel({
             {/* Footer Stats */}
             <div className="mt-auto pt-2 border-t border-green-500/20 space-y-0.5">
               <motion.div 
-                className="text-[7px] font-mono text-green-500/30 flex justify-between"
+                className="text-[9px] font-mono text-green-500/30 flex justify-between tracking-wide"
                 animate={{ opacity: [0.3, 0.7] }}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 <span>CONNECTION</span>
                 <span>ACTIVE</span>
               </motion.div>
-              <div className="text-[7px] font-mono text-green-500/30">
+              <div className="text-[9px] font-mono text-green-500/30">
                 v7.2.1-advanced
               </div>
             </div>

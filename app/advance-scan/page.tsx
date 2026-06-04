@@ -783,7 +783,7 @@ export default function AdvanceScanPage() {
                                     ? "border-amber-500/40 bg-amber-500/15 text-amber-200"
                                     : "border-emerald-400/20 bg-emerald-950/40 text-emerald-100/90"
                             }`}
-                            style={{ fontSize: `${logSize.xtermFontSize - 3}px` }}
+                            style={{ fontSize: `${logSize.xtermFontSize - 2}px` }}
                           >
                             <span className="mr-2 text-emerald-500/60">[{entry.createdAt}]</span>
                             <span className="font-bold text-emerald-300">{entry.event}</span>
