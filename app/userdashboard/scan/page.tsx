@@ -653,29 +653,28 @@ export default function ScanPage() {
             <motion.button
               type="button"
               onClick={() => openJobReport(activeRun.jobId)}
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03, y: -1, boxShadow: "0 10px 24px rgba(0, 208, 178, 0.22)" }}
+              whileTap={{ scale: 0.98 }}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "12px",
-                borderRadius: "8px",
-                border: "2px solid #00ff00",
-                backgroundColor: "#000000",
-                padding: "12px 24px",
-                fontSize: "16px",
-                fontWeight: "bold",
-                color: "#00ff00",
-                textShadow: "0 0 10px #00ff00",
-                boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
+                gap: "10px",
+                border: "0",
+                backgroundColor: "#00d0b2",
+                padding: "12px 18px",
+                fontSize: "14px",
+                fontWeight: 700,
+                color: "#0f172a",
+                boxShadow: "0 8px 18px rgba(0, 208, 178, 0.24)",
                 cursor: "pointer",
                 transition: "all 0.3s ease"
               }}
+              className="rounded-xl"
             >
-              <BarChart3 size={20} className="pointer-events-none" />
+              <BarChart3 size={16} className="pointer-events-none" />
               View Results
-              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ArrowRight size={20} className="pointer-events-none" />
+              <motion.div animate={{ x: [0, 3, 0] }} transition={{ duration: 1.4, repeat: Infinity }}>
+                <ArrowRight size={16} className="pointer-events-none" />
               </motion.div>
             </motion.button>
           </motion.div>

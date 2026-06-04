@@ -8,6 +8,7 @@ import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
+import { LOG_SIZES } from "@/lib/log-themes";
 
 // ─── ASCII Art Background - Epic Mountain Landscape ────────────────────────────
 const ASCII_BACKGROUND = `
@@ -321,6 +322,24 @@ export function AdvancedTerminalPanel({
   const prevErrorsLenRef = useRef(0);
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
+  const terminalFontSize = useMemo(() => {
+    const base = logSize.xtermFontSize;
+    if (base >= LOG_SIZES.xxl.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.xl.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.lg.xtermFontSize) return base;
+    if (base >= LOG_SIZES.md.xtermFontSize) return base;
+    return base;
+  }, [logSize.xtermFontSize]);
+
+  const terminalLetterSpacing = useMemo(() => {
+    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3;
+    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 2;
+    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1;
+    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 1;
+    return 1;
+  }, [logSize.xtermFontSize]);
+
+  const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
 
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
@@ -329,7 +348,7 @@ export function AdvancedTerminalPanel({
   // ── Prompt ───────────────────────────────────────────────────────────────
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m`;
+    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m  `;
   }, []);
 
   // ── Redraw current input line after cursor moves ─────────────────────────
@@ -340,7 +359,7 @@ export function AdvancedTerminalPanel({
     const buf = lineRef.current;
     const cur = cursorRef.current;
     // Move to column 0, clear line, reprint prompt + buffer
-    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m${buf}`);
+    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m  ${buf}`);
     // Move cursor back to correct position
     const charsAfterCursor = buf.length - cur;
     if (charsAfterCursor > 0) {
@@ -372,10 +391,11 @@ export function AdvancedTerminalPanel({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
         fontFamily: "var(--font-fira-code), 'Fira Code', Consolas, 'Courier New', monospace",
-        fontSize: Math.max(12, logSize.xtermFontSize - 2),  // Slightly smaller for more output
-        fontWeight: 300,
+        fontSize: terminalFontSize,
+        letterSpacing: terminalLetterSpacing,
+        fontWeight: 400,
         fontWeightBold: 700,
-        lineHeight: 1.9,  // Reduced from 1.9 for tighter display
+        lineHeight: terminalLineHeight,
         scrollback: 10000,  // Increased from 5000 for more history
         theme: terminalTheme,
         cols: 200,  // Force more columns for wider output
@@ -608,10 +628,12 @@ export function AdvancedTerminalPanel({
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.fontSize = logSize.xtermFontSize;
+      termRef.current.options.lineHeight = logSize.terminalLineHeight;
+      termRef.current.options.letterSpacing = terminalLetterSpacing;
       // Re-fit the terminal to recalculate cols/rows for new font size
       fitAddonRef.current?.fit();
     }
-  }, [logSize.xtermFontSize]);
+  }, [logSize.xtermFontSize, logSize.terminalLineHeight, terminalFontSize, terminalLetterSpacing, terminalLineHeight, terminalTheme]);
 
   // ── Terminal spinner while waiting for logs ───────────────────────────────
   const spinnerRef = useRef<ReturnType<typeof setInterval> | null>(null);

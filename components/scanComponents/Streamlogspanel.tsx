@@ -73,7 +73,7 @@ export function StreamLogsPanel({
       {/* Logs Container */}
       <div
         className={cn(
-          "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-[20rem]",
+          "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-80",
           theme.html.bg,
           size.className,
           size.lineHeight

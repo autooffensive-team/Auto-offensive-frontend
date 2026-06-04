@@ -62,7 +62,7 @@ export function LogToolbar({
               key={key}
               type="button"
               onClick={() => onSizeChange(key)}
-              className={cn(
+                className={cn(
                 "px-2 py-1 text-[10px] sm:text-[11px] font-semibold transition-all duration-200 font-mono",
                 key === sizeKey
                   ? "bg-green-500/30 text-green-300 border border-green-500/60 shadow-[0_0_10px_rgba(0,255,0,0.2)]"

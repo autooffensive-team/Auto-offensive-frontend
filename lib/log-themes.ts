@@ -72,7 +72,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       source: "text-teal-400",
       error: "text-red-400",
       warn: "text-amber-400",
-      info: "text-emerald-400",
+      info: "text-emerald-300",
       text: "text-gray-200",
       muted: "text-gray-500",
       asciiColor: "#2dd4bf",
@@ -90,10 +90,10 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       yellow: "#facc15",
       blue: "#60a5fa",
       magenta: "#c084fc",
-      cyan: "#2dd4bf",
+      cyan: "#4ade80",
       white: "#e2e8f0",
       brightBlack: "#94a3b8",
-      brightCyan: "#5eead4",
+      brightCyan: "#86efac",
     },
   },
 
@@ -340,7 +340,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
 
 // ─── Font Size Presets ────────────────────────────────────────────────────────
 
-export type LogSizeKey = "xs" | "sm" | "md" | "lg" | "xl";
+export type LogSizeKey = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 
 export type LogSizeConfig = {
   label: string;
@@ -350,14 +350,17 @@ export type LogSizeConfig = {
   xtermFontSize: number;
   /** Tailwind line-height class */
   lineHeight: string;
+  /** Line-height multiplier used by xterm */
+  terminalLineHeight: number;
 };
 
 export const LOG_SIZES: Record<LogSizeKey, LogSizeConfig> = {
-  xs: { label: "XS", className: "text-[12px]", xtermFontSize: 12, lineHeight: "leading-tight" },
-  sm: { label: "S", className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-snug" },
-  md: { label: "M", className: "text-[16px]", xtermFontSize: 16, lineHeight: "leading-normal" },
-  lg: { label: "L", className: "text-[18px]", xtermFontSize: 18, lineHeight: "leading-relaxed" },
-  xl: { label: "XL", className: "text-[21px]", xtermFontSize: 21, lineHeight: "leading-loose" },
+  xs: { label: "XS", className: "text-[12px]", xtermFontSize: 12, lineHeight: "leading-tight", terminalLineHeight: 1.35 },
+  sm: { label: "S", className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-snug", terminalLineHeight: 1.45 },
+  md: { label: "M", className: "text-[16px]", xtermFontSize: 16, lineHeight: "leading-[1.9]", terminalLineHeight: 1.55 },
+  lg: { label: "L", className: "text-[18px]", xtermFontSize: 18, lineHeight: "leading-[1.9]", terminalLineHeight: 1.65 },
+  xl: { label: "XL", className: "text-[21px]", xtermFontSize: 21, lineHeight: "leading-[2.05]", terminalLineHeight: 1.8 },
+  xxl: { label: "XXL", className: "text-[24px]", xtermFontSize: 24, lineHeight: "leading-[3.3]", terminalLineHeight: 2.0 },
 };
 
 /** Default theme key */
