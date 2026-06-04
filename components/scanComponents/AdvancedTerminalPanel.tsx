@@ -892,29 +892,15 @@ export function AdvancedTerminalPanel({
 
               {/* Title with glitch effect - CENTERED */}
               <div className="flex items-center gap-2 flex-1 justify-center">
-                <motion.div 
-                  className="h-2 w-2 rounded-full bg-green-500 neon-text"
-                  animate={{ opacity: [1, 0.5], boxShadow: ["0 0 5px #00ff00", "0 0 10px #00ff00"] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                />
-                <motion.span 
-                  className="font-mono text-xs sm:text-sm font-bold neon-text tracking-wider"
-                  animate={{ textShadow: ["0 0 10px #00ff00, 0 0 20px #00ff00", "0 0 5px #00ff00"] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {selectedProject ? `⚡ ${selectedProject.name}@auto-offensive` : "⚡ auto-offensive"} :: ADVANCED_SCAN
-                </motion.span>
+                <motion.div className="h-2 w-2 rounded-full bg-green-500/80" />
+                <motion.span className="font-mono text-xs sm:text-sm font-semibold tracking-wider text-green-400 dark:text-green-300">{selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} :: ADVANCED_SCAN</motion.span>
               </div>
             </div>
 
             {/* Right side - Status and Controls */}
             <div className="flex items-center gap-3 ml-4">
               {isSubmitting && (
-                <motion.span 
-                  className="rounded-md border-2 border-green-500/60 bg-green-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold neon-text flex items-center gap-2 whitespace-nowrap"
-                  animate={{ boxShadow: ["0 0 10px #00ff00", "0 0 20px #00ff00"] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                >
+                <motion.span className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold flex items-center gap-2 whitespace-nowrap text-green-400 dark:text-green-300">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -928,9 +914,9 @@ export function AdvancedTerminalPanel({
               <motion.button
                 type="button"
                 onClick={onReset}
-                whileHover={{ scale: 1.08, boxShadow: "0 0 15px rgba(0, 255, 0, 0.6)" }}
+                whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-green-500/60 bg-black hover:bg-green-500/15 px-3 py-1 text-[10px] sm:text-xs font-bold neon-text transition-all duration-300 whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-3 py-1 text-[10px] sm:text-xs font-bold text-green-400 transition-all duration-300 whitespace-nowrap hover:bg-green-500/10"
               >
                 <RotateCcw size={11} />
                 RESET
