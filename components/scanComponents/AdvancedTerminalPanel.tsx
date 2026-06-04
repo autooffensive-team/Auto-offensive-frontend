@@ -359,9 +359,12 @@ export function AdvancedTerminalPanel({
           const nav = navigator as NavigatorWithExtras;
           const agent = nav.userAgent;
           const match = agent.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
-          if (match?.[1] && match[2]) return `${match[1]} ${match[2]}`;
+          if (match?.[1] && match[2]) {
+            const version = match[2].split(".")[0];
+            return `${match[1]} ${version}`;
+          }
           const brand = nav.userAgentData?.brands?.find((item: { brand: string; version: string }) => !/not/i.test(item.brand));
-          return brand ? `${brand.brand} ${brand.version}` : "Browser";
+          return brand ? `${brand.brand} ${String(brand.version).split(".")[0]}` : "Browser";
         })(),
         tone: "text-green-300",
       },
