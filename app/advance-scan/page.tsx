@@ -301,7 +301,74 @@ export default function AdvanceScanPage() {
         }
 
         if (eventName === "error" && record) {
-          setPageError(typeof record.error === "string" ? record.error : "Scan error occurred.");
+          const errorMessage = typeof record.error === "string" ? record.error : "Scan error occurred.";
+          
+          // Provide contextual error messages based on the error type
+          let contextualMessage = errorMessage;
+          const lowerMessage = errorMessage.toLowerCase();
+          
+          // Check for off-topic/unauthorized commands
+          if (lowerMessage.includes("not in the active tool") || 
+              lowerMessage.includes("unauthorized") || 
+              lowerMessage.includes("not allowed") ||
+              lowerMessage.includes("command not found") ||
+              lowerMessage.includes("invalid command") ||
+              lowerMessage.includes("bad gateway") ||
+              lowerMessage.includes("first command") ||
+              lowerMessage.includes("rejected")) {
+            contextualMessage = "❌ UNAUTHORIZED COMMAND\n\n" +
+              "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+              "This environment ONLY supports authorized security scanning tools.\n\n" +
+              "✓ ALLOWED TOOLS:\n" +
+              "  • nmap, masscan, naabu (port scanning)\n" +
+              "  • nikto, gobuster, ffuf (web scanning)\n" +
+              "  • sqlmap, hydra (vulnerability assessment)\n" +
+              "  • nuclei, subfinder, httpx (reconnaissance)\n" +
+              "  • amass, katana (web crawling)\n\n" +
+              "✗ NOT ALLOWED:\n" +
+              "  • System commands: ls, cd, rm, mkdir, etc.\n" +
+              "  • Network tools: ping, curl, wget, telnet, etc.\n" +
+              "  • Shell access: bash, sh, powershell, cmd, etc.\n\n" +
+              "💡 TIP: Type 'help' to see usage examples\n" +
+              "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+          } else if (lowerMessage.includes("timeout")) {
+            contextualMessage = "⏱️ SCAN TIMEOUT\n\n" +
+              "The command execution exceeded the maximum time limit.\n\n" +
+              "Recommendations:\n" +
+              "• Use a narrower target scope\n" +
+              "• Reduce scan threads with -T2 or similar flags\n" +
+              "• Filter specific ports: -p 22,80,443\n" +
+              "• Use quick scan options if available";
+          } else if (lowerMessage.includes("quota") || lowerMessage.includes("limit")) {
+            contextualMessage = "📊 QUOTA EXCEEDED\n\n" +
+              "You have reached your scan limit for this period.\n\n" +
+              "Options:\n" +
+              "• Wait for your quota to reset\n" +
+              "• Upgrade your account for unlimited scans\n" +
+              "• Contact support for more information";
+          } else if (lowerMessage.includes("invalid") || lowerMessage.includes("syntax")) {
+            contextualMessage = "⚠️ INVALID COMMAND SYNTAX\n\n" +
+              "The command format is incorrect.\n\n" +
+              "Examples:\n" +
+              "• nmap -sV -sC target.com\n" +
+              "• nuclei -u https://example.com\n" +
+              "• subfinder -d example.com | httpx\n\n" +
+              "Always include a target (hostname or IP address).";
+          } else if (lowerMessage.includes("connection") || lowerMessage.includes("refused")) {
+            contextualMessage = "🔌 CONNECTION ERROR\n\n" +
+              "Unable to reach the target or execute the command.\n\n" +
+              "Verify:\n" +
+              "✓ Target host is reachable\n" +
+              "✓ Target is not blocked by firewall\n" +
+              "✓ Network connectivity is working\n" +
+              "✓ You have permission to scan this target";
+          }
+          
+          // Add the formatted error to logs
+          appendLog("error", { message: contextualMessage });
+          
+          // Also set it as page error for display
+          setPageError(contextualMessage);
           setStatus("FAILED");
           setIsStreaming(false);
         }
@@ -408,7 +475,7 @@ export default function AdvanceScanPage() {
     event.preventDefault();
 
     if (!command.trim()) {
-      setPageError("Enter a command to run.");
+      setPageError("⚠️ Please enter a command: Provide a valid security scanning command (e.g., nmap -sV target.com).");
       return;
     }
 
@@ -440,23 +507,27 @@ export default function AdvanceScanPage() {
       if (!response.ok) {
         // Handle 429 rate limit from backend
         if (response.status === 429) {
-          let errorMsg = "Anonymous scan quota exceeded.";
+          let errorMsg = "📊 Quota Exceeded: You have reached your scan limit.";
           try {
             const body = await response.json();
             if (body?.detail?.error) {
               errorMsg = body.detail.error;
             }
             if (body?.detail?.limit != null) {
-              errorMsg += ` Limit: ${body.detail.limit}, remaining: ${body.detail.remaining ?? 0}.`;
+              errorMsg = `📊 Rate Limited: You have used ${body.detail.limit - (body.detail.remaining ?? 0)} of ${body.detail.limit} scans available.`;
             }
             if (body?.detail?.reset_at) {
               const resetDate = new Date(body.detail.reset_at * 1000);
-              errorMsg += ` Resets at: ${resetDate.toLocaleString()}.`;
+              errorMsg += ` Access will resume at ${resetDate.toLocaleString()}.`;
+            } else {
+              errorMsg += " Please try again later or upgrade your account.";
             }
           } catch {
             const limit = response.headers.get("x-ratelimit-limit");
             const remaining = response.headers.get("x-ratelimit-remaining");
-            if (limit) errorMsg += ` Limit: ${limit}, remaining: ${remaining ?? 0}.`;
+            if (limit) {
+              errorMsg = `📊 Rate Limited: You have used ${parseInt(limit) - parseInt(remaining || "0")} of ${limit} scans. Please wait before attempting again.`;
+            }
           }
           setPageError(errorMsg);
           setStatus("IDLE");
@@ -465,11 +536,12 @@ export default function AdvanceScanPage() {
         }
 
         if (response.status === 422) {
-          let errorMsg = "Validation error.";
+          let errorMsg = "❌ Validation Error: The command provided does not meet security requirements.";
           try {
             const body = await response.json();
             if (body?.detail && Array.isArray(body.detail)) {
-              errorMsg = body.detail.map((d: any) => d.msg ?? String(d)).join(", ");
+              const details = body.detail.map((d: any) => d.msg ?? String(d)).join("; ");
+              errorMsg = `❌ Invalid Command: ${details}. Please verify your command syntax.`;
             }
           } catch { /* ignore */ }
           throw new Error(errorMsg);
@@ -483,7 +555,19 @@ export default function AdvanceScanPage() {
       if (controller.signal.aborted) {
         appendLog("warning", { message: "Streaming connection stopped from the browser." });
       } else {
-        const message = error instanceof Error ? error.message : "Advanced scan failed to start.";
+        let message = error instanceof Error ? error.message : "Advanced scan failed to start.";
+        
+        // Provide contextual error messages
+        if (message.toLowerCase().includes("network")) {
+          message = "🔌 NETWORK ERROR\n\nUnable to connect to the scanning server.\n\nPlease verify:\n✓ Your internet connection is active\n✓ The server is online\n✓ No firewall is blocking the connection\n\nTry again in a moment.";
+        } else if (message.toLowerCase().includes("timeout")) {
+          message = "⏱️ REQUEST TIMEOUT\n\nThe server took too long to respond.\n\nTip: Try again with a simpler command or narrower scan scope.";
+        } else if (message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("forbidden")) {
+          message = "❌ UNAUTHORIZED COMMAND\n\nYour command contains unauthorized operations.\n\nOnly approved security scanning tools are allowed:\n✓ nmap, nikto, gobuster, sqlmap, hydra, masscan, nuclei, subfinder, httpx\n✗ No: bash, ls, rm, curl, wget, ping, telnet\n\nPlease try a valid security scanning command.";
+        } else if (message.toLowerCase().includes("not found")) {
+          message = "❌ TOOL NOT AVAILABLE\n\nThe specified tool is not available in this environment.\n\nAvailable tools:\n• nmap, masscan, naabu (port scanning)\n• nikto, gobuster, ffuf (web scanning)\n• sqlmap, hydra (vulnerability assessment)\n• nuclei, subfinder, httpx (reconnaissance)\n\nVerify the tool name and try again.";
+        }
+        
         setPageError(message);
         appendLog("error", { error: message });
         setStatus("FAILED");
@@ -587,13 +671,15 @@ export default function AdvanceScanPage() {
               <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/80 p-4 sm:p-5 text-sm dark:border-amber-600/40 dark:bg-amber-950/20">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="mt-1 text-amber-700 dark:text-amber-500 flex-shrink-0" size={20} />
-                  <div>
+                  <div className="w-full">
                     <p className="font-bold text-amber-900 dark:text-amber-100">
-                      Guest Mode — Limited Scans
+                      ⚠️ Authorized Tools Only — Off-Topic Commands Will Be Rejected
                     </p>
-                    <p className="mt-2 text-xs text-amber-800 dark:text-amber-200/80 leading-relaxed">
-                      You're in guest mode with limited scans. Commands execute in a sandboxed environment. Create an account for unlimited access and project management.
-                    </p>
+                    <div className="mt-3 space-y-2 text-xs text-amber-800 dark:text-amber-200/90 leading-relaxed">
+                      <p><span className="font-semibold">✓ ALLOWED:</span> nmap, nikto, gobuster, sqlmap, hydra, masscan, nuclei, subfinder, httpx, amass, katana, ffuf, naabu</p>
+                      <p><span className="font-semibold">✗ NOT ALLOWED:</span> bash, ls, rm, curl, wget, ping, cd, mkdir, telnet, ssh, or any system commands</p>
+                      <p><span className="font-semibold">💡 Tip:</span> Type <span className="font-mono bg-amber-200/30 px-2 py-1 rounded">help</span> to see command examples and usage.</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -601,7 +687,7 @@ export default function AdvanceScanPage() {
               {pageError ? (
                 <div className="rounded-2xl border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 flex items-start gap-3">
                   <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
-                  <p>{pageError}</p>
+                  <p className="whitespace-pre-wrap break-words leading-relaxed font-mono text-xs">{pageError}</p>
                 </div>
               ) : null}
 

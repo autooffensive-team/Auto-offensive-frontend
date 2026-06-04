@@ -35,6 +35,29 @@ export function parseJsonMaybe(value: string) {
   }
 }
 
+function extractErrorMessage(detail: unknown): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        if (item && typeof item === "object") {
+          const data = item as Record<string, unknown>;
+          const msg = data.msg ?? data.message;
+          return typeof msg === "string" ? msg : String(item);
+        }
+        return String(item);
+      })
+      .join(", ");
+  }
+  if (detail && typeof detail === "object") {
+    const data = detail as Record<string, unknown>;
+    const nested = data.detail ?? data.error ?? data.message ?? data.msg;
+    if (nested !== undefined) return extractErrorMessage(nested);
+    return JSON.stringify(data);
+  }
+  return String(detail ?? "");
+}
+
 export function formatPayloadLine(payload: unknown) {
   if (payload && typeof payload === "object") {
     const data = payload as Record<string, unknown>;
@@ -300,7 +323,7 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const detail = body?.detail ?? body?.error ?? response.statusText;
-    throw new Error(Array.isArray(detail) ? detail.map((item: any) => item.msg ?? String(item)).join(", ") : String(detail));
+    throw new Error(extractErrorMessage(detail));
   }
 
   return response.json() as Promise<T>;

@@ -373,7 +373,7 @@ export default function ScanPage() {
   );
   const showViewResults =
     activeRun.status !== "idle" &&
-    /completed|failed|cancelled|partial/i.test(activeRun.status);
+    /completed|cancelled|partial/i.test(activeRun.status);
 
   return (
     <>
