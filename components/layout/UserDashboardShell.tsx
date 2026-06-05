@@ -460,7 +460,7 @@ export default function UserDashboardShell({
 
       <div className={`transition-all duration-300 ${desktopContentOffset}`}>
         <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
-          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-3 sm:px-4 md:px-5 md:py-3.5">
+          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -474,7 +474,7 @@ export default function UserDashboardShell({
                 <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${isGuest ? "text-amber-600 dark:text-amber-400" : "text-teal-600 dark:text-teal-300"}`}>
                   {isGuest ? "Guest Dashboard" : "User Dashboard"}
                 </p>
-                <h1 className="truncate text-xl font-semibold text-slate-950 dark:text-white">
+                <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
                   {pageLabel}
                 </h1>
               </div>
