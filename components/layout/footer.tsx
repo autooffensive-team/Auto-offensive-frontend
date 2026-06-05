@@ -156,10 +156,10 @@ export function Footer() {
                 alt="ISTAD logo"
                 width={150}
                 height={75}
-                className="sm:!max-h-[45px] sm:order-2 order-2"
+                className="sm:max-h-11.25! sm:order-2 order-2"
                 style={{ width: 'auto', height: 'auto' }}
               />
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug max-w-[280px] sm:max-w-[200px] text-center sm:order-3 order-3">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug max-w-70 sm:max-w-50 text-center sm:order-3 order-3">
                 Institute of Science and Technology Advanced Development
               </p>
             </div>
