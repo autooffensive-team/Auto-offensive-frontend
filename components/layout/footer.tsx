@@ -30,11 +30,18 @@ export function Footer() {
       {/* Watermark background text */}
       <div className="absolute inset-0 flex items-end justify-center pointer-events-none select-none overflow-hidden">
         <h1
-          className="font-black tracking-tighter whitespace-nowrap text-zinc-900 dark:text-zinc-100 opacity-[0.03]"
+          className="font-black tracking-tighter whitespace-nowrap"
           style={{
             fontFamily: "var(--font-hackdaddy), monospace",
             fontSize: "clamp(2rem, 12vw, 15rem)",
             transform: "translateY(25%)",
+            background: "linear-gradient(to bottom, var(--color-secondary-start), var(--color-secondary-mid), var(--color-secondary-end))",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            opacity: 0.12,
+            maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.05) 90%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.05) 90%, rgba(0,0,0,0) 100%)",
           }}
         >
           AUTO OFFENSIVE
