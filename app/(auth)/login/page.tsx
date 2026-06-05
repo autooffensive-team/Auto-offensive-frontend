@@ -53,6 +53,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     headers: requestHeaders,
   });
 
+  // If user has a session, redirect to dashboard
   if (session) {
     redirect("/userdashboard");
   }
