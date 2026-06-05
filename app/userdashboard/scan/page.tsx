@@ -492,13 +492,13 @@ export default function ScanPage() {
                   <AdvancedTerminalPanel
                     projectId={isGuest ? "guest-advanced-scan" : projectId}
                     selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
-                    logs={advancedLogs}
-                    run={advancedRun}
-                    errors={advancedErrors}
-                    isSubmitting={isSubmitting}
-                    onSubmit={submitAdvanced}
-                    onReset={() => resetRun("advanced")}
-                  />
+                  logs={advancedLogs}
+                  run={advancedRun}
+                  errors={advancedErrors}
+                  isSubmitting={isSubmitting}
+                  onSubmit={submitAdvanced}
+                  onReset={() => resetRun("advanced")}
+                />
 
                   <ScanExecutionGraph
                     run={advancedRun}
@@ -645,7 +645,7 @@ export default function ScanPage() {
 
         {showViewResults && (
           <motion.div 
-            className="fixed bottom-8 right-8 z-[60] pointer-events-none"
+            className="fixed bottom-8 right-8 z-[60]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -653,6 +653,7 @@ export default function ScanPage() {
             <motion.button
               type="button"
               onClick={() => openJobReport(activeRun.jobId)}
+              className="pointer-events-auto rounded-xl"
               whileHover={{ scale: 1.03, y: -1, boxShadow: "0 10px 24px rgba(0, 208, 178, 0.22)" }}
               whileTap={{ scale: 0.98 }}
               style={{
@@ -669,7 +670,6 @@ export default function ScanPage() {
                 cursor: "pointer",
                 transition: "all 0.3s ease"
               }}
-              className="rounded-xl"
             >
               <BarChart3 size={16} className="pointer-events-none" />
               View Results

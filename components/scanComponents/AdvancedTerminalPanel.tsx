@@ -117,6 +117,146 @@ const glitchAnimation = `
     }
   }
 
+  @keyframes radar-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes blip-pulse {
+    0%, 100% {
+      opacity: 0.7;
+      box-shadow: 0 0 6px rgba(34, 211, 155, 0.8), 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(34, 211, 155, 1), 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+  }
+
+  @keyframes radar-pulse-active {
+    0% {
+      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(34, 211, 155, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0);
+    }
+  }
+
+  @keyframes radar-pulse-found {
+    0%, 100% {
+      box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 24px rgba(34, 211, 155, 1), 0 0 48px rgba(16, 185, 129, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .radar-container {
+    position: relative;
+    width: 192px;
+    height: 192px;
+    background: radial-gradient(circle at center, rgba(10, 10, 10, 0.9) 0%, rgba(5, 5, 5, 1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .radar-base {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .radar-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1.2px solid rgba(34, 211, 155, 0.35);
+    border-radius: 50%;
+  }
+
+  .radar-ring-1 {
+    width: 85%;
+    height: 85%;
+  }
+
+  .radar-ring-2 {
+    width: 55%;
+    height: 55%;
+  }
+
+  .radar-ring-3 {
+    width: 25%;
+    height: 25%;
+  }
+
+  .radar-sweep {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 50%;
+    transform-origin: bottom center;
+    background: linear-gradient(to top, rgba(34, 211, 155, 0.9), rgba(34, 211, 155, 0.4), rgba(34, 211, 155, 0));
+    z-index: 2;
+    box-shadow: 0 0 8px rgba(34, 211, 155, 0.6);
+  }
+
+  .radar-sweep.active {
+    animation: radar-spin 4s linear infinite;
+  }
+
+  .radar-sweep.scanning {
+    animation: radar-spin 3.5s linear infinite;
+  }
+
+  .radar-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.8));
+    border-radius: 50%;
+    z-index: 4;
+    box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+  }
+
+  .radar-center.scanning {
+    animation: radar-pulse-active 1.5s ease-in-out infinite;
+  }
+
+  .radar-center.found {
+    animation: radar-pulse-found 1s ease-in-out infinite;
+  }
+
+  .radar-blip {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.6));
+    border-radius: 50%;
+    z-index: 3;
+    animation: blip-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(34, 211, 155, 0.9);
+  }
+
   .glitch-text {
     animation: glitch 0.3s ease-in-out infinite;
     position: relative;
@@ -294,6 +434,7 @@ export function AdvancedTerminalPanel({
   run,
   errors,
   isSubmitting,
+  isStreaming,
   onSubmit,
   onReset,
 }: {
@@ -303,6 +444,7 @@ export function AdvancedTerminalPanel({
   run: ActiveRun;
   errors: string[];
   isSubmitting: boolean;
+  isStreaming?: boolean;
   onSubmit: (command: string) => void;
   onReset: () => void;
 }) {
@@ -313,6 +455,7 @@ export function AdvancedTerminalPanel({
 
   // ── Cancel confirmation modal state ──────────────────────────────────────
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [radarTick, setRadarTick] = useState(0);
 
   // ── Input state ──────────────────────────────────────────────────────────
   // We maintain a full line buffer + cursor position so arrow keys, Home/End,
@@ -350,6 +493,66 @@ export function AdvancedTerminalPanel({
   }, [logSize.xtermFontSize]);
 
   const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
+  const radarState = useMemo(() => {
+    const findingCount = run.findings || 0;
+    const status = String(run.status || "").toLowerCase();
+    const isRunning =
+      isSubmitting ||
+      isStreaming ||
+      status.includes("running") ||
+      status.includes("scanning") ||
+      status.includes("processing") ||
+      status.includes("active");
+    const isFailed = status.includes("failed");
+    const isDone = status.includes("completed");
+
+    const blips = Array.from({ length: Math.min(4, Math.max(2, findingCount > 0 ? findingCount : 2)) }, (_, index) => ({
+      x: [-26, 18, 10, -12][index % 4],
+      y: [14, -16, -8, 10][index % 4],
+      delay: index * 0.45,
+    }));
+
+    return {
+      sweepDuration: isRunning ? 2.8 : isDone ? 4.2 : isFailed ? 5.5 : 3.8,
+      sweepTone: isFailed
+        ? "rgba(248,113,113,0.32)"
+        : isDone
+          ? "rgba(45,212,191,0.34)"
+          : isRunning
+            ? "rgba(74,222,128,0.42)"
+            : "rgba(74,222,128,0.28)",
+      pulseTone: isFailed
+        ? "rgba(248,113,113,0.55)"
+        : isDone
+          ? "rgba(45,212,191,0.55)"
+          : "rgba(52,211,153,0.55)",
+      blips,
+      badge: isFailed ? "alert" : isDone ? "locked" : isRunning ? "tracking" : "idle",
+    };
+  }, [isSubmitting, isStreaming, run.findings, run.status]);
+
+  useEffect(() => {
+    const status = String(run.status || "").toLowerCase();
+    const isRadarActive =
+      isSubmitting ||
+      isStreaming ||
+      status.includes("running") ||
+      status.includes("scanning") ||
+      status.includes("processing") ||
+      status.includes("active");
+
+    if (!isRadarActive) {
+      setRadarTick(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setRadarTick((value) => (value + 1) % 360);
+    }, 24);
+
+    return () => window.clearInterval(interval);
+  }, [isSubmitting, isStreaming, run.status]);
+
   const systemProfile = useMemo(
     () => [
       {
@@ -1032,34 +1235,62 @@ export function AdvancedTerminalPanel({
               </div>
             </div>
 
-            {/* Radar Scan */}
-            <div className="space-y-2 border-b border-green-500/20 pb-2">
-              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">RADAR_SCAN</div>
-              <div className="relative mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-green-500/30 bg-[radial-gradient(circle_at_center,rgba(0,255,0,0.12),rgba(0,0,0,0.04)_55%,rgba(0,0,0,0.85)_100%)]">
-                <div className="absolute inset-3 rounded-full border border-green-500/20" />
-                <div className="absolute inset-6 rounded-full border border-green-500/15" />
-                <div className="absolute inset-9 rounded-full border border-green-500/10" />
-                <motion.div
-                  className="absolute inset-0 rounded-full border-l-2 border-t-2 border-green-400/80"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div
-                  className="absolute h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_16px_rgba(34,197,94,0.95)]"
-                  animate={{
-                    x: [-20, 18, 0, -12, 14, 0],
-                    y: [18, -18, -22, 6, 14, 18],
-                    opacity: [0.7, 1, 0.85, 1, 0.8, 0.7],
-                  }}
-                  transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                  className="absolute h-20 w-20 rounded-full border border-emerald-400/20"
-                  animate={{ scale: [0.85, 1.1, 0.85], opacity: [0.25, 0.55, 0.25] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-mono text-green-300/70 tracking-[0.16em]">
-                  BUG RADAR
+            {/* Threat Map */}
+            <div className="space-y-3 border-b border-green-500/15 pb-3">
+              <div className="flex items-center justify-between">
+                <div className="text-[11px] font-mono uppercase tracking-[0.22em] text-emerald-400/80">
+                  Threat Map
+                </div>
+                <div className="rounded-full border border-emerald-500/15 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300/80">
+                  {isSubmitting || isStreaming ? "scanning" : radarState.badge}
+                </div>
+              </div>
+              <div className="radar-container border border-emerald-600/20 shadow-[0_0_24px_rgba(34,211,155,0.2)]">
+                <div className="radar-base">
+                  {/* Concentric Rings */}
+                  <div className="radar-ring radar-ring-1" />
+                  <div className="radar-ring radar-ring-2" />
+                  <div className="radar-ring radar-ring-3" />
+
+                  {/* Rotating Sweep Line - Sweeps until scan status is completed */}
+                  <div className={`radar-sweep ${
+                    isSubmitting || isStreaming || 
+                    (run.status && !String(run.status).toLowerCase().includes('completed') && !String(run.status).toLowerCase().includes('idle')) 
+                      ? 'scanning' 
+                      : ''
+                  }`} />
+
+                  {/* Center Point - Changes state based on scan activity */}
+                  <div className={`radar-center ${
+                    isSubmitting || isStreaming 
+                      ? 'scanning' 
+                      : (run.findings && run.findings > 0) 
+                        ? 'found' 
+                        : ''
+                  }`} />
+
+                  {/* Radar Blips - Only show if findings detected */}
+                  {(run.findings && run.findings > 0) && radarState.blips.map((blip, idx) => {
+                    const angle = (idx * 90) + (radarTick * 0.5);
+                    const radius = 80 + (idx % 2) * 25;
+                    const x = Math.cos((angle * Math.PI) / 180) * radius;
+                    const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                    return (
+                      <motion.div
+                        key={idx}
+                        className="radar-blip"
+                        style={{
+                          left: `calc(50% + ${x}px)`,
+                          top: `calc(50% + ${y}px)`,
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
