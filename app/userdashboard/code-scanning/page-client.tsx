@@ -2,9 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Activity,
   AlertCircle,
+  AlertTriangle,
   ChevronLeft,
   ChevronRight,
+  Eye,
   ExternalLink,
   FolderGit2,
   GitBranch,
@@ -195,12 +198,14 @@ function HexStatCard({
   variant = "default",
   badge,
   index,
+  icon,
 }: {
   value: number;
   label: string;
   variant?: StatVariant;
   badge: string;
   index: number;
+  icon?: React.ReactNode;
 }) {
   const { stroke, fill, label: labelColor } = HEX_CONFIGS[variant];
 
@@ -273,6 +278,15 @@ function HexStatCard({
           {badge}
         </span>
       </div>
+
+      {/* Half Icon Design on the right */}
+      {icon && (
+        <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: 'translateX(40%)' }}>
+          <div style={{ color: stroke, opacity: 0.12 }} className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]">
+            {icon}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -719,15 +733,55 @@ export default function CodeScanningPageClient() {
 
       {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet+ ── */}
       <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-3">
-        <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
-        <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
-        <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
+        <HexStatCard 
+          value={uniqueProjectCount} 
+          label="Tracked Projects" 
+          variant="default" 
+          badge={uniqueProjectCount === 0 ? "No Projects" : `${uniqueProjectCount} ${uniqueProjectCount === 1 ? "Project" : "Projects"}`} 
+          index={0}
+          icon={<FolderGit2 className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={totalScans} 
+          label="Recorded Scans" 
+          variant="teal" 
+          badge={totalScans === 0 ? "No Scans" : `${totalScans} Total`} 
+          index={1}
+          icon={<Activity className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={filtered.length} 
+          label="Visible Results" 
+          variant="amber" 
+          badge={
+            filtered.length === 0 
+              ? "No Results" 
+              : filtered.length === scanProjects.length 
+                ? "All Shown" 
+                : "Filtered"
+          } 
+          index={2}
+          icon={<Eye className="w-full h-full" strokeWidth={1.5} />}
+        />
         <HexStatCard
           value={totalIssues}
           label="Issues Found"
           variant="red"
-          badge={issueSummaryState.isLoading ? "Syncing" : totalIssues === 0 ? "None" : "Active"}
+          badge={
+            issueSummaryState.isLoading 
+              ? "Syncing..." 
+              : totalIssues === 0 
+                ? "Clean" 
+                : totalIssues >= 100
+                  ? "Critical"
+                  : totalIssues >= 50
+                    ? "High"
+                    : totalIssues >= 20
+                      ? "Medium"
+                      : "Low"
+          }
           index={3}
+          icon={<AlertTriangle className="w-full h-full" strokeWidth={1.5} />}
         />
       </div>
 
