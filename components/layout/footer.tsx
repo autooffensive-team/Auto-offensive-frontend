@@ -27,6 +27,30 @@ export function Footer() {
   return (
     <footer suppressHydrationWarning className="w-full border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 mt-auto relative overflow-hidden">
 
+      {/* Grid background pattern - Light mode (secondary) */}
+      <div className="absolute inset-0 opacity-[0.08] dark:opacity-0" style={{
+        backgroundImage: `
+          linear-gradient(to right, var(--color-secondary-mid) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--color-secondary-mid) 1px, transparent 1px)
+        `,
+        backgroundSize: '30px 30px',
+        backgroundPosition: 'center center',
+        maskImage: 'radial-gradient(ellipse 40% 50% at center, black, transparent)',
+        WebkitMaskImage: 'radial-gradient(ellipse 40% 50% at center, black, transparent)'
+      }} />
+
+      {/* Grid background pattern - Dark mode (primary) */}
+      <div className="absolute inset-0 opacity-0 dark:opacity-[0.12]" style={{
+        backgroundImage: `
+          linear-gradient(to right, var(--color-primary) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--color-primary) 1px, transparent 1px)
+        `,
+        backgroundSize: '30px 30px',
+        backgroundPosition: 'center center',
+        maskImage: 'radial-gradient(ellipse 40% 50% at center, black, transparent)',
+        WebkitMaskImage: 'radial-gradient(ellipse 40% 50% at center, black, transparent)'
+      }} />
+
       {/* Watermark background text */}
       <div className="absolute inset-0 flex items-end justify-center pointer-events-none select-none overflow-hidden">
         <h1
