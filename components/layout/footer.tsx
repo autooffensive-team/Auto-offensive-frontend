@@ -79,9 +79,53 @@ export function Footer() {
 
         {/* Top Section - Logo and Description */}
         <div className="py-10 md:py-12 flex flex-col items-center text-center gap-6">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
-            {/* Auto-Offensive Logo */}
-            <Link href="/" className="inline-flex items-center">
+
+          {/* ── MOBILE ONLY: Auto-Offensive logo at the very top ── */}
+          <Link href="/" className="inline-flex items-center sm:hidden">
+            <Image
+              src={logoSrc}
+              alt="Auto-Offensive"
+              width={150}
+              height={85}
+              priority
+              style={{ width: 'auto', height: 'auto' }}
+            />
+          </Link>
+
+          {/* ── MOBILE ONLY: Description + Tagline + Social ── */}
+          <div className="flex flex-col items-center gap-4 sm:hidden w-full">
+            <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xs px-4">
+              Automated penetration testing platform for developers, security engineers, and DevSecOps teams. Built to find vulnerabilities before attackers do.
+            </p>
+
+            {/* Tagline pill */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400 tracking-wide italic">&quot;Scan. Detect. Secure.&quot;</span>
+            </div>
+
+            {/* Social links */}
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              {socialLinks.map((social, index) => (
+                <Link
+                  key={index}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-150"
+                >
+                  <social.icon className="text-xl text-zinc-700 dark:text-zinc-300" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* ── MOBILE: Divider before ISTAD ── */}
+          <div className="sm:hidden w-full h-px bg-zinc-100 dark:bg-zinc-800" />
+
+          {/* Logos row — on mobile: ISTAD only (Auto-Offensive is already above); on desktop: side-by-side */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 w-full">
+            {/* Auto-Offensive Logo — desktop only */}
+            <Link href="/" className="hidden sm:inline-flex items-center">
               <Image
                 src={logoSrc}
                 alt="Auto-Offensive"
@@ -92,39 +136,48 @@ export function Footer() {
               />
             </Link>
 
-            {/* Divider */}
+            {/* Divider - desktop only */}
             <div className="hidden sm:block w-px h-16 bg-zinc-200 dark:bg-zinc-700" />
 
             {/* ISTAD Sponsor */}
             <div className="flex flex-col items-center gap-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              {/* Mobile: label → logo → description (button-like label on mobile) */}
+              <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400
+                            sm:order-1
+                            order-1
+                            /* mobile pill styling */
+                            sm:bg-transparent sm:border-0 sm:px-0 sm:py-0 sm:rounded-none
+                            bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700
+                            px-3 py-1.5 rounded-full">
                 {t('sponsoredBy')}
               </p>
               <Image
                 src={istadLogoSrc}
                 alt="ISTAD logo"
-                width={100}
-                height={50}
-                style={{ width: 'auto', height: 'auto', maxHeight: '45px' }}
+                width={150}
+                height={75}
+                className="sm:!max-h-[45px] sm:order-2 order-2"
+                style={{ width: 'auto', height: 'auto' }}
               />
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug max-w-50">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug max-w-[280px] sm:max-w-[200px] text-center sm:order-3 order-3">
                 Institute of Science and Technology Advanced Development
               </p>
             </div>
           </div>
 
-          <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-3xl mt-4">
+          {/* ── DESKTOP ONLY: Description + Tagline + Social ── */}
+          <p className="hidden sm:block text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-3xl px-4 sm:px-0">
             Automated penetration testing platform for developers, security engineers, and DevSecOps teams. Built to find vulnerabilities before attackers do.
           </p>
 
-          {/* Tagline pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
+          {/* Tagline pill - desktop only */}
+          <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="text-base font-medium text-zinc-600 dark:text-zinc-400 tracking-wide italic">&quot;Scan. Detect. Secure.&quot;</span>
+            <span className="text-sm sm:text-base font-medium text-zinc-600 dark:text-zinc-400 tracking-wide italic">&quot;Scan. Detect. Secure.&quot;</span>
           </div>
 
-          {/* Social links */}
-          <div className="flex items-center gap-2">
+          {/* Social links - desktop only */}
+          <div className="hidden sm:flex items-center justify-center gap-2 flex-wrap">
             {socialLinks.map((social, index) => (
               <Link
                 key={index}
@@ -136,6 +189,7 @@ export function Footer() {
               </Link>
             ))}
           </div>
+
         </div>
 
         {/* Navigation Grid */}
