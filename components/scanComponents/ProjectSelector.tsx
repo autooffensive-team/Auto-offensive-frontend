@@ -50,7 +50,7 @@ export function ProjectSelector({
             placeholder={loading ? "Loading projects..." : isEmpty ? "No projects available" : "Select a project"}
             showTrigger
             openOnClick
-            className={cn("w-full", isEmpty && "text-gray-500 dark:text-gray-400")}
+            className={cn("w-full font-semibold", isEmpty && "text-gray-500 dark:text-gray-400")}
             value={selectedProject?.name ?? ""}
             readOnly
             aria-label="Select project"

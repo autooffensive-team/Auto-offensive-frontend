@@ -39,6 +39,29 @@ const terminalStatuses = new Set([
   "partial",
 ]);
 
+function extractResponseError(detail: unknown): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        if (item && typeof item === "object") {
+          const data = item as Record<string, unknown>;
+          const msg = data.msg ?? data.message;
+          return typeof msg === "string" ? msg : String(item);
+        }
+        return String(item);
+      })
+      .join(", ");
+  }
+  if (detail && typeof detail === "object") {
+    const data = detail as Record<string, unknown>;
+    const nested = data.detail ?? data.error ?? data.message ?? data.msg;
+    if (nested !== undefined) return extractResponseError(nested);
+    return JSON.stringify(data);
+  }
+  return String(detail ?? "");
+}
+
 function isTerminalStatus(status: string): boolean {
   return terminalStatuses.has(status) || terminalStatuses.has(status.toUpperCase());
 }
@@ -1178,7 +1201,14 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             }
 
             const errorText = await response.text();
-            throw new Error(errorText || "Advanced scan failed to start.");
+            let parsedMessage = "";
+            try {
+              const parsed = JSON.parse(errorText);
+              parsedMessage = extractResponseError(parsed?.detail ?? parsed?.error ?? parsed);
+            } catch {
+              parsedMessage = "";
+            }
+            throw new Error(parsedMessage || errorText || "Advanced scan failed to start.");
           }
 
           // Extract rate-limit headers from the successful response

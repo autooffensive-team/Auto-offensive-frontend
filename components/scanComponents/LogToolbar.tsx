@@ -29,20 +29,21 @@ export function LogToolbar({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 sm:gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/80 px-3 py-2",
+        "flex flex-wrap items-center justify-center gap-3 rounded-md border bg-black px-4 py-2 backdrop-blur-sm",
+        "border-green-500/40 hover:border-green-500/60 transition-colors",
         className
       )}
     >
       {/* Theme selector */}
       <div className="flex items-center gap-1.5">
-        <Palette size={13} className="text-gray-400 dark:text-gray-500 shrink-0" />
+        <Palette size={13} className="text-green-400/70 shrink-0" />
         <select
           value={themeKey}
           onChange={(e) => onThemeChange(e.target.value as LogThemeKey)}
-          className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-[11px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 outline-none focus:border-teal-500 transition-colors cursor-pointer"
+          className="rounded-md border border-green-500/40 bg-black/50 px-2 py-1 text-[11px] sm:text-xs font-mono text-green-300 outline-none hover:border-green-500 focus:border-green-500 transition-colors cursor-pointer neon-text"
         >
           {themeKeys.map((key) => (
-            <option key={key} value={key}>
+            <option key={key} value={key} className="bg-black text-green-300">
               {LOG_THEMES[key].name}
             </option>
           ))}
@@ -50,22 +51,22 @@ export function LogToolbar({
       </div>
 
       {/* Divider */}
-      <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
+      <div className="h-4 w-px bg-green-500/30" />
 
       {/* Size selector */}
       <div className="flex items-center gap-1.5">
-        <Type size={13} className="text-gray-400 dark:text-gray-500 shrink-0" />
-        <div className="flex rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <Type size={13} className="text-green-400/70 shrink-0" />
+        <div className="flex rounded-md border border-green-500/40 overflow-hidden">
           {sizeKeys.map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => onSizeChange(key)}
-              className={cn(
-                "px-2 py-1 text-[10px] sm:text-[11px] font-semibold transition-colors",
+                className={cn(
+                "px-2 py-1 text-[10px] sm:text-[11px] font-semibold transition-all duration-200 font-mono",
                 key === sizeKey
-                  ? "bg-teal-500 text-white"
-                  : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ? "bg-green-500/30 text-green-300 border border-green-500/60 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
+                  : "bg-black text-green-400/60 hover:bg-green-500/10 hover:text-green-300"
               )}
             >
               {LOG_SIZES[key].label}
@@ -77,11 +78,11 @@ export function LogToolbar({
       {/* Reset to Default button */}
       {onReset && !isDefault && (
         <>
-          <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
+          <div className="h-4 w-px bg-green-500/30" />
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-[10px] sm:text-[11px] font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+            className="inline-flex items-center gap-1 rounded-md border border-green-500/40 bg-black/50 px-2 py-1 text-[10px] sm:text-[11px] font-mono text-green-300/70 transition-all duration-200 hover:bg-green-500/10 hover:border-green-500/60 hover:text-green-300 hover:shadow-[0_0_10px_rgba(0,255,0,0.2)]"
           >
             <RotateCcw size={10} />
             Default

@@ -51,6 +51,9 @@ async function getValidSessionData(
     if (authMe) {
       return { accessToken: tokenResult.accessToken, authMe };
     }
+    // Token exists but /auth/me failed - this can happen right after login
+    // Return token anyway, let the app try to fetch user data via Redux
+    console.warn("[userdashboard/layout] Token exists but /auth/me failed, continuing anyway");
   }
 
   // Current token expired or rejected by backend — attempt refresh
@@ -64,8 +67,11 @@ async function getValidSessionData(
     if (authMe) {
       return { accessToken: refreshed.accessToken, authMe };
     }
+    // Refreshed token exists but /auth/me failed
+    console.warn("[userdashboard/layout] Refreshed token exists but /auth/me failed, continuing anyway");
   }
 
+  // Both tokens are dead or refresh failed
   return null;
 }
 
@@ -79,29 +85,33 @@ export default async function UserDashboardLayout({
     headers: requestHeaders,
   });
 
-  // ─── Authenticated user flow (unchanged) ───────────────────────────────
+  // ─── Authenticated user flow ───────────────────────────────
   if (session) {
-    const sessionData = await getValidSessionData(requestHeaders);
+    // Simple approach: try to get user data, if it fails, redirect to logout
+    const tokenResult = await auth.api.getAccessToken({
+      headers: requestHeaders,
+      body: { providerId: "keycloak" },
+    }).catch(() => null);
 
-    if (!sessionData) {
-      // Session cookie exists but Keycloak tokens are dead.
-      redirect("/logout");
+    if (tokenResult?.accessToken) {
+      const authMe = await fetchAuthMe(tokenResult.accessToken);
+      if (authMe) {
+        return (
+          <>
+            <UserDashboardShell initialAuthMe={authMe} isGuest={false}>
+              {children}
+            </UserDashboardShell>
+            <Toaster duration={5000} position="top-center" />
+          </>
+        );
+      }
     }
 
-    return (
-      <>
-        <UserDashboardShell initialAuthMe={sessionData.authMe} isGuest={false}>
-          {children}
-        </UserDashboardShell>
-        <Toaster duration={5000} position="top-center" />
-      </>
-    );
+    // Token dead or /auth/me failed - just logout and start fresh
+    redirect("/logout");
   }
 
   // ─── Guest user flow ───────────────────────────────────────────────────
-  // No authenticated session — check if this is a guest access request.
-  // Guest access is triggered by visiting /api/guest/start which sets the cookie,
-  // then redirects here.
   const guestAccess = await hasValidGuestSession();
 
   if (!guestAccess) {

@@ -20,7 +20,7 @@ const MENTORS = [
     badge: "Mentor",
     badgeKh: "ទីប្រឹក្សា",
     isMentor: true,
-    slogan: "Every problem have solutions.",
+    slogan: "Every Solution has Problem.",
     img: "/images/teacher_Sokpheng.webp",
     social: {
       github: "https://github.com/sokpheng001",
@@ -50,14 +50,14 @@ const MENTORS = [
 
 const TEAM = [
   { name: "Chheng Panharath", nameKh: "ឆេង បញ្ញារតន៍", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Building the engine\nunder the hood.", img: "/images/panharoth.png", social: { github: "https://github.com/Panharoth06", telegram: "https://t.me/panharoth_chheng", linkedin: "https://www.linkedin.com/in/panharath-chheng-59b305309/", portfolio: "https://portfolio-panharoth.vercel.app" } },
-  { name: "Pech Rattanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/", portfolio: "#" } },
+  { name: "Pech Rattanakmony", nameKh: "ប៉ិច រតនៈមុន្នី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Team Leader", badgeKh: "មេក្រុម", slogan: "Pixels with\npurpose.", img: "/images/rathanakmony.png", social: { github: "https://github.com/aintantony", telegram: "https://t.me/aintantony", linkedin: "https://www.linkedin.com/in/rattanakmony-pech/", portfolio: "https://pech-rattanakmony.vercel.app" } },
   { name: "Kry Sobothty", nameKh: "គ្រី សុបុត្រទី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Hack it for\ Secure it.", img: "/images/bohty.png", social: { github: "https://github.com/Sobothty", telegram: "https://t.me/bothtyyy", linkedin: "https://www.linkedin.com/in/kry-sobothty/", portfolio: "https://www.sobothty.tech/" } },
-  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/", portfolio: "#" } },
+  { name: "Rin Bunvarn", nameKh: "រិន ប៊ុនវ៉ាន", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Defend your heart\nfrom bad guy.", img: "/images/bunvarn.png", social: { github: "https://github.com/bunniee00", telegram: "https://t.me/buniee0", linkedin: "https://www.linkedin.com/in/bunvarn-rin-1849593b6/", portfolio: "https://bun-s-portfolio.vercel.app/" } },
   { name: "Ey Channim", nameKh: "អុី ចាន់នីម", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Practice make perfect", img: "/images/channim.png", social: { github: "https://github.com/ChannimEY", telegram: "https://t.me/Jii_nim1", linkedin: "https://www.linkedin.com/in/ey-channim-aa71703b3/", portfolio: "https://channim-dev.vercel.app/" } },
   { name: "Mom Raksmey", nameKh: "មុំ រស្មី", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Cyber safety starts with you", img: "/images/reaksmey.png", social: { github: "https://github.com/raksmeymom", telegram: "https://t.me/Raksmeyy41", linkedin: "https://www.linkedin.com/in/mom-raksmey-3b0288389/", portfolio: "https://persional-portfolio-sooty.vercel.app/" } },
   { name: "Hor Ratha", nameKh: "ហោ រដ្ឋា", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "If it hard\nI work harder.", img: "/images/ratha.png", social: { github: "https://github.com/HorRatha", telegram: "https://t.me/xeinn7", linkedin: "https://www.linkedin.com/in/hor-ratha-42bb35388/", portfolio: "https://h-ratha-portfolio.vercel.app/" } },
   { name: "Ben Loemheng", nameKh: "ប៊ិន លឹមហេង", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "Process over perfection", img: "/images/loemheng.png", social: { github: "https://github.com/loemheng840", telegram: "https://t.me/loemheng840", linkedin: "https://www.linkedin.com/in/ben-loemheng-145533326/", portfolio: "https://benloemheng.vercel.app/" } },
-  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/", portfolio: "#" } },
+  { name: "Dina Pisethi", nameKh: "ឌីណា ពិសិទ្ធិ", role: "Cyber Security", roleKh: "អ្នកអភិវឌ្ឍ Full Stack", badge: "Member", badgeKh: "សមាជិក", slogan: "I’m not underqualified,\nI’m in beta version.", img: "/images/pisethi.png", social: { github: "https://github.com/j4nthirty1ne", telegram: "https://t.me/Dina_Pisethi", linkedin: "https://www.linkedin.com/in/dina-pisethi-623883358/", portfolio: "https://dinapisethi.vercel.app/" } },
 ];
 
 function IconGithub() {

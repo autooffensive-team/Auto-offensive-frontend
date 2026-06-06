@@ -2,9 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Activity,
   AlertCircle,
+  AlertTriangle,
   ChevronLeft,
   ChevronRight,
+  Eye,
   ExternalLink,
   FolderGit2,
   GitBranch,
@@ -195,12 +198,14 @@ function HexStatCard({
   variant = "default",
   badge,
   index,
+  icon,
 }: {
   value: number;
   label: string;
   variant?: StatVariant;
   badge: string;
   index: number;
+  icon?: React.ReactNode;
 }) {
   const { stroke, fill, label: labelColor } = HEX_CONFIGS[variant];
 
@@ -273,6 +278,15 @@ function HexStatCard({
           {badge}
         </span>
       </div>
+
+      {/* Half Icon Design on the right */}
+      {icon && (
+        <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: 'translateX(40%)' }}>
+          <div style={{ color: stroke, opacity: 0.12 }} className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]">
+            {icon}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -413,14 +427,14 @@ function ScanProjectCard({
             </span>
           </div>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onOpen(project.projectKey);
-              window.location.href = href;
-            }}
-            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-primary px-3 py-1.5 text-[11px] font-medium text-black transition-colors hover:bg-primary/80 hover:text-black active:scale-[0.98] sm:gap-1.5 sm:px-4 sm:py-1.75 sm:text-[13px]"
-          >
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpen(project.projectKey);
+                window.location.href = href;
+              }}
+              className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-primary px-3 py-1.5 text-[11px] font-medium text-black transition-colors hover:bg-primary/80 hover:text-black active:scale-[0.98] sm:gap-1.5 sm:px-4 sm:py-1.75 sm:text-[13px]"
+            >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-3.5 sm:w-3.5" aria-hidden="true">
               <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
             </svg>
@@ -719,15 +733,55 @@ export default function CodeScanningPageClient() {
 
       {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet+ ── */}
       <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-3">
-        <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
-        <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
-        <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
+        <HexStatCard 
+          value={uniqueProjectCount} 
+          label="Tracked Projects" 
+          variant="default" 
+          badge={uniqueProjectCount === 0 ? "No Projects" : `${uniqueProjectCount} ${uniqueProjectCount === 1 ? "Project" : "Projects"}`} 
+          index={0}
+          icon={<FolderGit2 className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={totalScans} 
+          label="Recorded Scans" 
+          variant="teal" 
+          badge={totalScans === 0 ? "No Scans" : `${totalScans} Total`} 
+          index={1}
+          icon={<Activity className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={filtered.length} 
+          label="Visible Results" 
+          variant="amber" 
+          badge={
+            filtered.length === 0 
+              ? "No Results" 
+              : filtered.length === scanProjects.length 
+                ? "All Shown" 
+                : "Filtered"
+          } 
+          index={2}
+          icon={<Eye className="w-full h-full" strokeWidth={1.5} />}
+        />
         <HexStatCard
           value={totalIssues}
           label="Issues Found"
           variant="red"
-          badge={issueSummaryState.isLoading ? "Syncing" : totalIssues === 0 ? "None" : "Active"}
+          badge={
+            issueSummaryState.isLoading 
+              ? "Syncing..." 
+              : totalIssues === 0 
+                ? "Clean" 
+                : totalIssues >= 100
+                  ? "Critical"
+                  : totalIssues >= 50
+                    ? "High"
+                    : totalIssues >= 20
+                      ? "Medium"
+                      : "Low"
+          }
           index={3}
+          icon={<AlertTriangle className="w-full h-full" strokeWidth={1.5} />}
         />
       </div>
 

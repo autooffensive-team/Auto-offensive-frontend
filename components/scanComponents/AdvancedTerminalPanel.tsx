@@ -1,22 +1,380 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2, RotateCcw, Zap } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
+import { LOG_SIZES } from "@/lib/log-themes";
+
+type NavigatorWithExtras = Navigator & {
+  userAgentData?: {
+    platform?: string;
+    brands?: Array<{ brand: string; version: string }>;
+  };
+  connection?: {
+    effectiveType?: string;
+  };
+};
+
+// ─── ASCII Art Background - Epic Mountain Landscape ────────────────────────────
+const ASCII_BACKGROUND = `
+                                                                                                                            ::::::                                                                                                                        ::...::                                                                                                                     ::...::::                                                                                                                 ::....:::-                                                                                                              ::.....::::                                                                                                           :...:::::::::           ::                                                                                          :::::::::::::::         :...                                                                                       -:::::::::::::::.       -:::                                                                                      =-::::::::::::::::::::::::::::::::::::      :...:                                                                                    -:::::::::::::::::::::::::::::::::::::::::::::::::::::::    :....:                                                                                  =::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   :....:-                                                                                -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::..:::    .:::::=                                                                    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::-   :::::.::::::.                                                             -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   ::::::::::::::::-                                                       .::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-   ::::::::::::::::::::::                                                 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::  :::::::::::::::::::::::::-                                            ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::                                       -::::::::::::::::::::::::::::::::::::::::::::::::::::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    -::::..::::::::::::::::::::::::                                   ::::....::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::         *::::::::::::::::::::::::::::-                             -::....:::::::::::::::::::::::::::::::::::::::::::::    **=:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..               -:::::::::::::::::::::::::                          ::::::-              :::::::::::::::::::::::::::::    ***=::::::::::::::::::::::::::::.:::::::::::::::::::::::::::::::::.::.:::...:                   :::::::::::::::::::::::                        ::::::::::::::::::::::::    +***+::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::::::::.  :::::::                       ::::::::::::::::::                        ::::::::::::::::::::    ****+-::::::::::::::::::::::::::::: ::::::::::::::::::::::::::::::::::::::::::. ::::::                          ::::::::::::::                        :::::::::::::::::    ****+-::::::::::::::::::::::::::::: :::::::::::::::::::::::::::::::::::::::::::::::::::::::                           -::::::::::                        ::::::::::::::-    *****=:::::::::::::::::::::::::::::. @+::::::::::::::::::::::::::::::::::::::::::::::::::::::::                          :::::::::.:                        :::::::::::+    *****+-::::::::::::::::::::::::::::.. **-::::::::::::::....  :::::::::::::::::::::::::::::::::::::::                        .::::::::::                        =::::::::=     *****+::::::::::::::::::::::::::::..  **+:.::::::::::::::     ::...:::-:..--:::::::::::::::::::::::::::                       :::::::::::                        ::....::-    ******=::::::::::::::::::::::::::::..  ***=:::::::::::::..      :..:=               =-:::::::::::::::::::::::                    :::::::::.-                        -:...:-     ******=:::::::::::::::::::::::::::::.   **+:::::::..:::.::                                  -::::::::::::::::..:                   ::::::::::=                        ::.::    =******=:::::::::::::::::::::::::::::..  ***+:::::::::......                                      ::::::::::::::..:                   ::::::::::                         ::::    *******=:::::::::::::::::::::::::::::.:  ****-::::::::::::..                                           ::::::::::::::                   ::::::::::                         :::    #******=::::::::::::::::::::::::::::::.  *****-:::::::::::::.:                                             .::::::...:                    ::::::::::                         ::    *******=:::::::::::::::::::::::::::::::   *****:::::::::::::...                                                :::...:                      ::::::::.:                         +******+::::::::::::::::::::::::::::::::  *****+:::::::::::::...                                                  :::::                      *::::::::::                         *******-....:::::::::::::::::::::::::::+  *****+::::::::::::::..:                                                                             -::::::::::                         *******=:..:::::::::::::::::::::::::::::  ******+:::::::::::::::..=                                                                             :::::::..::                         ********=:-          ::::::::::::::::::::  ******+::::::::::::::::::                                                                             ::::::::.::                          #******                 ::::::::::::::::   #*****+:::::::::::::::::..                                                                             ::::::::..:                          *****                     ::::::::::::::- #******+::::::::::::::::::..                                                                            :::::::::..-                          ***                         ::::::::::::  ********-:::::::::::::::::::.                                                                           -:::::::::::                           -*                            :::::::::-   *******-:::::::::::::::::::::                                                                           :::::::::::-                           :::::::::  ********=::::::::::::::::::::::                                                                           :::::::::::                            -::::::-  ********+::::::::::::::::::::::.:                                                                         -:::::::::::                            ::::::   ********-::::::::::::::::::::::::                                                                        ::::::::::::                             :::.:   ********=:::::::::::::::::::::::.:-                                                                      -::::::::::::                             :.::-  *********:::::::::::::::::::::::::::                                                                      ::::::::::::-                             #::-  *********-::::::::::::::::::::::::::::                                                                    ::::::::::..:                              :-  *********+:::::::::::::::::::::::::::::                                                                   :::::::::::.:                               =   *********-::::::::::::::::::::::::::::::                                                                 :::::::::::::                                #********+:::::::::::::::::::::::::::::::=                                                               ::::::::::::::                                *********=::::::::::::::::::::::::::::::::-                                                             ::::::::::::::                                 **********           :-:::::::::::::::::::::                                                           ::::::::::::::::                                 ******      *--::-=*     -:::::::::::::::::::                                                         ::::::::::::::::                                  +****       :::::::::::-     ::::::::::::::::::                                                       ::::::::::::::.:                                   ***         :::::::::...::     ::::::::::::::.::                                                    ::::::::::::::::.                                    ::::::::::::::     :::::::::::::..:                                                  :::::::::::::::::                                     ::::::::::::::.     ::::::::::::::::                                               ::::::::::::::::::                                      ::::::::::::..:      ::::::::::::::::                                           ::::::::::::::::::.                                       .:::::::::::::::      :::::::::::::::                                        -:::::::::::::::::..                                        ::::::::::::::::      ::::::::::::::-                                    -:::::::::::::::::::.                                         ::::::::::::::::       ::::::::::::::                                 ::::::::::::::::::::::                                          :::::::::::::::::       :::::::::.:::-                             :::::::::::::::::::::::                                             .::::::::::::::::::.       =::::.....::*                    :::::::::::::::::::::::::                                              :::::::::::::::::::..        -::.....::-               :::::::::::::::::::::::::.:                                               .::::::::::::::::::::.          ::::::::-          -:::::::::::::::::::::::::::                                                 ::::::::::::::::::::::::              @      :::::::::::::::::::::::::::::::                                                  =:::::::::::::::::::::::::.              ::::::::::::::::::::::::::::::..                                                    -::::::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::...                                                      -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::...:                                                        -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::..:                                                          :::::::::::::::::::::::::::::::::::::::::::::::::::::::..                                                            -::::::::::::::::::::::::::::::::::::::::::::::::..:.                                                              :::::::::::::::::::::::::::::::::::::::::::::::                                                                 ::::::::::::::::::::::::::::::::::::::::..:                                                                   ::::::::::::::::::::::::::::::::::::.                                                                      -::::::::::::::::::::::::::.:::.                                                                        @::::::::::::::::::::::::::                                                                           =::::::::::::::::::                                                                               -::::::::::::
+`;
+
+// ─── Hacker Vibe Animations ───────────────────────────────────────────────────
+const GLITCH_CHARS = ['█', '▓', '▒', '░', '▀', '▄', '─', '│', '┌', '┐', '└', '┘', '', '◆', '●'];
+const MATRIX_CHARS = '░▒▓█▀▄║═╬┤┬┴├└┘┐┌◆●';
+
+const glitchAnimation = `
+  @keyframes glitch {
+    0% {
+      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 10px #00ff00;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    }
+    20% {
+      clip-path: polygon(0 20%, 100% 20%, 100% 65%, 0 65%);
+      text-shadow: -2px 0 #ff00ff, 2px 0 #00ff00, 0 0 10px #ff00ff;
+    }
+    40% {
+      clip-path: polygon(0 35%, 100% 35%, 100% 80%, 0 80%);
+      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 15px #00ffff;
+    }
+    60% {
+      clip-path: polygon(0 50%, 100% 50%, 100% 95%, 0 95%);
+      text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff, 0 0 10px #00ff00;
+    }
+    100% {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      text-shadow: 0 0 20px #00ff00, 0 0 10px #00ffff;
+    }
+  }
+
+  @keyframes scanlines {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 0 10px;
+    }
+  }
+
+  @keyframes neon-flicker {
+    0% {
+      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+      opacity: 1;
+    }
+    50% {
+      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+      opacity: 0.8;
+    }
+    100% {
+      text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 40px #00ff00;
+      opacity: 1;
+    }
+  }
+
+  @keyframes matrix-rain {
+    0% {
+      transform: translateY(-100%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), inset 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+  }
+
+  @keyframes cyber-border {
+    0%, 100% {
+      border-color: rgba(0, 255, 0, 0.3);
+      box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+    }
+    50% {
+      border-color: rgba(0, 255, 0, 0.8);
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.1);
+    }
+  }
+
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes radar-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes blip-pulse {
+    0%, 100% {
+      opacity: 0.7;
+      box-shadow: 0 0 6px rgba(34, 211, 155, 0.8), 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(34, 211, 155, 1), 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+  }
+
+  @keyframes radar-pulse-active {
+    0% {
+      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(34, 211, 155, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0);
+    }
+  }
+
+  @keyframes radar-pulse-found {
+    0%, 100% {
+      box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 24px rgba(34, 211, 155, 1), 0 0 48px rgba(16, 185, 129, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .radar-container {
+    position: relative;
+    width: 192px;
+    height: 192px;
+    background: radial-gradient(circle at center, rgba(10, 10, 10, 0.9) 0%, rgba(5, 5, 5, 1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .radar-base {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .radar-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1.2px solid rgba(34, 211, 155, 0.35);
+    border-radius: 50%;
+  }
+
+  .radar-ring-1 {
+    width: 85%;
+    height: 85%;
+  }
+
+  .radar-ring-2 {
+    width: 55%;
+    height: 55%;
+  }
+
+  .radar-ring-3 {
+    width: 25%;
+    height: 25%;
+  }
+
+  .radar-sweep {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 50%;
+    transform-origin: bottom center;
+    background: linear-gradient(to top, rgba(34, 211, 155, 0.9), rgba(34, 211, 155, 0.4), rgba(34, 211, 155, 0));
+    z-index: 2;
+    box-shadow: 0 0 8px rgba(34, 211, 155, 0.6);
+  }
+
+  .radar-sweep.active {
+    animation: radar-spin 4s linear infinite;
+  }
+
+  .radar-sweep.scanning {
+    animation: radar-spin 3.5s linear infinite;
+  }
+
+  .radar-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.8));
+    border-radius: 50%;
+    z-index: 4;
+    box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+  }
+
+  .radar-center.scanning {
+    animation: radar-pulse-active 1.5s ease-in-out infinite;
+  }
+
+  .radar-center.found {
+    animation: radar-pulse-found 1s ease-in-out infinite;
+  }
+
+  .radar-blip {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.6));
+    border-radius: 50%;
+    z-index: 3;
+    animation: blip-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(34, 211, 155, 0.9);
+  }
+
+  .glitch-text {
+    animation: glitch 0.3s ease-in-out infinite;
+    position: relative;
+  }
+
+  .neon-text {
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    animation: neon-flicker 3s infinite;
+  }
+
+  .scanline-bg {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    animation: scanlines 8s linear infinite;
+  }
+
+  .cyber-pulse {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .cyber-border {
+    animation: cyber-border 2s ease-in-out infinite;
+  }
+
+  .flicker-effect {
+    animation: flicker 0.15s infinite;
+  }
+
+  .terminal-glow {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .hacker-gradient {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
+  }
+
+  @keyframes data-corruption {
+    0%, 100% {
+      transform: translate(0);
+    }
+    25% {
+      transform: translate(-2px, -2px);
+    }
+    50% {
+      transform: translate(2px, 2px);
+    }
+    75% {
+      transform: translate(-2px, 2px);
+    }
+  }
+
+  .data-glitch {
+    animation: data-corruption 0.1s infinite;
+  }
+
+  .ascii-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 7px;
+    line-height: 1.05;
+    color: rgba(0, 255, 0, 0.25);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 5;
+    animation: float 25s ease-in-out infinite;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.1);
+  }
+
+  @keyframes float {
+    0%, 100% {
+      opacity: 0.08;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 0.12;
+      transform: translateY(-10px);
+    }
+  }
+
+  .ascii-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    background-image: 
+      linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .terminal-content {
+    position: relative;
+    z-index: 10;
+  }
+`;
 
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
   "",
-  "  \x1b[1m\x1b[36mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
+  "  \x1b[1m\x1b[32mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
   "  \x1b[90m────────────────────────────────────────\x1b[0m",
   "  \x1b[33mUsage   \x1b[0m  <tool> [flags] [| <tool> ...]",
-  "  \x1b[33mExample \x1b[0m  \x1b[36mnuclei -u https://example.com\x1b[0m",
-  "  \x1b[33mPipeline\x1b[0m  \x1b[36msubfinder -d example.com | httpx\x1b[0m",
+  "  \x1b[33mExample \x1b[0m  \x1b[32mnuclei -u https://example.com\x1b[0m",
+  "  \x1b[33mPipeline\x1b[0m  \x1b[32msubfinder -d example.com | httpx\x1b[0m",
   "  \x1b[33mHelp    \x1b[0m  \x1b[90mCtrl+C to cancel  ·  clear to reset\x1b[0m",
   "  \x1b[90m────────────────────────────────────────\x1b[0m",
   "",
@@ -76,6 +434,7 @@ export function AdvancedTerminalPanel({
   run,
   errors,
   isSubmitting,
+  isStreaming,
   onSubmit,
   onReset,
 }: {
@@ -85,6 +444,7 @@ export function AdvancedTerminalPanel({
   run: ActiveRun;
   errors: string[];
   isSubmitting: boolean;
+  isStreaming?: boolean;
   onSubmit: (command: string) => void;
   onReset: () => void;
 }) {
@@ -95,6 +455,7 @@ export function AdvancedTerminalPanel({
 
   // ── Cancel confirmation modal state ──────────────────────────────────────
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [radarTick, setRadarTick] = useState(0);
 
   // ── Input state ──────────────────────────────────────────────────────────
   // We maintain a full line buffer + cursor position so arrow keys, Home/End,
@@ -114,6 +475,135 @@ export function AdvancedTerminalPanel({
   const prevErrorsLenRef = useRef(0);
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
+  const terminalFontSize = useMemo(() => {
+    const base = logSize.xtermFontSize;
+    if (base >= LOG_SIZES.xxl.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.xl.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.lg.xtermFontSize) return base + 1;
+    if (base >= LOG_SIZES.md.xtermFontSize) return base + 1;
+    return base + 1;
+  }, [logSize.xtermFontSize]);
+
+  const terminalLetterSpacing = useMemo(() => {
+    if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3.5;
+    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 2.75;
+    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1.9;
+    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 0.25;
+    return 0.2;
+  }, [logSize.xtermFontSize]);
+
+  const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
+  const radarState = useMemo(() => {
+    const findingCount = run.findings || 0;
+    const status = String(run.status || "").toLowerCase();
+    const isRunning =
+      isSubmitting ||
+      isStreaming ||
+      status.includes("running") ||
+      status.includes("scanning") ||
+      status.includes("processing") ||
+      status.includes("active");
+    const isFailed = status.includes("failed");
+    const isDone = status.includes("completed");
+
+    const blips = Array.from({ length: Math.min(4, Math.max(2, findingCount > 0 ? findingCount : 2)) }, (_, index) => ({
+      x: [-26, 18, 10, -12][index % 4],
+      y: [14, -16, -8, 10][index % 4],
+      delay: index * 0.45,
+    }));
+
+    return {
+      sweepDuration: isRunning ? 2.8 : isDone ? 4.2 : isFailed ? 5.5 : 3.8,
+      sweepTone: isFailed
+        ? "rgba(248,113,113,0.32)"
+        : isDone
+          ? "rgba(45,212,191,0.34)"
+          : isRunning
+            ? "rgba(74,222,128,0.42)"
+            : "rgba(74,222,128,0.28)",
+      pulseTone: isFailed
+        ? "rgba(248,113,113,0.55)"
+        : isDone
+          ? "rgba(45,212,191,0.55)"
+          : "rgba(52,211,153,0.55)",
+      blips,
+      badge: isFailed ? "alert" : isDone ? "locked" : isRunning ? "tracking" : "idle",
+    };
+  }, [isSubmitting, isStreaming, run.findings, run.status]);
+
+  useEffect(() => {
+    const status = String(run.status || "").toLowerCase();
+    const isRadarActive =
+      isSubmitting ||
+      isStreaming ||
+      status.includes("running") ||
+      status.includes("scanning") ||
+      status.includes("processing") ||
+      status.includes("active");
+
+    if (!isRadarActive) {
+      setRadarTick(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setRadarTick((value) => (value + 1) % 360);
+    }, 24);
+
+    return () => window.clearInterval(interval);
+  }, [isSubmitting, isStreaming, run.status]);
+
+  const systemProfile = useMemo(
+    () => [
+      {
+        label: "Browser",
+        value: (() => {
+          if (typeof navigator === "undefined") return "Browser";
+          const nav = navigator as NavigatorWithExtras;
+          const agent = nav.userAgent;
+          const match = agent.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
+          if (match?.[1] && match[2]) {
+            const version = match[2].split(".")[0];
+            return `${match[1]} ${version}`;
+          }
+          const brand = nav.userAgentData?.brands?.find((item: { brand: string; version: string }) => !/not/i.test(item.brand));
+          return brand ? `${brand.brand} ${String(brand.version).split(".")[0]}` : "Browser";
+        })(),
+        tone: "text-green-300",
+      },
+      {
+        label: "OS",
+        value: (() => {
+          if (typeof navigator === "undefined") return "Unknown OS";
+          const nav = navigator as NavigatorWithExtras;
+          const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
+          if (platformHint.includes("iphone") || platformHint.includes("ipad") || platformHint.includes("ipod")) return "iOS";
+          if (platformHint.includes("mac")) return "macOS";
+          if (platformHint.includes("android")) return "Android";
+          if (platformHint.includes("win")) return "Windows";
+          if (platformHint.includes("linux")) return "Linux";
+          return "Unknown OS";
+        })(),
+        tone: "text-green-300",
+      },
+      {
+        label: "CPU Cores",
+        value:
+          typeof navigator !== "undefined" && Number.isFinite(navigator.hardwareConcurrency)
+            ? `${navigator.hardwareConcurrency} cores`
+            : "unknown",
+        tone: "text-green-300",
+      },
+      {
+        label: "Network",
+        value: typeof navigator !== "undefined"
+          ? (navigator.onLine ? "Online" : "Offline")
+          : "Online",
+        tone: "text-emerald-300",
+      },
+    ],
+    [],
+  );
 
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
@@ -122,7 +612,7 @@ export function AdvancedTerminalPanel({
   // ── Prompt ───────────────────────────────────────────────────────────────
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m`;
+    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m `;
   }, []);
 
   // ── Redraw current input line after cursor moves ─────────────────────────
@@ -133,7 +623,7 @@ export function AdvancedTerminalPanel({
     const buf = lineRef.current;
     const cur = cursorRef.current;
     // Move to column 0, clear line, reprint prompt + buffer
-    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m${buf}`);
+    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m ${buf}`);
     // Move cursor back to correct position
     const charsAfterCursor = buf.length - cur;
     if (charsAfterCursor > 0) {
@@ -164,13 +654,15 @@ export function AdvancedTerminalPanel({
       const term = new Terminal({
         cursorBlink: true,
         convertEol: false,          // we handle \r ourselves
-        fontFamily: "Consolas, 'Courier New', monospace",
-        fontSize: logSize.xtermFontSize,
-        fontWeight: "bold",
-        fontWeightBold: "bold",
-        lineHeight: 1.4,
-        scrollback: 5000,
+        fontFamily: "var(--font-fira-code), 'Fira Code', Consolas, 'Courier New', monospace",
+        fontSize: terminalFontSize,
+        letterSpacing: terminalLetterSpacing,
+        fontWeight: 400,
+        fontWeightBold: 700,
+        lineHeight: terminalLineHeight,
+        scrollback: 10000,  // Increased from 5000 for more history
         theme: terminalTheme,
+        cols: 200,  // Force more columns for wider output
       });
 
       const fitAddon = new FitAddon();
@@ -400,10 +892,12 @@ export function AdvancedTerminalPanel({
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.fontSize = logSize.xtermFontSize;
+      termRef.current.options.lineHeight = logSize.terminalLineHeight;
+      termRef.current.options.letterSpacing = terminalLetterSpacing;
       // Re-fit the terminal to recalculate cols/rows for new font size
       fitAddonRef.current?.fit();
     }
-  }, [logSize.xtermFontSize]);
+  }, [logSize.xtermFontSize, logSize.terminalLineHeight, terminalFontSize, terminalLetterSpacing, terminalLineHeight, terminalTheme]);
 
   // ── Terminal spinner while waiting for logs ───────────────────────────────
   const spinnerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -547,92 +1041,400 @@ export function AdvancedTerminalPanel({
 
   return (
     <>
+      <style>{glitchAnimation}</style>
       <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="relative rounded-xl overflow-hidden border-2 bg-black cyber-border"
+        style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
       >
-        {/* ── Title bar ── */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-red-500" />
-              <span className="h-3 w-3 rounded-full bg-yellow-400" />
-              <span className="h-3 w-3 rounded-full bg-green-500" />
-            </div>
-            <span className="font-mono text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs">
-              {selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} — advanced scan
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {isSubmitting && (
-              <span className="rounded-full bg-teal-50 dark:bg-teal-500/10 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
-                <Loader2 size={11} className="animate-spin" /> Running
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={onReset}
-              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2.5 py-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-            >
-              <RotateCcw size={12} />
-              Reset
-            </button>
-          </div>
+        {/* ── Animated background glow ── */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
+
+        {/* ── Scanlines overlay ── */}
+        <div className="absolute inset-0 pointer-events-none scanline-bg opacity-20 mix-blend-overlay" />
+
+        {/* ── Black Top Bar - PURE BLACK ── */}
+        <motion.div 
+          className="relative z-20 border-b-2 px-6 py-3.5 backdrop-blur-sm bg-black flex items-center justify-center cyber-pulse"
+          style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="w-full flex items-center justify-between">
+            {/* Left side - Window controls + Title */}
+            <div className="flex items-center gap-4 flex-1">
+              {/* Hacker-style window controls */}
+              <motion.div 
+                className="flex gap-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+              >
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-red-500 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #ff0000", "0 0 5px #ff0000"] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-yellow-400 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #ffff00", "0 0 5px #ffff00"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                />
+                <motion.span 
+                  className="h-3 w-3 rounded-full bg-green-500 cursor-pointer hover:scale-125"
+                  animate={{ boxShadow: ["0 0 10px #00ff00", "0 0 5px #00ff00"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                />
+              </motion.div>
+
+              {/* Title with glitch effect - CENTERED */}
+              <div className="flex items-center gap-2 flex-1 justify-center">
+                <motion.div className="h-2 w-2 rounded-full bg-green-500/80" />
+                <motion.span className="font-mono text-xs sm:text-sm font-semibold tracking-wider text-green-400 dark:text-green-300">{selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} :: ADVANCED_SCAN</motion.span>
+              </div>
+            </div>
+
+            {/* Right side - Status and Controls */}
+            <div className="flex items-center gap-3 ml-4">
+              {isSubmitting && (
+                <motion.span className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold flex items-center gap-2 whitespace-nowrap text-green-400 dark:text-green-300">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Zap size={11} />
+                  </motion.div>
+                  RUNNING
+                </motion.span>
+              )}
+
+              <motion.button
+                type="button"
+                onClick={onReset}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-3 py-1 text-[10px] sm:text-xs font-bold text-green-400 transition-all duration-300 whitespace-nowrap hover:bg-green-500/10"
+              >
+                <RotateCcw size={11} />
+                RESET
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
 
         {!projectId && (
-          <div className="rounded-lg border border-red-200/25 dark:border-red-900/25 bg-red-50 dark:bg-red-950/30 p-3 sm:p-4 text-xs sm:text-sm text-red-600 dark:text-red-400 m-4">
-            ⚠ Select a project above before running a scan.
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs sm:text-sm font-mono"
+            style={{ boxShadow: "0 0 15px rgba(255, 0, 0, 0.3)" }}
+          >
+            <span className="text-red-400 font-bold">⚠ ERROR:</span> <span className="text-red-300">Select a project above before running a scan.</span>
+          </motion.div>
         )}
 
-        {/* ── Theme & Size Toolbar ── */}
-        <LogToolbar
-          themeKey={themeKey}
-          sizeKey={sizeKey}
-          onThemeChange={setTheme}
-          onSizeChange={setSize}
-          onReset={resetToDefault}
-          className="mx-4 mt-3"
-        />
+        {/* ── Theme & Size Toolbar - STYLED HACKER ── */}
+        <motion.div 
+          className="relative z-15 border-t border-b border-green-500/30 px-4 py-2 bg-black/50 backdrop-blur flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          <LogToolbar
+            themeKey={themeKey}
+            sizeKey={sizeKey}
+            onThemeChange={setTheme}
+            onSizeChange={setSize}
+            onReset={resetToDefault}
+            className="bg-transparent! border-0!"
+          />
+        </motion.div>
 
-        {/* ── Full-width xterm ── */}
-        <div
-          ref={containerRef}
-          className="h-144 w-full overflow-hidden"
-          style={{ backgroundColor: terminalTheme.background }}
-        />
+        {/* ── Full-width xterm with cyber effects ── */}
+        <div className="relative flex-1 w-full bg-black overflow-hidden flex">
+          {/* Background Image Layer */}
+          <div 
+            className="absolute inset-0 opacity-15 pointer-events-none z-0"
+            style={{
+              backgroundImage: "url('/ascii.png')",
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundAttachment: "fixed"
+            }}
+          />
+          
+          {/* xterm Container - MAXIMIZED ── */}
+          <div
+            ref={containerRef}
+            className="terminal-content flex-1 overflow-hidden terminal-glow scanline-bg relative z-10"
+            style={{ 
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
+              borderRight: "2px solid rgba(0, 255, 0, 0.2)",
+              borderTop: "2px solid rgba(0, 255, 0, 0.2)",
+              minHeight: "calc(100vh - 300px)"
+            }}
+          />
+
+          {/* Cyberpunk Side Panel - Real Data Display */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="w-56 border-l-2 border-green-500/40 bg-black/40 backdrop-blur p-3 flex flex-col gap-3 z-10 overflow-y-auto"
+            style={{ borderColor: "rgba(0, 255, 0, 0.3)" }}
+          >
+            {/* Header */}
+            <motion.div 
+              className="text-sm font-mono neon-text tracking-wide"
+              animate={{ textShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              ▸▸▸ SCAN_ANALYTICS
+            </motion.div>
+
+            {/* Scan Status */}
+            <div className="space-y-1.5 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">PROJECT</div>
+              <div className="text-base font-mono text-green-300 tracking-wide">
+                {selectedProject?.name || "no_project"}
+              </div>
+              <div className="text-[12px] font-mono text-green-400/70 mt-1 tracking-[0.18em]">STATUS</div>
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  className="w-2 h-2 rounded-full bg-green-500"
+                  animate={{ boxShadow: ["0 0 5px #00ff00", "0 0 15px #00ff00"] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span className="text-base font-mono text-green-300 tracking-wide">
+                  {isSubmitting ? "◆ SCANNING..." : "◆ IDLE"}
+                </span>
+              </div>
+            </div>
+
+            {/* Environment Profile */}
+            <div className="space-y-2 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">ENVIRONMENT</div>
+              <div className="space-y-1.5">
+                {systemProfile.map((item) => (
+                  <div key={item.label} className="flex items-baseline justify-between gap-3 font-mono">
+                    <span className="text-[11px] text-green-400/65 tracking-[0.14em] uppercase">
+                      {item.label}
+                    </span>
+                    <span className={`text-sm font-semibold ${item.tone} tracking-wide text-right`}>
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Threat Map */}
+            <div className="space-y-3 border-b border-green-500/15 pb-3">
+              <div className="flex items-center justify-between">
+                <div className="text-[11px] font-mono uppercase tracking-[0.22em] text-emerald-400/80">
+                  Threat Map
+                </div>
+                <div className="rounded-full border border-emerald-500/15 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300/80">
+                  {isSubmitting || isStreaming ? "scanning" : radarState.badge}
+                </div>
+              </div>
+              <div className="radar-container border border-emerald-600/20 shadow-[0_0_24px_rgba(34,211,155,0.2)]">
+                <div className="radar-base">
+                  {/* Concentric Rings */}
+                  <div className="radar-ring radar-ring-1" />
+                  <div className="radar-ring radar-ring-2" />
+                  <div className="radar-ring radar-ring-3" />
+
+                  {/* Rotating Sweep Line - Sweeps until scan status is completed */}
+                  <div className={`radar-sweep ${
+                    isSubmitting || isStreaming || 
+                    (run.status && !String(run.status).toLowerCase().includes('completed') && !String(run.status).toLowerCase().includes('idle')) 
+                      ? 'scanning' 
+                      : ''
+                  }`} />
+
+                  {/* Center Point - Changes state based on scan activity */}
+                  <div className={`radar-center ${
+                    isSubmitting || isStreaming 
+                      ? 'scanning' 
+                      : (run.findings && run.findings > 0) 
+                        ? 'found' 
+                        : ''
+                  }`} />
+
+                  {/* Radar Blips - Only show if findings detected */}
+                  {(run.findings && run.findings > 0) && radarState.blips.map((blip, idx) => {
+                    const angle = (idx * 90) + (radarTick * 0.5);
+                    const radius = 80 + (idx % 2) * 25;
+                    const x = Math.cos((angle * Math.PI) / 180) * radius;
+                    const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                    return (
+                      <motion.div
+                        key={idx}
+                        className="radar-blip"
+                        style={{
+                          left: `calc(50% + ${x}px)`,
+                          top: `calc(50% + ${y}px)`,
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Findings Stats */}
+            <div className="space-y-1 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">FINDINGS</div>
+              <div className="text-2xl font-mono text-green-400">
+                {run.findings || 0}
+              </div>
+              <div className="text-[11px] font-mono text-green-300/60 tracking-wide">
+                vulnerabilities
+              </div>
+            </div>
+
+            {/* Logs Stats */}
+            <div className="space-y-1 border-b border-green-500/20 pb-2">
+              <div className="text-[12px] font-mono text-green-400/70 tracking-[0.18em]">LOG_ENTRIES</div>
+              <motion.div 
+                className="text-xl font-mono text-green-400"
+                animate={{ opacity: [0.8, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                {logs.length}
+              </motion.div>
+              <div className="text-[11px] font-mono text-green-300/60 tracking-wide">
+                records
+              </div>
+            </div>
+
+            {/* Error Count */}
+            {errors.length > 0 && (
+              <div className="space-y-1 border-b border-red-500/20 pb-2">
+                <div className="text-[12px] font-mono text-red-400/70 tracking-[0.18em]">SCAN_FAIL</div>
+                <motion.div 
+                  className="text-lg font-mono text-red-400"
+                  animate={{ textShadow: ["0 0 5px #ff0000", "0 0 10px #ff0000"] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  {errors.length}
+                </motion.div>
+              </div>
+            )}
+
+            {/* Recent Activity */}
+            <div className="space-y-1">
+              <div className="text-[12px] font-mono text-green-400/70 mb-1 tracking-[0.18em]">RECENT</div>
+              {logs.slice(-3).map((log, idx) => (
+                <motion.div 
+                  key={idx}
+                  className="text-[11px] font-mono text-green-300/60 line-clamp-1 tracking-wide"
+                  animate={{ opacity: [0.5, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: idx * 0.2 }}
+                >
+                  ▸ {log.text.substring(0, 20)}...
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Footer Stats */}
+            <div className="mt-auto pt-2 border-t border-green-500/20 space-y-0.5">
+              <motion.div 
+                className="text-[10px] font-mono text-green-500/30 flex justify-between tracking-[0.16em]"
+                animate={{ opacity: [0.3, 0.7] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <span>CONNECTION</span>
+                <span>ACTIVE</span>
+              </motion.div>
+              <div className="text-[10px] font-mono text-green-500/30 tracking-wide">
+                v7.2.1-advanced
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+        </div>
       </motion.section>
 
-      {/* Cancel Confirmation Modal */}
+      {/* Cancel Confirmation Modal - Hacker Themed */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Cancel Scan?
-            </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              A scan is currently running. Are you sure you want to cancel it? This action cannot be undone.
-            </p>
-            <div className="mt-5 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleDismissCancel}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+        <motion.div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div 
+            className="w-full max-w-sm rounded-lg border-2 border-red-500/60 bg-black/80 p-6 shadow-2xl cyber-pulse relative overflow-hidden"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+          >
+            {/* Background glow */}
+            <div className="absolute inset-0 opacity-10 bg-linear-to-br from-red-500 to-purple-500 pointer-events-none" />
+            
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-red-500 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-red-500 pointer-events-none" />
+
+            <div className="relative z-10">
+              <motion.h3 
+                className="text-lg font-bold font-mono text-red-400 tracking-wider"
+                animate={{ textShadow: ["0 0 10px #ff0000", "0 0 20px #ff0000"] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
               >
-                Continue Scan
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmCancel}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-              >
-                Cancel Scan
-              </button>
+                ⚠ CRITICAL_ACTION
+              </motion.h3>
+              
+              <p className="mt-3 text-sm font-mono text-red-300/80">
+                Scan termination requested. This operation is {' '}
+                <span className="text-red-400 font-bold animate-pulse">IRREVERSIBLE</span>.
+                <br />
+                <span className="text-xs text-red-300/60 block mt-2">[CONFIRM_REQUIRED]</span>
+              </p>
+
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <motion.button
+                  type="button"
+                  onClick={handleDismissCancel}
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-4 py-2 text-sm font-bold font-mono text-blue-400 transition-all hover:border-blue-500/80"
+                >
+                  [ABORT]
+                </motion.button>
+                
+                <motion.button
+                  type="button"
+                  onClick={handleConfirmCancel}
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255, 0, 0, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-4 py-2 text-sm font-bold font-mono text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
+                >
+                  [CONFIRM_TERMINATION]
+                </motion.button>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

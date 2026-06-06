@@ -114,7 +114,7 @@ function ComboboxTrigger({
       size="icon-xs"
       data-slot="combobox-trigger"
       className={cn(
-        "[&_svg:not([class*='size-'])]:size-4 text-black hover:bg-primary hover:text-black",
+        "[&_svg:not([class*='size-'])]:size-4",
         open && "bg-transparent",
         className
       )}
@@ -168,26 +168,16 @@ function ComboboxInput({
 }) {
   const context = useComboboxContext("ComboboxInput")
   const isDisabled = disabled || context.disabled
-  const handleGroupMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!openOnClick || isDisabled) {
-      return
+  const handleInputClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    props.onClick?.(event)
+    if (!event.defaultPrevented && openOnClick && !isDisabled) {
+      context.setOpen((current) => !current)
     }
-
-    const target = event.target as HTMLElement
-    if (
-      target.closest("[data-slot='combobox-trigger']") ||
-      target.closest("[data-slot='combobox-clear']")
-    ) {
-      return
-    }
-
-    event.preventDefault()
-    context.setOpen((current) => !current)
   }
 
   return (
-    <InputGroup className={cn("w-auto", className)} onMouseDown={handleGroupMouseDown}>
-      <InputGroupInput disabled={isDisabled} {...props} />
+    <InputGroup className={cn("w-auto", className)}>
+      <InputGroupInput disabled={isDisabled} {...props} onClick={handleInputClick} />
       <InputGroupAddon align="inline-end">
         {showTrigger ? <ComboboxTrigger disabled={isDisabled} /> : null}
         {showClear ? <ComboboxClear disabled={isDisabled} /> : null}
@@ -260,7 +250,7 @@ function ComboboxItem({
       data-slot="combobox-item"
       data-selected={selected || undefined}
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors hover:bg-primary/35 hover:text-black data-[selected=true]:bg-primary/45 data-[selected=true]:text-black data-[selected=true]:font-semibold disabled:pointer-events-none disabled:opacity-50",
+        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm font-normal outline-hidden select-none transition-colors hover:bg-primary/10 hover:text-black data-[selected=true]:bg-primary/12 data-[selected=true]:text-black data-[selected=true]:font-bold disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       disabled={disabled}

@@ -646,20 +646,25 @@ function MetricCard({ metric, index }: { metric: MetricCardData; index: number }
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.04 + index * 0.04 }}
-      className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white p-2.5 sm:p-3 md:p-4 lg:p-5 dark:border-slate-800 dark:bg-slate-900 transition-all hover:shadow-sm dark:hover:shadow-lg/10"
+      className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:p-6 lg:p-7 dark:border-slate-800 dark:bg-slate-900 transition-all hover:shadow-sm dark:hover:shadow-lg/10"
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-[10px] sm:text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">{metric.label}</p>
-        <div className={`rounded-lg p-1 sm:p-1.5 md:p-2 ${metric.gradient} shrink-0`}>
-          <metric.icon size={14} className={`${metric.iconColor} sm:size-4 md:size-5`} />
+      {/* Large half-circle icon on the right */}
+      <div className="absolute -right-16 sm:-right-20 md:-right-24 lg:-right-32 top-1/2 -translate-y-1/2">
+        <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center ${metric.gradient} opacity-20`}>
+          <metric.icon className={`${metric.iconColor} w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 opacity-60`} />
         </div>
       </div>
-      <p className="mt-1.5 sm:mt-2 md:mt-3 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">
-        {formatCompactNumber(metric.value)}
-      </p>
-      <p className="mt-1 sm:mt-1.5 truncate text-[8px] sm:text-[9px] md:text-xs text-slate-400 dark:text-slate-500">
-        {metric.note}
-      </p>
+
+      {/* Content on the left */}
+      <div className="relative z-10">
+        <p className="text-xs sm:text-sm md:text-base font-medium text-slate-500 dark:text-slate-400 line-clamp-2 pr-8 sm:pr-10 md:pr-12">{metric.label}</p>
+        <p className="mt-2 sm:mt-3 md:mt-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white">
+          {formatCompactNumber(metric.value)}
+        </p>
+        <p className="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs lg:text-sm text-slate-400 dark:text-slate-500 pr-12 sm:pr-16 md:pr-20 break-words">
+          {metric.note}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -735,8 +740,8 @@ function VulnerabilityBarChart({ data }: { data: VulnItem[] }) {
       preserveAspectRatio="none"
     >
       {/* Grid lines */}
-      {gridLines.map(({ y, label }) => (
-        <g key={label}>
+      {gridLines.map(({ y, label }, index) => (
+        <g key={`grid-line-${index}-${y}`}>
           <line
             x1={paddingLeft}
             y1={y}

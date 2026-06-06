@@ -5,6 +5,7 @@ import {
   Activity,
   AlertCircle,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Clock3,
   Database,
@@ -15,6 +16,7 @@ import {
   ShieldAlert,
   Terminal,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -840,16 +842,41 @@ export default function MediumScanPage() {
 
               {/* ── View Scan Results button (Floating) ── */}
               {/completed|failed|cancelled|partial/i.test(status) && (
-                <div className="fixed bottom-8 right-8 z-50 animate-bounce">
-                  <button
+                <motion.div 
+                  className="fixed bottom-8 right-8 z-50"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.button
                     type="button"
                     onClick={() => router.push("/userdashboard/assets")}
-                    className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-teal-500/50 transition-all hover:bg-teal-700 hover:scale-105 active:scale-95 border-2 border-white/20"
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      borderRadius: "8px",
+                      border: "2px solid #00ff00",
+                      backgroundColor: "#000000",
+                      padding: "12px 24px",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      color: "#00ff00",
+                      textShadow: "0 0 10px #00ff00",
+                      boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease"
+                    }}
                   >
-                    View Scan Results
-                    <ArrowRight size={20} />
-                  </button>
-                </div>
+                    <BarChart3 size={20} />
+                    View Results
+                    <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                      <ArrowRight size={20} />
+                    </motion.div>
+                  </motion.button>
+                </motion.div>
               )}
             </div>
           </section>
