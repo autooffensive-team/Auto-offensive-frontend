@@ -19,11 +19,17 @@ export function StreamLogsPanel({
   title = "auto-offensive - stream logs",
 }: StreamLogsPanelProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Throttle + avoid smooth scrolling (smooth can be expensive on rapid updates).
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      logEndRef.current?.scrollIntoView({ behavior: "auto" });
+      rafRef.current = null;
+    });
   }, [logs]);
 
   return (

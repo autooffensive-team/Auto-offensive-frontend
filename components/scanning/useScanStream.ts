@@ -40,7 +40,7 @@ export function useScanStream(
     const lastSyncTimeRef = useRef<number>(0);
 
     const syncFromActiveRun = useGraphStore((s) => s.syncFromActiveRun);
-    const appendLog = useGraphStore((s) => s.appendLog);
+    const appendLogs = useGraphStore((s) => s.appendLogs);
     const reset = useGraphStore((s) => s.reset);
 
     // -------------------------------------------------------------------------
@@ -95,12 +95,10 @@ export function useScanStream(
             return;
         }
 
-        for (let i = prevLength; i < currentLength; i++) {
-            appendLog(logs[i]);
-        }
+        appendLogs(logs.slice(prevLength, currentLength));
 
         prevLogsLengthRef.current = currentLength;
-    }, [logs, appendLog]);
+    }, [logs, appendLogs]);
 
     // -------------------------------------------------------------------------
     // Effect: Handle connection errors

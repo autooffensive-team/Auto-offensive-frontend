@@ -259,6 +259,7 @@ export default function BasicScanPage() {
     setMediumTarget,
     mediumSteps,
     mediumTools,
+    wordlists,
     isSubmitting,
     basicRun,
     basicLogs,
@@ -374,6 +375,7 @@ export default function BasicScanPage() {
                 onAddStep={addMediumStep}
                 onRemoveStep={removeMediumStep}
                 tools={mediumTools}
+                wordlists={wordlists}
                 disabled={isSubmitting || !projectId}
                 onSubmit={submitMedium}
               />

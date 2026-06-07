@@ -14,11 +14,15 @@ import type {
   ScanMode,
   ScanStep,
   Tool,
+  WordlistAsset,
 } from "@/types/scan";
 import {
   analyzeAdvancedCommand,
   fetchJson,
   formatPayloadLine,
+  formatScanError,
+  formatStepFailureMessage,
+  extractStreamFailureLine,
   logFromPayload,
   parseJsonMaybe,
 } from "@/utils/scan";
@@ -66,6 +70,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
   const onGuestScanConsumed = options?.onGuestScanConsumed;
   const [projects, setProjects] = useState<Project[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
+  const [wordlists, setWordlists] = useState<WordlistAsset[]>([]);
   const [projectId, setProjectId] = useState(initialProjectId || "");
   const [loadingMeta, setLoadingMeta] = useState(true);
   const [metaError, setMetaError] = useState("");
@@ -147,12 +152,47 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
   // ---------------------------------------------------------------------------
   // Per-mode helpers
   // ---------------------------------------------------------------------------
-  const appendLogForMode = useCallback((mode: ScanMode, line: LogLine) => {
-    logsSetterRef.current[mode]((current) => [...current.slice(-399), line]);
+  // Buffer log appends to avoid UI freeze when tools emit huge output bursts.
+  // We flush in small batches on a short timer instead of setState per line.
+  const logQueueRef = useRef<Record<ScanMode, LogLine[]>>({
+    basic: [],
+    medium: [],
+    advanced: [],
+  });
+  const logFlushTimerRef = useRef<Record<ScanMode, ReturnType<typeof setTimeout> | null>>({
+    basic: null,
+    medium: null,
+    advanced: null,
+  });
+
+  const flushLogs = useCallback((mode: ScanMode) => {
+    const queued = logQueueRef.current[mode];
+    if (!queued.length) return;
+    logQueueRef.current[mode] = [];
+    logsSetterRef.current[mode]((current) => {
+      const next = current.length ? current.concat(queued) : queued;
+      // Keep a small tail in memory; terminal panel renders from this.
+      return next.slice(-399);
+    });
   }, []);
 
+  const appendLogForMode = useCallback((mode: ScanMode, line: LogLine) => {
+    logQueueRef.current[mode].push(line);
+    if (logFlushTimerRef.current[mode]) return;
+    // ~20fps flush is plenty for readability and keeps React responsive.
+    logFlushTimerRef.current[mode] = setTimeout(() => {
+      logFlushTimerRef.current[mode] = null;
+      flushLogs(mode);
+    }, 50);
+  }, [flushLogs]);
+
   const appendErrorForMode = useCallback((mode: ScanMode, err: string) => {
-    errorsSetterRef.current[mode]((current) => [...current.slice(-4), err]);
+    const message = formatScanError(err);
+    if (!message) return;
+    errorsSetterRef.current[mode]((current) => {
+      if (current[current.length - 1] === message) return current;
+      return [...current.slice(-9), message];
+    });
   }, []);
 
   const setRunForMode = useCallback(
@@ -160,6 +200,39 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       runSetterRef.current[mode](updater);
     },
     [],
+  );
+
+  const reportStepFailures = useCallback(
+    async (mode: ScanMode, steps: ScanStep[] | undefined) => {
+      const failedSteps = (steps ?? []).filter((step) => /failed/i.test(step.status));
+      if (!failedSteps.length) return;
+
+      let primaryMessage: string | undefined;
+
+      await Promise.all(
+        failedSteps.map(async (step) => {
+          try {
+            const detail = await fetchJson<{
+              tool_name?: string;
+              error_message?: string | null;
+              exit_code?: number;
+            }>(`/scans/steps/${step.step_id}`);
+            const message = formatStepFailureMessage(detail);
+            appendErrorForMode(mode, message);
+            if (!primaryMessage) primaryMessage = message;
+          } catch {
+            const message = formatStepFailureMessage({ tool_name: step.tool_name });
+            appendErrorForMode(mode, message);
+            if (!primaryMessage) primaryMessage = message;
+          }
+        }),
+      );
+
+      if (primaryMessage) {
+        setRunForMode(mode, (current) => ({ ...current, failureMessage: primaryMessage }));
+      }
+    },
+    [appendErrorForMode, setRunForMode],
   );
   const openGuestBasicStepStreamRef = useRef<((mode: ScanMode, stepId: string) => void) | null>(null);
   const fetchGuestBasicParsedDataRef = useRef<((mode: ScanMode, stepId: string) => Promise<void>) | null>(null);
@@ -287,15 +360,17 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       try {
         // Fetch projects and tools separately so that a project auth failure
         // (e.g. guest mode) doesn't prevent tools from loading.
-        const [projectData, toolData] = await Promise.all([
+        const [projectData, toolData, wordlistData] = await Promise.all([
           fetchJson<Project[]>("/projects").catch(() => [] as Project[]),
           fetchJson<Tool[]>("/tools?active_only=true"),
+          fetchJson<WordlistAsset[]>("/wordlists").catch(() => [] as WordlistAsset[]),
         ]);
 
         if (cancelled) return;
 
         setProjects(projectData);
         setTools(toolData);
+        setWordlists(wordlistData);
         setProjectId((current) => current || initialProjectId || projectData[0]?.project_id || "");
 
         const firstBasicTool = toolData.find(
@@ -397,7 +472,11 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         }
 
         if (eventName === "stream-error" || eventName === "error") {
-          appendErrorForMode(mode, formatPayloadLine(payload));
+          appendErrorForMode(mode, formatScanError(formatPayloadLine(payload) || payload));
+        }
+        if (eventName === "log") {
+          const failureLine = extractStreamFailureLine(payload);
+          if (failureLine) appendErrorForMode(mode, failureLine);
         }
         if (!["heartbeat", "ping", "ready"].includes(eventName)) {
           appendLogForMode(mode, logFromPayload(mode, eventName, payload));
@@ -466,19 +545,16 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             /partial/i.test(job.status)
           ) {
             stopWatchingJob();
+            if (/failed|partial/i.test(job.status)) {
+              await reportStepFailures(mode, job.steps);
+            }
             notifyScanComplete(mode, job.status, jobId, target, job.total_findings ?? 0);
             void fetchParsedData(mode, jobId);
           }
         } catch (error) {
           consecutivePollFailures += 1;
-          // Single transient blip → swallow. Sustained failure (≥ 3 ticks ≈
-          // 7.5s) → surface once so the user knows the status pane is stale,
-          // without piling identical lines onto the errors panel.
           if (consecutivePollFailures === 3) {
-            appendErrorForMode(
-              mode,
-              error instanceof Error ? error.message : "Failed to refresh job status.",
-            );
+            appendErrorForMode(mode, formatScanError(error));
           }
         }
       }, 2500);
@@ -488,6 +564,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       fetchParsedData,
       notifyScanComplete,
       openStepStream,
+      reportStepFailures,
       setRunForMode,
       stopWatchingJob,
       transformSummaryToJobStatus,
@@ -706,8 +783,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           });
         }
       } catch (error) {
-        appendErrorForMode("basic", error instanceof Error ? error.message : "Basic scan failed.");
-        setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
+        appendErrorForMode("basic", formatScanError(error));
+        toast.error(formatScanError(error));
+        setRunForMode("basic", (current) => ({ ...current, status: "failed", failureMessage: formatScanError(error) }));
       } finally {
         setIsSubmitting(false);
       }
@@ -743,8 +821,10 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       );
       watchJob("basic", submit.job_id, submit.step_id, basicTarget.trim());
     } catch (error) {
-      appendErrorForMode("basic", error instanceof Error ? error.message : "Basic scan failed.");
-      setRunForMode("basic", (current) => ({ ...current, status: "failed" }));
+      const message = formatScanError(error);
+      appendErrorForMode("basic", message);
+      toast.error(message);
+      setRunForMode("basic", (current) => ({ ...current, status: "failed", failureMessage: message }));
     } finally {
       setIsSubmitting(false);
     }
@@ -910,8 +990,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
           });
         }
       } catch (error) {
-        appendErrorForMode("medium", error instanceof Error ? error.message : "Medium scan failed.");
-        setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
+        appendErrorForMode("medium", formatScanError(error));
+        toast.error(formatScanError(error));
+        setRunForMode("medium", (current) => ({ ...current, status: "failed", failureMessage: formatScanError(error) }));
       } finally {
         setIsSubmitting(false);
       }
@@ -947,8 +1028,10 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
       );
       watchJob("medium", submit.job_id, submit.step_id, mediumTarget.trim());
     } catch (error) {
-      appendErrorForMode("medium", error instanceof Error ? error.message : "Medium scan failed.");
-      setRunForMode("medium", (current) => ({ ...current, status: "failed" }));
+      const message = formatScanError(error);
+      appendErrorForMode("medium", message);
+      toast.error(message);
+      setRunForMode("medium", (current) => ({ ...current, status: "failed", failureMessage: message }));
     } finally {
       setIsSubmitting(false);
     }
@@ -993,7 +1076,11 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         }
 
         if (eventName === "stream-error" || eventName === "error") {
-          appendErrorForMode(mode, formatPayloadLine(payload));
+          appendErrorForMode(mode, formatScanError(formatPayloadLine(payload) || payload));
+        }
+        if (eventName === "log") {
+          const failureLine = extractStreamFailureLine(payload);
+          if (failureLine) appendErrorForMode(mode, failureLine);
         }
         if (!["heartbeat", "ping", "ready"].includes(eventName)) {
           appendLogForMode(mode, logFromPayload(mode, eventName, payload));
@@ -1055,7 +1142,11 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         }
 
         if (eventName === "stream-error" || eventName === "error") {
-          appendErrorForMode(mode, formatPayloadLine(payload));
+          appendErrorForMode(mode, formatScanError(formatPayloadLine(payload) || payload));
+        }
+        if (eventName === "log") {
+          const failureLine = extractStreamFailureLine(payload);
+          if (failureLine) appendErrorForMode(mode, failureLine);
         }
         if (!["heartbeat", "ping", "ready"].includes(eventName)) {
           appendLogForMode(mode, logFromPayload(mode, eventName, payload));
@@ -1290,8 +1381,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
             });
           }
         } catch (error) {
-          appendErrorForMode("advanced", error instanceof Error ? error.message : "Advanced scan failed.");
-          setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));
+          appendErrorForMode("advanced", formatScanError(error));
+          toast.error(formatScanError(error));
+          setRunForMode("advanced", (current) => ({ ...current, status: "failed", failureMessage: formatScanError(error) }));
         } finally {
           setIsSubmitting(false);
         }
@@ -1333,8 +1425,9 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         }));
         watchJob("advanced", submit.job_id, submit.step_id, finalCommand);
       } catch (error) {
-        appendErrorForMode("advanced", error instanceof Error ? error.message : "Advanced scan failed.");
-        setRunForMode("advanced", (current) => ({ ...current, status: "failed" }));
+        appendErrorForMode("advanced", formatScanError(error));
+        toast.error(formatScanError(error));
+        setRunForMode("advanced", (current) => ({ ...current, status: "failed", failureMessage: formatScanError(error) }));
       } finally {
         setIsSubmitting(false);
       }
@@ -1384,6 +1477,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
     // Meta
     projects,
     tools,
+    wordlists,
     projectId,
     setProjectId,
     loadingMeta,

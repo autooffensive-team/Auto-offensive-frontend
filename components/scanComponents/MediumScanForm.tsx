@@ -2,7 +2,7 @@
 
 import { Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
 import { useState } from "react";
-import { Tool, MediumStepState } from "@/types/scan";
+import { Tool, MediumStepState, WordlistAsset } from "@/types/scan";
 import { Field } from "./Field";
 import { ToolSelector } from "./ToolSelector";
 import { ToolOptionField } from "./ToolOptionsField";
@@ -26,6 +26,7 @@ interface MediumScanFormProps {
   onAddStep: () => void;
   onRemoveStep: (id: string) => void;
   tools: Tool[];
+  wordlists?: WordlistAsset[];
   disabled: boolean;
   onSubmit: () => void;
 }
@@ -39,6 +40,7 @@ export function MediumScanForm({
   onAddStep,
   onRemoveStep,
   tools,
+  wordlists = [],
   disabled,
   onSubmit,
 }: MediumScanFormProps) {
@@ -163,6 +165,7 @@ export function MediumScanForm({
               index={index}
               totalSteps={steps.length}
               tools={tools}
+              wordlists={wordlists}
               onChange={onStepChange}
               onOptionChange={onOptionChange}
               onRemove={onRemoveStep}
@@ -296,6 +299,7 @@ interface PipelineStepProps {
   index: number;
   totalSteps: number;
   tools: Tool[];
+  wordlists: WordlistAsset[];
   onChange: (id: string, patch: Partial<MediumStepState>) => void;
   onOptionChange: (stepId: string, key: string, value: string | boolean) => void;
   onRemove: (id: string) => void;
@@ -308,6 +312,7 @@ function PipelineStep({
   index,
   totalSteps,
   tools,
+  wordlists,
   onChange,
   onOptionChange,
   onRemove,
@@ -404,6 +409,7 @@ function PipelineStep({
                 key={option.key}
                 option={option}
                 value={step.options[option.key]}
+                wordlists={wordlists}
                 onChange={(value) => onOptionChange(step.id, option.key, value)}
               />
             ))}

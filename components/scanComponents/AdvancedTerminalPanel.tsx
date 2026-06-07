@@ -41,7 +41,11 @@ const HELP_LINES = [
   "    Example: \x1b[32msubfinder -d example.com | httpx\x1b[0m",
   "    Example: \x1b[32msubfinder -d example.com | httpx | nuclei\x1b[0m",
   "",
-  "  \x1b[1m\x1b[33mAvailable Tools:\x1b[0m",
+  "  \x1b[1m\x1b[33mFlags:\x1b[0m",
+  "    Any valid tool flag works — you do \x1b[1mnot\x1b[0m need it listed in medium mode.",
+  "    Use \x1b[36m-flag value\x1b[0m or \x1b[36m-flag=value\x1b[0m (e.g. \x1b[32mhttpx -fc 404\x1b[0m).",
+  "    Only globally denied flags (e.g. \x1b[90m-o, --proxy\x1b[0m) are blocked.",
+  "",
   "    \x1b[36msubfinder\x1b[0m    Subdomain discovery",
   "    \x1b[36mhttpx\x1b[0m        HTTP probing & tech detection",
   "    \x1b[36mnuclei\x1b[0m       Vulnerability scanning",
@@ -112,6 +116,7 @@ export function AdvancedTerminalPanel({
   const prevStepsRef = useRef<ScanStep[]>([]);
   const prevStatusRef = useRef("idle");
   const prevErrorsLenRef = useRef(0);
+  const lastFailureSignatureRef = useRef("");
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
 
@@ -466,7 +471,8 @@ export function AdvancedTerminalPanel({
     const newLines = logs.slice(logCursorRef.current);
     if (!newLines.length) return;
     logCursorRef.current = logs.length;
-    newLines.forEach((line) => {
+    // Write in a single chunk to avoid UI freezing on bursty output.
+    const chunk = newLines.map((line) => {
       const time = new Date(line.timestamp).toLocaleTimeString();
       let col = "\x1b[90m";
       const lvl = line.level.toLowerCase();
@@ -474,19 +480,29 @@ export function AdvancedTerminalPanel({
       else if (lvl.includes("warn")) col = "\x1b[33m";
       else if (lvl === "done" || lvl === "submitted") col = "\x1b[32m";
       else if (lvl === "log") col = "\x1b[36m";
-      term.write(`\r\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
-    });
+      return `\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`;
+    }).join("");
+    term.write(chunk);
   }, [logs]);
 
-  // ── Errors ───────────────────────────────────────────────────────────────
+  // ── Errors (in-progress only; terminal failures use the failure effect below) ─
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
+    const isFailed = run.status.includes("FAILED") || run.status === "failed";
+    if (isFailed) return;
+
     const newErrs = errors.slice(prevErrorsLenRef.current);
     if (!newErrs.length) return;
     prevErrorsLenRef.current = errors.length;
-    newErrs.forEach((e) => term.write(`\r\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
-  }, [errors]);
+    if (spinnerRef.current) {
+      clearInterval(spinnerRef.current);
+      spinnerRef.current = null;
+      term.write("\r\x1b[K");
+      spinnerLineRef.current = false;
+    }
+    newErrs.forEach((e) => term.write(`\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
+  }, [errors, run.status]);
 
   // ── Step announcements — removed per UX request ─────────────────────────
 
@@ -498,30 +514,44 @@ export function AdvancedTerminalPanel({
     prevStatusRef.current = status;
 
     if (status === "submitting") {
-      term.write(`\r\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
+      term.write(`\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
     } else if (status.includes("COMPLETED")) {
-      term.write(`\r\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
-    } else if (status.includes("FAILED")) {
-      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
+      term.write(`\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status.includes("CANCELLED") || status.includes("PARTIAL")) {
-      term.write(`\r\x1b[1m\x1b[33m⚠ Scan ${status.replace("JOB_STATUS_", "").toLowerCase()}.\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
-    } else if (status === "failed") {
-      term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
+      term.write(`\x1b[1m\x1b[33m⚠ Scan ${status.replace("JOB_STATUS_", "").toLowerCase()}.\x1b[0m\r\n`);
       isInputActiveRef.current = true;
       term.write(getPrompt());
     } else if (status === "idle") {
       prevStepsRef.current = [];
       prevErrorsLenRef.current = 0;
+      lastFailureSignatureRef.current = "";
       isInputActiveRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.status, run.findings]);
+
+  // ── Failure details (may arrive after status via step lookup or API error) ─
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+    const status = run.status;
+    const isFailed = status.includes("FAILED") || status === "failed";
+    if (!isFailed) return;
+
+    const reason = run.failureMessage || errors[errors.length - 1];
+    const signature = `${status}:${reason ?? ""}`;
+    if (signature === lastFailureSignatureRef.current) return;
+    lastFailureSignatureRef.current = signature;
+
+    term.write(`\x1b[1m\x1b[31m✗ Scan failed\x1b[0m\r\n`);
+    if (reason) {
+      term.write(`\x1b[31m  ${reason}\x1b[0m\r\n`);
+    }
+    isInputActiveRef.current = true;
+    term.write(getPrompt());
+  }, [run.status, run.failureMessage, errors, getPrompt]);
 
   // ── Cancel confirmation handlers ──────────────────────────────────────────
   const handleConfirmCancel = useCallback(() => {

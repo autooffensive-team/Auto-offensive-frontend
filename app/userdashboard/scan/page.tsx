@@ -332,6 +332,7 @@ export default function ScanPage() {
     setMediumTarget,
     mediumSteps,
     mediumTools,
+    wordlists,
     isSubmitting,
     basicRun,
     basicLogs,
@@ -473,6 +474,7 @@ export default function ScanPage() {
                   onAddStep={addMediumStep}
                   onRemoveStep={removeMediumStep}
                   tools={mediumTools}
+                  wordlists={wordlists}
                   disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
                   onSubmit={() => guardedSubmit(submitMedium)}
                 />
