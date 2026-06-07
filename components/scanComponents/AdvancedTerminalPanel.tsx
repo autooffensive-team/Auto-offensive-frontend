@@ -1476,6 +1476,22 @@ export function AdvancedTerminalPanel({
     }
   }, [getPrompt]);
 
+  // ── Top-bar RESET button — clears terminal + shows splash ────────────────
+  const handleReset = useCallback(() => {
+    const term = termRef.current;
+    lineRef.current = "";
+    cursorRef.current = 0;
+    histIdxRef.current = -1;
+    isInputActiveRef.current = true;
+    onResetRef.current();
+    useGraphStore.getState().reset();
+    if (term) {
+      term.reset();          // clears scrollback
+      showSplash(term);      // re-shows the splash screen
+      term.write(getPrompt());
+    }
+  }, [getPrompt, showSplash]);
+
   const handleDismissCancel = useCallback(() => {
     setShowCancelModal(false);
   }, []);
@@ -1619,7 +1635,7 @@ export function AdvancedTerminalPanel({
 
               <motion.button
                 type="button"
-                onClick={onReset}
+                onClick={handleReset}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-3 py-1 text-[10px] sm:text-xs font-bold text-green-400 transition-all duration-300 whitespace-nowrap hover:bg-green-500/10"
