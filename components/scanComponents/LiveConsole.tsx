@@ -85,26 +85,46 @@ function getBrowserProfile(): EnvCard[] {
     };
   };
 
-  const match = nav.userAgent?.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
-  const browserBrand = nav.userAgentData?.brands?.find((item) => !/not/i.test(item.brand));
-  const browser = match?.[1] && match[2]
-    ? `${match[1]} ${match[2].split(".")[0]}`
-    : browserBrand?.brand && browserBrand.version
-      ? `${browserBrand.brand} ${browserBrand.version.split(".")[0]}`
-      : "Browser";
+  // Browser detection — order matters:
+  // Chrome/Edge UA both contain "Safari" token, so Safari must only match
+  // when Chrome is NOT present. Edge UA also contains "Chrome", so check Edge first.
+  const ua = nav.userAgent ?? "";
+  const edgeVer    = ua.match(/Edg\/([\d]+)/i)?.[1];
+  const chromeVer  = ua.match(/Chrome\/([\d]+)/i)?.[1];
+  const firefoxVer = ua.match(/Firefox\/([\d]+)/i)?.[1];
+  const operaVer   = ua.match(/(?:OPR|Opera)\/([\d]+)/i)?.[1];
+  const safariVer  = ua.match(/Version\/([\d]+).*Safari/i)?.[1]; // real Safari only
+  const brandFallback = nav.userAgentData?.brands?.find((item) => !/not.?a.?brand/i.test(item.brand));
 
-  const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
-  const os = platformHint.includes("iphone") || platformHint.includes("ipad") || platformHint.includes("ipod")
+  const browser = edgeVer
+    ? `Edge ${edgeVer}`
+    : operaVer
+      ? `Opera ${operaVer}`
+      : firefoxVer
+        ? `Firefox ${firefoxVer}`
+        : safariVer && !chromeVer          // Safari only if no Chrome token
+          ? `Safari ${safariVer}`
+          : chromeVer
+            ? `Chrome ${chromeVer}`
+            : brandFallback
+              ? `${brandFallback.brand} ${String(brandFallback.version).split(".")[0]}`
+              : "Browser";
+
+  // OS: iOS must come before macOS (iPhone/iPad UAs also contain "Mac")
+  const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${ua}`.toLowerCase();
+  const os = /iphone|ipad|ipod/.test(platformHint)
     ? "iOS"
-    : platformHint.includes("mac")
-      ? "macOS"
-      : platformHint.includes("android")
-        ? "Android"
-        : platformHint.includes("win")
+    : /android/.test(platformHint)
+      ? "Android"
+      : /macintosh|mac os x|macos/.test(platformHint)
+        ? "macOS"
+        : /win/.test(platformHint)
           ? "Windows"
-          : platformHint.includes("linux")
+          : /linux/.test(platformHint)
             ? "Linux"
             : "Unknown OS";
+
+  // CPU cores: standard Web API, works on all platforms/browsers
   const cpu = Number.isFinite(nav.hardwareConcurrency) ? `${nav.hardwareConcurrency} cores` : "Unknown";
   const network = nav.onLine ? "Online" : "Offline";
 

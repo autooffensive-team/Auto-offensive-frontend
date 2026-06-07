@@ -21,71 +21,15 @@ type NavigatorWithExtras = Navigator & {
   };
 };
 
-// ─── ASCII Art Background - Epic Mountain Landscape ────────────────────────────
-const ASCII_BACKGROUND = `
-                                                                                                                            ::::::                                                                                                                        ::...::                                                                                                                     ::...::::                                                                                                                 ::....:::-                                                                                                              ::.....::::                                                                                                           :...:::::::::           ::                                                                                          :::::::::::::::         :...                                                                                       -:::::::::::::::.       -:::                                                                                      =-::::::::::::::::::::::::::::::::::::      :...:                                                                                    -:::::::::::::::::::::::::::::::::::::::::::::::::::::::    :....:                                                                                  =::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   :....:-                                                                                -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ::..:::    .:::::=                                                                    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::-   :::::.::::::.                                                             -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::   ::::::::::::::::-                                                       .::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-   ::::::::::::::::::::::                                                 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::  :::::::::::::::::::::::::-                                            ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-:::::::::::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::                                       -::::::::::::::::::::::::::::::::::::::::::::::::::::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::    -::::..::::::::::::::::::::::::                                   ::::....::::::::::::::::::::::::::::::::::::::::::::::   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::         *::::::::::::::::::::::::::::-                             -::....:::::::::::::::::::::::::::::::::::::::::::::    **=:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..               -:::::::::::::::::::::::::                          ::::::-              :::::::::::::::::::::::::::::    ***=::::::::::::::::::::::::::::.:::::::::::::::::::::::::::::::::.::.:::...:                   :::::::::::::::::::::::                        ::::::::::::::::::::::::    +***+::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::::::::.  :::::::                       ::::::::::::::::::                        ::::::::::::::::::::    ****+-::::::::::::::::::::::::::::: ::::::::::::::::::::::::::::::::::::::::::. ::::::                          ::::::::::::::                        :::::::::::::::::    ****+-::::::::::::::::::::::::::::: :::::::::::::::::::::::::::::::::::::::::::::::::::::::                           -::::::::::                        ::::::::::::::-    *****=:::::::::::::::::::::::::::::. @+::::::::::::::::::::::::::::::::::::::::::::::::::::::::                          :::::::::.:                        :::::::::::+    *****+-::::::::::::::::::::::::::::.. **-::::::::::::::....  :::::::::::::::::::::::::::::::::::::::                        .::::::::::                        =::::::::=     *****+::::::::::::::::::::::::::::..  **+:.::::::::::::::     ::...:::-:..--:::::::::::::::::::::::::::                       :::::::::::                        ::....::-    ******=::::::::::::::::::::::::::::..  ***=:::::::::::::..      :..:=               =-:::::::::::::::::::::::                    :::::::::.-                        -:...:-     ******=:::::::::::::::::::::::::::::.   **+:::::::..:::.::                                  -::::::::::::::::..:                   ::::::::::=                        ::.::    =******=:::::::::::::::::::::::::::::..  ***+:::::::::......                                      ::::::::::::::..:                   ::::::::::                         ::::    *******=:::::::::::::::::::::::::::::.:  ****-::::::::::::..                                           ::::::::::::::                   ::::::::::                         :::    #******=::::::::::::::::::::::::::::::.  *****-:::::::::::::.:                                             .::::::...:                    ::::::::::                         ::    *******=:::::::::::::::::::::::::::::::   *****:::::::::::::...                                                :::...:                      ::::::::.:                         +******+::::::::::::::::::::::::::::::::  *****+:::::::::::::...                                                  :::::                      *::::::::::                         *******-....:::::::::::::::::::::::::::+  *****+::::::::::::::..:                                                                             -::::::::::                         *******=:..:::::::::::::::::::::::::::::  ******+:::::::::::::::..=                                                                             :::::::..::                         ********=:-          ::::::::::::::::::::  ******+::::::::::::::::::                                                                             ::::::::.::                          #******                 ::::::::::::::::   #*****+:::::::::::::::::..                                                                             ::::::::..:                          *****                     ::::::::::::::- #******+::::::::::::::::::..                                                                            :::::::::..-                          ***                         ::::::::::::  ********-:::::::::::::::::::.                                                                           -:::::::::::                           -*                            :::::::::-   *******-:::::::::::::::::::::                                                                           :::::::::::-                           :::::::::  ********=::::::::::::::::::::::                                                                           :::::::::::                            -::::::-  ********+::::::::::::::::::::::.:                                                                         -:::::::::::                            ::::::   ********-::::::::::::::::::::::::                                                                        ::::::::::::                             :::.:   ********=:::::::::::::::::::::::.:-                                                                      -::::::::::::                             :.::-  *********:::::::::::::::::::::::::::                                                                      ::::::::::::-                             #::-  *********-::::::::::::::::::::::::::::                                                                    ::::::::::..:                              :-  *********+:::::::::::::::::::::::::::::                                                                   :::::::::::.:                               =   *********-::::::::::::::::::::::::::::::                                                                 :::::::::::::                                #********+:::::::::::::::::::::::::::::::=                                                               ::::::::::::::                                *********=::::::::::::::::::::::::::::::::-                                                             ::::::::::::::                                 **********           :-:::::::::::::::::::::                                                           ::::::::::::::::                                 ******      *--::-=*     -:::::::::::::::::::                                                         ::::::::::::::::                                  +****       :::::::::::-     ::::::::::::::::::                                                       ::::::::::::::.:                                   ***         :::::::::...::     ::::::::::::::.::                                                    ::::::::::::::::.                                    ::::::::::::::     :::::::::::::..:                                                  :::::::::::::::::                                     ::::::::::::::.     ::::::::::::::::                                               ::::::::::::::::::                                      ::::::::::::..:      ::::::::::::::::                                           ::::::::::::::::::.                                       .:::::::::::::::      :::::::::::::::                                        -:::::::::::::::::..                                        ::::::::::::::::      ::::::::::::::-                                    -:::::::::::::::::::.                                         ::::::::::::::::       ::::::::::::::                                 ::::::::::::::::::::::                                          :::::::::::::::::       :::::::::.:::-                             :::::::::::::::::::::::                                             .::::::::::::::::::.       =::::.....::*                    :::::::::::::::::::::::::                                              :::::::::::::::::::..        -::.....::-               :::::::::::::::::::::::::.:                                               .::::::::::::::::::::.          ::::::::-          -:::::::::::::::::::::::::::                                                 ::::::::::::::::::::::::              @      :::::::::::::::::::::::::::::::                                                  =:::::::::::::::::::::::::.              ::::::::::::::::::::::::::::::..                                                    -::::::::::::::::::::::::::::::::.::::::::::::::::::::::::::::::::...                                                      -::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::...:                                                        -:::::::::::::::::::::::::::::::::::::::::::::::::::::::::..:                                                          :::::::::::::::::::::::::::::::::::::::::::::::::::::::..                                                            -::::::::::::::::::::::::::::::::::::::::::::::::..:.                                                              :::::::::::::::::::::::::::::::::::::::::::::::                                                                 ::::::::::::::::::::::::::::::::::::::::..:                                                                   ::::::::::::::::::::::::::::::::::::.                                                                      -::::::::::::::::::::::::::.:::.                                                                        @::::::::::::::::::::::::::                                                                           =::::::::::::::::::                                                                               -::::::::::::
-`;
-
 // ─── Hacker Vibe Animations ───────────────────────────────────────────────────
-const GLITCH_CHARS = ['█', '▓', '▒', '░', '▀', '▄', '─', '│', '┌', '┐', '└', '┘', '', '◆', '●'];
-const MATRIX_CHARS = '░▒▓█▀▄║═╬┤┬┴├└┘┐┌◆●';
 
 const glitchAnimation = `
-  @keyframes glitch {
-    0% {
-      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 10px #00ff00;
-      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-    }
-    20% {
-      clip-path: polygon(0 20%, 100% 20%, 100% 65%, 0 65%);
-      text-shadow: -2px 0 #ff00ff, 2px 0 #00ff00, 0 0 10px #ff00ff;
-    }
-    40% {
-      clip-path: polygon(0 35%, 100% 35%, 100% 80%, 0 80%);
-      text-shadow: 2px 0 #00ff00, -2px 0 #ff00ff, 0 0 15px #00ffff;
-    }
-    60% {
-      clip-path: polygon(0 50%, 100% 50%, 100% 95%, 0 95%);
-      text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff, 0 0 10px #00ff00;
-    }
-    100% {
-      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-      text-shadow: 0 0 20px #00ff00, 0 0 10px #00ffff;
-    }
-  }
-
   @keyframes scanlines {
     0% {
       background-position: 0 0;
     }
     100% {
       background-position: 0 10px;
-    }
-  }
-
-  @keyframes neon-flicker {
-    0% {
-      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
-      opacity: 1;
-    }
-    50% {
-      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
-      opacity: 0.8;
-    }
-    100% {
-      text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 40px #00ff00;
-      opacity: 1;
-    }
-  }
-
-  @keyframes matrix-rain {
-    0% {
-      transform: translateY(-100%);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh);
-      opacity: 0;
     }
   }
 
@@ -109,22 +53,9 @@ const glitchAnimation = `
     }
   }
 
-  @keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      opacity: 1;
-    }
-    20%, 24%, 55% {
-      opacity: 0.5;
-    }
-  }
-
   @keyframes radar-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
   }
 
   @keyframes blip-pulse {
@@ -139,15 +70,9 @@ const glitchAnimation = `
   }
 
   @keyframes radar-pulse-active {
-    0% {
-      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0.7);
-    }
-    50% {
-      box-shadow: 0 0 0 8px rgba(34, 211, 155, 0.2);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(34, 211, 155, 0);
-    }
+    0%   { box-shadow: 0 0 0 0 rgba(34, 211, 155, 0.7); }
+    50%  { box-shadow: 0 0 0 8px rgba(34, 211, 155, 0.2); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 211, 155, 0); }
   }
 
   @keyframes radar-pulse-found {
@@ -191,20 +116,9 @@ const glitchAnimation = `
     border-radius: 50%;
   }
 
-  .radar-ring-1 {
-    width: 85%;
-    height: 85%;
-  }
-
-  .radar-ring-2 {
-    width: 55%;
-    height: 55%;
-  }
-
-  .radar-ring-3 {
-    width: 25%;
-    height: 25%;
-  }
+  .radar-ring-1 { width: 85%; height: 85%; }
+  .radar-ring-2 { width: 55%; height: 55%; }
+  .radar-ring-3 { width: 25%; height: 25%; }
 
   .radar-sweep {
     position: absolute;
@@ -218,13 +132,8 @@ const glitchAnimation = `
     box-shadow: 0 0 8px rgba(34, 211, 155, 0.6);
   }
 
-  .radar-sweep.active {
-    animation: radar-spin 4s linear infinite;
-  }
-
-  .radar-sweep.scanning {
-    animation: radar-spin 3.5s linear infinite;
-  }
+  .radar-sweep.active   { animation: radar-spin 4s linear infinite; }
+  .radar-sweep.scanning { animation: radar-spin 3.5s linear infinite; }
 
   .radar-center {
     position: absolute;
@@ -239,13 +148,8 @@ const glitchAnimation = `
     box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
   }
 
-  .radar-center.scanning {
-    animation: radar-pulse-active 1.5s ease-in-out infinite;
-  }
-
-  .radar-center.found {
-    animation: radar-pulse-found 1s ease-in-out infinite;
-  }
+  .radar-center.scanning { animation: radar-pulse-active 1.5s ease-in-out infinite; }
+  .radar-center.found    { animation: radar-pulse-found 1s ease-in-out infinite; }
 
   .radar-blip {
     position: absolute;
@@ -256,17 +160,6 @@ const glitchAnimation = `
     z-index: 3;
     animation: blip-pulse 2s ease-in-out infinite;
     box-shadow: 0 0 10px rgba(34, 211, 155, 0.9);
-  }
-
-  .glitch-text {
-    animation: glitch 0.3s ease-in-out infinite;
-    position: relative;
-  }
-
-  .neon-text {
-    color: #00ff00;
-    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
-    animation: neon-flicker 3s infinite;
   }
 
   .scanline-bg {
@@ -280,50 +173,16 @@ const glitchAnimation = `
     animation: scanlines 8s linear infinite;
   }
 
-  .cyber-pulse {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  .cyber-border {
-    animation: cyber-border 2s ease-in-out infinite;
-  }
-
-  .flicker-effect {
-    animation: flicker 0.15s infinite;
-  }
+  .cyber-pulse  { animation: pulse-glow 2s ease-in-out infinite; }
+  .cyber-border { animation: cyber-border 2s ease-in-out infinite; }
 
   .terminal-glow {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
   }
 
-  .hacker-gradient {
-    background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
-  }
-
-  @keyframes data-corruption {
-    0%, 100% {
-      transform: translate(0);
-    }
-    25% {
-      transform: translate(-2px, -2px);
-    }
-    50% {
-      transform: translate(2px, 2px);
-    }
-    75% {
-      transform: translate(-2px, 2px);
-    }
-  }
-
-  .data-glitch {
-    animation: data-corruption 0.1s infinite;
-  }
-
-  /* ─── Decorative Circuit Traces ─────────────────────────────────────── */
+  /* ─── Circuit Traces (used by TerminalSidebar) ───────────────────────── */
   @keyframes trace-flow {
-    to {
-      stroke-dashoffset: 0;
-    }
+    to { stroke-dashoffset: 0; }
   }
 
   .circuit-traces {
@@ -351,116 +210,13 @@ const glitchAnimation = `
     animation: trace-flow 4s cubic-bezier(0.4, 0, 0.85, 1) infinite;
   }
 
-  .trace-c1 {
-    stroke: #00ff00;
-  }
+  .trace-c1 { stroke: #00ff00; }
+  .trace-c2 { stroke: #00ff88; animation-delay: -1.2s; }
+  .trace-c3 { stroke: #00ffaa; animation-delay: -2.4s; }
+  .trace-c4 { stroke: #00ffcc; animation-delay: -0.6s; }
+  .trace-dot { fill: rgba(0, 255, 0, 0.4); }
 
-  .trace-c2 {
-    stroke: #00ff88;
-    animation-delay: -1.2s;
-  }
-
-  .trace-c3 {
-    stroke: #00ffaa;
-    animation-delay: -2.4s;
-  }
-
-  .trace-c4 {
-    stroke: #00ffcc;
-    animation-delay: -0.6s;
-  }
-
-  .trace-dot {
-    fill: rgba(0, 255, 0, 0.4);
-  }
-
-  .trace-corner-tick {
-    position: absolute;
-    width: 60px;
-    height: 40px;
-    pointer-events: none;
-  }
-
-  .trace-tick-tl {
-    top: 8px;
-    left: 8px;
-    border-top: 1px solid rgba(0, 255, 0, 0.4);
-    border-left: 1px solid rgba(0, 255, 0, 0.4);
-  }
-
-  .trace-tick-tr {
-    top: 8px;
-    right: 8px;
-    border-top: 1px solid rgba(0, 255, 136, 0.35);
-    border-right: 1px solid rgba(0, 255, 136, 0.35);
-  }
-
-  .trace-tick-bl {
-    bottom: 8px;
-    left: 8px;
-    border-bottom: 1px solid rgba(0, 255, 170, 0.35);
-    border-left: 1px solid rgba(0, 255, 170, 0.35);
-  }
-
-  .trace-tick-br {
-    bottom: 8px;
-    right: 8px;
-    border-bottom: 1px solid rgba(0, 255, 204, 0.4);
-    border-right: 1px solid rgba(0, 255, 204, 0.4);
-  }
-
-  /* ─── Hexagon Nodes ───────────────────────────────────────────────── */
-  .hex-node {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    transform: rotate(30deg);
-    pointer-events: none;
-    animation: hex-pulse 3s ease-in-out infinite;
-  }
-
-  .hex-node-inner {
-    width: 100%;
-    height: 100%;
-    border: 1.5px solid rgba(0, 255, 0, 0.5);
-    background: rgba(0, 255, 0, 0.08);
-    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
-  }
-
-  @keyframes hex-pulse {
-    0%, 100% {
-      opacity: 0.6;
-      box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
-    }
-    50% {
-      opacity: 1;
-      box-shadow: 0 0 16px rgba(0, 255, 0, 0.6);
-    }
-  }
-
-  /* ─── Data Stream Lines ──────────────────────────────────────────── */
-  @keyframes data-stream {
-    0% {
-      stroke-dashoffset: 1000;
-    }
-    100% {
-      stroke-dashoffset: 0;
-    }
-  }
-
-  .data-stream {
-    stroke: rgba(0, 255, 0, 0.3);
-    stroke-width: 1;
-    fill: none;
-    stroke-dasharray: 5 10;
-    animation: data-stream 8s linear infinite;
-  }
-
-  .data-stream-fast {
-    animation-duration: 4s;
-  }
-
-  /* ─── Corner Brackets ────────────────────────────────────────────── */
+  /* ─── Corner Brackets ────────────────────────────────────────────────── */
   .corner-bracket {
     position: absolute;
     width: 80px;
@@ -469,8 +225,7 @@ const glitchAnimation = `
   }
 
   .corner-bracket-tl {
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     border-top: 2px solid rgba(0, 255, 0, 0.4);
     border-left: 2px solid rgba(0, 255, 0, 0.4);
     border-top-left-radius: 4px;
@@ -483,85 +238,28 @@ const glitchAnimation = `
     background: rgba(0, 255, 0, 0.6);
   }
 
-  .corner-bracket-tl::before {
-    width: 20px;
-    height: 2px;
-    top: -2px;
-    left: 30px;
-  }
-
-  .corner-bracket-tl::after {
-    width: 2px;
-    height: 20px;
-    left: -2px;
-    top: 30px;
-  }
+  .corner-bracket-tl::before { width: 20px; height: 2px; top: -2px; left: 30px; }
+  .corner-bracket-tl::after  { width: 2px; height: 20px; left: -2px; top: 30px; }
 
   .corner-bracket-tr {
-    top: 0;
-    right: 0;
+    top: 0; right: 0;
     border-top: 2px solid rgba(0, 255, 136, 0.4);
     border-right: 2px solid rgba(0, 255, 136, 0.4);
     border-top-right-radius: 4px;
   }
 
   .corner-bracket-bl {
-    bottom: 0;
-    left: 0;
+    bottom: 0; left: 0;
     border-bottom: 2px solid rgba(0, 255, 170, 0.4);
     border-left: 2px solid rgba(0, 255, 170, 0.4);
     border-bottom-left-radius: 4px;
   }
 
   .corner-bracket-br {
-    bottom: 0;
-    right: 0;
+    bottom: 0; right: 0;
     border-bottom: 2px solid rgba(0, 255, 204, 0.4);
     border-right: 2px solid rgba(0, 255, 204, 0.4);
     border-bottom-right-radius: 4px;
-  }
-
-  .ascii-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    font-family: 'Courier New', 'Courier', monospace;
-    font-size: 7px;
-    line-height: 1.05;
-    color: rgba(0, 255, 0, 0.25);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 5;
-    animation: float 25s ease-in-out infinite;
-    letter-spacing: -0.5px;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.1);
-  }
-
-  @keyframes float {
-    0%, 100% {
-      opacity: 0.08;
-      transform: translateY(0);
-    }
-    50% {
-      opacity: 0.12;
-      transform: translateY(-10px);
-    }
-  }
-
-  .ascii-grid {
-    position: absolute;
-    inset: 0;
-    opacity: 0.02;
-    background-image: 
-      linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent),
-      linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%, transparent);
-    background-size: 50px 50px;
-    pointer-events: none;
-    z-index: 1;
   }
 
   .terminal-content {
@@ -770,20 +468,46 @@ export function AdvancedTerminalPanel({
     ];
     const nav = navigator as NavigatorWithExtras;
 
-    const match = nav.userAgent?.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
-    const brand = nav.userAgentData?.brands?.find((item) => !/not/i.test(item.brand));
-    const browser = match?.[1] && match[2]
-      ? `${match[1]} ${match[2].split(".")[0]}`
-      : brand ? `${brand.brand} ${String(brand.version).split(".")[0]}` : "Browser";
+    // Browser detection — order matters:
+    // Chrome/Edge UA both contain "Safari" token, so Safari must only match
+    // when Chrome is NOT present. Edge UA also contains "Chrome", so check Edge first.
+    const ua = nav.userAgent ?? "";
+    const edgeVer    = ua.match(/Edg\/([\d]+)/i)?.[1];
+    const chromeVer  = ua.match(/Chrome\/([\d]+)/i)?.[1];
+    const firefoxVer = ua.match(/Firefox\/([\d]+)/i)?.[1];
+    const operaVer   = ua.match(/(?:OPR|Opera)\/([\d]+)/i)?.[1];
+    const safariVer  = ua.match(/Version\/([\d]+).*Safari/i)?.[1]; // real Safari only
+    const brandFallback = nav.userAgentData?.brands?.find((item) => !/not.?a.?brand/i.test(item.brand));
 
-    const hint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
-    const os = hint.includes("iphone") || hint.includes("ipad") ? "iOS"
-      : hint.includes("mac") ? "macOS"
-      : hint.includes("android") ? "Android"
-      : hint.includes("win") ? "Windows"
-      : hint.includes("linux") ? "Linux"
-      : "Unknown OS";
+    const browser = edgeVer
+      ? `Edge ${edgeVer}`
+      : operaVer
+        ? `Opera ${operaVer}`
+        : firefoxVer
+          ? `Firefox ${firefoxVer}`
+          : safariVer && !chromeVer          // Safari only if no Chrome token
+            ? `Safari ${safariVer}`
+            : chromeVer
+              ? `Chrome ${chromeVer}`
+              : brandFallback
+                ? `${brandFallback.brand} ${String(brandFallback.version).split(".")[0]}`
+                : "Browser";
 
+    // OS: iOS must come before macOS (iPhone/iPad UAs also contain "Mac")
+    const hint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${ua}`.toLowerCase();
+    const os = /iphone|ipad|ipod/.test(hint)
+      ? "iOS"
+      : /android/.test(hint)
+        ? "Android"
+        : /macintosh|mac os x|macos/.test(hint)
+          ? "macOS"
+          : /win/.test(hint)
+            ? "Windows"
+            : /linux/.test(hint)
+              ? "Linux"
+              : "Unknown OS";
+
+    // CPU cores: standard Web API, works on all platforms/browsers
     const cores = Number.isFinite(nav.hardwareConcurrency)
       ? `${nav.hardwareConcurrency} cores` : "—";
 
@@ -1376,7 +1100,7 @@ export function AdvancedTerminalPanel({
               {/* Title with glitch effect - CENTERED */}
               <div className="flex items-center gap-2 flex-1 justify-center">
                 <motion.div className="h-2 w-2 rounded-full bg-green-500/80" />
-                <motion.span className="font-mono text-xs sm:text-sm font-semibold tracking-wider text-green-400 dark:text-green-300">{selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} :: ADVANCED_SCAN</motion.span>
+                <motion.span className="font-(family-name:--font-fira-code) text-xs sm:text-sm font-semibold tracking-wider text-green-400 dark:text-green-300">{selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} :: ADVANCED_SCAN</motion.span>
               </div>
             </div>
 
@@ -1432,7 +1156,7 @@ export function AdvancedTerminalPanel({
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs sm:text-sm font-mono"
+            className="relative m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs sm:text-sm font-(family-name:--font-fira-code)"
             style={{ boxShadow: "0 0 15px rgba(255, 0, 0, 0.3)" }}
           >
             <span className="text-red-400 font-bold">⚠ ERROR:</span> <span className="text-red-300">Select a project above before running a scan.</span>
@@ -1455,7 +1179,7 @@ export function AdvancedTerminalPanel({
               className="absolute z-50 right-4 top-13 bg-black/95 backdrop-blur-md border border-green-500/25 rounded-lg overflow-hidden"
             >
               <div className="px-3 py-1.5 border-b border-green-500/15">
-                <span className="text-[9px] font-mono text-green-500/40 tracking-[0.2em] uppercase">Configuration</span>
+                <span className="text-[9px] font-(family-name:--font-fira-code) text-green-500/40 tracking-[0.2em] uppercase">Configuration</span>
               </div>
               <div className="px-3 py-2">
                 <LogToolbar
@@ -1475,18 +1199,6 @@ export function AdvancedTerminalPanel({
 
         {/* ── Full-width xterm with cyber effects ── */}
         <div className="relative flex-1 w-full bg-black overflow-hidden" style={{ minHeight: "720px" }}>
-          {/* Background Image Layer */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none z-0"
-            style={{
-              backgroundImage: "url('/ascii.png')",
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              backgroundAttachment: "fixed"
-            }}
-          />
-          
           {/* xterm Container — fills full width minus sidebar width */}
           <div
             ref={containerRef}
@@ -1522,7 +1234,7 @@ export function AdvancedTerminalPanel({
             >
               <div className="bg-black/60 backdrop-blur-sm border-l-2 border-b-2 border-emerald-600/20 rounded-bl-lg p-2">
                 {/* Minimal Title */}
-                <div className="text-[8px] font-mono uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
+                <div className="text-[8px] font-(family-name:--font-fira-code) uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
                   Threat Map
                 </div>
                 
@@ -1626,14 +1338,14 @@ export function AdvancedTerminalPanel({
 
             <div className="relative z-10">
               <motion.h3 
-                className="text-lg font-bold font-mono text-red-400 tracking-wider"
+                className="text-lg font-bold font-(family-name:--font-fira-code) text-red-400 tracking-wider"
                 animate={{ textShadow: ["0 0 10px #ff0000", "0 0 20px #ff0000"] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 ⚠ CRITICAL_ACTION
               </motion.h3>
               
-              <p className="mt-3 text-sm font-mono text-red-300/80">
+              <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-red-300/80">
                 Scan termination requested. This operation is {' '}
                 <span className="text-red-400 font-bold animate-pulse">IRREVERSIBLE</span>.
                 <br />
@@ -1646,7 +1358,7 @@ export function AdvancedTerminalPanel({
                   onClick={handleDismissCancel}
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-4 py-2 text-sm font-bold font-mono text-blue-400 transition-all hover:border-blue-500/80"
+                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-blue-400 transition-all hover:border-blue-500/80"
                 >
                   [ABORT]
                 </motion.button>
@@ -1656,7 +1368,7 @@ export function AdvancedTerminalPanel({
                   onClick={handleConfirmCancel}
                   whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255, 0, 0, 0.5)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-4 py-2 text-sm font-bold font-mono text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
+                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
                 >
                   [CONFIRM_TERMINATION]
                 </motion.button>
