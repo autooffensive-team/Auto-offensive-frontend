@@ -781,7 +781,7 @@ export default function ResourceComponent() {
                       <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[0].desc}</p>
                     </div>
                   </div>
-                </div>
+                ))}
 
                 {/* Step 2 — Middle right */}
                 <div className="absolute top-[220px] right-[4%] flex items-center gap-3 z-10">
