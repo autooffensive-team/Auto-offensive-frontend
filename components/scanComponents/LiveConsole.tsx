@@ -119,8 +119,27 @@ function getBrowserProfile(): EnvCard[] {
 function FindingsDonut({ run }: { run: ActiveRun }) {
   const [profile, setProfile] = useState<EnvCard[]>(FALLBACK_PROFILE);
 
+  // Initial read after hydration
   useEffect(() => {
     setProfile(getBrowserProfile());
+  }, []);
+
+  // Dynamic network status — updates on online/offline events
+  useEffect(() => {
+    const update = () =>
+      setProfile((prev) =>
+        prev.map((item) =>
+          item.label === "Network"
+            ? { ...item, value: navigator.onLine ? "Online" : "Offline", tone: navigator.onLine ? "text-emerald-700 dark:text-emerald-300" : "text-red-600 dark:text-red-400" }
+            : item
+        )
+      );
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
   }, []);
 
   return (

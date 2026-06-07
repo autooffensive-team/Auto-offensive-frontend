@@ -760,57 +760,72 @@ export function AdvancedTerminalPanel({
     return () => window.clearInterval(interval);
   }, [isSubmitting, isStreaming, run.status]);
 
-  const systemProfile = useMemo(
-    () => [
-      {
-        label: "Browser",
-        value: (() => {
-          if (typeof navigator === "undefined") return "Browser";
-          const nav = navigator as NavigatorWithExtras;
-          const agent = nav.userAgent;
-          const match = agent.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
-          if (match?.[1] && match[2]) {
-            const version = match[2].split(".")[0];
-            return `${match[1]} ${version}`;
-          }
-          const brand = nav.userAgentData?.brands?.find((item: { brand: string; version: string }) => !/not/i.test(item.brand));
-          return brand ? `${brand.brand} ${String(brand.version).split(".")[0]}` : "Browser";
-        })(),
-        tone: "text-green-300",
-      },
-      {
-        label: "OS",
-        value: (() => {
-          if (typeof navigator === "undefined") return "Unknown OS";
-          const nav = navigator as NavigatorWithExtras;
-          const platformHint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
-          if (platformHint.includes("iphone") || platformHint.includes("ipad") || platformHint.includes("ipod")) return "iOS";
-          if (platformHint.includes("mac")) return "macOS";
-          if (platformHint.includes("android")) return "Android";
-          if (platformHint.includes("win")) return "Windows";
-          if (platformHint.includes("linux")) return "Linux";
-          return "Unknown OS";
-        })(),
-        tone: "text-green-300",
-      },
-      {
-        label: "CPU Cores",
-        value:
-          typeof navigator !== "undefined" && Number.isFinite(navigator.hardwareConcurrency)
-            ? `${navigator.hardwareConcurrency} cores`
-            : "unknown",
-        tone: "text-green-300",
-      },
-      {
-        label: "Network",
-        value: typeof navigator !== "undefined"
-          ? (navigator.onLine ? "Online" : "Offline")
-          : "Online",
-        tone: "text-emerald-300",
-      },
-    ],
-    [],
-  );
+  // ── System profile — dynamic, reads real browser data after hydration ────
+  const buildProfile = useCallback(() => {
+    if (typeof navigator === "undefined") return [
+      { label: "Browser",   value: "Browser",    tone: "text-green-300" },
+      { label: "OS",        value: "Unknown OS", tone: "text-green-300" },
+      { label: "CPU Cores", value: "—",          tone: "text-green-300" },
+      { label: "Network",   value: "Online",     tone: "text-emerald-300" },
+    ];
+    const nav = navigator as NavigatorWithExtras;
+
+    const match = nav.userAgent?.match(/(Chrome|Chromium|Firefox|Safari|Edge)\/?\s*([\d.]+)/i);
+    const brand = nav.userAgentData?.brands?.find((item) => !/not/i.test(item.brand));
+    const browser = match?.[1] && match[2]
+      ? `${match[1]} ${match[2].split(".")[0]}`
+      : brand ? `${brand.brand} ${String(brand.version).split(".")[0]}` : "Browser";
+
+    const hint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${nav.userAgent ?? ""}`.toLowerCase();
+    const os = hint.includes("iphone") || hint.includes("ipad") ? "iOS"
+      : hint.includes("mac") ? "macOS"
+      : hint.includes("android") ? "Android"
+      : hint.includes("win") ? "Windows"
+      : hint.includes("linux") ? "Linux"
+      : "Unknown OS";
+
+    const cores = Number.isFinite(nav.hardwareConcurrency)
+      ? `${nav.hardwareConcurrency} cores` : "—";
+
+    const isOnline = nav.onLine;
+
+    return [
+      { label: "Browser",   value: browser,                        tone: "text-green-300" },
+      { label: "OS",        value: os,                             tone: "text-green-300" },
+      { label: "CPU Cores", value: cores,                          tone: "text-green-300" },
+      { label: "Network",   value: isOnline ? "Online" : "Offline", tone: isOnline ? "text-emerald-300" : "text-red-400" },
+    ];
+  }, []);
+
+  const [systemProfile, setSystemProfile] = useState(() => [
+    { label: "Browser",   value: "—",     tone: "text-green-300" },
+    { label: "OS",        value: "—",     tone: "text-green-300" },
+    { label: "CPU Cores", value: "—",     tone: "text-green-300" },
+    { label: "Network",   value: "—",     tone: "text-emerald-300" },
+  ]);
+
+  // Read real values after hydration
+  useEffect(() => {
+    setSystemProfile(buildProfile());
+  }, [buildProfile]);
+
+  // Update Network status live on connect/disconnect
+  useEffect(() => {
+    const update = () =>
+      setSystemProfile((prev) =>
+        prev.map((item) =>
+          item.label === "Network"
+            ? { ...item, value: navigator.onLine ? "Online" : "Offline", tone: navigator.onLine ? "text-emerald-300" : "text-red-400" }
+            : item
+        )
+      );
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
 
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
