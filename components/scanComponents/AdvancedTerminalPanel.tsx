@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { RotateCcw, Zap } from "lucide-react";
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { RotateCcw, Zap, PanelRight, X } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
@@ -25,32 +26,18 @@ type NavigatorWithExtras = Navigator & {
 
 const glitchAnimation = `
   @keyframes scanlines {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 0 10px;
-    }
+    0% { background-position: 0 0; }
+    100% { background-position: 0 10px; }
   }
 
   @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1);
-    }
-    50% {
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), inset 0 0 20px rgba(0, 255, 0, 0.2);
-    }
+    0%, 100% { box-shadow: 0 0 10px rgba(0,255,0,0.3), inset 0 0 10px rgba(0,255,0,0.1); }
+    50%       { box-shadow: 0 0 20px rgba(0,255,0,0.6), inset 0 0 20px rgba(0,255,0,0.2); }
   }
 
   @keyframes cyber-border {
-    0%, 100% {
-      border-color: rgba(0, 255, 0, 0.3);
-      box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
-    }
-    50% {
-      border-color: rgba(0, 255, 0, 0.8);
-      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.1);
-    }
+    0%, 100% { border-color: rgba(0,255,0,0.3); box-shadow: 0 0 5px rgba(0,255,0,0.2); }
+    50%       { border-color: rgba(0,255,0,0.8); box-shadow: 0 0 15px rgba(0,255,0,0.5), inset 0 0 10px rgba(0,255,0,0.1); }
   }
 
   @keyframes radar-spin {
@@ -59,36 +46,24 @@ const glitchAnimation = `
   }
 
   @keyframes blip-pulse {
-    0%, 100% {
-      opacity: 0.7;
-      box-shadow: 0 0 6px rgba(34, 211, 155, 0.8), 0 0 12px rgba(16, 185, 129, 0.4);
-    }
-    50% {
-      opacity: 1;
-      box-shadow: 0 0 10px rgba(34, 211, 155, 1), 0 0 20px rgba(16, 185, 129, 0.6);
-    }
+    0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(34,211,155,0.8), 0 0 12px rgba(16,185,129,0.4); }
+    50%       { opacity: 1;   box-shadow: 0 0 10px rgba(34,211,155,1),   0 0 20px rgba(16,185,129,0.6); }
   }
 
   @keyframes radar-pulse-active {
-    0%   { box-shadow: 0 0 0 0 rgba(34, 211, 155, 0.7); }
-    50%  { box-shadow: 0 0 0 8px rgba(34, 211, 155, 0.2); }
-    100% { box-shadow: 0 0 0 0 rgba(34, 211, 155, 0); }
+    0%   { box-shadow: 0 0 0 0   rgba(34,211,155,0.7); }
+    50%  { box-shadow: 0 0 0 8px rgba(34,211,155,0.2); }
+    100% { box-shadow: 0 0 0 0   rgba(34,211,155,0);   }
   }
 
   @keyframes radar-pulse-found {
-    0%, 100% {
-      box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 24px rgba(34, 211, 155, 1), 0 0 48px rgba(16, 185, 129, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.5);
-    }
+    0%, 100% { box-shadow: 0 0 16px rgba(34,211,155,1), 0 0 32px rgba(16,185,129,0.6), inset 0 0 8px rgba(255,255,255,0.3); }
+    50%       { box-shadow: 0 0 24px rgba(34,211,155,1), 0 0 48px rgba(16,185,129,0.8), inset 0 0 12px rgba(255,255,255,0.5); }
   }
 
   .radar-container {
     position: relative;
-    width: 192px;
-    height: 192px;
-    background: radial-gradient(circle at center, rgba(10, 10, 10, 0.9) 0%, rgba(5, 5, 5, 1) 100%);
+    background: radial-gradient(circle at center, rgba(10,10,10,0.9) 0%, rgba(5,5,5,1) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,10 +84,9 @@ const glitchAnimation = `
 
   .radar-ring {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    border: 1.2px solid rgba(34, 211, 155, 0.35);
+    border: 1.2px solid rgba(34,211,155,0.35);
     border-radius: 50%;
   }
 
@@ -122,14 +96,12 @@ const glitchAnimation = `
 
   .radar-sweep {
     position: absolute;
-    top: 0;
-    left: 50%;
-    width: 2px;
-    height: 50%;
+    top: 0; left: 50%;
+    width: 2px; height: 50%;
     transform-origin: bottom center;
-    background: linear-gradient(to top, rgba(34, 211, 155, 0.9), rgba(34, 211, 155, 0.4), rgba(34, 211, 155, 0));
+    background: linear-gradient(to top, rgba(34,211,155,0.9), rgba(34,211,155,0.4), rgba(34,211,155,0));
     z-index: 2;
-    box-shadow: 0 0 8px rgba(34, 211, 155, 0.6);
+    box-shadow: 0 0 8px rgba(34,211,155,0.6);
   }
 
   .radar-sweep.active   { animation: radar-spin 4s linear infinite; }
@@ -137,36 +109,32 @@ const glitchAnimation = `
 
   .radar-center {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
+    top: 50%; left: 50%;
+    width: 10px; height: 10px;
     transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.8));
+    background: radial-gradient(circle, rgba(167,243,208,1), rgba(34,211,155,0.8));
     border-radius: 50%;
     z-index: 4;
-    box-shadow: 0 0 16px rgba(34, 211, 155, 1), 0 0 32px rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 16px rgba(34,211,155,1), 0 0 32px rgba(16,185,129,0.6), inset 0 0 8px rgba(255,255,255,0.3);
   }
 
   .radar-center.scanning { animation: radar-pulse-active 1.5s ease-in-out infinite; }
-  .radar-center.found    { animation: radar-pulse-found 1s ease-in-out infinite; }
+  .radar-center.found    { animation: radar-pulse-found  1s   ease-in-out infinite; }
 
   .radar-blip {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, rgba(167, 243, 208, 1), rgba(34, 211, 155, 0.6));
+    background: radial-gradient(circle, rgba(167,243,208,1), rgba(34,211,155,0.6));
     border-radius: 50%;
     z-index: 3;
     animation: blip-pulse 2s ease-in-out infinite;
-    box-shadow: 0 0 10px rgba(34, 211, 155, 0.9);
+    box-shadow: 0 0 10px rgba(34,211,155,0.9);
   }
 
   .scanline-bg {
     background: repeating-linear-gradient(
       0deg,
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.15) 1px,
+      rgba(0,0,0,0.15),
+      rgba(0,0,0,0.15) 1px,
       transparent 1px,
       transparent 2px
     );
@@ -176,95 +144,79 @@ const glitchAnimation = `
   .cyber-pulse  { animation: pulse-glow 2s ease-in-out infinite; }
   .cyber-border { animation: cyber-border 2s ease-in-out infinite; }
 
+  /* ─── Window dot glow cycles — pure CSS, zero JS/RAF overhead ─────── */
+  @keyframes dot-red    { 0%,100%{box-shadow:0 0 10px #ff0000}50%{box-shadow:0 0 5px #ff0000} }
+  @keyframes dot-yellow { 0%,100%{box-shadow:0 0 10px #ffff00}50%{box-shadow:0 0 5px #ffff00} }
+  @keyframes dot-green  { 0%,100%{box-shadow:0 0 10px #00ff00}50%{box-shadow:0 0 5px #00ff00} }
+  @keyframes status-dot { 0%,100%{opacity:.4}50%{opacity:1} }
+
+  .dot-red    { animation: dot-red    1.5s ease-in-out infinite; }
+  .dot-yellow { animation: dot-yellow 1.5s ease-in-out infinite 0.3s; }
+  .dot-green  { animation: dot-green  1.5s ease-in-out infinite 0.6s; }
+  .status-dot { animation: status-dot 1.2s ease-in-out infinite; }
+
   .terminal-glow {
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0,255,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
   }
 
-  /* ─── Circuit Traces (used by TerminalSidebar) ───────────────────────── */
-  @keyframes trace-flow {
-    to { stroke-dashoffset: 0; }
-  }
+  /* ─── Circuit Traces ─────────────────────────────────────────────────── */
+  @keyframes trace-flow { to { stroke-dashoffset: 0; } }
 
   .circuit-traces {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     overflow: hidden;
     pointer-events: none;
     opacity: 0.45;
     z-index: 0 !important;
   }
 
-  .trace-base {
-    stroke: rgba(0, 255, 0, 0.15);
-    stroke-width: 1;
-    fill: none;
-  }
-
-  .trace-flow {
-    fill: none;
-    stroke-width: 1.5;
-    stroke-dasharray: 12 180;
-    stroke-dashoffset: 192;
-    animation: trace-flow 4s cubic-bezier(0.4, 0, 0.85, 1) infinite;
-  }
+  .trace-base { stroke: rgba(0,255,0,0.15); stroke-width: 1; fill: none; }
+  .trace-flow { fill: none; stroke-width: 1.5; stroke-dasharray: 12 180; stroke-dashoffset: 192; animation: trace-flow 4s cubic-bezier(0.4,0,0.85,1) infinite; }
 
   .trace-c1 { stroke: #00ff00; }
   .trace-c2 { stroke: #00ff88; animation-delay: -1.2s; }
   .trace-c3 { stroke: #00ffaa; animation-delay: -2.4s; }
   .trace-c4 { stroke: #00ffcc; animation-delay: -0.6s; }
-  .trace-dot { fill: rgba(0, 255, 0, 0.4); }
+  .trace-dot { fill: rgba(0,255,0,0.4); }
 
   /* ─── Corner Brackets ────────────────────────────────────────────────── */
-  .corner-bracket {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    pointer-events: none;
-  }
-
-  .corner-bracket-tl {
-    top: 0; left: 0;
-    border-top: 2px solid rgba(0, 255, 0, 0.4);
-    border-left: 2px solid rgba(0, 255, 0, 0.4);
-    border-top-left-radius: 4px;
-  }
-
-  .corner-bracket-tl::before,
-  .corner-bracket-tl::after {
-    content: '';
-    position: absolute;
-    background: rgba(0, 255, 0, 0.6);
-  }
-
+  .corner-bracket { position: absolute; width: 80px; height: 80px; pointer-events: none; }
+  .corner-bracket-tl { top: 0; left: 0; border-top: 2px solid rgba(0,255,0,0.4); border-left: 2px solid rgba(0,255,0,0.4); border-top-left-radius: 4px; }
+  .corner-bracket-tl::before, .corner-bracket-tl::after { content: ''; position: absolute; background: rgba(0,255,0,0.6); }
   .corner-bracket-tl::before { width: 20px; height: 2px; top: -2px; left: 30px; }
   .corner-bracket-tl::after  { width: 2px; height: 20px; left: -2px; top: 30px; }
+  .corner-bracket-tr { top: 0; right: 0; border-top: 2px solid rgba(0,255,136,0.4); border-right: 2px solid rgba(0,255,136,0.4); border-top-right-radius: 4px; }
+  .corner-bracket-bl { bottom: 0; left: 0; border-bottom: 2px solid rgba(0,255,170,0.4); border-left: 2px solid rgba(0,255,170,0.4); border-bottom-left-radius: 4px; }
+  .corner-bracket-br { bottom: 0; right: 0; border-bottom: 2px solid rgba(0,255,204,0.4); border-right: 2px solid rgba(0,255,204,0.4); border-bottom-right-radius: 4px; }
 
-  .corner-bracket-tr {
-    top: 0; right: 0;
-    border-top: 2px solid rgba(0, 255, 136, 0.4);
-    border-right: 2px solid rgba(0, 255, 136, 0.4);
-    border-top-right-radius: 4px;
+  .terminal-content { position: relative; z-index: 10; }
+
+  /* ─── Sidebar Drawer (mobile/tablet overlay) ─────────────────────────── */
+  .sidebar-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 60;
   }
 
-  .corner-bracket-bl {
-    bottom: 0; left: 0;
-    border-bottom: 2px solid rgba(0, 255, 170, 0.4);
-    border-left: 2px solid rgba(0, 255, 170, 0.4);
-    border-bottom-left-radius: 4px;
+  .sidebar-drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(320px, 85vw);
+    z-index: 61;
+    overflow-y: auto;
   }
 
-  .corner-bracket-br {
-    bottom: 0; right: 0;
-    border-bottom: 2px solid rgba(0, 255, 204, 0.4);
-    border-right: 2px solid rgba(0, 255, 204, 0.4);
-    border-bottom-right-radius: 4px;
+  /* ─── Fix xterm viewport overflow on mobile ──────────────────────────── */
+  .xterm-viewport {
+    overflow-y: auto !important;
   }
-
-  .terminal-content {
-    position: relative;
-    z-index: 10;
+  .xterm-screen {
+    /* prevent the xterm canvas from overflowing its wrapper */
+    max-width: 100% !important;
   }
 `;
 
@@ -328,7 +280,32 @@ const HELP_LINES = [
 
 const HELP_TEXT = HELP_LINES.join("\r\n");
 
-export function AdvancedTerminalPanel({
+// ─── Breakpoint hook ──────────────────────────────────────────────────────────
+function useBreakpoint() {
+  const [width, setWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
+
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handler, { passive: true });
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+
+  return {
+    isMobile: width < 640,           // < sm
+    isTablet: width >= 640 && width < 1024, // sm–lg
+    isDesktop: width >= 1024,        // lg+
+    isNarrow: width < 1024,          // mobile + tablet
+    width,
+  };
+}
+
+// Wrapped in React.memo so parent re-renders (e.g. from scan state updates
+// in the dashboard) don't re-render the terminal — the xterm canvas sits
+// inside and any React reconciliation touching its container causes a repaint
+// that shows up as the "glitch/breathing" effect while typing.
+export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   projectId,
   selectedProject,
   logs,
@@ -349,29 +326,40 @@ export function AdvancedTerminalPanel({
   onSubmit: (command: string) => void;
   onReset: () => void;
 }) {
-  const { themeKey, sizeKey, decorationsEnabled, theme: logTheme, size: logSize, setTheme, setSize, setDecorations, resetToDefault } = useLogPreferences();
+  const {
+    themeKey, sizeKey, decorationsEnabled,
+    theme: logTheme, size: logSize,
+    setTheme, setSize, setDecorations, resetToDefault,
+  } = useLogPreferences();
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<{ fit: () => void } | null>(null);
+  const { isMobile, isTablet, isNarrow } = useBreakpoint();
 
-  // Show decorations based on user preference (not theme)
   const showDecorations = decorationsEnabled;
 
-  // ── Cancel confirmation modal state ──────────────────────────────────────
+  // ── State ─────────────────────────────────────────────────────────────────
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [radarTick, setRadarTick] = useState(0);
+  // radarTick is intentionally NOT React state — updating it 42×/s caused the
+  // entire panel to re-render, making typed text flicker ("breathing" effect).
+  // Instead we keep the angle in a ref and push it to the DOM directly via a
+  // CSS custom property on a dedicated wrapper element.
+  const radarTickRef = useRef(0);
+  const radarElRef = useRef<HTMLDivElement | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile/tablet drawer
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
+
   // ── Input state ──────────────────────────────────────────────────────────
-  // We maintain a full line buffer + cursor position so arrow keys, Home/End,
-  // and multi-byte pastes all work correctly.
-  const lineRef = useRef("");          // current input buffer
-  const cursorRef = useRef(0);         // cursor position within lineRef
+  const lineRef = useRef("");
+  const cursorRef = useRef(0);
   const historyRef = useRef<string[]>([]);
-  const histIdxRef = useRef(-1);       // -1 = not browsing history
+  const histIdxRef = useRef(-1);
 
   const logCursorRef = useRef(0);
   const isInputActiveRef = useRef(true);
+  const isMobileRef = useRef(isMobile);         // kept current so prompt callbacks stay stable
   const selectedProjectRef = useRef(selectedProject);
   const onSubmitRef = useRef(onSubmit);
   const onResetRef = useRef(onReset);
@@ -381,56 +369,54 @@ export function AdvancedTerminalPanel({
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
   const terminalFontSize = useMemo(() => {
-    const base = logSize.xtermFontSize;
-    if (base >= LOG_SIZES.xxl.xtermFontSize) return base + 1;
-    if (base >= LOG_SIZES.xl.xtermFontSize) return base + 1;
-    if (base >= LOG_SIZES.lg.xtermFontSize) return base + 1;
-    if (base >= LOG_SIZES.md.xtermFontSize) return base + 1;
-    return base + 1;
-  }, [logSize.xtermFontSize]);
+    // Mobile: xs = 12px, tight letter spacing → more cols, less wrap
+    if (isMobile) return 12;
+    if (isTablet) return Math.max(11, logSize.xtermFontSize);
+    return logSize.xtermFontSize + 1;
+  }, [logSize.xtermFontSize, isMobile, isTablet]);
 
   const terminalLetterSpacing = useMemo(() => {
+    // Mobile: no extra letter spacing — keeps chars compact for narrow cols
+    if (isMobile) return 0;
     if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3.5;
-    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize) return 2.75;
-    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize) return 1.9;
-    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize) return 0.25;
+    if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize)  return 2.75;
+    if (logSize.xtermFontSize >= LOG_SIZES.lg.xtermFontSize)  return 1.9;
+    if (logSize.xtermFontSize >= LOG_SIZES.md.xtermFontSize)  return 0.25;
     return 0.2;
-  }, [logSize.xtermFontSize]);
+  }, [logSize.xtermFontSize, isMobile]);
 
   const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
+
   const radarState = useMemo(() => {
     const findingCount = run.findings || 0;
     const status = String(run.status || "").toLowerCase();
     const isRunning =
-      isSubmitting ||
-      isStreaming ||
-      status.includes("running") ||
-      status.includes("scanning") ||
-      status.includes("processing") ||
-      status.includes("active");
+      isSubmitting || isStreaming ||
+      status.includes("running") || status.includes("scanning") ||
+      status.includes("processing") || status.includes("active");
     const isFailed = status.includes("failed");
     const isDone = status.includes("completed");
 
-    const blips = Array.from({ length: Math.min(4, Math.max(2, findingCount > 0 ? findingCount : 2)) }, (_, index) => ({
-      x: [-26, 18, 10, -12][index % 4],
-      y: [14, -16, -8, 10][index % 4],
-      delay: index * 0.45,
-    }));
+    const blips = Array.from(
+      { length: Math.min(4, Math.max(2, findingCount > 0 ? findingCount : 2)) },
+      (_, index) => ({
+        x: [-26, 18, 10, -12][index % 4],
+        y: [ 14,-16, -8,  10][index % 4],
+        delay: index * 0.45,
+      })
+    );
 
     return {
       sweepDuration: isRunning ? 2.8 : isDone ? 4.2 : isFailed ? 5.5 : 3.8,
       sweepTone: isFailed
         ? "rgba(248,113,113,0.32)"
-        : isDone
-          ? "rgba(45,212,191,0.34)"
-          : isRunning
-            ? "rgba(74,222,128,0.42)"
-            : "rgba(74,222,128,0.28)",
+        : isDone    ? "rgba(45,212,191,0.34)"
+        : isRunning ? "rgba(74,222,128,0.42)"
+        :             "rgba(74,222,128,0.28)",
       pulseTone: isFailed
         ? "rgba(248,113,113,0.55)"
-        : isDone
-          ? "rgba(45,212,191,0.55)"
-          : "rgba(52,211,153,0.55)",
+        : isDone ? "rgba(45,212,191,0.55)"
+        :          "rgba(52,211,153,0.55)",
       blips,
       badge: isFailed ? "alert" : isDone ? "locked" : isRunning ? "tracking" : "idle",
     };
@@ -439,26 +425,32 @@ export function AdvancedTerminalPanel({
   useEffect(() => {
     const status = String(run.status || "").toLowerCase();
     const isRadarActive =
-      isSubmitting ||
-      isStreaming ||
-      status.includes("running") ||
-      status.includes("scanning") ||
-      status.includes("processing") ||
-      status.includes("active");
+      isSubmitting || isStreaming ||
+      status.includes("running") || status.includes("scanning") ||
+      status.includes("processing") || status.includes("active");
 
-    if (!isRadarActive) {
-      setRadarTick(0);
-      return;
-    }
+    if (!isRadarActive) { radarTickRef.current = 0; return; }
 
     const interval = window.setInterval(() => {
-      setRadarTick((value) => (value + 1) % 360);
+      radarTickRef.current = (radarTickRef.current + 1) % 360;
+      // Push the new angle directly to each blip element via CSS transform —
+      // zero React re-renders involved.
+      const el = radarElRef.current;
+      if (!el) return;
+      const blips = el.querySelectorAll<HTMLElement>(".radar-blip");
+      blips.forEach((blip, idx) => {
+        const radius = 28 + (idx % 2) * 8;
+        const angle = idx * 90 + radarTickRef.current * 0.5;
+        const x = Math.cos((angle * Math.PI) / 180) * radius;
+        const y = Math.sin((angle * Math.PI) / 180) * radius;
+        blip.style.left = `calc(50% + ${x}px)`;
+        blip.style.top  = `calc(50% + ${y}px)`;
+      });
     }, 24);
-
     return () => window.clearInterval(interval);
   }, [isSubmitting, isStreaming, run.status]);
 
-  // ── System profile — dynamic, reads real browser data after hydration ────
+  // ── System profile ────────────────────────────────────────────────────────
   const buildProfile = useCallback(() => {
     if (typeof navigator === "undefined") return [
       { label: "Browser",   value: "Browser",    tone: "text-green-300" },
@@ -467,73 +459,50 @@ export function AdvancedTerminalPanel({
       { label: "Network",   value: "Online",     tone: "text-emerald-300" },
     ];
     const nav = navigator as NavigatorWithExtras;
-
-    // Browser detection — order matters:
-    // Chrome/Edge UA both contain "Safari" token, so Safari must only match
-    // when Chrome is NOT present. Edge UA also contains "Chrome", so check Edge first.
     const ua = nav.userAgent ?? "";
     const edgeVer    = ua.match(/Edg\/([\d]+)/i)?.[1];
     const chromeVer  = ua.match(/Chrome\/([\d]+)/i)?.[1];
     const firefoxVer = ua.match(/Firefox\/([\d]+)/i)?.[1];
     const operaVer   = ua.match(/(?:OPR|Opera)\/([\d]+)/i)?.[1];
-    const safariVer  = ua.match(/Version\/([\d]+).*Safari/i)?.[1]; // real Safari only
+    const safariVer  = ua.match(/Version\/([\d]+).*Safari/i)?.[1];
     const brandFallback = nav.userAgentData?.brands?.find((item) => !/not.?a.?brand/i.test(item.brand));
 
-    const browser = edgeVer
-      ? `Edge ${edgeVer}`
-      : operaVer
-        ? `Opera ${operaVer}`
-        : firefoxVer
-          ? `Firefox ${firefoxVer}`
-          : safariVer && !chromeVer          // Safari only if no Chrome token
-            ? `Safari ${safariVer}`
-            : chromeVer
-              ? `Chrome ${chromeVer}`
-              : brandFallback
-                ? `${brandFallback.brand} ${String(brandFallback.version).split(".")[0]}`
-                : "Browser";
+    const browser = edgeVer    ? `Edge ${edgeVer}`
+      : operaVer               ? `Opera ${operaVer}`
+      : firefoxVer             ? `Firefox ${firefoxVer}`
+      : safariVer && !chromeVer ? `Safari ${safariVer}`
+      : chromeVer              ? `Chrome ${chromeVer}`
+      : brandFallback          ? `${brandFallback.brand} ${String(brandFallback.version).split(".")[0]}`
+      : "Browser";
 
-    // OS: iOS must come before macOS (iPhone/iPad UAs also contain "Mac")
     const hint = `${nav.userAgentData?.platform ?? ""} ${nav.platform ?? ""} ${ua}`.toLowerCase();
-    const os = /iphone|ipad|ipod/.test(hint)
-      ? "iOS"
-      : /android/.test(hint)
-        ? "Android"
-        : /macintosh|mac os x|macos/.test(hint)
-          ? "macOS"
-          : /win/.test(hint)
-            ? "Windows"
-            : /linux/.test(hint)
-              ? "Linux"
-              : "Unknown OS";
+    const os = /iphone|ipad|ipod/.test(hint) ? "iOS"
+      : /android/.test(hint)               ? "Android"
+      : /macintosh|mac os x|macos/.test(hint) ? "macOS"
+      : /win/.test(hint)                   ? "Windows"
+      : /linux/.test(hint)                 ? "Linux"
+      : "Unknown OS";
 
-    // CPU cores: standard Web API, works on all platforms/browsers
-    const cores = Number.isFinite(nav.hardwareConcurrency)
-      ? `${nav.hardwareConcurrency} cores` : "—";
-
+    const cores = Number.isFinite(nav.hardwareConcurrency) ? `${nav.hardwareConcurrency} cores` : "—";
     const isOnline = nav.onLine;
 
     return [
-      { label: "Browser",   value: browser,                        tone: "text-green-300" },
-      { label: "OS",        value: os,                             tone: "text-green-300" },
-      { label: "CPU Cores", value: cores,                          tone: "text-green-300" },
+      { label: "Browser",   value: browser,                         tone: "text-green-300" },
+      { label: "OS",        value: os,                              tone: "text-green-300" },
+      { label: "CPU Cores", value: cores,                           tone: "text-green-300" },
       { label: "Network",   value: isOnline ? "Online" : "Offline", tone: isOnline ? "text-emerald-300" : "text-red-400" },
     ];
   }, []);
 
   const [systemProfile, setSystemProfile] = useState(() => [
-    { label: "Browser",   value: "—",     tone: "text-green-300" },
-    { label: "OS",        value: "—",     tone: "text-green-300" },
-    { label: "CPU Cores", value: "—",     tone: "text-green-300" },
-    { label: "Network",   value: "—",     tone: "text-emerald-300" },
+    { label: "Browser",   value: "—", tone: "text-green-300" },
+    { label: "OS",        value: "—", tone: "text-green-300" },
+    { label: "CPU Cores", value: "—", tone: "text-green-300" },
+    { label: "Network",   value: "—", tone: "text-emerald-300" },
   ]);
 
-  // Read real values after hydration
-  useEffect(() => {
-    setSystemProfile(buildProfile());
-  }, [buildProfile]);
+  useEffect(() => { setSystemProfile(buildProfile()); }, [buildProfile]);
 
-  // Update Network status live on connect/disconnect
   useEffect(() => {
     const update = () =>
       setSystemProfile((prev) =>
@@ -545,44 +514,88 @@ export function AdvancedTerminalPanel({
       );
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
-    return () => {
-      window.removeEventListener("online", update);
-      window.removeEventListener("offline", update);
-    };
+    return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
   }, []);
 
+  useEffect(() => { isMobileRef.current = isMobile; }, [isMobile]);
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
   useEffect(() => { onResetRef.current = onReset; }, [onReset]);
 
   // ── Prompt ───────────────────────────────────────────────────────────────
+  // After writing the prompt we emit \x1b[s (save cursor position). This
+  // marks the exact column where user input starts. redrawLine then does
+  // \x1b[u (restore) + \x1b[J (erase to end of screen) to wipe the old
+  // input across ANY number of wrapped rows — no row-counting needed.
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m `;
+    if (isMobileRef.current) {
+      return `\r\n\x1b[1m\x1b[32m[${project}]\x1b[0m\x1b[1m\x1b[32m❯\x1b[0m \x1b[s`;
+    }
+    return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m \x1b[s`;
   }, []);
 
-  // ── Redraw current input line after cursor moves ─────────────────────────
-  // Clears from start of line, reprints prompt + buffer, repositions cursor.
+  // ── Redraw ───────────────────────────────────────────────────────────────
+  // \x1b[u restores the saved cursor (set by getPrompt right after the prompt)
+  // \x1b[J erases everything from that position to end of screen — works
+  // correctly whether the input spans 1, 2 or 10 wrapped rows on any width.
+  // No row-counting, no ANSI-length math, no off-by-one errors.
+  // prevRenderedLenRef is kept only for the \x1b[s save — it's no longer
+  // used for row arithmetic.
+  const prevRenderedLenRef = useRef(0); // kept for API compat, unused internally
+
   const redrawLine = useCallback((term: Terminal) => {
     const project = selectedProjectRef.current?.name ?? "no-project";
-    const promptPlain = `[${project}@auto-offensive]$ `;
     const buf = lineRef.current;
     const cur = cursorRef.current;
-    // Move to column 0, clear line, reprint prompt + buffer
-    term.write(`\r\x1b[K\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m ${buf}`);
-    // Move cursor back to correct position
+
+    // 1. Jump back to saved cursor position (right after the prompt)
+    //    then erase everything to end of screen
+    term.write("\x1b[u\x1b[J");
+
+    // 2. Rewrite just the buffer (prompt is already there, cursor is right after it)
+    term.write(buf);
+
+    // 3. Reposition cursor if not at end of buffer
     const charsAfterCursor = buf.length - cur;
-    if (charsAfterCursor > 0) {
-      term.write(`\x1b[${charsAfterCursor}D`);
-    }
+    if (charsAfterCursor > 0) term.write(`\x1b[${charsAfterCursor}D`);
+
+    // Update length tracker (informational only)
+    const promptPlain = isMobileRef.current
+      ? `[${project}]❯ `
+      : `[${project}@auto-offensive]$ `;
+    prevRenderedLenRef.current = promptPlain.length + buf.length;
   }, []);
 
   // ── Splash / clear ───────────────────────────────────────────────────────
   const showSplash = useCallback((term: Terminal) => {
-    term.write("\x1b[3J\x1b[2J\x1b[H"); // clear scrollback + screen, home
+    term.write("\x1b[3J\x1b[2J\x1b[H");
     term.write("\r\n");
     term.write(SPLASH);
     term.write("\r\n");
+  }, []);
+
+  // ── Safe fit helper — retries once after a frame if dimensions are zero ──
+  // This is the key fix: on mobile the container may have zero dimensions
+  // at the moment boot() runs (framer-motion is still animating the parent
+  // into view, or the browser hasn't finished its first layout pass).
+  // We wait for a requestAnimationFrame, then another 50 ms tick, before
+  // giving up. Both attempts call fitAddon.fit() so xterm recalculates
+  // cols/rows from the real pixel width.
+  const safeFit = useCallback((fitAddon: { fit: () => void }, maxTries = 5) => {
+    let tries = 0;
+    const attempt = () => {
+      if (!containerRef.current) return;
+      const { offsetWidth } = containerRef.current;
+      if (offsetWidth > 0) {
+        fitAddon.fit();
+        return;
+      }
+      if (++tries < maxTries) {
+        requestAnimationFrame(() => setTimeout(attempt, 50));
+      }
+    };
+    requestAnimationFrame(() => setTimeout(attempt, 0));
   }, []);
 
   // ── Boot ─────────────────────────────────────────────────────────────────
@@ -599,41 +612,44 @@ export function AdvancedTerminalPanel({
 
       const term = new Terminal({
         cursorBlink: true,
-        convertEol: false,          // we handle \r ourselves
+        convertEol: false,
         fontFamily: "var(--font-fira-code), 'Fira Code', Consolas, 'Courier New', monospace",
         fontSize: terminalFontSize,
         letterSpacing: terminalLetterSpacing,
         fontWeight: 400,
         fontWeightBold: 700,
         lineHeight: terminalLineHeight,
-        scrollback: 10000,  // Increased from 5000 for more history
+        scrollback: 10000,
         theme: terminalTheme,
-        cols: 200,  // Force more columns for wider output
+        // cols intentionally omitted — fitAddon.fit() calculates the correct
+        // column count from the actual container pixel width. Hardcoding 200
+        // caused xterm to render a virtual wide canvas on mobile, making the
+        // prompt+input wrap visually while xterm thought it was on one line.
       });
 
       const fitAddon = new FitAddon();
       term.loadAddon(fitAddon);
       term.open(containerRef.current);
-      fitAddon.fit();
+
+      // ── FIX: use safeFit so the first fit() is deferred until the
+      // container actually has a non-zero pixel width. On mobile the
+      // element can be 0-wide at the moment open() returns (parent is
+      // still mid-animation), so fitAddon would compute cols=0 or a huge
+      // stale value, causing every typed character to overflow the line.
+      safeFit(fitAddon);
       fitAddonRef.current = fitAddon;
 
-      // Show fastfetch splash on first boot
       showSplash(term);
       term.write(getPrompt());
 
       term.onData((data) => {
-        // ── Ctrl+C ──────────────────────────────────────────────────────
         if (data === "\x03") {
-          // If a scan is running, show confirmation modal instead of immediately cancelling
           const isRunning = !isInputActiveRef.current;
-          if (isRunning) {
-            setShowCancelModal(true);
-            return;
-          }
-          // If no scan running, just clear the line
+          if (isRunning) { setShowCancelModal(true); return; }
           lineRef.current = "";
           cursorRef.current = 0;
           histIdxRef.current = -1;
+          prevRenderedLenRef.current = 0;
           term.write("^C");
           term.write(getPrompt());
           return;
@@ -641,31 +657,23 @@ export function AdvancedTerminalPanel({
 
         if (!isInputActiveRef.current) return;
 
-        // ── Enter ────────────────────────────────────────────────────────
-        if (data === "\r") {
+        // Mobile keyboards (iOS/Android) send \n for Enter; treat it same as \r.
+        if (data === "\r" || data === "\n") {
           const cmd = lineRef.current.trim();
+          prevRenderedLenRef.current = 0; // reset for next prompt
           term.write("\r\n");
           lineRef.current = "";
           cursorRef.current = 0;
 
           if (cmd === "clear") {
             histIdxRef.current = -1;
-            // Use xterm's native reset to fully clear scrollback and screen
             term.reset();
             term.write(getPrompt());
-            // Also reset the graph visualization state
             useGraphStore.getState().reset();
             return;
           }
-
-          if (cmd === "help") {
-            term.write(HELP_TEXT);
-            term.write(getPrompt());
-            return;
-          }
-
+          if (cmd === "help") { term.write(HELP_TEXT); term.write(getPrompt()); return; }
           if (cmd) {
-            // Push to history (deduplicate consecutive)
             if (historyRef.current[0] !== cmd) {
               historyRef.current.unshift(cmd);
               if (historyRef.current.length > 100) historyRef.current.pop();
@@ -679,38 +687,26 @@ export function AdvancedTerminalPanel({
           return;
         }
 
-        // ── Backspace ────────────────────────────────────────────────────
         if (data === "\u007f") {
           if (cursorRef.current === 0) return;
           const buf = lineRef.current;
-          lineRef.current =
-            buf.slice(0, cursorRef.current - 1) + buf.slice(cursorRef.current);
+          lineRef.current = buf.slice(0, cursorRef.current - 1) + buf.slice(cursorRef.current);
           cursorRef.current -= 1;
-          redrawLine(term);
+
+          if (cursorRef.current === lineRef.current.length) {
+            // Cursor was at end — simple destructive backspace, no full redraw needed.
+            // \b moves left, space overwrites the char, \b moves left again.
+            term.write("\b \b");
+          } else {
+            // Mid-line delete — must redraw to shift chars left.
+            redrawLine(term);
+          }
           return;
         }
 
-        // ── Escape sequences (arrows, Home, End, Delete) ─────────────────
         if (data.startsWith("\x1b[") || data.startsWith("\x1bO")) {
-          const seq = data.slice(data.startsWith("\x1bO") ? 2 : 2);
-
-          // Arrow Left
-          if (data === "\x1b[D") {
-            if (cursorRef.current > 0) {
-              cursorRef.current -= 1;
-              term.write("\x1b[D");
-            }
-            return;
-          }
-          // Arrow Right
-          if (data === "\x1b[C") {
-            if (cursorRef.current < lineRef.current.length) {
-              cursorRef.current += 1;
-              term.write("\x1b[C");
-            }
-            return;
-          }
-          // Arrow Up — history prev
+          if (data === "\x1b[D") { if (cursorRef.current > 0) { cursorRef.current -= 1; term.write("\x1b[D"); } return; }
+          if (data === "\x1b[C") { if (cursorRef.current < lineRef.current.length) { cursorRef.current += 1; term.write("\x1b[C"); } return; }
           if (data === "\x1b[A") {
             const hist = historyRef.current;
             if (!hist.length) return;
@@ -721,99 +717,70 @@ export function AdvancedTerminalPanel({
             redrawLine(term);
             return;
           }
-          // Arrow Down — history next
           if (data === "\x1b[B") {
-            if (histIdxRef.current <= 0) {
-              histIdxRef.current = -1;
-              lineRef.current = "";
-              cursorRef.current = 0;
-              redrawLine(term);
-              return;
-            }
+            if (histIdxRef.current <= 0) { histIdxRef.current = -1; lineRef.current = ""; cursorRef.current = 0; redrawLine(term); return; }
             histIdxRef.current -= 1;
             lineRef.current = historyRef.current[histIdxRef.current];
             cursorRef.current = lineRef.current.length;
             redrawLine(term);
             return;
           }
-          // Home / Ctrl+A
-          if (data === "\x1b[H" || data === "\x01") {
-            cursorRef.current = 0;
-            redrawLine(term);
-            return;
-          }
-          // End / Ctrl+E
-          if (data === "\x1b[F" || data === "\x05") {
-            cursorRef.current = lineRef.current.length;
-            redrawLine(term);
-            return;
-          }
-          // Delete (forward delete)
+          if (data === "\x1b[H" || data === "\x01") { cursorRef.current = 0; redrawLine(term); return; }
+          if (data === "\x1b[F" || data === "\x05") { cursorRef.current = lineRef.current.length; redrawLine(term); return; }
           if (data === "\x1b[3~") {
             if (cursorRef.current >= lineRef.current.length) return;
             const buf = lineRef.current;
-            lineRef.current =
-              buf.slice(0, cursorRef.current) + buf.slice(cursorRef.current + 1);
+            lineRef.current = buf.slice(0, cursorRef.current) + buf.slice(cursorRef.current + 1);
             redrawLine(term);
             return;
           }
-          // Ctrl+Left — word left
           if (data === "\x1b[1;5D" || data === "\x1bb") {
             let pos = cursorRef.current;
             while (pos > 0 && lineRef.current[pos - 1] === " ") pos--;
             while (pos > 0 && lineRef.current[pos - 1] !== " ") pos--;
-            cursorRef.current = pos;
-            redrawLine(term);
-            return;
+            cursorRef.current = pos; redrawLine(term); return;
           }
-          // Ctrl+Right — word right
           if (data === "\x1b[1;5C" || data === "\x1bf") {
             let pos = cursorRef.current;
             const len = lineRef.current.length;
             while (pos < len && lineRef.current[pos] !== " ") pos++;
             while (pos < len && lineRef.current[pos] === " ") pos++;
-            cursorRef.current = pos;
-            redrawLine(term);
-            return;
+            cursorRef.current = pos; redrawLine(term); return;
           }
-          // Ignore other escape sequences
           return;
         }
 
-        // ── Ctrl+A / Ctrl+E (non-escape variants) ────────────────────────
         if (data === "\x01") { cursorRef.current = 0; redrawLine(term); return; }
         if (data === "\x05") { cursorRef.current = lineRef.current.length; redrawLine(term); return; }
+        if (data === "\x0b") { lineRef.current = lineRef.current.slice(0, cursorRef.current); redrawLine(term); return; }
+        if (data === "\x15") { lineRef.current = lineRef.current.slice(cursorRef.current); cursorRef.current = 0; redrawLine(term); return; }
 
-        // ── Ctrl+K — kill to end of line ─────────────────────────────────
-        if (data === "\x0b") {
-          lineRef.current = lineRef.current.slice(0, cursorRef.current);
-          redrawLine(term);
-          return;
-        }
-
-        // ── Ctrl+U — kill to start of line ───────────────────────────────
-        if (data === "\x15") {
-          lineRef.current = lineRef.current.slice(cursorRef.current);
-          cursorRef.current = 0;
-          redrawLine(term);
-          return;
-        }
-
-        // ── Printable characters (including multi-char pastes) ────────────
-        // Filter out remaining control characters
         const printable = data.replace(/[\x00-\x1f\x7f]/g, "");
         if (!printable) return;
 
         const buf = lineRef.current;
-        lineRef.current =
-          buf.slice(0, cursorRef.current) + printable + buf.slice(cursorRef.current);
+        const atEnd = cursorRef.current === buf.length;
+        lineRef.current = buf.slice(0, cursorRef.current) + printable + buf.slice(cursorRef.current);
         cursorRef.current += printable.length;
-        redrawLine(term);
+
+        if (atEnd) {
+          // Typing at end of line — just write the chars directly.
+          // No erase/redraw needed, zero flicker.
+          term.write(printable);
+        } else {
+          // Mid-line insert — must redraw to shift existing chars right.
+          redrawLine(term);
+        }
       });
 
-      ro = new ResizeObserver(() => fitAddon.fit());
-      const parent = containerRef.current.parentElement;
-      if (parent) ro.observe(parent);
+      // ── FIX: observe containerRef.current directly (not parentElement).
+      // Observing the element xterm renders into means we get notified of
+      // the exact pixel-width change that matters for column recalculation.
+      ro = new ResizeObserver(() => {
+        // Debounce slightly so we don't thrash during animated transitions
+        requestAnimationFrame(() => fitAddon.fit());
+      });
+      ro.observe(containerRef.current);
       termRef.current = term;
     }
 
@@ -829,34 +796,43 @@ export function AdvancedTerminalPanel({
 
   // ── Theme hot-swap ───────────────────────────────────────────────────────
   useEffect(() => {
-    if (termRef.current?.options) {
-      termRef.current.options.theme = terminalTheme;
-    }
+    if (termRef.current?.options) termRef.current.options.theme = terminalTheme;
   }, [terminalTheme]);
 
-  // ── Font size hot-swap ─────────────────────────────────────────────────
+  // ── Font hot-swap ────────────────────────────────────────────────────────
   useEffect(() => {
     if (termRef.current?.options) {
-      termRef.current.options.fontSize = logSize.xtermFontSize;
+      // Use the responsive terminalFontSize (already accounts for mobile/tablet)
+      termRef.current.options.fontSize = terminalFontSize;
       termRef.current.options.lineHeight = logSize.terminalLineHeight;
       termRef.current.options.letterSpacing = terminalLetterSpacing;
-      // Re-fit the terminal to recalculate cols/rows for new font size
       fitAddonRef.current?.fit();
     }
   }, [logSize.xtermFontSize, logSize.terminalLineHeight, terminalFontSize, terminalLetterSpacing, terminalLineHeight, terminalTheme]);
 
-  // ── Terminal spinner while waiting for logs ───────────────────────────────
+  // ── Re-fit when sidebar opens/closes on narrow screens ───────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => fitAddonRef.current?.fit(), 300);
+    return () => clearTimeout(timer);
+  }, [sidebarOpen]);
+
+  // ── Re-fit when mobile breakpoint changes (font size change → new col count)
+  useEffect(() => {
+    const timer = setTimeout(() => fitAddonRef.current?.fit(), 100);
+    return () => clearTimeout(timer);
+  }, [isMobile]);
+
+  // ── Spinner while waiting ─────────────────────────────────────────────────
   const spinnerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const spinnerLineRef = useRef(false); // whether we've written a spinner line
+  const spinnerLineRef = useRef(false);
 
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
-
     const isWaiting = isSubmitting && logs.length === 0;
 
     if (isWaiting && !spinnerRef.current) {
-      const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+      const frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"];
       const messages = [
         "Initializing scan engine",
         "Establishing connection",
@@ -865,17 +841,12 @@ export function AdvancedTerminalPanel({
         "Enumerating services",
         "Waiting for scan output",
       ];
-      let frameIdx = 0;
-      let msgIdx = 0;
-      let tick = 0;
-
+      let frameIdx = 0, msgIdx = 0, tick = 0;
       spinnerLineRef.current = true;
       spinnerRef.current = setInterval(() => {
         frameIdx = (frameIdx + 1) % frames.length;
         tick++;
         if (tick % 30 === 0) msgIdx = (msgIdx + 1) % messages.length;
-
-        // Overwrite current line with spinner
         term.write(`\r\x1b[K\x1b[36m  ${frames[frameIdx]} \x1b[0m\x1b[90m${messages[msgIdx]}...\x1b[0m`);
       }, 80);
     }
@@ -883,18 +854,11 @@ export function AdvancedTerminalPanel({
     if (!isWaiting && spinnerRef.current) {
       clearInterval(spinnerRef.current);
       spinnerRef.current = null;
-      if (spinnerLineRef.current) {
-        // Clear the spinner line
-        term.write(`\r\x1b[K`);
-        spinnerLineRef.current = false;
-      }
+      if (spinnerLineRef.current) { term.write(`\r\x1b[K`); spinnerLineRef.current = false; }
     }
 
     return () => {
-      if (spinnerRef.current) {
-        clearInterval(spinnerRef.current);
-        spinnerRef.current = null;
-      }
+      if (spinnerRef.current) { clearInterval(spinnerRef.current); spinnerRef.current = null; }
     };
   }, [isSubmitting, logs.length]);
 
@@ -911,9 +875,9 @@ export function AdvancedTerminalPanel({
       let col = "\x1b[90m";
       const lvl = line.level.toLowerCase();
       if (lvl.includes("error") || lvl.includes("fail")) col = "\x1b[31m";
-      else if (lvl.includes("warn")) col = "\x1b[33m";
-      else if (lvl === "done" || lvl === "submitted") col = "\x1b[32m";
-      else if (lvl === "log") col = "\x1b[36m";
+      else if (lvl.includes("warn"))                      col = "\x1b[33m";
+      else if (lvl === "done" || lvl === "submitted")     col = "\x1b[32m";
+      else if (lvl === "log")                             col = "\x1b[36m";
       term.write(`\r\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
     });
   }, [logs]);
@@ -928,8 +892,6 @@ export function AdvancedTerminalPanel({
     newErrs.forEach((e) => term.write(`\r\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
   }, [errors]);
 
-  // ── Step announcements — removed per UX request ─────────────────────────
-
   // ── Job status ───────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
@@ -941,20 +903,16 @@ export function AdvancedTerminalPanel({
       term.write(`\r\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
     } else if (status.includes("COMPLETED")) {
       term.write(`\r\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
+      isInputActiveRef.current = true; term.write(getPrompt());
     } else if (status.includes("FAILED")) {
       term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
+      isInputActiveRef.current = true; term.write(getPrompt());
     } else if (status.includes("CANCELLED") || status.includes("PARTIAL")) {
       term.write(`\r\x1b[1m\x1b[33m⚠ Scan ${status.replace("JOB_STATUS_", "").toLowerCase()}.\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
+      isInputActiveRef.current = true; term.write(getPrompt());
     } else if (status === "failed") {
       term.write(`\r\x1b[1m\x1b[31m✗ Scan failed.\x1b[0m\r\n`);
-      isInputActiveRef.current = true;
-      term.write(getPrompt());
+      isInputActiveRef.current = true; term.write(getPrompt());
     } else if (status === "idle") {
       prevStepsRef.current = [];
       prevErrorsLenRef.current = 0;
@@ -963,43 +921,61 @@ export function AdvancedTerminalPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.status, run.findings]);
 
-  // ── Cancel confirmation handlers ──────────────────────────────────────────
+  // ── Cancel handlers ──────────────────────────────────────────────────────
   const handleConfirmCancel = useCallback(() => {
     setShowCancelModal(false);
     const term = termRef.current;
-    if (term) {
-      term.write("\r\n\x1b[1m\x1b[33m⚠ Scan cancelled by user.\x1b[0m\r\n");
-    }
+    if (term) term.write("\r\n\x1b[1m\x1b[33m⚠ Scan cancelled by user.\x1b[0m\r\n");
     lineRef.current = "";
     cursorRef.current = 0;
     histIdxRef.current = -1;
     isInputActiveRef.current = true;
     onResetRef.current();
     useGraphStore.getState().reset();
-    if (term) {
-      term.write(getPrompt());
-    }
+    if (term) term.write(getPrompt());
   }, [getPrompt]);
 
-  // ── Top-bar RESET button — clears terminal + shows splash ────────────────
   const handleReset = useCallback(() => {
     const term = termRef.current;
     lineRef.current = "";
     cursorRef.current = 0;
     histIdxRef.current = -1;
+    prevRenderedLenRef.current = 0;
     isInputActiveRef.current = true;
     onResetRef.current();
     useGraphStore.getState().reset();
-    if (term) {
-      term.reset();          // clears scrollback
-      showSplash(term);      // re-shows the splash screen
-      term.write(getPrompt());
-    }
+    if (term) { term.reset(); showSplash(term); term.write(getPrompt()); }
   }, [getPrompt, showSplash]);
 
-  const handleDismissCancel = useCallback(() => {
-    setShowCancelModal(false);
-  }, []);
+  const handleDismissCancel = useCallback(() => setShowCancelModal(false), []);
+
+  // ── Terminal container style — full-width on narrow, partial on desktop ──
+  const termContainerStyle = useMemo(() => {
+    if (isNarrow) {
+      return {
+        backgroundColor: "rgba(0,0,0,0.85)",
+        borderTop: "2px solid rgba(0,255,0,0.2)",
+        position: "absolute" as const,
+        inset: 0,
+        right: 0,   // full-width; sidebar is a drawer overlay
+        zIndex: 2,
+        // FIX: prevent xterm canvas from exceeding the container width on mobile
+        overflow: "hidden" as const,
+        minWidth: 0,
+      };
+    }
+    return {
+      backgroundColor: "rgba(0,0,0,0.85)",
+      borderRight: "2px solid rgba(0,255,0,0.2)",
+      borderTop: "2px solid rgba(0,255,0,0.2)",
+      position: "absolute" as const,
+      inset: 0,
+      right: "260px",
+      zIndex: 2,
+      overflow: "hidden" as const,
+      minWidth: 0,
+    };
+  }, [isNarrow]);
 
   return (
     <>
@@ -1008,175 +984,170 @@ export function AdvancedTerminalPanel({
         initial={{ opacity: 0, y: 8, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="relative rounded-xl overflow-hidden border-2 bg-black cyber-border"
-        style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
+        onAnimationComplete={() => {
+          // ── FIX: re-fit once the entrance animation finishes so xterm
+          // recalculates columns from the final settled pixel width.
+          // Without this, the column count is based on a mid-animation
+          // (smaller) width, causing input to wrap on mobile.
+          requestAnimationFrame(() => fitAddonRef.current?.fit());
+        }}
+        className="relative rounded-xl overflow-hidden border-2 bg-black"
+        style={{ borderColor: "rgba(0,255,0,0.4)", boxShadow: "0 0 8px rgba(0,255,0,0.25)" }}
       >
-        {/* ── Animated background glow ── */}
+        {/* ── Background glow — static, no animate-pulse (pulse caused terminal text flicker) ── */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         </div>
 
-        {/* ── Scanlines overlay ── */}
-        <div className="absolute inset-0 pointer-events-none scanline-bg opacity-20 mix-blend-overlay" />
+        {/* ── Scanlines removed — background-position animation on/above the
+               xterm canvas caused a repaint on every frame, visible as
+               per-keystroke flicker. The cyber aesthetic is preserved by
+               the static border and corner brackets. ── */}
 
-        {/* ── Black Top Bar - PURE BLACK ── */}
-        <motion.div 
-          className="relative z-20 border-b-2 px-6 py-3.5 backdrop-blur-sm bg-black flex items-center justify-center cyber-pulse overflow-hidden"
-          style={{ borderColor: "rgba(0, 255, 0, 0.4)" }}
+        {/* ── Top Bar ── */}
+        <motion.div
+          className="relative z-20 border-b-2 px-3 sm:px-6 py-3 sm:py-3.5 backdrop-blur-sm bg-black flex items-center justify-center overflow-hidden"
+          style={{ borderColor: "rgba(0,255,0,0.4)" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          {/* Top bar corner traces — angular paths converging toward center title */}
-          {showDecorations && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0, opacity: 0.55 }} viewBox="0 0 1200 56" preserveAspectRatio="none">
-            {/* ── LEFT SIDE — from window controls toward center ── */}
-            {/* Branch 1: steps down then right */}
-            <path className="trace-base" d="M0 8 H18 V14 H38 V10 H72 V20 H95 V12 H130 V28 H160 V22 H200 V28" />
-            <path className="trace-flow trace-c1" d="M0 8 H18 V14 H38 V10 H72 V20 H95 V12 H130 V28 H160 V22 H200 V28" />
-            {/* Branch 2: steps up then right */}
-            <path className="trace-base" d="M0 48 H22 V42 H50 V48 H80 V38 H110 V44 H145 V34 H175 V28" />
-            <path className="trace-flow trace-c2" d="M0 48 H22 V42 H50 V48 H80 V38 H110 V44 H145 V34 H175 V28" />
-            {/* Branch 3: short diagonal hop */}
-            <path className="trace-base" d="M60 0 V8 H90 V16 H118 V28" />
-            <path className="trace-flow trace-c3" d="M60 0 V8 H90 V16 H118 V28" />
-
-            {/* Dots at left branch endpoints */}
-            <circle className="trace-dot" cx="200" cy="28" r="2" />
-            <circle className="trace-dot" cx="175" cy="28" r="2" />
-            <circle className="trace-dot" cx="118" cy="28" r="2" />
-            <circle className="trace-dot" cx="38" cy="10" r="1.5" />
-            <circle className="trace-dot" cx="95" cy="12" r="1.5" />
-            <circle className="trace-dot" cx="145" cy="34" r="1.5" />
-
-            {/* ── RIGHT SIDE — from buttons toward center ── */}
-            {/* Branch 1: steps down then left */}
-            <path className="trace-base" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
-            <path className="trace-flow trace-c3" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
-            {/* Branch 2: steps up then left */}
-            <path className="trace-base" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
-            <path className="trace-flow trace-c4" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
-            {/* Branch 3: short hop from top */}
-            <path className="trace-base" d="M1140 0 V8 H1110 V16 H1082 V28" />
-            <path className="trace-flow trace-c1" d="M1140 0 V8 H1110 V16 H1082 V28" />
-
-            {/* Dots at right branch endpoints */}
-            <circle className="trace-dot" cx="1000" cy="28" r="2" />
-            <circle className="trace-dot" cx="1025" cy="28" r="2" />
-            <circle className="trace-dot" cx="1082" cy="28" r="2" />
-            <circle className="trace-dot" cx="1162" cy="10" r="1.5" />
-            <circle className="trace-dot" cx="1105" cy="12" r="1.5" />
-            <circle className="trace-dot" cx="1055" cy="34" r="1.5" />
-          </svg>
+          {/* Circuit trace decoration — static only, no animated stroke-dashoffset
+               (trace-flow animation caused SVG repaints while typing) */}
+          {showDecorations && !isMobile && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0, opacity: 0.35 }} viewBox="0 0 1200 56" preserveAspectRatio="none">
+              <path className="trace-base" d="M0 8 H18 V14 H38 V10 H72 V20 H95 V12 H130 V28 H160 V22 H200 V28" />
+              <path className="trace-base" d="M0 48 H22 V42 H50 V48 H80 V38 H110 V44 H145 V34 H175 V28" />
+              <path className="trace-base" d="M60 0 V8 H90 V16 H118 V28" />
+              <circle className="trace-dot" cx="200" cy="28" r="2" />
+              <circle className="trace-dot" cx="175" cy="28" r="2" />
+              <circle className="trace-dot" cx="118" cy="28" r="2" />
+              <circle className="trace-dot" cx="38" cy="10" r="1.5" />
+              <circle className="trace-dot" cx="95" cy="12" r="1.5" />
+              <circle className="trace-dot" cx="145" cy="34" r="1.5" />
+              <path className="trace-base" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
+              <path className="trace-base" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
+              <path className="trace-base" d="M1140 0 V8 H1110 V16 H1082 V28" />
+              <circle className="trace-dot" cx="1000" cy="28" r="2" />
+              <circle className="trace-dot" cx="1025" cy="28" r="2" />
+              <circle className="trace-dot" cx="1082" cy="28" r="2" />
+              <circle className="trace-dot" cx="1162" cy="10" r="1.5" />
+              <circle className="trace-dot" cx="1105" cy="12" r="1.5" />
+              <circle className="trace-dot" cx="1055" cy="34" r="1.5" />
+            </svg>
           )}
-          <div className="w-full flex items-center justify-between">
-            {/* Left side - Window controls + Title */}
-            <div className="flex items-center gap-4 flex-1">
-              {/* Hacker-style window controls */}
-              <motion.div 
-                className="flex gap-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ staggerChildren: 0.1 }}
-              >
-                <motion.span 
-                  className="h-3 w-3 rounded-full bg-red-500 cursor-pointer hover:scale-125"
-                  animate={{ boxShadow: ["0 0 10px #ff0000", "0 0 5px #ff0000"] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-                <motion.span 
-                  className="h-3 w-3 rounded-full bg-yellow-400 cursor-pointer hover:scale-125"
-                  animate={{ boxShadow: ["0 0 10px #ffff00", "0 0 5px #ffff00"] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                />
-                <motion.span 
-                  className="h-3 w-3 rounded-full bg-green-500 cursor-pointer hover:scale-125"
-                  animate={{ boxShadow: ["0 0 10px #00ff00", "0 0 5px #00ff00"] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                />
-              </motion.div>
 
-              {/* Title with glitch effect - CENTERED */}
-              <div className="flex items-center gap-2 flex-1 justify-center">
-                <motion.div className="h-2 w-2 rounded-full bg-green-500/80" />
-                <motion.span className="font-(family-name:--font-fira-code) text-xs sm:text-sm font-semibold tracking-wider text-green-400 dark:text-green-300">{selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive"} :: ADVANCED_SCAN</motion.span>
+          <div className="w-full flex items-center justify-between gap-2">
+            {/* Left — window controls + title */}
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+              {/* Window controls */}
+              {/* Window controls — pure CSS animation, no framer RAF */}
+              <div className="flex gap-1.5 sm:gap-2 shrink-0">
+                <span className="dot-red    h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500    cursor-pointer hover:scale-125 inline-block" />
+                <span className="dot-yellow h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400 cursor-pointer hover:scale-125 inline-block" />
+                <span className="dot-green  h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500  cursor-pointer hover:scale-125 inline-block" />
+              </div>
+
+              {/* Title */}
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-center min-w-0">
+                {/* Pure CSS pulse — no framer RAF */}
+                <span className="status-dot h-2 w-2 rounded-full bg-green-500/80 shrink-0 inline-block" />
+                <span className="font-(family-name:--font-fira-code) text-[10px] sm:text-xs font-semibold tracking-wider text-green-400 dark:text-green-300 truncate">
+                  {isMobile
+                    ? (selectedProject ? `${selectedProject.name}` : "auto-offensive")
+                    : (selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive")} :: ADVANCED_SCAN
+                </span>
               </div>
             </div>
 
-            {/* Right side - Status and Controls */}
-            <div className="flex items-center gap-3 ml-4">
+            {/* Right — status + controls */}
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {isSubmitting && (
-                <motion.span className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold flex items-center gap-2 whitespace-nowrap text-green-400 dark:text-green-300">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Zap size={11} />
-                  </motion.div>
-                  RUNNING
-                </motion.span>
+                <span className="rounded-md border border-green-500/40 bg-green-500/10 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold flex items-center gap-1.5 text-green-400 dark:text-green-300">
+                  {/* spin via CSS — no framer RAF */}
+                  <Zap size={10} className="animate-spin" style={{ animationDuration: "1s" }} />
+                  <span className="hidden sm:inline">RUNNING</span>
+                </span>
               )}
 
-              {/* Settings toggle button */}
+              {/* Settings */}
               <motion.button
                 ref={settingsBtnRef}
                 type="button"
-                onClick={() => setShowSettings(v => !v)}
+                onClick={() => setShowSettings((v) => !v)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-[10px] sm:text-xs font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200 ${
                   showSettings
                     ? "border-green-500/70 bg-green-500/20 text-green-300 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
                     : "border-green-500/30 bg-black/60 text-green-400/70 hover:border-green-500/50 hover:text-green-400"
                 }`}
               >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
-                CONFIG
+                <span className="hidden sm:inline">CONFIG</span>
               </motion.button>
 
+              {/* Reset */}
               <motion.button
                 type="button"
                 onClick={handleReset}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-3 py-1 text-[10px] sm:text-xs font-bold text-green-400 transition-all duration-300 whitespace-nowrap hover:bg-green-500/10"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold text-green-400 hover:bg-green-500/10 transition-all duration-300"
               >
-                <RotateCcw size={11} />
-                RESET
+                <RotateCcw size={10} />
+                <span className="hidden sm:inline">RESET</span>
               </motion.button>
+
+              {/* Analytics drawer toggle — only on narrow screens */}
+              {isNarrow && (
+                <motion.button
+                  type="button"
+                  onClick={() => setSidebarOpen((v) => !v)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200 ${
+                    sidebarOpen
+                      ? "border-cyan-500/60 bg-cyan-500/15 text-cyan-300"
+                      : "border-cyan-500/30 bg-black/60 text-cyan-400/70 hover:border-cyan-500/50 hover:text-cyan-400"
+                  }`}
+                  aria-label="Toggle analytics panel"
+                >
+                  {sidebarOpen ? <X size={10} /> : <PanelRight size={10} />}
+                  <span className="hidden sm:inline">{sidebarOpen ? "CLOSE" : "STATS"}</span>
+                </motion.button>
+              )}
             </div>
           </div>
         </motion.div>
 
+        {/* ── Project warning ── */}
         {!projectId && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs sm:text-sm font-(family-name:--font-fira-code)"
-            style={{ boxShadow: "0 0 15px rgba(255, 0, 0, 0.3)" }}
+            className="relative m-3 sm:m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs font-(family-name:--font-fira-code)"
+            style={{ boxShadow: "0 0 15px rgba(255,0,0,0.3)" }}
           >
-            <span className="text-red-400 font-bold">⚠ ERROR:</span> <span className="text-red-300">Select a project above before running a scan.</span>
+            <span className="text-red-400 font-bold">⚠ ERROR:</span>{" "}
+            <span className="text-red-300">Select a project above before running a scan.</span>
           </motion.div>
         )}
 
         {/* ── Settings Dropdown ── */}
         {showSettings && (
           <>
-            {/* Click-outside overlay */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setShowSettings(false)}
-            />
+            <div className="fixed inset-0 z-40" onClick={() => setShowSettings(false)} />
             <motion.div
               initial={{ opacity: 0, y: -6, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
               transition={{ duration: 0.15 }}
-              className="absolute z-50 right-4 top-13 bg-black/95 backdrop-blur-md border border-green-500/25 rounded-lg overflow-hidden"
+              className="absolute z-50 right-2 sm:right-4 top-13 bg-black/95 backdrop-blur-md border border-green-500/25 rounded-lg overflow-hidden"
             >
               <div className="px-3 py-1.5 border-b border-green-500/15">
                 <span className="text-[9px] font-(family-name:--font-fira-code) text-green-500/40 tracking-[0.2em] uppercase">Configuration</span>
@@ -1197,26 +1168,19 @@ export function AdvancedTerminalPanel({
           </>
         )}
 
-        {/* ── Full-width xterm with cyber effects ── */}
-        <div className="relative flex-1 w-full bg-black overflow-hidden" style={{ minHeight: "720px" }}>
-          {/* xterm Container — fills full width minus sidebar width */}
+        {/* ── Main content area ── */}
+        <div
+          className="relative flex-1 w-full bg-black overflow-hidden"
+          style={{ minHeight: isMobile ? "480px" : isTablet ? "600px" : "720px" }}
+        >
+          {/* xterm container */}
           <div
             ref={containerRef}
-            className="terminal-content overflow-hidden terminal-glow scanline-bg relative min-h-0"
-            style={{ 
-              backgroundColor: "rgba(0, 0, 0, 0.85)",
-              borderRight: "2px solid rgba(0, 255, 0, 0.2)",
-              borderTop: "2px solid rgba(0, 255, 0, 0.2)",
-              position: "absolute",
-              inset: 0,
-              right: "260px", /* same as sidebar width */
-              zIndex: 2,
-            }}
+            className="terminal-content overflow-hidden terminal-glow relative min-h-0"
+            style={termContainerStyle}
           >
-            {/* ─── CLEAN MINIMAL DECORATIONS (Just Corner Brackets) ─── */}
             {showDecorations && (
               <>
-                {/* Large Corner Brackets Only - Clean & Simple */}
                 <span className="corner-bracket corner-bracket-tl" />
                 <span className="corner-bracket corner-bracket-tr" />
                 <span className="corner-bracket corner-bracket-bl" />
@@ -1224,151 +1188,185 @@ export function AdvancedTerminalPanel({
               </>
             )}
 
-            {/* ─── FLOATING RADAR DISPLAY (Top-Right Corner - Compact & Subtle) ─── */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-              className="absolute top-0 right-0 z-50"
-              style={{ pointerEvents: 'none' }}
-            >
-              <div className="bg-black/60 backdrop-blur-sm border-l-2 border-b-2 border-emerald-600/20 rounded-bl-lg p-2">
-                {/* Minimal Title */}
-                <div className="text-[8px] font-(family-name:--font-fira-code) uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
-                  Threat Map
-                </div>
-                
-                {/* Compact Radar Display */}
-                <div className="radar-container border border-emerald-600/15" style={{ width: '100px', height: '100px' }}>
-                  <div className="radar-base">
-                    {/* Concentric Rings */}
-                    <div className="radar-ring radar-ring-1" />
-                    <div className="radar-ring radar-ring-2" />
-                    <div className="radar-ring radar-ring-3" />
-
-                    {/* Rotating Sweep Line */}
-                    <div className={`radar-sweep ${
-                      isSubmitting || isStreaming || 
-                      (run.status && !String(run.status).toLowerCase().includes('completed') && !String(run.status).toLowerCase().includes('idle')) 
-                        ? 'scanning' 
-                        : ''
-                    }`} />
-
-                    {/* Center Point */}
-                    <div className={`radar-center ${
-                      isSubmitting || isStreaming 
-                        ? 'scanning' 
-                        : (run.findings && run.findings > 0) 
-                          ? 'found' 
-                          : ''
-                    }`} />
-
-                    {/* Radar Blips */}
-                    {(run.findings && run.findings > 0) && radarState.blips.map((blip, idx) => {
-                      const angle = (idx * 90) + (radarTick * 0.5);
-                      const radius = 35 + (idx % 2) * 12;  // Adjusted for much smaller radar
-                      const x = Math.cos((angle * Math.PI) / 180) * radius;
-                      const y = Math.sin((angle * Math.PI) / 180) * radius;
-
-                      return (
-                        <motion.div
-                          key={idx}
-                          className="radar-blip"
-                          style={{
-                            left: `calc(50% + ${x}px)`,
-                            top: `calc(50% + ${y}px)`,
-                            transform: 'translate(-50%, -50%)',
-                            width: '6px',
-                            height: '6px',
-                          }}
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.3, delay: idx * 0.1 }}
-                        />
-                      );
-                    })}
+            {/* Floating radar — desktop only; on mobile it lives inside the drawer sidebar */}
+            {!isMobile && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
+                className="absolute top-0 right-0 z-50"
+                style={{ pointerEvents: "none" }}
+              >
+                <div className="bg-black/60 backdrop-blur-sm border-l-2 border-b-2 border-emerald-600/20 rounded-bl-lg p-1.5 sm:p-2">
+                  <div className="text-[8px] font-(family-name:--font-fira-code) uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
+                    Threat Map
+                  </div>
+                  {/* radarElRef is used by the interval to animate blips via DOM — no React re-renders */}
+                  <div
+                    ref={radarElRef}
+                    className="radar-container border border-emerald-600/15"
+                    style={{ width: "100px", height: "100px" }}
+                  >
+                    <div className="radar-base">
+                      <div className="radar-ring radar-ring-1" />
+                      <div className="radar-ring radar-ring-2" />
+                      <div className="radar-ring radar-ring-3" />
+                      <div
+                        className={`radar-sweep ${
+                          isSubmitting || isStreaming ||
+                          (run.status && !String(run.status).toLowerCase().includes("completed") && !String(run.status).toLowerCase().includes("idle"))
+                            ? "scanning"
+                            : ""
+                        }`}
+                      />
+                      <div
+                        className={`radar-center ${
+                          isSubmitting || isStreaming ? "scanning"
+                          : run.findings && run.findings > 0 ? "found"
+                          : ""
+                        }`}
+                      />
+                      {run.findings && run.findings > 0
+                        ? radarState.blips.map((_, idx) => (
+                            <div
+                              key={idx}
+                              className="radar-blip"
+                              style={{
+                                left: `calc(50% + ${Math.cos((idx * 90 * Math.PI) / 180) * (35 + (idx % 2) * 9)}px)`,
+                                top:  `calc(50% + ${Math.sin((idx * 90 * Math.PI) / 180) * (35 + (idx % 2) * 9)}px)`,
+                                transform: "translate(-50%, -50%)",
+                                width: "6px",
+                                height: "6px",
+                              }}
+                            />
+                          ))
+                        : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </div>
 
-          {/* -- Sidebar -- */}
-          <TerminalSidebar
-            selectedProject={selectedProject}
-            logs={logs}
-            run={run}
-            errors={errors}
-            isSubmitting={isSubmitting}
-            isStreaming={isStreaming}
-            showDecorations={showDecorations}
-            radarState={radarState}
-            radarTick={radarTick}
-            systemProfile={systemProfile}
-          />
-          
+          {/* ── Desktop sidebar (inline, always visible) ── */}
+          {!isNarrow && (
+            <TerminalSidebar
+              selectedProject={selectedProject}
+              logs={logs}
+              run={run}
+              errors={errors}
+              isSubmitting={isSubmitting}
+              showDecorations={showDecorations}
+              systemProfile={systemProfile}
+            />
+          )}
+
           {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute top-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
         </div>
       </motion.section>
 
-      {/* Cancel Confirmation Modal - Hacker Themed */}
+      {/* ── Mobile/Tablet sidebar drawer ── */}
+      <AnimatePresence>
+        {isNarrow && sidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="sidebar-drawer-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+            />
+            {/* Drawer panel */}
+            <motion.div
+              className="sidebar-drawer"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+            >
+              {/* Close button inside drawer */}
+              <div className="absolute top-3 left-3 z-10">
+                <motion.button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  whileTap={{ scale: 0.9 }}
+                  className="rounded-md border border-green-500/30 bg-black/80 p-1.5 text-green-400/70 hover:text-green-400"
+                  aria-label="Close panel"
+                >
+                  <X size={12} />
+                </motion.button>
+              </div>
+
+              <TerminalSidebar
+                selectedProject={selectedProject}
+                logs={logs}
+                run={run}
+                errors={errors}
+                isSubmitting={isSubmitting}
+                showDecorations={showDecorations}
+                systemProfile={systemProfile}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Cancel Confirmation Modal ── */}
       {showCancelModal && (
-        <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <motion.div 
-            className="w-full max-w-sm rounded-lg border-2 border-red-500/60 bg-black/80 p-6 shadow-2xl cyber-pulse relative overflow-hidden"
+          <motion.div
+            className="w-full max-w-sm rounded-lg border-2 border-red-500/60 bg-black/80 p-5 sm:p-6 shadow-2xl cyber-pulse relative overflow-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
           >
-            {/* Background glow */}
             <div className="absolute inset-0 opacity-10 bg-linear-to-br from-red-500 to-purple-500 pointer-events-none" />
-            
-            {/* Corner accents */}
             <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-red-500 pointer-events-none" />
             <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-red-500 pointer-events-none" />
 
             <div className="relative z-10">
-              <motion.h3 
-                className="text-lg font-bold font-(family-name:--font-fira-code) text-red-400 tracking-wider"
-                animate={{ textShadow: ["0 0 10px #ff0000", "0 0 20px #ff0000"] }}
+              <motion.h3
+                className="text-base sm:text-lg font-bold font-(family-name:--font-fira-code) text-red-400 tracking-wider"
+                animate={{ textShadow: ["0 0 10px #ff0000","0 0 20px #ff0000"] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 ⚠ CRITICAL_ACTION
               </motion.h3>
-              
-              <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-red-300/80">
-                Scan termination requested. This operation is {' '}
+
+              <p className="mt-3 text-xs sm:text-sm font-(family-name:--font-fira-code) text-red-300/80">
+                Scan termination requested. This operation is{" "}
                 <span className="text-red-400 font-bold animate-pulse">IRREVERSIBLE</span>.
                 <br />
                 <span className="text-xs text-red-300/60 block mt-2">[CONFIRM_REQUIRED]</span>
               </p>
 
-              <div className="mt-6 flex items-center justify-end gap-3">
+              <div className="mt-5 sm:mt-6 flex items-center justify-end gap-3">
                 <motion.button
                   type="button"
                   onClick={handleDismissCancel}
-                  whileHover={{ scale: 1.05, backgroundColor: "rgba(59, 130, 246, 0.2)" }}
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(59,130,246,0.2)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-blue-400 transition-all hover:border-blue-500/80"
+                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold font-(family-name:--font-fira-code) text-blue-400 transition-all hover:border-blue-500/80"
                 >
                   [ABORT]
                 </motion.button>
-                
+
                 <motion.button
                   type="button"
                   onClick={handleConfirmCancel}
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255, 0, 0, 0.5)" }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,0,0,0.5)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
+                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold font-(family-name:--font-fira-code) text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
                 >
                   [CONFIRM_TERMINATION]
                 </motion.button>
@@ -1379,4 +1377,4 @@ export function AdvancedTerminalPanel({
       )}
     </>
   );
-}
+});

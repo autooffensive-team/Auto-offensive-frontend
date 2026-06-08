@@ -358,6 +358,10 @@ export default function ScanPage() {
     onGuestScanConsumed: updateRateLimitDirect,
   });
 
+  // Stable reset callback — inline `() => resetRun("advanced")` would create a
+  // new function reference every render and defeat React.memo on AdvancedTerminalPanel
+  const resetAdvanced = useCallback(() => resetRun("advanced"), [resetRun]);
+
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
 
@@ -522,7 +526,7 @@ export default function ScanPage() {
                   errors={advancedErrors}
                   isSubmitting={isSubmitting}
                   onSubmit={submitAdvanced}
-                  onReset={() => resetRun("advanced")}
+                  onReset={resetAdvanced}
                 />
 
                   <ScanExecutionGraph
