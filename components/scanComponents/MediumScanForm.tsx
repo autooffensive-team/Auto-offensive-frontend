@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
+import { Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
 import { useState } from "react";
 import { Tool, MediumStepState } from "@/types/scan";
 import { Field } from "./Field";
@@ -197,14 +197,6 @@ export function MediumScanForm({
 
   return (
     <div className="space-y-2">
-      {/* Info banner about 4-tool limit */}
-      <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
-        <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-        <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
-          Medium scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
-        </p>
-      </div>
-
       {/* Layout customization toolbar */}
       <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
         <div className="flex items-center gap-2">
