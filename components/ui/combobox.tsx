@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import * as ReactDOM from "react-dom"
 import { CheckIcon, ChevronDownIcon, XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -188,6 +189,11 @@ function ComboboxInput({
   )
 }
 
+// ─── ComboboxContent — portal-based ──────────────────────────────────────────
+// Renders into document.body via ReactDOM.createPortal so it escapes ANY
+// clip-path or overflow:hidden ancestor in the DOM tree.
+// Uses position:fixed + getBoundingClientRect to stay anchored below the
+// trigger regardless of page scroll or layout nesting.
 function ComboboxContent({
   className,
   children,
@@ -196,23 +202,61 @@ function ComboboxContent({
 }: React.ComponentProps<"div"> & {
   anchor?: HTMLElement | null
 }) {
-  const { open } = useComboboxContext("ComboboxContent")
+  const { open, containerRef } = useComboboxContext("ComboboxContent")
+  const [coords, setCoords] = React.useState<{
+    top: number
+    left: number
+    width: number
+  } | null>(null)
 
-  if (!open) {
-    return null
-  }
+  // Recompute position whenever the dropdown opens or the window resizes/scrolls
+  React.useEffect(() => {
+    if (!open) return
 
-  return (
+    function reposition() {
+      if (!containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      setCoords({
+        top: rect.bottom + 6,   // 6px gap below the input
+        left: rect.left,
+        width: rect.width,
+      })
+    }
+
+    reposition()
+    window.addEventListener("resize", reposition)
+    window.addEventListener("scroll", reposition, true)
+    return () => {
+      window.removeEventListener("resize", reposition)
+      window.removeEventListener("scroll", reposition, true)
+    }
+  }, [open, containerRef])
+
+  if (!open || !coords) return null
+
+  // Portal to document.body — fully escapes all clip-path ancestors
+  return ReactDOM.createPortal(
     <div
       data-slot="combobox-content"
       className={cn(
-        "absolute top-[calc(100%+6px)] left-0 z-50 w-full overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10",
+        // position:fixed so it's relative to viewport, not any parent
+        "fixed z-[9999] overflow-hidden rounded-lg shadow-md ring-1",
+        // Light mode
+        "bg-white text-gray-900 ring-gray-200",
+        // Dark mode
+        "dark:bg-gray-900 dark:text-gray-100 dark:ring-gray-700",
         className
       )}
+      style={{
+        top: coords.top,
+        left: coords.left,
+        width: coords.width,
+      }}
       {...props}
     >
       {children}
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -251,7 +295,14 @@ function ComboboxItem({
       data-slot="combobox-item"
       data-selected={selected || undefined}
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm font-normal outline-hidden select-none transition-colors hover:bg-primary/10 hover:text-black data-[selected=true]:bg-primary/12 data-[selected=true]:text-black data-[selected=true]:font-bold disabled:pointer-events-none disabled:opacity-50",
+        "relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm font-normal outline-hidden select-none transition-colors",
+        // Light mode
+        "hover:bg-primary/10 hover:text-gray-900",
+        "data-[selected=true]:bg-primary/12 data-[selected=true]:text-gray-900 data-[selected=true]:font-bold",
+        // Dark mode
+        "dark:hover:bg-primary/20 dark:hover:text-gray-100",
+        "dark:data-[selected=true]:bg-primary/25 dark:data-[selected=true]:text-gray-100",
+        "disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       disabled={disabled}
