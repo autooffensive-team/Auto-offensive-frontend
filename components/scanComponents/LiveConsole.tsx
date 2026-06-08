@@ -444,10 +444,10 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function StepIcon({ status, isCurrent }: { status: string; isCurrent: boolean }) {
-  if (status.includes("COMPLETED")) return <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />;
-  if (status.includes("FAILED"))    return <XCircle size={14} className="text-red-500 flex-shrink-0" />;
+  if (status.includes("COMPLETED")) return <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />;
+  if (status.includes("FAILED"))    return <XCircle size={14} className="text-red-500 shrink-0" />;
   if (isCurrent)                    return <div className="lc-spin" />;
-  return <Circle size={14} className="text-slate-400 flex-shrink-0" />;
+  return <Circle size={14} className="text-slate-400 shrink-0" />;
 }
 
 // ─── Live Clock ────────────────────────────────────────────────────────────────

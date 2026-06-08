@@ -466,7 +466,7 @@ export default function ScanPage() {
                   id="tour-project-selector"
                   className="p-3 sm:p-4"
                   style={{
-                    background: "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
+                    background: "var(--lc-panel-bg)",
                     outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
                     clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
                     position: "relative",

@@ -309,7 +309,7 @@ function useBreakpoint() {
   }, []);
 
   return {
-    isMobile: width < 640,           // < sm
+    isMobile: width < 640,          
     isTablet: width >= 640 && width < 1024, // sm–lg
     isDesktop: width >= 1024,        // lg+
     isNarrow: width < 1024,          // mobile + tablet
@@ -317,10 +317,6 @@ function useBreakpoint() {
   };
 }
 
-// Wrapped in React.memo so parent re-renders (e.g. from scan state updates
-// in the dashboard) don't re-render the terminal — the xterm canvas sits
-// inside and any React reconciliation touching its container causes a repaint
-// that shows up as the "glitch/breathing" effect while typing.
 export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   projectId,
   selectedProject,
@@ -354,17 +350,11 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const { isMobile, isTablet, isNarrow } = useBreakpoint();
 
   const showDecorations = decorationsEnabled;
-
-  // ── State ─────────────────────────────────────────────────────────────────
   const [showCancelModal, setShowCancelModal] = useState(false);
-  // radarTick is intentionally NOT React state — updating it 42×/s caused the
-  // entire panel to re-render, making typed text flicker ("breathing" effect).
-  // Instead we keep the angle in a ref and push it to the DOM directly via a
-  // CSS custom property on a dedicated wrapper element.
   const radarTickRef = useRef(0);
   const radarElRef = useRef<HTMLDivElement | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile/tablet drawer
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
 
   // ── Input state ──────────────────────────────────────────────────────────
@@ -375,7 +365,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
 
   const logCursorRef = useRef(0);
   const isInputActiveRef = useRef(true);
-  const isMobileRef = useRef(isMobile);         // kept current so prompt callbacks stay stable
+  const isMobileRef = useRef(isMobile);         
   const selectedProjectRef = useRef(selectedProject);
   const onSubmitRef = useRef(onSubmit);
   const onResetRef = useRef(onReset);
@@ -385,14 +375,12 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
   const terminalFontSize = useMemo(() => {
-    // Mobile: xs = 12px, tight letter spacing → more cols, less wrap
     if (isMobile) return 12;
     if (isTablet) return Math.max(11, logSize.xtermFontSize);
     return logSize.xtermFontSize + 1;
   }, [logSize.xtermFontSize, isMobile, isTablet]);
 
   const terminalLetterSpacing = useMemo(() => {
-    // Mobile: no extra letter spacing — keeps chars compact for narrow cols
     if (isMobile) return 0;
     if (logSize.xtermFontSize >= LOG_SIZES.xxl.xtermFontSize) return 3.5;
     if (logSize.xtermFontSize >= LOG_SIZES.xl.xtermFontSize)  return 2.75;
@@ -537,12 +525,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
   useEffect(() => { onResetRef.current = onReset; }, [onReset]);
-
-  // ── Prompt ───────────────────────────────────────────────────────────────
-  // After writing the prompt we emit \x1b[s (save cursor position). This
-  // marks the exact column where user input starts. redrawLine then does
-  // \x1b[u (restore) + \x1b[J (erase to end of screen) to wipe the old
-  // input across ANY number of wrapped rows — no row-counting needed.
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
     if (isMobileRef.current) {
@@ -550,33 +532,19 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     }
     return `\r\n\x1b[1m\x1b[32m[${project}@auto-offensive]\x1b[0m\x1b[1m$ \x1b[0m \x1b[s`;
   }, []);
-
-  // ── Redraw ───────────────────────────────────────────────────────────────
-  // \x1b[u restores the saved cursor (set by getPrompt right after the prompt)
-  // \x1b[J erases everything from that position to end of screen — works
-  // correctly whether the input spans 1, 2 or 10 wrapped rows on any width.
-  // No row-counting, no ANSI-length math, no off-by-one errors.
-  // prevRenderedLenRef is kept only for the \x1b[s save — it's no longer
-  // used for row arithmetic.
-  const prevRenderedLenRef = useRef(0); // kept for API compat, unused internally
+  const prevRenderedLenRef = useRef(0); 
 
   const redrawLine = useCallback((term: Terminal) => {
     const project = selectedProjectRef.current?.name ?? "no-project";
     const buf = lineRef.current;
     const cur = cursorRef.current;
-
-    // 1. Jump back to saved cursor position (right after the prompt)
-    //    then erase everything to end of screen
     term.write("\x1b[u\x1b[J");
 
-    // 2. Rewrite just the buffer (prompt is already there, cursor is right after it)
     term.write(buf);
 
-    // 3. Reposition cursor if not at end of buffer
     const charsAfterCursor = buf.length - cur;
     if (charsAfterCursor > 0) term.write(`\x1b[${charsAfterCursor}D`);
 
-    // Update length tracker (informational only)
     const promptPlain = isMobileRef.current
       ? `[${project}]❯ `
       : `[${project}@auto-offensive]$ `;
@@ -590,14 +558,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     term.write(SPLASH);
     term.write("\r\n");
   }, []);
-
-  // ── Safe fit helper — retries once after a frame if dimensions are zero ──
-  // This is the key fix: on mobile the container may have zero dimensions
-  // at the moment boot() runs (framer-motion is still animating the parent
-  // into view, or the browser hasn't finished its first layout pass).
-  // We wait for a requestAnimationFrame, then another 50 ms tick, before
-  // giving up. Both attempts call fitAddon.fit() so xterm recalculates
-  // cols/rows from the real pixel width.
   const safeFit = useCallback((fitAddon: { fit: () => void }, maxTries = 5) => {
     let tries = 0;
     const attempt = () => {
@@ -637,21 +597,11 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         lineHeight: terminalLineHeight,
         scrollback: 10000,
         theme: terminalTheme,
-        // cols intentionally omitted — fitAddon.fit() calculates the correct
-        // column count from the actual container pixel width. Hardcoding 200
-        // caused xterm to render a virtual wide canvas on mobile, making the
-        // prompt+input wrap visually while xterm thought it was on one line.
       });
 
       const fitAddon = new FitAddon();
       term.loadAddon(fitAddon);
       term.open(containerRef.current);
-
-      // ── FIX: use safeFit so the first fit() is deferred until the
-      // container actually has a non-zero pixel width. On mobile the
-      // element can be 0-wide at the moment open() returns (parent is
-      // still mid-animation), so fitAddon would compute cols=0 or a huge
-      // stale value, causing every typed character to overflow the line.
       safeFit(fitAddon);
       fitAddonRef.current = fitAddon;
 
@@ -672,11 +622,9 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         }
 
         if (!isInputActiveRef.current) return;
-
-        // Mobile keyboards (iOS/Android) send \n for Enter; treat it same as \r.
         if (data === "\r" || data === "\n") {
           const cmd = lineRef.current.trim();
-          prevRenderedLenRef.current = 0; // reset for next prompt
+          prevRenderedLenRef.current = 0;
           term.write("\r\n");
           lineRef.current = "";
           cursorRef.current = 0;
@@ -710,11 +658,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           cursorRef.current -= 1;
 
           if (cursorRef.current === lineRef.current.length) {
-            // Cursor was at end — simple destructive backspace, no full redraw needed.
-            // \b moves left, space overwrites the char, \b moves left again.
             term.write("\b \b");
           } else {
-            // Mid-line delete — must redraw to shift chars left.
             redrawLine(term);
           }
           return;
@@ -780,20 +725,12 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         cursorRef.current += printable.length;
 
         if (atEnd) {
-          // Typing at end of line — just write the chars directly.
-          // No erase/redraw needed, zero flicker.
           term.write(printable);
         } else {
-          // Mid-line insert — must redraw to shift existing chars right.
           redrawLine(term);
         }
       });
-
-      // ── FIX: observe containerRef.current directly (not parentElement).
-      // Observing the element xterm renders into means we get notified of
-      // the exact pixel-width change that matters for column recalculation.
       ro = new ResizeObserver(() => {
-        // Debounce slightly so we don't thrash during animated transitions
         requestAnimationFrame(() => fitAddon.fit());
       });
       ro.observe(containerRef.current);
@@ -807,38 +744,28 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
       termRef.current?.dispose();
       termRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ── Theme hot-swap ───────────────────────────────────────────────────────
   useEffect(() => {
     if (termRef.current?.options) termRef.current.options.theme = terminalTheme;
   }, [terminalTheme]);
-
-  // ── Font hot-swap ────────────────────────────────────────────────────────
   useEffect(() => {
     if (termRef.current?.options) {
-      // Use the responsive terminalFontSize (already accounts for mobile/tablet)
       termRef.current.options.fontSize = terminalFontSize;
       termRef.current.options.lineHeight = logSize.terminalLineHeight;
       termRef.current.options.letterSpacing = terminalLetterSpacing;
       fitAddonRef.current?.fit();
     }
   }, [logSize.xtermFontSize, logSize.terminalLineHeight, terminalFontSize, terminalLetterSpacing, terminalLineHeight, terminalTheme]);
-
-  // ── Re-fit when sidebar opens/closes on narrow screens ───────────────────
   useEffect(() => {
     const timer = setTimeout(() => fitAddonRef.current?.fit(), 300);
     return () => clearTimeout(timer);
   }, [sidebarOpen]);
 
-  // ── Re-fit when mobile breakpoint changes (font size change → new col count)
   useEffect(() => {
     const timer = setTimeout(() => fitAddonRef.current?.fit(), 100);
     return () => clearTimeout(timer);
   }, [isMobile]);
 
-  // ── Spinner while waiting ─────────────────────────────────────────────────
   const spinnerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spinnerLineRef = useRef(false);
 
@@ -878,7 +805,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     };
   }, [isSubmitting, logs.length]);
 
-  // ── Stream logs ──────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
@@ -897,8 +823,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
       term.write(`\r\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
     });
   }, [logs]);
-
-  // ── Errors ───────────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     if (!term) return;
@@ -907,8 +831,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     prevErrorsLenRef.current = errors.length;
     newErrs.forEach((e) => term.write(`\r\x1b[1m\x1b[31m[ERROR] ${e}\x1b[0m\r\n`));
   }, [errors]);
-
-  // ── Job status ───────────────────────────────────────────────────────────
   useEffect(() => {
     const term = termRef.current;
     const status = run.status;
@@ -964,8 +886,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   }, [getPrompt, showSplash]);
 
   const handleDismissCancel = useCallback(() => setShowCancelModal(false), []);
-
-  // ── Terminal container style — full-width on narrow, partial on desktop ──
   const termContainerStyle = useMemo(() => {
     if (isNarrow) {
       return {
@@ -973,9 +893,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         borderTop: "2px solid rgba(0,255,0,0.2)",
         position: "absolute" as const,
         inset: 0,
-        right: 0,   // full-width; sidebar is a drawer overlay
+        right: 0,  
         zIndex: 2,
-        // FIX: prevent xterm canvas from exceeding the container width on mobile
         overflow: "hidden" as const,
         minWidth: 0,
       };
@@ -1001,10 +920,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         onAnimationComplete={() => {
-          // ── FIX: re-fit once the entrance animation finishes so xterm
-          // recalculates columns from the final settled pixel width.
-          // Without this, the column count is based on a mid-animation
-          // (smaller) width, causing input to wrap on mobile.
           requestAnimationFrame(() => fitAddonRef.current?.fit());
         }}
         className="relative rounded-xl overflow-hidden border-2 bg-black"
@@ -1015,13 +930,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         </div>
-
-        {/* ── Scanlines removed — background-position animation on/above the
-               xterm canvas caused a repaint on every frame, visible as
-               per-keystroke flicker. The cyber aesthetic is preserved by
-               the static border and corner brackets. ── */}
-
-        {/* ── Top Bar ── */}
         <motion.div
           className="relative z-20 border-b-2 px-3 sm:px-6 py-3 sm:py-3.5 backdrop-blur-sm bg-black flex items-center justify-center overflow-hidden"
           style={{ borderColor: "rgba(0,255,0,0.4)" }}
@@ -1029,7 +937,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          {/* Circuit trace decoration — static base + animated flow on isolated GPU layer */}
           {showDecorations && !isMobile && (
             <svg className="trace-svg-isolated" style={{ zIndex: 0, opacity: 0.55 }} viewBox="0 0 1200 56" preserveAspectRatio="none">
               {/* Static base lines */}
@@ -1061,21 +968,15 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               <circle className="trace-dot" cx="1055" cy="34" r="1.5" />
             </svg>
           )}
-
           <div className="w-full flex items-center justify-between gap-2">
             {/* Left — window controls + title */}
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-              {/* Window controls */}
-              {/* Window controls — pure CSS animation, no framer RAF */}
               <div className="flex gap-1.5 sm:gap-2 shrink-0">
                 <span className="dot-red    h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500    cursor-pointer hover:scale-125 inline-block" />
                 <span className="dot-yellow h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-yellow-400 cursor-pointer hover:scale-125 inline-block" />
                 <span className="dot-green  h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500  cursor-pointer hover:scale-125 inline-block" />
               </div>
-
-              {/* Title */}
               <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-center min-w-0">
-                {/* Pure CSS pulse — no framer RAF */}
                 <span className="status-dot h-2 w-2 rounded-full bg-green-500/80 shrink-0 inline-block" />
                 <span className="font-(family-name:--font-fira-code) text-[10px] sm:text-xs font-semibold tracking-wider text-green-400 dark:text-green-300 truncate">
                   {isMobile
@@ -1084,8 +985,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 </span>
               </div>
             </div>
-
-            {/* Right — status + controls */}
             <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {isSubmitting && (
                 <span className="rounded-md border border-green-500/40 bg-green-500/10 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold flex items-center gap-1.5 text-green-400 dark:text-green-300">
@@ -1094,8 +993,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   <span className="hidden sm:inline">RUNNING</span>
                 </span>
               )}
-
-              {/* Settings */}
               <motion.button
                 ref={settingsBtnRef}
                 type="button"
@@ -1114,8 +1011,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 </svg>
                 <span className="hidden sm:inline">CONFIG</span>
               </motion.button>
-
-              {/* Reset */}
               <motion.button
                 type="button"
                 onClick={handleReset}
@@ -1126,8 +1021,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 <RotateCcw size={10} />
                 <span className="hidden sm:inline">RESET</span>
               </motion.button>
-
-              {/* Analytics drawer toggle — only on narrow screens */}
               {isNarrow && (
                 <motion.button
                   type="button"
@@ -1148,8 +1041,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
             </div>
           </div>
         </motion.div>
-
-        {/* ── Project warning ── */}
         {!projectId && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -1161,8 +1052,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
             <span className="text-red-300">Select a project above before running a scan.</span>
           </motion.div>
         )}
-
-        {/* ── Settings Dropdown ── */}
         {showSettings && (
           <>
             <div className="fixed inset-0 z-40" onClick={() => setShowSettings(false)} />
@@ -1191,13 +1080,10 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
             </motion.div>
           </>
         )}
-
-        {/* ── Main content area ── */}
         <div
           className="relative flex-1 w-full bg-black overflow-hidden"
           style={{ minHeight: isMobile ? "480px" : isTablet ? "600px" : "720px" }}
         >
-          {/* xterm container */}
           <div
             ref={containerRef}
             className="terminal-content overflow-hidden terminal-glow relative min-h-0"
@@ -1211,8 +1097,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 <span className="corner-bracket corner-bracket-br" />
               </>
             )}
-
-            {/* Floating radar — desktop only; on mobile it lives inside the drawer sidebar */}
             {!isMobile && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -1225,7 +1109,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   <div className="text-[8px] font-(family-name:--font-fira-code) uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
                     Threat Map
                   </div>
-                  {/* radarElRef is used by the interval to animate blips via DOM — no React re-renders */}
                   <div
                     ref={radarElRef}
                     className="radar-container border border-emerald-600/15"
@@ -1271,8 +1154,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               </motion.div>
             )}
           </div>
-
-          {/* ── Desktop sidebar (inline, always visible) ── */}
           {!isNarrow && (
             <TerminalSidebar
               selectedProject={selectedProject}
@@ -1284,8 +1165,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               systemProfile={systemProfile}
             />
           )}
-
-          {/* Corner accents */}
           <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
           <div className="absolute top-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
           <div className="absolute bottom-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
@@ -1293,11 +1172,9 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         </div>
       </motion.section>
 
-      {/* ── Mobile/Tablet sidebar drawer ── */}
       <AnimatePresence>
         {isNarrow && sidebarOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               className="sidebar-drawer-overlay"
               initial={{ opacity: 0 }}
@@ -1305,7 +1182,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
             />
-            {/* Drawer panel */}
+
             <motion.div
               className="sidebar-drawer"
               initial={{ x: "100%" }}
@@ -1313,7 +1190,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
             >
-              {/* Close button inside drawer */}
+
               <div className="absolute top-3 left-3 z-10">
                 <motion.button
                   type="button"
@@ -1340,7 +1217,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         )}
       </AnimatePresence>
 
-      {/* ── Cancel Confirmation Modal ── */}
+
       {showCancelModal && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md px-4"

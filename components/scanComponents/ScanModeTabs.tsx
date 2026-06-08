@@ -12,9 +12,9 @@ interface ScanModeOption {
 }
 
 const SCAN_MODES: ScanModeOption[] = [
-  { id: "basic",    label: "Basic",    icon: ScanLine,        description: "Quick scan with presets" },
-  { id: "medium",   label: "Medium",   icon: Wrench,          description: "Customizable tool pipeline" },
-  { id: "advanced", label: "Advanced", icon: SquareTerminal,  description: "Full command control" },
+  { id: "basic",    label: "Basic",    icon: ScanLine,       description: "Quick scan with presets" },
+  { id: "medium",   label: "Medium",   icon: Wrench,         description: "Customizable tool pipeline" },
+  { id: "advanced", label: "Advanced", icon: SquareTerminal, description: "Full command control" },
 ];
 
 interface ScanModeTabsProps {
@@ -27,7 +27,7 @@ export function ScanModeTabs({ value, onChange }: ScanModeTabsProps) {
     <div
       className="grid grid-cols-3 gap-1.5 p-1.5"
       style={{
-        background: "color-mix(in srgb, var(--color-primary) 4%, transparent)",
+        background: "var(--lc-panel-bg)",
         outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
         clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
         position: "relative",
@@ -47,12 +47,17 @@ export function ScanModeTabs({ value, onChange }: ScanModeTabsProps) {
             aria-selected={isActive}
             aria-controls={`panel-${mode.id}`}
             onClick={() => onChange(mode.id)}
-            style={isActive ? {
-              background: "var(--color-primary)",
-              color: "#000",
-              clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
-              fontWeight: 700,
-            } : {}}
+            style={
+              isActive
+                ? {
+                    background: "var(--color-primary)",
+                    color: "#000",
+                    clipPath:
+                      "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
+                    fontWeight: 700,
+                  }
+                : {}
+            }
             className={cn(
               "flex items-center justify-center gap-2 px-3 py-2.5 text-xs sm:text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               isActive
@@ -75,31 +80,56 @@ interface ScanModePanelProps {
   isActive: boolean;
 }
 
+// ── ScanModePanel ─────────────────────────────────────────────────────────────
+// KEY FIX: clip-path is moved to an absolutely-positioned background layer so
+// it never clips child elements (dropdowns, popovers, etc.) that overflow.
+// The outer <section> has NO clip-path and overflow:visible.
 export function ScanModePanel({ mode, children, isActive }: ScanModePanelProps) {
   if (!isActive) return null;
+
   return (
     <section
       id={`panel-${mode}`}
       role="tabpanel"
       aria-labelledby={`tab-${mode}`}
-      className="p-4 sm:p-5 md:p-6"
-      style={{
-        background: "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
-        clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
-        position: "relative",
-      }}
+      className="relative p-4 sm:p-5 md:p-6"
+      // NO clip-path here — see bg layer below
     >
-      {/* corner accents — same as LiveConsole panels */}
-      <span aria-hidden="true" style={{
-        pointerEvents: "none", position: "absolute", inset: 0,
-        background: `
-          linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 18px 18px no-repeat,
-          linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 18px 18px no-repeat
-        `,
-        opacity: 0.5, zIndex: 0,
-      }} />
-      <div style={{ position: "relative", zIndex: 1 }}>
+      {/* ── Decorative background layer — clip-path lives only here ── */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "var(--lc-panel-bg)",
+          outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+          clipPath:
+            "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
+      {/* ── Corner accent triangles ── */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 18px 18px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 18px 18px no-repeat
+          `,
+          opacity: 0.5,
+          clipPath:
+            "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
+      {/* ── Panel content — z-index above decorative layers ── */}
+      <div style={{ position: "relative", zIndex: 2 }}>
         {children}
       </div>
     </section>
@@ -122,15 +152,20 @@ export function ScanModeHeader({
         style={{
           background: "color-mix(in srgb, var(--color-primary) 10%, transparent)",
           outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
-          clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
+          clipPath:
+            "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
           color: "var(--color-primary)",
         }}
       >
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
       <div>
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-card-foreground">{title}</h2>
-        <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400">{description}</p>
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-card-foreground">
+          {title}
+        </h2>
+        <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400">
+          {description}
+        </p>
       </div>
     </div>
   );

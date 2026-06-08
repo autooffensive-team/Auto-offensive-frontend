@@ -240,7 +240,7 @@ function ComboboxContent({
       data-slot="combobox-content"
       className={cn(
         // position:fixed so it's relative to viewport, not any parent
-        "fixed z-[9999] overflow-hidden rounded-lg shadow-md ring-1",
+        "fixed z-9999 overflow-hidden rounded-lg shadow-md ring-1",
         // Light mode
         "bg-white text-gray-900 ring-gray-200",
         // Dark mode
