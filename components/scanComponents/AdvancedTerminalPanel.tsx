@@ -170,6 +170,22 @@ const glitchAnimation = `
     pointer-events: none;
     opacity: 0.45;
     z-index: 0 !important;
+    /* Own compositing layer — repaints stay isolated from xterm canvas */
+    will-change: transform;
+    transform: translateZ(0);
+    contain: strict;
+  }
+
+  /* Topbar SVG wrapper — promoted layer so stroke animation
+     never invalidates the terminal canvas below */
+  .trace-svg-isolated {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    will-change: transform;
+    transform: translateZ(0);
+    contain: strict;
   }
 
   .trace-base { stroke: rgba(0,255,0,0.15); stroke-width: 1; fill: none; }
@@ -1013,22 +1029,30 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          {/* Circuit trace decoration — static only, no animated stroke-dashoffset
-               (trace-flow animation caused SVG repaints while typing) */}
+          {/* Circuit trace decoration — static base + animated flow on isolated GPU layer */}
           {showDecorations && !isMobile && (
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0, opacity: 0.35 }} viewBox="0 0 1200 56" preserveAspectRatio="none">
+            <svg className="trace-svg-isolated" style={{ zIndex: 0, opacity: 0.55 }} viewBox="0 0 1200 56" preserveAspectRatio="none">
+              {/* Static base lines */}
               <path className="trace-base" d="M0 8 H18 V14 H38 V10 H72 V20 H95 V12 H130 V28 H160 V22 H200 V28" />
               <path className="trace-base" d="M0 48 H22 V42 H50 V48 H80 V38 H110 V44 H145 V34 H175 V28" />
               <path className="trace-base" d="M60 0 V8 H90 V16 H118 V28" />
+              <path className="trace-base" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
+              <path className="trace-base" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
+              <path className="trace-base" d="M1140 0 V8 H1110 V16 H1082 V28" />
+              {/* Animated flow pulses */}
+              <path className="trace-flow trace-c1" d="M0 8 H18 V14 H38 V10 H72 V20 H95 V12 H130 V28 H160 V22 H200 V28" />
+              <path className="trace-flow trace-c2" d="M0 48 H22 V42 H50 V48 H80 V38 H110 V44 H145 V34 H175 V28" />
+              <path className="trace-flow trace-c3" d="M60 0 V8 H90 V16 H118 V28" />
+              <path className="trace-flow trace-c3" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
+              <path className="trace-flow trace-c4" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
+              <path className="trace-flow trace-c1" d="M1140 0 V8 H1110 V16 H1082 V28" />
+              {/* Dots */}
               <circle className="trace-dot" cx="200" cy="28" r="2" />
               <circle className="trace-dot" cx="175" cy="28" r="2" />
               <circle className="trace-dot" cx="118" cy="28" r="2" />
               <circle className="trace-dot" cx="38" cy="10" r="1.5" />
               <circle className="trace-dot" cx="95" cy="12" r="1.5" />
               <circle className="trace-dot" cx="145" cy="34" r="1.5" />
-              <path className="trace-base" d="M1200 8 H1182 V14 H1162 V10 H1128 V20 H1105 V12 H1070 V28 H1040 V22 H1000 V28" />
-              <path className="trace-base" d="M1200 48 H1178 V42 H1150 V48 H1120 V38 H1090 V44 H1055 V34 H1025 V28" />
-              <path className="trace-base" d="M1140 0 V8 H1110 V16 H1082 V28" />
               <circle className="trace-dot" cx="1000" cy="28" r="2" />
               <circle className="trace-dot" cx="1025" cy="28" r="2" />
               <circle className="trace-dot" cx="1082" cy="28" r="2" />

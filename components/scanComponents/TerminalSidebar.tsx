@@ -15,20 +15,28 @@ export type RadarState = {
   badge: string;
 };
 
-// ─── SidebarTraces SVG — static only, no trace-flow animations ───────────────
-// (stroke-dashoffset animations on SVG paths adjacent to the xterm canvas
-// were causing GPU compositing repaints visible as typing flicker)
+// ─── SidebarTraces SVG — animated on isolated GPU layer ──────────────────────
+// will-change:transform on .circuit-traces promotes this SVG to its own
+// compositing layer so stroke-dashoffset repaints never touch the xterm canvas.
 function SidebarTraces() {
   return (
     <svg className="circuit-traces" viewBox="0 0 260 800" preserveAspectRatio="xMidYMid slice">
       <path className="trace-base" d="M20 0 V30 H30 V60" />
+      <path className="trace-flow trace-c1" d="M20 0 V30 H30 V60" />
       <path className="trace-base" d="M240 0 V30 H230 V60" />
+      <path className="trace-flow trace-c2" d="M240 0 V30 H230 V60" />
       <path className="trace-base" d="M20 740 V770 H30 V800" />
+      <path className="trace-flow trace-c3" d="M20 740 V770 H30 V800" />
       <path className="trace-base" d="M240 740 V770 H230 V800" />
+      <path className="trace-flow trace-c4" d="M240 740 V770 H230 V800" />
       <path className="trace-base" d="M10 380 H40 V390 H70" />
+      <path className="trace-flow trace-c2" d="M10 380 H40 V390 H70" />
       <path className="trace-base" d="M250 400 H220 V410 H190" />
+      <path className="trace-flow trace-c3" d="M250 400 H220 V410 H190" />
       <path className="trace-base" d="M0 200 L15 200 L25 210 L40 210" />
+      <path className="trace-flow trace-c1" d="M0 200 L15 200 L25 210 L40 210" />
       <path className="trace-base" d="M260 600 L245 600 L235 590 L220 590" />
+      <path className="trace-flow trace-c4" d="M260 600 L245 600 L235 590 L220 590" />
       <circle className="trace-dot" cx="30" cy="60" r="2" />
       <circle className="trace-dot" cx="230" cy="60" r="2" />
       <circle className="trace-dot" cx="30" cy="770" r="2" />
@@ -322,14 +330,18 @@ export function TerminalSidebar({
         {showDecorations && (
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 0, opacity: 0.4 }}
+            style={{ zIndex: 0, opacity: 0.4, willChange: "transform", transform: "translateZ(0)" }}
             viewBox="0 0 260 120"
             preserveAspectRatio="none"
           >
             <path className="trace-base" d="M0 20 H16 V10 H36" />
+            <path className="trace-flow trace-c1" d="M0 20 H16 V10 H36" />
             <path className="trace-base" d="M260 20 H244 V10 H224" />
+            <path className="trace-flow trace-c3" d="M260 20 H244 V10 H224" />
             <path className="trace-base" d="M0 100 H16 V110 H36" />
+            <path className="trace-flow trace-c2" d="M0 100 H16 V110 H36" />
             <path className="trace-base" d="M260 100 H244 V110 H224" />
+            <path className="trace-flow trace-c4" d="M260 100 H244 V110 H224" />
             <circle className="trace-dot" cx="36"  cy="10"  r="1.5" />
             <circle className="trace-dot" cx="224" cy="10"  r="1.5" />
             <circle className="trace-dot" cx="36"  cy="110" r="1.5" />
@@ -366,14 +378,18 @@ export function TerminalSidebar({
         {showDecorations && (
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 0, opacity: 0.4 }}
+            style={{ zIndex: 0, opacity: 0.4, willChange: "transform", transform: "translateZ(0)" }}
             viewBox="0 0 260 70"
             preserveAspectRatio="none"
           >
             <path className="trace-base" d="M0 14 H14 V6 H32" />
+            <path className="trace-flow trace-c1" d="M0 14 H14 V6 H32" />
             <path className="trace-base" d="M260 14 H246 V6 H228" />
+            <path className="trace-flow trace-c2" d="M260 14 H246 V6 H228" />
             <path className="trace-base" d="M0 56 H14 V64 H32" />
+            <path className="trace-flow trace-c3" d="M0 56 H14 V64 H32" />
             <path className="trace-base" d="M260 56 H246 V64 H228" />
+            <path className="trace-flow trace-c4" d="M260 56 H246 V64 H228" />
             <circle className="trace-dot" cx="32"  cy="6"  r="1.5" />
             <circle className="trace-dot" cx="228" cy="6"  r="1.5" />
             <circle className="trace-dot" cx="32"  cy="64" r="1.5" />
