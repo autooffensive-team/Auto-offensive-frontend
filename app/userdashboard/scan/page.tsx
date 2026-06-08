@@ -423,7 +423,16 @@ export default function ScanPage() {
               <ScanModeTabs value={activeTab} onChange={handleTabChange} />
 
               {activeTab !== "advanced" && (
-                <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+                <div
+                  id="tour-project-selector"
+                  className="p-3 sm:p-4"
+                  style={{
+                    background: "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
+                    outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+                    clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+                    position: "relative",
+                  }}
+                >
                   {isGuest ? (
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                       <Scan size={16} className="text-teal-500" />

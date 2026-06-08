@@ -160,10 +160,19 @@ export function BasicScanForm({
   return (
     <div className="space-y-2">
       {/* Layout toolbar */}
-      <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
+      <div
+        className="flex items-center justify-between px-3 py-2"
+        style={{
+          background: "color-mix(in srgb, var(--color-primary) 4%, transparent)",
+          outline: "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)",
+          clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
+        }}
+      >
         <div className="flex items-center gap-2">
-          <LayoutGrid className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Drag sections to reorder your layout</span>
+          <LayoutGrid className="h-3.5 w-3.5" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }} />
+          <span className="text-[10px] sm:text-xs" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }}>
+            Drag sections to reorder your layout
+          </span>
         </div>
         {isCustom && (
           <Button
@@ -171,7 +180,8 @@ export function BasicScanForm({
             variant="ghost"
             size="sm"
             onClick={() => setLayout([...DEFAULT_LAYOUT])}
-            className="h-7 gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            className="h-7 gap-1.5 text-xs hover:text-white"
+            style={{ color: "color-mix(in srgb, var(--color-primary) 70%, transparent)" }}
           >
             <RotateCcw className="h-3 w-3" />
             Reset layout
@@ -216,32 +226,50 @@ function DraggableWidget({
       onDrop={(e) => onDrop(e, widgetKey)}
       onDragEnd={onDragEnd}
       className={cn(
-        "group relative rounded-xl border bg-white dark:bg-gray-900 transition-all duration-150",
-        isDragging  && "opacity-40 scale-[0.98] border-dashed border-gray-200 dark:border-gray-800",
-        isDragOver && !isDragging && "border-teal-500/60",
-        !isDragging && !isDragOver && "border-gray-200 dark:border-gray-800"
+        "group relative transition-all duration-150",
+        isDragging  && "opacity-40 scale-[0.98]",
       )}
+      style={{
+        background: "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
+        outline: isDragOver && !isDragging
+          ? "1px solid color-mix(in srgb, var(--color-primary) 55%, transparent)"
+          : "1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)",
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        filter: isDragging ? "brightness(0.7)" : undefined,
+      }}
     >
+      {/* corner accents */}
+      <span aria-hidden="true" style={{
+        pointerEvents: "none", position: "absolute", inset: 0,
+        background: `
+          linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
+          linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+        `,
+        opacity: 0.45, zIndex: 0,
+      }} />
+
       {/* Drag handle */}
       <div
         className={cn(
-          "flex cursor-grab select-none items-center gap-2 border-b border-gray-200/50 dark:border-gray-800/50 px-4 py-2.5",
+          "relative z-10 flex cursor-grab select-none items-center gap-2 px-4 py-2.5",
           "active:cursor-grabbing",
-          isDragOver && !isDragging && "border-teal-500/30"
         )}
+        style={{ borderBottom: "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)" }}
       >
-        <GripVertical className="h-4 w-4 text-gray-400 dark:text-gray-500 transition-colors group-hover:text-gray-400 dark:group-hover:text-gray-500" />
-        {icon && <span className="text-gray-400 dark:text-gray-500">{icon}</span>}
-        <span className="text-[10px] sm:text-[11px] md:text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+        <GripVertical className="h-4 w-4 transition-colors"
+          style={{ color: "color-mix(in srgb, var(--color-primary) 40%, transparent)" }} />
+        {icon && <span style={{ color: "color-mix(in srgb, var(--color-primary) 50%, transparent)" }}>{icon}</span>}
+        <span className="text-[10px] sm:text-[11px] md:text-xs font-semibold uppercase tracking-widest"
+          style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)", letterSpacing: "0.18em" }}>
           {label}
         </span>
         {badge && <span className="ml-1">{badge}</span>}
         {isDragOver && !isDragging && (
-          <span className="ml-auto text-[10px] font-medium text-teal-600 dark:text-teal-400">Drop here</span>
+          <span className="ml-auto text-[10px] font-medium" style={{ color: "var(--color-primary)" }}>Drop here</span>
         )}
       </div>
 
-      <div className="p-3 sm:p-4">{children}</div>
+      <div className="relative z-10 p-3 sm:p-4">{children}</div>
     </div>
   );
 }
@@ -275,47 +303,61 @@ function PresetSelector({ presets, selected, onSelect, disabled }: PresetSelecto
             <label
               key={p.name}
               className={cn(
-                "relative flex cursor-pointer flex-col rounded-lg border p-3 sm:p-4 transition-all duration-150",
-                "focus-within:ring-2 focus-within:ring-teal-500/30 focus-within:ring-offset-1",
-                isSelected
-                  ? "border-teal-500/60 bg-white dark:bg-gray-900"
-                  : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-teal-500/40 hover:bg-teal-50/30 dark:hover:bg-teal-500/3",
+                "relative flex cursor-pointer flex-col p-3 sm:p-4 transition-all duration-150",
+                "focus-within:ring-2 focus-within:ring-offset-1",
                 disabled && "pointer-events-none opacity-50"
               )}
+              style={{
+                background: isSelected
+                  ? "color-mix(in srgb, var(--color-primary) 8%, var(--background))"
+                  : "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
+                outline: isSelected
+                  ? "1px solid color-mix(in srgb, var(--color-primary) 55%, transparent)"
+                  : "1px solid color-mix(in srgb, var(--color-primary) 18%, transparent)",
+                clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+              }}
             >
-              <div className="flex items-center justify-between gap-3">
-                <span
-                  className={cn(
-                    "text-xs sm:text-sm font-semibold",
-                    isSelected ? "text-teal-600 dark:text-teal-400" : "text-gray-900 dark:text-white"
-                  )}
-                >
+              {/* corner accent when selected */}
+              {isSelected && (
+                <span aria-hidden="true" style={{
+                  pointerEvents: "none", position: "absolute", inset: 0,
+                  background: `
+                    linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 12px 12px no-repeat,
+                    linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 12px 12px no-repeat
+                  `,
+                  opacity: 0.5,
+                }} />
+              )}
+              <div className="relative flex items-center justify-between gap-3">
+                <span className="text-xs sm:text-sm font-semibold"
+                  style={{ color: isSelected ? "var(--color-primary)" : undefined }}>
                   {p.name}
                 </span>
                 {isSelected ? (
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--color-primary)" }} aria-hidden="true" />
                 ) : (
-                  <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-200/60 dark:border-gray-800/60" />
+                  <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-200/60 dark:border-gray-700/60" />
                 )}
               </div>
 
               {p.description && (
-                <p className="mt-1.5 text-[10px] sm:text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="relative mt-1.5 text-[10px] sm:text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                   {p.description}
                 </p>
               )}
 
               {p.flags && p.flags.length > 0 && (
-                <div className="mt-2.5 flex flex-wrap gap-1">
+                <div className="relative mt-2.5 flex flex-wrap gap-1">
                   {p.flags.map((flag) => (
                     <code
                       key={flag}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 font-mono text-[10px]",
-                        isSelected
-                          ? "bg-teal-50 dark:bg-teal-500/10 text-teal-600/80 dark:text-teal-400/80"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                      )}
+                      className="rounded px-1.5 py-0.5 font-mono text-[10px]"
+                      style={{
+                        background: isSelected
+                          ? "color-mix(in srgb, var(--color-primary) 12%, transparent)"
+                          : "color-mix(in srgb, var(--color-primary) 6%, transparent)",
+                        color: "color-mix(in srgb, var(--color-primary) 80%, var(--foreground))",
+                      }}
                     >
                       {flag}
                     </code>
