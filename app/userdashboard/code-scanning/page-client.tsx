@@ -11,6 +11,7 @@ import {
   ExternalLink,
   FolderGit2,
   GitBranch,
+  KeyRound,
   LoaderCircle,
   Plus,
   RefreshCw,
@@ -686,6 +687,13 @@ export default function CodeScanningPageClient() {
 
         <div className="flex shrink-0 items-center gap-2 sm:pt-1">
           <CodeScanTourTriggerButton />
+          <Link
+            href="/userdashboard/code-scanning/integrations"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:text-white"
+          >
+            <KeyRound size={14} />
+            CI/CD Tokens
+          </Link>
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
