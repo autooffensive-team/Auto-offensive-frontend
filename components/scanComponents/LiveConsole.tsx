@@ -103,25 +103,25 @@ const FUTURE_STYLES = `
 
 /* ── CSS variables — dark mode ── */
 .dark {
-  --lc-panel-bg:      rgba(4,10,18,0.97);
-  --lc-panel-border:  rgba(0,255,200,0.15);
-  --lc-panel-hot:     rgba(0,255,200,0.5);
-  --lc-toolbar-bg:    rgba(2,7,13,0.98);
-  --lc-card-bg:       rgba(0,22,20,0.55);
-  --lc-card-border:   rgba(0,255,200,0.13);
-  --lc-grid-line:     rgba(0,255,200,0.04);
-  --lc-scan-beam:     rgba(0,255,200,0.06);
-  --lc-shimmer:       rgba(0,255,200,0.07);
-  --lc-label:         rgba(0,255,200,0.42);
-  --lc-text:          #e0fff8;
-  --lc-text-muted:    rgba(0,255,200,0.5);
-  --lc-text-dim:      rgba(0,255,200,0.25);
-  --lc-neon:          #00ffc8;
-  --lc-neon-rgb:      0,255,200;
-  --lc-metric-val:    #00ffc8;
-  --lc-metric-bg:     rgba(0,255,200,0.05);
-  --lc-radial:        rgba(0,255,200,0.04);
-  --lc-stream-line:   rgba(0,255,200,0.5);
+  --lc-panel-bg:      rgba(16,24,40,0.98);
+  --lc-panel-border:  rgba(0,208,178,0.18);
+  --lc-panel-hot:     rgba(0,208,178,0.45);
+  --lc-toolbar-bg:    rgba(12,19,33,0.99);
+  --lc-card-bg:       rgba(20,29,46,0.85);
+  --lc-card-border:   rgba(0,208,178,0.15);
+  --lc-grid-line:     rgba(0,208,178,0.04);
+  --lc-scan-beam:     rgba(0,208,178,0.06);
+  --lc-shimmer:       rgba(0,208,178,0.06);
+  --lc-label:         rgba(0,208,178,0.55);
+  --lc-text:          #e2e8f0;
+  --lc-text-muted:    rgba(226,232,240,0.6);
+  --lc-text-dim:      rgba(226,232,240,0.32);
+  --lc-neon:          #00d0b2;
+  --lc-neon-rgb:      0,208,178;
+  --lc-metric-val:    #00d0b2;
+  --lc-metric-bg:     rgba(0,208,178,0.06);
+  --lc-radial:        rgba(0,208,178,0.04);
+  --lc-stream-line:   rgba(0,208,178,0.65);
 }
 
 /* ── Aside wrapper — animated grid bg ── */
@@ -315,10 +315,10 @@ const FUTURE_STYLES = `
   clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
   transition: background 0.2s;
 }
-.lc-step-current { background: rgba(var(--lc-neon-rgb),0.055); outline: 1px solid rgba(var(--lc-neon-rgb),0.3); }
-.lc-step-done    { background: rgba(16,185,129,0.05); outline: 1px solid rgba(16,185,129,0.2); }
-.lc-step-failed  { background: rgba(239,68,68,0.04); outline: 1px solid rgba(239,68,68,0.18); }
-.lc-step-idle    { background: rgba(100,116,139,0.04); outline: 1px solid rgba(100,116,139,0.1); }
+.lc-step-current { background: rgba(var(--lc-neon-rgb),0.08); outline: 1px solid rgba(var(--lc-neon-rgb),0.3); }
+.lc-step-done    { background: rgba(16,185,129,0.07); outline: 1px solid rgba(16,185,129,0.22); }
+.lc-step-failed  { background: rgba(239,68,68,0.06); outline: 1px solid rgba(239,68,68,0.2); }
+.lc-step-idle    { background: rgba(148,163,184,0.06); outline: 1px solid rgba(148,163,184,0.12); }
 /* energy pulse on left edge of running step */
 .lc-step-current::before {
   content: '';
@@ -395,8 +395,8 @@ const FUTURE_STYLES = `
 .lc-error-row {
   display: flex; align-items: flex-start; gap: 8px;
   padding: 8px 10px; margin-bottom: 6px;
-  background: rgba(239,68,68,0.04);
-  outline: 1px solid rgba(239,68,68,0.14);
+  background: rgba(239,68,68,0.06);
+  outline: 1px solid rgba(239,68,68,0.18);
   clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
 }
 
@@ -506,21 +506,36 @@ function LiveClock() {
 //  - Speed and color driven by run.status
 //  - No random seeds — every user sees the same bar for the same scan state
 function Waveform({ status, logCount, findings }: { status: string; logCount: number; findings: number }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const isRunning   = status === "RUNNING";
   const isCompleted = /completed/i.test(status);
   const isFailed    = /failed/i.test(status);
 
-  // Use logCount to create a deterministic but varied bar pattern that grows with scan activity
   const BAR_COUNT = 22;
+
+  // Render a flat placeholder on the server / before mount to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="lc-waveform">
+        {Array.from({ length: BAR_COUNT }, (_, i) => (
+          <div
+            key={i}
+            className="lc-wave-bar"
+            style={{ height: "8%", background: "rgba(var(--lc-neon-rgb,0,208,178),0.15)", "--d": "3s", "--delay": "0s" } as React.CSSProperties}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="lc-waveform">
       {Array.from({ length: BAR_COUNT }, (_, i) => {
-        // Deterministic height based on log count and bar position — not random
-        // Each bar uses a sine/cosine offset so they look varied without being random
         const phase = (i / BAR_COUNT) * Math.PI * 2;
-        const logFactor = Math.min(logCount / 50, 1); // 0→1 as logs arrive up to 50
-        const findingBoost = Math.min(findings * 2, 20); // findings add extra height
+        const logFactor = Math.min(logCount / 50, 1);
+        const findingBoost = Math.min(findings * 2, 20);
 
         const h = isRunning
           ? 15 + (Math.abs(Math.sin(phase + logCount * 0.1)) * 60 * logFactor) + findingBoost + (i % 3 === 0 ? 10 : 0)
@@ -528,9 +543,8 @@ function Waveform({ status, logCount, findings }: { status: string; logCount: nu
           ? 20 + Math.abs(Math.sin(phase)) * 35
           : isFailed
           ? 8 + Math.abs(Math.sin(phase)) * 18
-          : 5 + Math.abs(Math.sin(phase)) * 12; // idle: short flat
+          : 5 + Math.abs(Math.sin(phase)) * 12;
 
-        // Animation speed: running = fast, idle = very slow
         const d = isRunning
           ? 0.35 + (i % 5) * 0.08
           : isCompleted ? 1.4 + (i % 4) * 0.25
@@ -539,7 +553,6 @@ function Waveform({ status, logCount, findings }: { status: string; logCount: nu
 
         const delay = (i * 0.04) * (isRunning ? 1 : 2);
 
-        // Color: running = neon + accents driven by findings, completed = green, failed = red, idle = muted
         const color = isRunning
           ? findings > 0 && i % 4 === 0 ? "rgba(255,60,172,0.7)"
           : i % 6 === 0               ? "rgba(0,170,255,0.65)"
@@ -553,10 +566,10 @@ function Waveform({ status, logCount, findings }: { status: string; logCount: nu
             key={i}
             className="lc-wave-bar"
             style={{
-              height: `${Math.max(4, Math.min(100, h))}%`,
+              height: `${Math.round(Math.max(4, Math.min(100, h)))}%`,
               background: color,
-              "--d": `${d}s`,
-              "--delay": `${delay}s`,
+              "--d": `${d.toFixed(1)}s`,
+              "--delay": `${delay.toFixed(2)}s`,
             } as React.CSSProperties}
           />
         );
@@ -737,15 +750,24 @@ function buildClientProfile(): EnvCard[] {
 }
 
 function ClientInfoGrid() {
-  const [profile, setProfile] = useState<EnvCard[]>(() => buildClientProfile());
+  // Always start with placeholder "—" on both server and client first render
+  // to avoid SSR/client mismatch. Real values are populated after mount.
+  const [profile, setProfile] = useState<EnvCard[]>([
+    { label: "Browser", value: "—" },
+    { label: "OS",      value: "—" },
+    { label: "CPU",     value: "—" },
+    { label: "Network", value: "—" },
+  ]);
+  const [mounted, setMounted] = useState(false);
 
-  // Re-read on mount (SSR-safe: buildClientProfile returns "—" during SSR)
   useEffect(() => {
+    setMounted(true);
     setProfile(buildClientProfile());
   }, []);
 
-  // Live network status updates
+  // Live network status updates — only after mount
   useEffect(() => {
+    if (!mounted) return;
     const update = () =>
       setProfile((prev) =>
         prev.map((c) =>
@@ -760,7 +782,7 @@ function ClientInfoGrid() {
       window.removeEventListener("online",  update);
       window.removeEventListener("offline", update);
     };
-  }, []);
+  }, [mounted]);
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
