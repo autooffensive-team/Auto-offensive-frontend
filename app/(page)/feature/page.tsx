@@ -703,7 +703,7 @@ export default function PlatformCapabilities() {
           className="mt-12 flex flex-row flex-wrap items-center justify-center gap-4"
         >
           <button
-            className={`${primaryButtonClass} bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
+            className={`${primaryButtonClass} bg-[#00BCA1] text-black hover:bg-[#0AAE98] px-6`}
           >
             <span>{t("workflow.primaryCta")}</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

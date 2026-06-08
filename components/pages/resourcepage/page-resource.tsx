@@ -430,13 +430,13 @@ export default function ResourceComponent() {
       service: isKhmer ? 'Scanner API v2' : 'Scanner API v2',
       version: isKhmer ? '2.4.1' : '2.4.1-Stable',
       status: 'operational',
-      lastAudit: isKhmer ? '24 តុលា 2023' : 'Oct 24, 2023',
+      lastAudit: isKhmer ? '24 មេសា 2026' : 'April 24, 2026',
     },
     {
       service: isKhmer ? 'CLI Modules' : 'CLI Core Modules',
       version: isKhmer ? '1.9.0' : '1.9.0-Legacy',
       status: 'degraded',
-      lastAudit: isKhmer ? '12 កញ្ញា 2023' : 'Sep 12, 2023',
+      lastAudit: isKhmer ? '12 ឧសភា 2026' : 'May 12, 2026',
     },
     {
       service: isKhmer ? 'Payload DB' : 'Payload Database',
@@ -837,12 +837,12 @@ export default function ResourceComponent() {
                 </svg>
 
                 {/* Step 1 — Top left */}
-                <div className="absolute top-[16px] left-[4%] flex items-center gap-3 z-10">
-                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
-                    <div className="h-[14px] w-[14px] rounded-full bg-[#00BCA1]" />
+                <div className="absolute top-4 left-[4%] flex items-center gap-3 z-10">
+                  <div className="flex h-12.5 w-12.5 shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
+                    <div className="h-3.5 w-3.5 rounded-full bg-[#00BCA1]" />
                   </div>
                   <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
-                    <div className="h-9 w-[3px] rounded-full bg-[#00BCA1]" />
+                    <div className="h-9 w-0.75 rounded-full bg-[#00BCA1]" />
                     <div>
                       <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#00BCA1] mr-1.5">1.</span>{workflowSteps[0].title}</p>
                       <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[0].desc}</p>
@@ -851,26 +851,26 @@ export default function ResourceComponent() {
                 </div>
 
                 {/* Step 2 — Middle right */}
-                <div className="absolute top-[220px] right-[4%] flex items-center gap-3 z-10">
+                <div className="absolute top-55 right-[4%] flex items-center gap-3 z-10">
                   <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
-                    <div className="h-9 w-[3px] rounded-full bg-[#00BCA1]" />
+                    <div className="h-9 w-0.75 rounded-full bg-[#00BCA1]" />
                     <div>
                       <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#00BCA1] mr-1.5">2.</span>{workflowSteps[1].title}</p>
                       <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[1].desc}</p>
                     </div>
                   </div>
-                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
-                    <div className="h-[14px] w-[14px] rounded-full bg-[#00BCA1]" />
+                  <div className="flex h-12.5 w-12.5 shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#00BCA1] bg-transparent">
+                    <div className="h-3.5 w-3.5 rounded-full bg-[#00BCA1]" />
                   </div>
                 </div>
 
                 {/* Step 3 — Bottom left */}
-                <div className="absolute bottom-[16px] left-[4%] flex items-center gap-3 z-10">
-                  <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#01509e] bg-transparent">
-                    <div className="h-[14px] w-[14px] rounded-full bg-[#01509e]" />
+                <div className="absolute bottom-4 left-[4%] flex items-center gap-3 z-10">
+                  <div className="flex h-12.5 w-12.5 shrink-0 items-center justify-center rounded-full border-[2.5px] border-[#01509e] bg-transparent">
+                    <div className="h-3.5 w-3.5 rounded-full bg-[#01509e]" />
                   </div>
                   <div className="flex items-center gap-2.5 rounded-xl bg-white/95 dark:bg-[#1a1f1d]/95 backdrop-blur-sm px-5 py-3.5 border border-[#e2e8e6] dark:border-white/10">
-                    <div className="h-9 w-[3px] rounded-full bg-[#01509e]" />
+                    <div className="h-9 w-0.75 rounded-full bg-[#01509e]" />
                     <div>
                       <p className="text-[15px] font-bold text-[#18181B] dark:text-white"><span className="text-[#01509e] mr-1.5">3.</span>{workflowSteps[2].title}</p>
                       <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">{workflowSteps[2].desc}</p>
