@@ -276,7 +276,7 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
     name: "Auto-Offensive",
     html: {
       name: "Auto-Offensive",
-      bg: "bg-[#0a0e0d]",
+      bg: "bg-[#101c29]",
       timestamp: "text-emerald-600",
       source: "text-emerald-400",
       error: "text-red-400",
@@ -288,10 +288,10 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       isLight: false,
     },
     xterm: {
-      background: "#0a0e0d",
+      background: "#101c29",
       foreground: "#e0f5f0",
       cursor: "#10b981",
-      cursorAccent: "#0a0e0d",
+      cursorAccent: "#101c29",
       selectionBackground: "#065f46",
       black: "#0a1f1a",
       red: "#ef4444",

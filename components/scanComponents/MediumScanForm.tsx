@@ -209,7 +209,7 @@ export function MediumScanForm({
       <div
         className="flex items-center justify-between px-3 py-2"
         style={{
-          background: "color-mix(in srgb, var(--color-primary) 4%, transparent)",
+          background: "var(--lc-panel-bg)",
           outline: "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)",
           clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
         }}
@@ -244,6 +244,9 @@ export function MediumScanForm({
 }
 
 // ─── DraggableWidget wrapper ──────────────────────────────────────────────────
+// KEY FIX: clip-path is moved to an absolutely-positioned background layer.
+// The outer div has NO clip-path and NO overflow:hidden so that <select>
+// and other portal-based dropdowns can render outside the widget bounds.
 
 interface DraggableWidgetProps {
   widgetKey: LayoutKey;
@@ -268,6 +271,11 @@ function DraggableWidget({
   onDrop,
   onDragEnd,
 }: DraggableWidgetProps) {
+  const borderColor =
+    isDragOver && !isDragging
+      ? "color-mix(in srgb, var(--color-primary) 55%, transparent)"
+      : "color-mix(in srgb, var(--color-primary) 20%, transparent)";
+
   return (
     <div
       draggable
@@ -277,23 +285,45 @@ function DraggableWidget({
       onDragEnd={onDragEnd}
       className={cn("group relative transition-all duration-150", isDragging && "opacity-40 scale-[0.98]")}
       style={{
-        background: "color-mix(in srgb, var(--color-primary) 2%, var(--background))",
-        outline: isDragOver && !isDragging
-          ? "1px solid color-mix(in srgb, var(--color-primary) 55%, transparent)"
-          : "1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)",
-        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        // NO clip-path here — overflow must stay visible for dropdowns
+        position: "relative",
         filter: isDragging ? "brightness(0.7)" : undefined,
       }}
     >
-      {/* corner accents */}
-      <span aria-hidden="true" style={{
-        pointerEvents: "none", position: "absolute", inset: 0,
-        background: `
-          linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
-          linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
-        `,
-        opacity: 0.45, zIndex: 0,
-      }} />
+      {/*
+       * ── Decorative background layer ──────────────────────────────────────
+       * clip-path + background live ONLY here (absolutely positioned).
+       * This never affects overflow of content above it.
+       */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "var(--lc-panel-bg)",
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+          outline: `1px solid ${borderColor}`,
+        }}
+      />
+
+      {/* ── Corner accent triangles ── */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
 
       {/* Drag handle header */}
       <div
@@ -311,13 +341,14 @@ function DraggableWidget({
         )}
       </div>
 
-      {/* Widget content */}
+      {/* Widget content — z-index keeps it above bg layer */}
       <div className="relative z-10 p-3 sm:p-4">{children}</div>
     </div>
   );
 }
 
 // ─── PipelineStep ─────────────────────────────────────────────────────────────
+// Same fix: clip-path moved to bg layer, outer div has overflow:visible
 
 interface PipelineStepProps {
   step: MediumStepState;
@@ -357,18 +388,31 @@ function PipelineStep({
     <div
       className="relative transition-colors"
       style={{
-        background: "color-mix(in srgb, var(--color-primary) 3%, var(--background))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 16%, transparent)",
-        clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+        // NO clip-path on outer — background layer carries it instead
+        position: "relative",
       }}
     >
+      {/* Decorative bg layer for PipelineStep */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "color-mix(in srgb, var(--color-primary) 3%, var(--lc-panel-bg))",
+          clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+          outline: "1px solid color-mix(in srgb, var(--color-primary) 16%, transparent)",
+        }}
+      />
+
       {index > 0 && (
-        <div className="absolute -top-3.5 left-6 flex items-center gap-1.5">
+        <div className="absolute -top-3.5 left-6 flex items-center gap-1.5" style={{ zIndex: 2 }}>
           <ChevronsRight className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
         </div>
       )}
 
-      <div className="p-3 sm:p-4">
+      <div className="relative z-10 p-3 sm:p-4">
         <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span

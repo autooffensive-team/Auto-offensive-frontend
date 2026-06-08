@@ -53,10 +53,6 @@ const FUTURE_STYLES = `
   0%,100% { box-shadow: none; }
   50%      { box-shadow: inset 0 0 8px rgba(0,255,200,0.18); }
 }
-@keyframes lc-grid-drift {
-  from { background-position: 0 0; }
-  to   { background-position: 40px 40px; }
-}
 @keyframes lc-wave {
   from { opacity: 0.25; transform: scaleY(0.25); }
   to   { opacity: 1;    transform: scaleY(1);    }
@@ -124,33 +120,10 @@ const FUTURE_STYLES = `
   --lc-stream-line:   rgba(0,208,178,0.65);
 }
 
-/* ── Aside wrapper — animated grid bg ── */
+/* ── Aside wrapper ── */
 .lc-aside {
   position: relative;
   space-y: 0;
-}
-.lc-aside::before {
-  content: '';
-  position: absolute;
-  inset: -40px;
-  background-image:
-    linear-gradient(var(--lc-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--lc-grid-line) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: lc-grid-drift 22s linear infinite;
-  pointer-events: none;
-  z-index: 0;
-  border-radius: 4px;
-}
-.lc-aside::after {
-  content: '';
-  position: absolute;
-  top: -60px; left: 50%;
-  transform: translateX(-50%);
-  width: 340px; height: 260px;
-  background: radial-gradient(ellipse, var(--lc-radial) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
 }
 .lc-aside > * { position: relative; z-index: 1; }
 
