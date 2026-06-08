@@ -316,7 +316,7 @@ export function TerminalSidebar({
 
       {/* ── Environment rows ── */}
       <div className="relative z-10 px-4 py-3 border-b border-green-500/10 space-y-1.5">
-        <div className="text-[9px] font-(family-name:--font-fira-code) text-cyan-400/70 tracking-[0.18em] uppercase mb-2">Environment</div>
+        <div className="text-[9px] font-(family-name:--font-fira-code) text-cyan-400/70 tracking-[0.18em] uppercase mb-2">Client Environment</div>
         {systemProfile.map((item) => (
           <div key={item.label} className="flex items-center justify-between">
             <span className="text-[9px] font-(family-name:--font-fira-code) text-orange-400/70 uppercase tracking-wider">{item.label}</span>

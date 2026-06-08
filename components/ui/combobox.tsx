@@ -115,7 +115,8 @@ function ComboboxTrigger({
       data-slot="combobox-trigger"
       className={cn(
         "[&_svg:not([class*='size-'])]:size-4",
-        open && "bg-transparent",
+        "hover:bg-primary hover:text-primary-foreground",
+        open && "bg-primary/10 text-primary",
         className
       )}
       disabled={disabled}
@@ -123,7 +124,7 @@ function ComboboxTrigger({
       {...props}
     >
       {children}
-      <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+      <ChevronDownIcon className="pointer-events-none size-4 text-foreground" />
     </InputGroupButton>
   )
 }

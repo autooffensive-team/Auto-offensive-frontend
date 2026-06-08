@@ -510,11 +510,23 @@ export default function ScanPage() {
                         />
                       )}
                     </div>
-                    <div className="inline-flex items-center gap-3 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 px-5 py-4 whitespace-nowrap shrink-0">
-                      <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
-                      <p className="text-base text-blue-700 dark:text-blue-400 font-medium">
-                        Limited to <strong>4 tools</strong> per scan.
-                      </p>
+                    <div className="flex flex-col gap-2 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 shrink-0 sm:max-w-xs">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle size={15} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                          Advanced Scan
+                        </p>
+                      </div>
+                      <ul className="space-y-1 text-xs text-blue-700/80 dark:text-blue-300/70 leading-relaxed">
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-blue-500 shrink-0 mt-px">·</span>
+                          Pipeline up to <strong className="font-semibold text-blue-700 dark:text-blue-300">4 tools</strong> per scan
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-blue-500 shrink-0 mt-px">·</span>
+                          Chain with <code className="font-mono bg-blue-100 dark:bg-blue-900/40 px-1 rounded">|</code> e.g. <code className="font-mono bg-blue-100 dark:bg-blue-900/40 px-1 rounded">subfinder | httpx</code>
+                        </li>
+                      </ul>
                     </div>
                   </div>
 
@@ -551,6 +563,7 @@ export default function ScanPage() {
                 <LiveConsole
                   run={activeRun}
                   errors={activeErrors}
+                  logs={activeLogs}
                 />
               </div>
             )}
