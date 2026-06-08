@@ -172,6 +172,7 @@ export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<ReportFormatFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDelete, setPendingDelete] = useState<ReportMetaResponse | null>(null);
+  const [downloadingIds, setDownloadingIds] = useState<Set<string>>(new Set());
 
   const { data, isLoading, isFetching, isError, refetch } = useListReportsQuery({
     page: 1,
@@ -179,7 +180,7 @@ export default function ReportsPage() {
   });
 
   const [deleteReport, { isLoading: isDeleting }] = useDeleteReportMutation();
-  const [downloadReport, { isLoading: isDownloading }] = useDownloadStoredReportMutation();
+  const [downloadReport] = useDownloadStoredReportMutation();
 
   const allReports: ReportMetaResponse[] = data?.reports ?? [];
 
@@ -211,11 +212,19 @@ export default function ReportsPage() {
   };
 
   const handleDownload = async (report: ReportMetaResponse) => {
+    if (downloadingIds.has(report.report_id)) return;
+    setDownloadingIds((prev) => new Set(prev).add(report.report_id));
     try {
       await downloadReport({ reportId: report.report_id, fileName: report.file_name }).unwrap();
       toast.success("Download started");
     } catch {
       toast.error("Failed to download report");
+    } finally {
+      setDownloadingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(report.report_id);
+        return next;
+      });
     }
   };
 
@@ -451,11 +460,11 @@ export default function ReportsPage() {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleDownload(report)}
-                            disabled={isDownloading}
+                            disabled={downloadingIds.has(report.report_id)}
                             title="Download"
                             className="p-2.5 rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 disabled:opacity-50"
                           >
-                            {isDownloading ? (
+                            {downloadingIds.has(report.report_id) ? (
                               <Loader2 size={16} className="text-teal-500 animate-spin" />
                             ) : (
                               <Download size={16} className="text-teal-500" />
