@@ -116,9 +116,29 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4 md:p-5"
+      className="relative p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-900 transition-all"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
-      <div className="flex items-start justify-between">
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+
+      <div className="relative z-10 flex items-start justify-between">
         <div>
           <p className={`text-xl font-bold leading-none sm:text-2xl md:text-[28px] ${s.value}`}>
             {value}

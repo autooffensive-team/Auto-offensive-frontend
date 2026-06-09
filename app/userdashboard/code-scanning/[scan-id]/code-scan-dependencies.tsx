@@ -11,7 +11,7 @@ import {
   RefreshCw,
   ShieldAlert,
 } from "lucide-react";
-import type { ComponentType } from "react";
+import type { LucideIcon } from "lucide-react";
 import { useMemo } from "react";
 
 import type { DependencyResponse } from "@/types/scanner";
@@ -28,7 +28,7 @@ type TopStatCardProps = {
   value: string;
   helper: string;
   accent: "teal" | "emerald" | "amber" | "slate";
-  icon: ComponentType<{ className?: string }>;
+  icon: LucideIcon;
 };
 
 const dependencySeverityOptions: FilterOption[] = [
@@ -137,6 +137,13 @@ function DependencyFlag({
   );
 }
 
+const accentColor: Record<string, string> = {
+  teal: "#14b8a6",
+  emerald: "#10b981",
+  amber: "#f59e0b",
+  slate: "#94a3b8",
+};
+
 function TopStatCard({
   label,
   value,
@@ -149,35 +156,43 @@ function TopStatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
+      className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
-      <div className="flex items-start justify-between gap-3 sm:gap-4">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-400">
-            {label}
-          </p>
-          <p className="mt-2 text-xl font-bold text-slate-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
-            {value}
-          </p>
-          <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
-            {helper}
-          </p>
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+      {/* Half-bleed icon */}
+      <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+        <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: accentColor[accent], opacity: 0.12 }}>
+          <Icon className="w-full h-full" strokeWidth={1.5} />
         </div>
-        <div
-          className={cn(
-            "flex size-9 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl md:size-11",
-            accent === "teal" &&
-              "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
-            accent === "emerald" &&
-              "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-            accent === "amber" &&
-              "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
-            accent === "slate" &&
-              "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-          )}
-        >
-          <Icon className="size-4 sm:size-5" />
-        </div>
+      </div>
+      <div className="relative z-10">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-400">
+          {label}
+        </p>
+        <p className="mt-2 text-xl font-bold text-slate-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
+          {value}
+        </p>
+        <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
+          {helper}
+        </p>
       </div>
     </motion.div>
   );

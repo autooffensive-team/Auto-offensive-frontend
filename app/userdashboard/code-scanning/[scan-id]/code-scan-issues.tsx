@@ -323,24 +323,45 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f6fbfb] p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          style={{
+            clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+          }}
         >
-          <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Total issues</div>
-          <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+            <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#14b8a6", opacity: 0.12 }}>
+              <BarChart3 className="w-full h-full" strokeWidth={1.5} />
+            </div>
+          </div>
+          <div className="relative z-10">
+            <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Total issues</div>
+            <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
+          </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-red-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          style={{
+            clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+          }}
         >
-          <div className="flex items-center justify-between">
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+            <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#ef4444", opacity: 0.12 }}>
+              <Bug className="w-full h-full" strokeWidth={1.5} />
+            </div>
+          </div>
+          <div className="relative z-10">
             <div>
               <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Bugs</div>
               <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.BUG}</div>
             </div>
-            <Bug className="size-4 text-red-500 sm:size-5 dark:text-red-400" />
           </div>
         </motion.div>
 
@@ -348,14 +369,23 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-orange-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          style={{
+            clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+          }}
         >
-          <div className="flex items-center justify-between">
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+            <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#f97316", opacity: 0.12 }}>
+              <Lock className="w-full h-full" strokeWidth={1.5} />
+            </div>
+          </div>
+          <div className="relative z-10">
             <div>
               <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Vulnerabilities</div>
               <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.VULNERABILITY}</div>
             </div>
-            <Lock className="size-4 text-orange-500 sm:size-5 dark:text-orange-400" />
           </div>
         </motion.div>
 
@@ -363,14 +393,23 @@ export function CodeScanIssues({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-blue-50/40 p-3 sm:p-4 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          style={{
+            clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+          }}
         >
-          <div className="flex items-center justify-between">
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+            <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#3b82f6", opacity: 0.12 }}>
+              <Zap className="w-full h-full" strokeWidth={1.5} />
+            </div>
+          </div>
+          <div className="relative z-10">
             <div>
               <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Code smells</div>
               <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.CODE_SMELL}</div>
             </div>
-            <Zap className="size-4 text-blue-500 sm:size-5 dark:text-blue-400" />
           </div>
         </motion.div>
       </div>

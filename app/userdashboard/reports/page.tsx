@@ -288,51 +288,99 @@ export default function ReportsPage() {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-teal-500/10 flex items-center justify-center">
-                <FileText size={22} className="text-teal-500" />
-              </div>
-              <div>
-                <p className="text-[24px] font-bold text-gray-900 dark:text-white">
-                  {isLoading ? "—" : allReports.length}
-                </p>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400">Total Reports</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center">
-                <File size={22} className="text-red-500" />
-              </div>
-              <div>
-                <p className="text-[24px] font-bold text-red-500">{isLoading ? "—" : formatCounts.pdf}</p>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400">PDF</p>
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 sm:p-5"
+            style={{
+              clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+              outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            }}
+          >
+            <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+              <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#14b8a6", opacity: 0.12 }}>
+                <FileText className="w-full h-full" strokeWidth={1.5} />
               </div>
             </div>
-          </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <FilePlus size={22} className="text-blue-500" />
-              </div>
-              <div>
-                <p className="text-[24px] font-bold text-blue-500">{isLoading ? "—" : formatCounts.docx}</p>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400">DOCX</p>
-              </div>
+            <div className="relative z-10">
+              <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Reports</p>
+              <p className="mt-1.5 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{isLoading ? "—" : allReports.length}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 pr-10">All formats combined</p>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <FileSpreadsheet size={22} className="text-green-500" />
+
+          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 sm:p-5"
+            style={{
+              clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+              outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            }}
+          >
+            <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+              <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#ef4444", opacity: 0.12 }}>
+                <File className="w-full h-full" strokeWidth={1.5} />
               </div>
-              <div>
-                <p className="text-[24px] font-bold text-green-500">{isLoading ? "—" : formatCounts.xlsx}</p>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400">Excel</p>
+            </div>
+            <div className="relative z-10">
+              <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
+              <p className="mt-1.5 text-2xl sm:text-3xl font-bold text-red-500">{isLoading ? "—" : formatCounts.pdf}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 pr-10">Portable document format</p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 sm:p-5"
+            style={{
+              clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+              outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            }}
+          >
+            <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+              <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#3b82f6", opacity: 0.12 }}>
+                <FilePlus className="w-full h-full" strokeWidth={1.5} />
               </div>
+            </div>
+            <div className="relative z-10">
+              <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
+              <p className="mt-1.5 text-2xl sm:text-3xl font-bold text-blue-500">{isLoading ? "—" : formatCounts.docx}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 pr-10">Word document format</p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 sm:p-5"
+            style={{
+              clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+              outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            }}
+          >
+            <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+              <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#22c55e", opacity: 0.12 }}>
+                <FileSpreadsheet className="w-full h-full" strokeWidth={1.5} />
+              </div>
+            </div>
+            <div className="relative z-10">
+              <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
+              <p className="mt-1.5 text-2xl sm:text-3xl font-bold text-green-500">{isLoading ? "—" : formatCounts.xlsx}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 pr-10">Spreadsheet format</p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 sm:p-5"
+            style={{
+              clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+              outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            }}
+          >
+            <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+              <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#f59e0b", opacity: 0.12 }}>
+                <FileJson className="w-full h-full" strokeWidth={1.5} />
+              </div>
+            </div>
+            <div className="relative z-10">
+              <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
+              <p className="mt-1.5 text-2xl sm:text-3xl font-bold text-amber-500">{isLoading ? "—" : formatCounts.json}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 pr-10">Machine-readable format</p>
             </div>
           </div>
         </div>
