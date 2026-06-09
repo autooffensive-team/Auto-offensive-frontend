@@ -7,7 +7,6 @@ import {
   ComboboxContent,
   ComboboxList,
   ComboboxItem,
-  useComboboxAnchor,
 } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
 
@@ -26,61 +25,91 @@ export function ProjectSelector({
   disabled,
   loading,
 }: ProjectSelectorProps) {
-  const anchorRef = useComboboxAnchor();
+  // No anchorRef needed — ComboboxContent now portals to document.body
+  // and positions itself via containerRef from Combobox context
   const selectedProject = projects.find((p) => p.project_id === value);
   const isEmpty = !loading && projects.length === 0;
 
   return (
     <div className="space-y-2">
-      <label 
-        htmlFor="project-selector" 
+      <label
+        htmlFor="project-selector"
         className="text-[10px] sm:text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         Project
       </label>
-      
+
       <Combobox
         value={value}
-        onValueChange={(newValue) => { if (newValue) onChange(newValue); }}
+        onValueChange={(newValue) => {
+          if (newValue) onChange(newValue);
+        }}
         disabled={disabled || loading}
       >
-        <div ref={anchorRef}>
-          <ComboboxInput
-            id="project-selector"
-            placeholder={loading ? "Loading projects..." : isEmpty ? "No projects available" : "Select a project"}
-            showTrigger
-            openOnClick
-            className={cn("w-full font-semibold", isEmpty && "text-gray-500 dark:text-gray-400")}
-            value={selectedProject?.name ?? ""}
-            readOnly
-            aria-label="Select project"
-            aria-busy={loading}
-          />
-        </div>
-        
-        <ComboboxContent anchor={anchorRef.current}>
+        <ComboboxInput
+          id="project-selector"
+          placeholder={
+            loading
+              ? "Loading projects..."
+              : isEmpty
+                ? "No projects available"
+                : "Select a project"
+          }
+          showTrigger
+          openOnClick
+          className={cn(
+            "w-full font-semibold",
+            isEmpty && "text-gray-500 dark:text-gray-400"
+          )}
+          value={selectedProject?.name ?? ""}
+          readOnly
+          aria-label="Select project"
+          aria-busy={loading}
+        />
+
+        {/* Portal-based — escapes clip-path on any ancestor */}
+        <ComboboxContent>
           <ComboboxList>
             {isEmpty ? (
               <ComboboxItem value="" disabled>
                 No projects available
               </ComboboxItem>
             ) : (
-              projects.map((project) => (
-                <ComboboxItem 
-                  key={project.project_id} 
+              projects.map((project, index) => (
+                <ComboboxItem
+                  key={project.project_id}
                   value={project.project_id}
                   aria-selected={project.project_id === value}
+                  className={cn(
+                    "rounded-none border-b border-gray-200/30 dark:border-gray-700/40 last:border-b-0",
+                    // alternating row tint
+                    index % 2 === 0
+                      ? "bg-gray-50/60 dark:bg-gray-800/40"
+                      : "bg-transparent",
+                    // hover — light + dark
+                    "hover:bg-teal-50 hover:text-gray-900",
+                    "dark:hover:bg-teal-500/15 dark:hover:text-gray-100",
+                    // selected — light + dark
+                    "data-[selected=true]:bg-teal-50 data-[selected=true]:text-gray-900",
+                    "dark:data-[selected=true]:bg-teal-500/20 dark:data-[selected=true]:text-gray-100",
+                  )}
                 >
-                  {project.name}
+                  <span className="flex items-center gap-2 font-medium">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-500/60" />
+                    {project.name}
+                  </span>
                 </ComboboxItem>
               ))
             )}
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
-      
+
       {selectedProject && (
-        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400" role="note">
+        <p
+          className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400"
+          role="note"
+        >
           Scans will be saved under {selectedProject.name}.
         </p>
       )}
@@ -99,11 +128,13 @@ export function ProjectSelectorSkeleton() {
 
 export function ProjectSelectorEmpty({ onCreate }: { onCreate?: () => void }) {
   return (
-    <div 
+    <div
       className="rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-800/50 p-6 text-center"
       role="status"
     >
-      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">No projects available</p>
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        No projects available
+      </p>
       {onCreate && (
         <button
           onClick={onCreate}

@@ -324,7 +324,7 @@ export default function PlatformCapabilities() {
               </p>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/webui"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -377,7 +377,7 @@ export default function PlatformCapabilities() {
 
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/ai"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -435,7 +435,7 @@ export default function PlatformCapabilities() {
               </div>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/cicd"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -470,7 +470,7 @@ export default function PlatformCapabilities() {
               </div>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/cli"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -703,7 +703,7 @@ export default function PlatformCapabilities() {
           className="mt-12 flex flex-row flex-wrap items-center justify-center gap-4"
         >
           <button
-            className={`${primaryButtonClass} bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
+            className={`${primaryButtonClass} bg-[#00BCA1] text-black hover:bg-[#0AAE98] px-6`}
           >
             <span>{t("workflow.primaryCta")}</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
