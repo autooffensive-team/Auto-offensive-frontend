@@ -122,7 +122,7 @@ function StatCard({
         outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
       }}
     >
-      {/* Corner accent triangles */}
+      {/* Corner accent triangle */}
       <span
         aria-hidden="true"
         style={{
