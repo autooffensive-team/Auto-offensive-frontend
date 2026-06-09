@@ -296,9 +296,9 @@
   "featurePages": {
     "ai": {
       "hero": {
-        "badge": "AI-Powered Reporting",
-        "titleLine1": "AI-Assisted",
-        "titleLine2": "Reporting.",
+        "badge": "AI Vulnerability Analysis",
+        "titleLine1": "AI Vulnerability",
+        "titleLine2": "Analysis.",
         "subtitle": "Transform raw vulnerability data into boardroom-ready intelligence. Our AI automates analysis, narrative, and remediation strategies.",
         "primaryCta": "Create Report",
         "secondaryCta": "View Demo",
