@@ -20,6 +20,7 @@ import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import {
   type UserProject,
   useGetProjectsQuery,
+  useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/lib/redux/services/userdashboard/project/project-api";
@@ -115,9 +116,29 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4 md:p-5"
+      className="relative p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-900 transition-all"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
-      <div className="flex items-start justify-between">
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+
+      <div className="relative z-10 flex items-start justify-between">
         <div>
           <p className={`text-xl font-bold leading-none sm:text-2xl md:text-[28px] ${s.value}`}>
             {value}
@@ -232,6 +253,130 @@ function ProjectCard({
           </div>
         </div>
       </div>
+    </motion.div>
+  );
+}
+
+function AddProjectModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [createProject, { isLoading }] = useCreateProjectMutation();
+
+  async function handleSubmit() {
+    if (!name.trim()) return;
+    setSubmitError(null);
+    try {
+      await createProject({ name: name.trim(), description: description.trim() }).unwrap();
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, "Failed to create project. Please try again."));
+      return;
+    }
+
+    onCreated();
+    onClose();
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+        transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.25 }}
+        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl"
+      >
+        <div className="flex items-start justify-between p-6 pb-0">
+          <div>
+            <h2 className="text-[20px] sm:text-[22px] font-bold text-gray-900 dark:text-white leading-tight">
+              Add New Project
+            </h2>
+            <p className="mt-1 text-[14px] sm:text-[15px] leading-relaxed text-gray-500 dark:text-gray-400">
+              Create a new project for code scanning
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-5">
+          <div>
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+              Project Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              placeholder="my-repository"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+              Description{" "}
+              <span className="normal-case tracking-normal font-normal text-gray-400 dark:text-gray-600">
+                (optional)
+              </span>
+            </label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description of the project..."
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+            />
+          </div>
+
+          {submitError && (
+            <div className="flex items-center gap-2 text-[14px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3.5 py-2.5">
+              <AlertCircle size={14} />
+              {submitError}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2.5 px-6 pb-6">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[15px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Cancel
+          </button>
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleSubmit}
+            disabled={isLoading || !name.trim()}
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[15px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            {isLoading ? (
+              <LoaderCircle size={15} className="animate-spin" />
+            ) : (
+              <Plus size={15} />
+            )}
+            {isLoading ? "Creating..." : "Create Project"}
+          </motion.button>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -387,6 +532,7 @@ export default function ProjectsPageClient({
   initialProjects: UserProject[];
 }) {
   const router = useRouter();
+  const [showAddModal, setShowAddModal] = useState(false);
   const [editingProject, setEditingProject] = useState<UserProject | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -426,10 +572,6 @@ export default function ProjectsPageClient({
     }
   }
 
-  function handleImportRepo() {
-    router.push("/userdashboard/code-scanning/new");
-  }
-
   const filtered = projects.filter(
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -466,7 +608,7 @@ export default function ProjectsPageClient({
             Projects
           </h1>
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            Manage projects used for code scanning and repository onboarding
+            Manage project connected for Tools scanning
           </p>
         </div>
 
@@ -484,11 +626,11 @@ export default function ProjectsPageClient({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            onClick={handleImportRepo}
+            onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-[14px] font-semibold rounded-xl shadow-sm transition-colors"
           >
             <Plus size={16} />
-            Import Repo
+            Create Project
           </motion.button>
         </div>
       </motion.div>
@@ -566,7 +708,7 @@ export default function ProjectsPageClient({
                 index={i}
                 onEdit={setEditingProject}
                 onDelete={handleDelete}
-                onOpen={() => router.push("/userdashboard/code-scanning")}
+                onOpen={(p) => router.push(`/userdashboard/scan?project=${p.project_id}`)}
                 isDeleting={deletingId === project.project_id}
               />
             ))}
@@ -586,22 +728,31 @@ export default function ProjectsPageClient({
             <p className="mt-1 text-xs sm:text-[13px] text-gray-500 dark:text-gray-400 max-w-xs">
               {searchTerm
                 ? "Try adjusting your search term"
-                : "Import a repository to start scanning your code"}
+                : "Import a repository to start scanning for vulnerabilities"}
             </p>
             {!searchTerm && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={handleImportRepo}
+                onClick={() => setShowAddModal(true)}
                 className="mt-5 flex items-center gap-2 bg-[#00d0b2] hover:bg-[#00b89e] text-gray-800 px-4 py-2 text-[13px] font-semibold rounded-xl transition-colors shadow-sm"
               >
                 <Plus size={14} />
-                Import your first repo
+                Create your first project
               </motion.button>
             )}
           </motion.div>
         )}
       </div>
+
+      <AnimatePresence>
+        {showAddModal && (
+          <AddProjectModal
+            onClose={() => setShowAddModal(false)}
+            onCreated={refreshRouteData}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {editingProject && (
