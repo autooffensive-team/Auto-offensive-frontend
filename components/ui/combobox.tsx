@@ -20,6 +20,7 @@ type ComboboxContextValue = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   containerRef: React.RefObject<HTMLDivElement | null>
+  contentRef: React.RefObject<HTMLDivElement | null>
 }
 
 const ComboboxContext = React.createContext<ComboboxContextValue | null>(null)
@@ -46,6 +47,7 @@ function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement | null>(null)
+  const contentRef = React.useRef<HTMLDivElement | null>(null)
 
   React.useEffect(() => {
     if (!open) {
@@ -53,9 +55,15 @@ function Combobox({
     }
 
     function handlePointerDown(event: MouseEvent) {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setOpen(false)
+      const target = event.target as Node
+      // Keep open if click is inside the trigger container OR the portal content
+      if (
+        containerRef.current?.contains(target) ||
+        contentRef.current?.contains(target)
+      ) {
+        return
       }
+      setOpen(false)
     }
 
     function handleEscape(event: KeyboardEvent) {
@@ -81,6 +89,7 @@ function Combobox({
         open,
         setOpen,
         containerRef,
+        contentRef,
       }}
     >
       <div ref={containerRef} className="relative">
@@ -202,7 +211,7 @@ function ComboboxContent({
 }: React.ComponentProps<"div"> & {
   anchor?: HTMLElement | null
 }) {
-  const { open, containerRef } = useComboboxContext("ComboboxContent")
+  const { open, containerRef, contentRef } = useComboboxContext("ComboboxContent")
   const [coords, setCoords] = React.useState<{
     top: number
     left: number
@@ -237,6 +246,7 @@ function ComboboxContent({
   // Portal to document.body — fully escapes all clip-path ancestors
   return ReactDOM.createPortal(
     <div
+      ref={contentRef}
       data-slot="combobox-content"
       className={cn(
         // position:fixed so it's relative to viewport, not any parent
