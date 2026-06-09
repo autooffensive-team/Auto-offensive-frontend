@@ -16,10 +16,20 @@ export type InputField = {
   description?: string | null;
 };
 
+export type WordlistAsset = {
+  wordlist_id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  line_count: number;
+  byte_size: number;
+  tags?: string[];
+};
+
 export type ToolOption = {
   key: string;
   flag: string;
-  type: "integer" | "string" | "boolean" | "array" | string;
+  type: "integer" | "string" | "boolean" | "array" | "wordlist" | string;
   required?: boolean | null;
   description?: string | null;
 };
@@ -112,6 +122,8 @@ export type ActiveRun = {
   findings: number;
   steps: ScanStep[];
   parsedSteps: ParsedData[];
+  /** Human-readable reason when status is failed (from API or step details). */
+  failureMessage?: string;
 };
 
 export type SseEvent = {

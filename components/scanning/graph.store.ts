@@ -122,6 +122,7 @@ export interface GraphStoreState {
     // Actions
     syncFromActiveRun: (run: ActiveRun) => void;
     appendLog: (line: LogLine) => void;
+    appendLogs: (lines: LogLine[]) => void;
     setToolFilter: (toolName: string | null) => void;
     reset: () => void;
     freeze: () => void;
@@ -238,17 +239,22 @@ export const useGraphStore = create<GraphStoreState>((set, get) => ({
     },
 
     appendLog: (line: LogLine) => {
+        get().appendLogs([line]);
+    },
+
+    appendLogs: (lines: LogLine[]) => {
         const state = get();
         if (state._frozen) return;
+        if (!lines.length) return;
 
-        let entries = [...state.logEntries, line];
+        let entries = state.logEntries.length ? state.logEntries.concat(lines) : lines;
         if (entries.length > MAX_LOG_ENTRIES) {
             entries = entries.slice(entries.length - MAX_LOG_ENTRIES);
         }
 
         set({
             logEntries: entries,
-            unreadCount: state.unreadCount + 1,
+            unreadCount: state.unreadCount + lines.length,
         });
     },
 
