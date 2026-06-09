@@ -163,7 +163,7 @@ export async function proxyGatewayRequest(
   options: GatewayProxyOptions = {},
 ): Promise<NextResponse> {
   const { path } = await context.params;
-  if (!Array.isArray(path) || path.length === 0) {
+  if (!Array.isArray(path)) {
     return NextResponse.json({ error: "Invalid proxy path" }, { status: 400 });
   }
 

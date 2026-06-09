@@ -23,6 +23,15 @@ import type { CITokenResponse } from "@/types/ci-token";
 
 type ExpiryPreset = "30d" | "90d" | "180d" | "custom" | "never";
 
+function normalizeProjectKey(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._:-]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^[\-._:]+|[\-._:]+$/g, "");
+}
+
 function formatDateTime(value?: string | null): string {
   if (!value) {
     return "Never";
@@ -91,8 +100,11 @@ function toExpiryISOString(preset: ExpiryPreset, customDate: string): string | n
   return expiresAt.toISOString();
 }
 
-function buildGithubActionsSnippet(): string {
-  return `name: Sonar scan
+function buildGithubPrivateRepoSnippet(projectId: string, projectKey: string): string {
+  const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
+  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
+
+  return `name: Platform code scan
 
 on:
   push:
@@ -100,74 +112,73 @@ on:
   pull_request:
 
 jobs:
-  sonar:
+  scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: \${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: \${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.projectKey=\${{ vars.SONAR_PROJECT_KEY }}
-      - name: Sync result to platform
+      # Assumptions:
+      # 1. This repository is already connected in your platform with a GitHub account
+      # 2. The connected GitHub account can access this private repository
+      # 3. PLATFORM_CI_TOKEN belongs to the same platform project shown in the UI
+      - name: Trigger backend-managed scan
         run: |
-          curl -sS -X POST "\${{ secrets.PLATFORM_API_URL }}/api/v1/scanner/ci/ingest" \\
+          cat <<EOF > payload.json
+          {
+            "project_id": "${resolvedProjectId}",
+            "project_key": "${resolvedProjectKey}",
+            "repo_url": "https://github.com/\${{ github.repository }}.git",
+            "branch": "\${{ github.ref_name }}"
+          }
+          EOF
+          curl -sS -X POST "\${{ secrets.PLATFORM_API_URL }}/api/v1/scanner/ci/start" \\
             -H "Content-Type: application/json" \\
             -H "X-CI-Token: \${{ secrets.PLATFORM_CI_TOKEN }}" \\
-            -d '{
-              "project_id": "\${{ vars.PLATFORM_PROJECT_ID }}",
-              "sonar_project_key": "\${{ vars.SONAR_PROJECT_KEY }}",
-              "branch": "\${{ github.ref_name }}",
-              "commit_sha": "\${{ github.sha }}",
-              "pipeline_url": "\${{ github.server_url }}/\${{ github.repository }}/actions/runs/\${{ github.run_id }}",
-              "provider": "github-actions"
-            }'`;
+            --data @payload.json`;
 }
 
-function buildGitlabSnippet(): string {
-  return `sonar_scan:
-  image: sonarsource/sonar-scanner-cli:latest
+function buildGitlabSnippet(projectId: string, projectKey: string): string {
+  const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
+  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
+
+  return `platform_scan:
   script:
-    - sonar-scanner -Dsonar.projectKey="$SONAR_PROJECT_KEY"
     - |
-      curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/ingest" \\
+      cat <<EOF > payload.json
+      {
+        "project_id": "${resolvedProjectId}",
+        "project_key": "${resolvedProjectKey}",
+        "repo_url": "$CI_PROJECT_URL.git",
+        "branch": "$CI_COMMIT_REF_NAME"
+      }
+      EOF
+      curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/start" \\
         -H "Content-Type: application/json" \\
         -H "X-CI-Token: $CI_TOKEN" \\
-        -d "{
-          \\"project_id\\": \\"$PLATFORM_PROJECT_ID\\",
-          \\"sonar_project_key\\": \\"$SONAR_PROJECT_KEY\\",
-          \\"branch\\": \\"$CI_COMMIT_REF_NAME\\",
-          \\"commit_sha\\": \\"$CI_COMMIT_SHA\\",
-          \\"pipeline_url\\": \\"$CI_PIPELINE_URL\\",
-          \\"provider\\": \\"gitlab-ci\\"
-        }"
+        --data @payload.json
   variables:
-    SONAR_HOST_URL: $SONAR_HOST_URL
-    SONAR_TOKEN: $SONAR_TOKEN`;
+    PLATFORM_API_URL: $PLATFORM_API_URL
+    CI_TOKEN: $CI_TOKEN`;
 }
 
-function buildJenkinsSnippet(): string {
-  return `stage('Sonar Scan') {
+function buildJenkinsSnippet(projectId: string, projectKey: string): string {
+  const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
+  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
+
+  return `stage('Platform Code Scan') {
   steps {
-    withCredentials([
-      string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN'),
-      string(credentialsId: 'platform-ci-token', variable: 'CI_TOKEN'),
-    ]) {
+    withCredentials([string(credentialsId: 'platform-ci-token', variable: 'CI_TOKEN')]) {
       sh '''
-        sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY
-        curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/ingest" \\
+        cat <<EOF > payload.json
+        {
+          "project_id": "${resolvedProjectId}",
+          "project_key": "${resolvedProjectKey}",
+          "repo_url": "$GIT_URL",
+          "branch": "$BRANCH_NAME"
+        }
+        EOF
+        curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/start" \\
           -H "Content-Type: application/json" \\
           -H "X-CI-Token: $CI_TOKEN" \\
-          -d "{
-            \\"project_id\\": \\"$PLATFORM_PROJECT_ID\\",
-            \\"sonar_project_key\\": \\"$SONAR_PROJECT_KEY\\",
-            \\"branch\\": \\"$BRANCH_NAME\\",
-            \\"commit_sha\\": \\"$GIT_COMMIT\\",
-            \\"pipeline_url\\": \\"$BUILD_URL\\",
-            \\"provider\\": \\"jenkins\\"
-          }"
+          --data @payload.json
       '''
     }
   }
@@ -218,6 +229,8 @@ export default function CodeScanningIntegrationsPageClient() {
   const [description, setDescription] = useState("");
   const [expiryPreset, setExpiryPreset] = useState<ExpiryPreset>("90d");
   const [customDate, setCustomDate] = useState("");
+  const [projectKeyInput, setProjectKeyInput] = useState("");
+  const [projectKeyTouched, setProjectKeyTouched] = useState(false);
   const [creationError, setCreationError] = useState<string | null>(null);
   const [latestPlainToken, setLatestPlainToken] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState(false);
@@ -248,14 +261,26 @@ export default function CodeScanningIntegrationsPageClient() {
     () => projects.find((project) => project.project_id === effectiveSelectedProjectId) ?? null,
     [projects, effectiveSelectedProjectId],
   );
+  const suggestedProjectKey = useMemo(() => {
+    if (!selectedProject) {
+      return "";
+    }
+    return normalizeProjectKey(selectedProject.name) || `project-${selectedProject.project_id.slice(0, 8)}`;
+  }, [selectedProject]);
+  const effectiveProjectKey = useMemo(() => {
+    if (!projectKeyTouched) {
+      return suggestedProjectKey;
+    }
+    return normalizeProjectKey(projectKeyInput);
+  }, [projectKeyInput, projectKeyTouched, suggestedProjectKey]);
 
   const snippets = useMemo(() => {
     return {
-      github: buildGithubActionsSnippet(),
-      gitlab: buildGitlabSnippet(),
-      jenkins: buildJenkinsSnippet(),
+      githubPrivate: buildGithubPrivateRepoSnippet(effectiveSelectedProjectId, effectiveProjectKey),
+      gitlab: buildGitlabSnippet(effectiveSelectedProjectId, effectiveProjectKey),
+      jenkins: buildJenkinsSnippet(effectiveSelectedProjectId, effectiveProjectKey),
     };
-  }, []);
+  }, [effectiveProjectKey, effectiveSelectedProjectId]);
 
   async function handleCreateToken(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -329,7 +354,7 @@ export default function CodeScanningIntegrationsPageClient() {
               CI/CD Integration
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Generate project-scoped CI tokens for SonarQube result ingestion.
+              Generate project-scoped CI tokens for backend-managed code scanning.
             </p>
           </div>
 
@@ -406,6 +431,30 @@ export default function CodeScanningIntegrationsPageClient() {
                   </div>
                 </div>
 
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                    CI project key
+                  </label>
+                  <input
+                    value={projectKeyTouched ? projectKeyInput : suggestedProjectKey}
+                    onChange={(event) => {
+                      setProjectKeyTouched(true);
+                      setProjectKeyInput(event.target.value);
+                    }}
+                    placeholder="my-private-repo"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  />
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                    This controls how CI-triggered scans are grouped in the code-scanning dashboard.
+                    {effectiveProjectKey ? (
+                      <>
+                        {" "}Normalized key:{" "}
+                        <span className="font-mono text-slate-700 dark:text-slate-200">{effectiveProjectKey}</span>
+                      </>
+                    ) : null}
+                  </p>
+                </div>
+
                 {expiryPreset === "custom" ? (
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
@@ -450,7 +499,7 @@ export default function CodeScanningIntegrationsPageClient() {
                     Generate token
                   </button>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    Scope: <span className="font-medium text-slate-700 dark:text-slate-200">code_scan:ingest</span>
+                    Scope: <span className="font-medium text-slate-700 dark:text-slate-200">code_scan:ingest</span> for CI submission
                   </span>
                 </div>
               </form>
@@ -508,6 +557,9 @@ export default function CodeScanningIntegrationsPageClient() {
                 </p>
                 <p className="mt-2 break-all font-mono text-xs text-slate-500 dark:text-slate-400">
                   {effectiveSelectedProjectId || "Project ID will appear here"}
+                </p>
+                <p className="mt-2 break-all font-mono text-xs text-slate-500 dark:text-slate-400">
+                  {effectiveProjectKey || "Project key will appear here"}
                 </p>
               </div>
             </div>
@@ -602,12 +654,12 @@ export default function CodeScanningIntegrationsPageClient() {
               CI setup examples
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Keep `SONAR_TOKEN` for SonarQube auth and `CI_TOKEN` for platform ingest separate.
+              CI only sends repository metadata and the platform CI token. The backend keeps SonarQube credentials server-side and uses the explicit `project_key` shown above.
             </p>
           </div>
 
           <div className="grid gap-4 xl:grid-cols-3">
-            <ExampleBlock title="GitHub Actions" body={snippets.github} />
+            <ExampleBlock title="GitHub Actions · Private Repo" body={snippets.githubPrivate} />
             <ExampleBlock title="GitLab CI" body={snippets.gitlab} />
             <ExampleBlock title="Jenkins" body={snippets.jenkins} />
           </div>
@@ -615,7 +667,7 @@ export default function CodeScanningIntegrationsPageClient() {
           <div className="flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
             <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-500" />
             <span>
-              CI only needs the token plus metadata. The backend resolves project ownership from the token and then syncs SonarQube results into the existing dashboard.
+              For private GitHub repositories, the backend can only clone successfully when the same repository is already connected in your platform through a GitHub account with access.
             </span>
           </div>
         </section>
