@@ -17,6 +17,9 @@ export function Footer() {
   const t = useTranslations('footer');
   const { resolvedTheme } = useTheme();
 
+  const DOCS_HOST = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
+  const toDocsUrl = (path: string) => `${DOCS_HOST}/docs/${path.replace(/^\//, '')}`;
+
   const logoSrc =
     resolvedTheme === "dark"
       ? "/Auto_Offensive_Dark-mode.png"
@@ -255,37 +258,23 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Overview
+                <a href={toDocsUrl('/')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Introduction
                 </a>
               </li>
               <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Scanning
+                <a href={toDocsUrl('/scanning')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Platform Features
                 </a>
               </li>
               <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Dashboard &amp; Analytics
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  REST API
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  CLI Reference
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  CI/CD Integration
+                <a href={toDocsUrl('/api')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Developer Reference
                 </a>
               </li>
             </ul>
           </div>
+
 
           {/* Company */}
           <div>
