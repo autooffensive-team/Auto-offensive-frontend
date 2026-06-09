@@ -366,10 +366,29 @@ function AuthenticatedDashboard() {
         )}
 
         {/* ── Metric Cards ─────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 md:grid-cols-3 lg:grid-cols-6">
-          {scannedAssetMetrics.map((metric, index) => (
-            <MetricCard key={metric.label} metric={metric} index={index} />
-          ))}
+        {/* Mobile/tablet: uniform grid. Desktop: row1=4, row2=2 centered at same card size */}
+        <div className="space-y-1.5 sm:space-y-2">
+          {/* All 6 in one grid — mobile 2col, tablet 3col */}
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 sm:grid-cols-3 lg:hidden">
+            {scannedAssetMetrics.map((metric, index) => (
+              <MetricCard key={metric.label} metric={metric} index={index} total={scannedAssetMetrics.length} />
+            ))}
+          </div>
+          {/* Desktop: row 1 — 4 cards */}
+          <div className="hidden lg:grid lg:grid-cols-4 gap-2">
+            {scannedAssetMetrics.slice(0, 4).map((metric, index) => (
+              <MetricCard key={metric.label} metric={metric} index={index} total={scannedAssetMetrics.length} />
+            ))}
+          </div>
+          {/* Desktop: row 2 — 2 cards, same width as above (1/4 each), centered */}
+          <div className="hidden lg:grid lg:grid-cols-4 gap-2">
+            <div className="col-start-2 col-span-1">
+              <MetricCard metric={scannedAssetMetrics[4]} index={4} total={scannedAssetMetrics.length} />
+            </div>
+            <div className="col-span-1">
+              <MetricCard metric={scannedAssetMetrics[5]} index={5} total={scannedAssetMetrics.length} />
+            </div>
+          </div>
         </div>
 
         {/* ── Main 2-col grid ──────────────────────────────────────── */}
@@ -640,7 +659,7 @@ function AuthenticatedDashboard() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function MetricCard({ metric, index }: { metric: MetricCardData; index: number }) {
+function MetricCard({ metric, index, total }: { metric: MetricCardData; index: number; total: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
