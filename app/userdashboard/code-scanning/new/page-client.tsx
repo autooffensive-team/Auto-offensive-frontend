@@ -37,10 +37,7 @@ import {
 } from "@/lib/redux/services/userdashboard/git/git-api";
 import { useGetIntegrationAccountsQuery } from "@/lib/redux/services/userdashboard/integrations/integrations-api";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
-import {
-  useCreateScannerProjectMutation,
-  useTriggerScanMutation,
-} from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import { useTriggerScanMutation } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
 import {
   areProviderAccountQueriesReady,
   buildConnectedProviderMap,
@@ -201,10 +198,6 @@ function readErrorMessage(error: unknown, fallback: string): string {
   }
   const message = "message" in queryError ? asText(queryError.message).trim() : "";
   return message || fallback;
-}
-
-function isConflictError(error: unknown): boolean {
-  return typeof error === "object" && error !== null && "status" in error && (error as { status?: unknown }).status === 409;
 }
 
 function formatConnectedText(accounts: ProviderAccount[]): string {
@@ -664,7 +657,6 @@ export default function CodeScanningNewPageClient() {
   const gitlabAccountsQuery = useGetProviderAccountsQuery("gitlab");
   const githubRepositoriesQuery = useGetProviderRepositoriesQuery("github");
   const gitlabRepositoriesQuery = useGetProviderRepositoriesQuery("gitlab");
-  const [createScannerProject] = useCreateScannerProjectMutation();
   const [triggerScan, { isLoading: isCreating }] = useTriggerScanMutation();
   const [triggerConnectUrl] = useLazyGetProviderConnectUrlQuery();
 
@@ -880,18 +872,6 @@ export default function CodeScanningNewPageClient() {
     }
     setSubmitError(null);
     try {
-      try {
-        await createScannerProject({
-          project_key: trimmedProjectKey,
-          display_name: asText(selectedRepository.full_name).trim() || asText(selectedRepository.name).trim() || trimmedProjectKey,
-          description: `Repository import from ${providerMeta[selectedProvider].label}`,
-        }).unwrap();
-      } catch (error) {
-        if (!isConflictError(error)) {
-          throw error;
-        }
-      }
-
       const payload = await triggerScan({
         project_key: trimmedProjectKey,
         branch: selectedBranchValue.trim() || null,
