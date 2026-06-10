@@ -16,7 +16,7 @@ function generateSessionId(): string {
  */
 export async function GET(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const redirectUrl = new URL("/userdashboard", appUrl);
+  const redirectUrl = new URL("/userdashboard/scan", appUrl);
 
   // Generate a session ID
   const sessionId = generateSessionId();
