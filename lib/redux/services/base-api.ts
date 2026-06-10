@@ -29,7 +29,9 @@ function resolveProxyUrl(url: string): string {
     normalized === "scanner" ||
     normalized.startsWith("scanner/") ||
     normalized === "git" ||
-    normalized.startsWith("git/")
+    normalized.startsWith("git/") ||
+    normalized === "apikeys" ||
+    normalized.startsWith("apikeys/")
   ) {
     return `/api/${normalized}`;
   }
@@ -75,6 +77,6 @@ const proxyBaseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: proxyBaseQueryWithReauth,
-  tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git", "CIToken", "ScannerProject"],
+  tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git", "ApiKey"],
   endpoints: () => ({}),
 });

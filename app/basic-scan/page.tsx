@@ -2,7 +2,7 @@
 
 import { ArrowRight, BarChart3, RotateCcw, ScanLine, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
@@ -281,6 +281,14 @@ export default function BasicScanPage() {
     addMediumStep,
     removeMediumStep,
   } = useScanController(initialProjectId);
+
+  // Pre-select a tool when navigating from the tools page via ?tool=<tool_id>
+  const requestedToolId = searchParams.get("tool");
+  useEffect(() => {
+    if (!requestedToolId || loadingMeta) return;
+    setBasicToolId(requestedToolId);
+    setActiveTab("basic");
+  }, [requestedToolId, loadingMeta, setBasicToolId]);
 
   const activeRun = activeTab === "basic" ? basicRun : mediumRun;
   const activeLogs = activeTab === "basic" ? basicLogs : mediumLogs;

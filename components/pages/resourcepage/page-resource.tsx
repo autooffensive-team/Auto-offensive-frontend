@@ -73,18 +73,11 @@ type FeatureCard = {
 };
 
 type StatusItem = {
-  service: string;
-  version: string;
-  status: "operational" | "degraded" | "maintenance";
-  lastAudit: string;
-};
-
-const docsAppUrl = (process.env.NEXT_PUBLIC_DOCS_APP_URL || "").replace(
-  /\/$/,
-  "",
-);
-const toDocsUrl = (path: string) =>
-  docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`;
+  service: string
+  version: string
+  status: 'operational' | 'degraded' | 'maintenance'
+  lastAudit: string
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -150,332 +143,307 @@ export default function ResourceComponent() {
 
   const sectionLabels = isKhmer
     ? {
-        heroBadge: "",
-        heroTitleLine1: "ឯកសារ និង Resources",
-        heroTitleLine2: "",
+        heroBadge: '',
+        heroTitleLine1: (<>ឯកសារ និង <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
+        heroTitleLine2: '',
         heroSubtitle:
-          "មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។",
-        quickStart: "ផ្លូវចាប់ផ្តើមរហ័ស (Quick Start Paths)",
-        technical: "Technical Deep Dives",
-        technicalSubtitle:
-          "បណ្ណាល័យឯកសារបច្ចេកទេសសម្រាប់ scanner និង tools សំខាន់ៗ។",
-        technicalCta: "មើលឧបករណ៍ទាំងអស់",
-        workflowSteps: "ដំណាក់កាលការងារ Pentest (Workflow)",
-        what: "តើវាជាអ្វី?",
-        why: "ហេតុអ្វីត្រូវប្រើ?",
-        how: "របៀបប្រើ",
-        systemStatus: "ស្ថានភាពប្រព័ន្ធ (System Status)",
-        systemStatusSubtitle: "ស្ថានភាពពេលវេលាជាក់ស្តែង នៃសេវាកម្មទាំងអស់",
-        component: "Component",
-        version: "Version",
-        status: "ស្ថានភាព",
-        lastAudit: "Last Audit",
-        operational: "ដំណើរការធម្មតា",
-        degraded: "ដំណើរការខ្សោយ",
-        maintenance: "កំពុងថែទាំ",
-        mobileTableHint: "អាចអូសឆ្វេង ឬស្ដាំ ដើម្បីមើលតារាងទាំងមូល។",
-        featureCards: "ឯកសារ និង Resources",
+          'មគ្គុទ្ទេសក៍ ឯកសារ API និងមេរៀនជាច្រើន ដែលជួយឱ្យអ្នកយល់ និងប្រើ Auto-Offensive បានយ៉ាងមានប្រសិទ្ធភាព ព្រមទាំងបង្កើនជំនាញសុវត្ថិភាពរបស់អ្នក។',
+        quickStart: 'ផ្លូវចាប់ផ្តើមរហ័ស (Quick Start Paths)',
+        technical: 'Technical Deep Dives',
+        technicalSubtitle: 'បណ្ណាល័យឯកសារបច្ចេកទេសសម្រាប់ scanner និង tools សំខាន់ៗ។',
+        technicalCta: 'មើលឧបករណ៍ទាំងអស់',
+        workflowSteps: 'ដំណាក់កាលការងារ Pentest (Workflow)',
+        what: 'តើវាជាអ្វី?',
+        why: 'ហេតុអ្វីត្រូវប្រើ?',
+        how: 'របៀបប្រើ',
+        systemStatus: 'ស្ថានភាពប្រព័ន្ធ (System Status)',
+        systemStatusSubtitle: 'ស្ថានភាពពេលវេលាជាក់ស្តែង នៃសេវាកម្មទាំងអស់',
+        component: 'Component',
+        version: 'Version',
+        status: 'ស្ថានភាព',
+        lastAudit: 'Last Audit',
+        operational: 'ដំណើរការធម្មតា',
+        degraded: 'ដំណើរការខ្សោយ',
+        maintenance: 'កំពុងថែទាំ',
+        mobileTableHint: 'អាចអូសឆ្វេង ឬស្ដាំ ដើម្បីមើលតារាងទាំងមូល។',
+        featureCards: 'ឯកសារ និង Resources',
       }
     : {
-        heroBadge: "",
-        heroTitleLine1: "Docs & Resources",
-        heroTitleLine2: "",
+        heroBadge: '',
+        heroTitleLine1: (<>Docs & <span className="text-[#01509e] dark:text-[#4fa3e5]">Resources</span></>),
+        heroTitleLine2: '',
         heroSubtitle:
-          "Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.",
-        quickStart: "Quick Start Paths",
-        technical: "Technical Deep Dives",
-        technicalSubtitle:
-          "Library of technical scanner guides and core tool documentation.",
-        technicalCta: "Browse all tools",
-        workflowSteps: "Pentest Workflow",
-        what: "What",
-        why: "Why",
-        how: "How",
-        systemStatus: "System Status",
-        systemStatusSubtitle: "Real-time service health across the platform",
-        component: "Component",
-        version: "Version",
-        status: "Status",
-        lastAudit: "Last Audit",
-        operational: "Operational",
-        degraded: "Degraded",
-        maintenance: "Maintenance",
-        mobileTableHint: "Swipe left or right to view the full table.",
-        featureCards: "Docs & Integrations",
-      };
+          'Comprehensive guides, API references, and tutorials to help you master the Auto-Offensive toolkit and level up your offensive security skills.',
+        quickStart: 'Quick Start Paths',
+        technical: 'Technical Deep Dives',
+        technicalSubtitle: 'Library of technical scanner guides and core tool documentation.',
+        technicalCta: 'Browse all tools',
+        workflowSteps: 'Pentest Workflow',
+        what: 'What',
+        why: 'Why',
+        how: 'How',
+        systemStatus: 'System Status',
+        systemStatusSubtitle: 'Real-time service health across the platform',
+        component: 'Component',
+        version: 'Version',
+        status: 'Status',
+        lastAudit: 'Last Audit',
+        operational: 'Operational',
+        degraded: 'Degraded',
+        maintenance: 'Maintenance',
+        mobileTableHint: 'Swipe left or right to view the full table.',
+        featureCards: 'Docs & Integrations',
+      }
 
   const quickCards: QuickCard[] = isKhmer
     ? [
         {
-          title: "ឯកសារ CLI",
-          what: "កម្មវិធី binary តែមួយ សម្រាប់គ្រប់គ្រងការងារ offensive security នៅលើម៉ាស៊ីនរបស់អ្នក។",
-          why: "អាចពង្រីកការធ្វើ pentest បានងាយស្រួល ដោយមិនចាំបាច់ចាកចេញពី terminal។",
-          how: "curl -sSfL guardian.sh | sh",
+          title: 'ឯកសារ CLI',
+          what: 'កម្មវិធី binary តែមួយ សម្រាប់គ្រប់គ្រងការងារ offensive security នៅលើម៉ាស៊ីនរបស់អ្នក។',
+          why: 'អាចពង្រីកការធ្វើ pentest បានងាយស្រួល ដោយមិនចាំបាច់ចាកចេញពី terminal។',
+          how: 'curl -sSfL guardian.sh | sh',
           icon: TerminalSquare,
         },
         {
-          title: "ឯកសារ API",
-          what: "REST API សម្រាប់គ្រប់គ្រង និងដំណើរការការស្កេនសុវត្ថិភាពតាមកម្មវិធី។",
-          why: "អាចបង្កើត workflow សុវត្ថិភាព និងរបាយការណ៍ដោយស្វ័យប្រវត្តិ។",
-          how: "GET /v2/scans/{id}/report",
+          title: 'ឯកសារ API',
+          what: 'REST API សម្រាប់គ្រប់គ្រង និងដំណើរការការស្កេនសុវត្ថិភាពតាមកម្មវិធី។',
+          why: 'អាចបង្កើត workflow សុវត្ថិភាព និងរបាយការណ៍ដោយស្វ័យប្រវត្តិ។',
+          how: 'GET /v2/scans/{id}/report',
           icon: Cpu,
         },
         {
-          title: "ការភ្ជាប់ CI/CD",
-          what: "Plugin ដែលភ្ជាប់ជាមួយ GitHub Actions, GitLab និង Jenkins។",
-          why: "ជួយទប់ស្កាត់កូដដែលមានបញ្ហាសុវត្ថិភាព មុនពេលដាក់ចូល production។",
-          how: "uses: guardian/scan-action@v1",
+          title: 'ការភ្ជាប់ CI/CD',
+          what: 'Plugin ដែលភ្ជាប់ជាមួយ GitHub Actions, GitLab និង Jenkins។',
+          why: 'ជួយទប់ស្កាត់កូដដែលមានបញ្ហាសុវត្ថិភាព មុនពេលដាក់ចូល production។',
+          how: 'uses: guardian/scan-action@v1',
           icon: GitBranch,
         },
       ]
     : [
         {
-          title: "CLI Documents",
-          what: "The unified binary for local orchestration of offensive operations.",
-          why: "Scale your pentesting without leaving the terminal environment.",
-          how: "curl -sSfL guardian.sh | sh",
+          title: 'CLI Documents',
+          what: 'The unified binary for local orchestration of offensive operations.',
+          why: 'Scale your pentesting without leaving the terminal environment.',
+          how: 'curl -sSfL guardian.sh | sh',
           icon: TerminalSquare,
         },
         {
-          title: "API Documents",
-          what: "RESTful endpoints for programmatic vulnerability management.",
-          why: "Build custom security workflows and automated reporting loops.",
-          how: "GET /v2/scans/{id}/report",
+          title: 'API Documents',
+          what: 'RESTful endpoints for programmatic vulnerability management.',
+          why: 'Build custom security workflows and automated reporting loops.',
+          how: 'GET /v2/scans/{id}/report',
           icon: Cpu,
         },
         {
-          title: "CI/CD Integration",
-          what: "Native plugins for GitHub Actions, GitLab, and Jenkins.",
-          why: "Stop vulnerable code before it reaches your production clusters.",
-          how: "uses: guardian/scan-action@v1",
+          title: 'CI/CD Integration',
+          what: 'Native plugins for GitHub Actions, GitLab, and Jenkins.',
+          why: 'Stop vulnerable code before it reaches your production clusters.',
+          how: 'uses: guardian/scan-action@v1',
           icon: GitBranch,
         },
-      ];
+      ]
 
   const miniCards: MiniCard[] = isKhmer
     ? [
         {
-          title: "Nmap Integration",
-          description: "សម្រាប់ស្វែងរក network និង auditing",
-          version: "V2.4",
+          title: 'Nmap Integration',
+          description: 'សម្រាប់ស្វែងរក network និង auditing',
+          version: 'V2.4',
           level: 2,
           icon: Search,
         },
         {
-          title: "Subfinder Core",
-          description: "ស្វែងរក subdomain (passive)",
-          version: "V1.9",
+          title: 'Subfinder Core',
+          description: 'ស្វែងរក subdomain (passive)',
+          version: 'V1.9',
           level: 1,
           icon: FolderOpen,
         },
         {
-          title: "Nuclei Engine",
-          description: "ស្កេន vulnerability តាម template",
-          version: "V3.0",
+          title: 'Nuclei Engine',
+          description: 'ស្កេន vulnerability តាម template',
+          version: 'V3.0',
           level: 3,
           icon: Shield,
         },
         {
-          title: "Payload DB",
-          description: "បណ្ណាល័យ exploit និង payload",
-          version: "V2.1",
+          title: 'Payload DB',
+          description: 'បណ្ណាល័យ exploit និង payload',
+          version: 'V2.1',
           level: 2,
           icon: Database,
         },
       ]
     : [
         {
-          title: "Nmap Integration",
-          description:
-            "Advanced network discovery and security auditing protocols.",
-          version: "V2.4",
+          title: 'Nmap Integration',
+          description: 'Advanced network discovery and security auditing protocols.',
+          version: 'V2.4',
           level: 2,
           icon: Search,
         },
         {
-          title: "Subfinder Core",
-          description:
-            "Passive subdomain discovery engine for surface mapping.",
-          version: "V1.9",
+          title: 'Subfinder Core',
+          description: 'Passive subdomain discovery engine for surface mapping.',
+          version: 'V1.9',
           level: 1,
           icon: FolderOpen,
         },
         {
-          title: "Nuclei Engine",
-          description:
-            "Template-based vulnerability scanner for large scale testing.",
-          version: "V3.0",
+          title: 'Nuclei Engine',
+          description: 'Template-based vulnerability scanner for large scale testing.',
+          version: 'V3.0',
           level: 3,
           icon: Shield,
         },
         {
-          title: "Payload DB",
-          description: "Extensive library of verified exploits and payloads.",
-          version: "V2.1",
+          title: 'Payload DB',
+          description: 'Extensive library of verified exploits and payloads.',
+          version: 'V2.1',
           level: 2,
           icon: Database,
         },
-      ];
+      ]
 
   const featureCards: FeatureCard[] = isKhmer
     ? [
         {
-          title: "ឯកសារ CLI",
+          title: 'ឯកសារ CLI',
           description:
-            "រៀនប្រើ command line សម្រាប់ automation, កំណត់ parameter និង stealth execution។",
-          href: toDocsUrl("/cli"),
-          cta: "មើល CLI Reference",
-          meta: "បានអាប់ដេត 2 ម៉ោងមុន",
+            'រៀនប្រើ command line សម្រាប់ automation, កំណត់ parameter និង stealth execution។',
+          href: '/resource/cli',
+          cta: 'មើល CLI Reference',
+          meta: 'បានអាប់ដេត 2 ម៉ោងមុន',
           icon: TerminalSquare,
-          imageSide: "left",
-          imageSrc: "/images/cli-illustration.png",
-          imageAlt: "CLI illustration",
+          imageSide: 'left',
+          imageSrc: '/images/cli-illustration.png',
+          imageAlt: 'CLI illustration',
         },
         {
-          title: "ឯកសារ API",
+          title: 'ឯកសារ API',
           description:
-            "ឯកសារ REST API សម្រាប់ដំណើរការ penetration testing ដោយស្វ័យប្រវត្តិ។",
-          href: toDocsUrl("/api"),
-          cta: "Explore Endpoints",
+            'ឯកសារ REST API សម្រាប់ដំណើរការ penetration testing ដោយស្វ័យប្រវត្តិ។',
+          href: '/resource/api',
+          cta: 'Explore Endpoints',
           icon: Cpu,
-          imageSide: "right",
-          imageSrc: "/images/api-illustration.png",
-          imageAlt: "API illustration",
+          imageSide: 'right',
+          imageSrc: '/images/api-illustration.png',
+          imageAlt: 'API illustration',
         },
         {
-          title: "ឯកសារ Tools",
+          title: 'ឯកសារ Tools',
           description:
-            "ពន្យល់លម្អិតអំពីរបៀបដំណើរការនៃ fuzzing និង exploitation tools។",
-          href: toDocsUrl("/tools"),
-          cta: "Access Toolkits",
-          badge: "HOT",
+            'ពន្យល់លម្អិតអំពីរបៀបដំណើរការនៃ fuzzing និង exploitation tools។',
+          href: '/resource/tool',
+          cta: 'Access Toolkits',
+          badge: 'HOT',
           icon: Wrench,
-          imageSide: "left",
-          imageSrc: "/images/tools-illustration.png",
-          imageAlt: "Tools illustration",
+          imageSide: 'left',
+          imageSrc: '/images/tools-illustration.png',
+          imageAlt: 'Tools illustration',
         },
         {
-          title: "ការភ្ជាប់ CI/CD",
+          title: 'ការភ្ជាប់ CI/CD',
           description:
-            "ភ្ជាប់ Auto-Offensive ទៅក្នុង GitHub, GitLab ឬ Jenkins ដើម្បីធ្វើ security scan ដោយស្វ័យប្រវត្តិ។",
-          href: toDocsUrl("/ci-cd"),
-          cta: "មើលឯកសារ CI/CD",
-          tags: ["GITHUB ACTIONS", "GITLAB CI", "AZURE DEVOPS"],
+            'ភ្ជាប់ Auto-Offensive ទៅក្នុង GitHub, GitLab ឬ Jenkins ដើម្បីធ្វើ security scan ដោយស្វ័យប្រវត្តិ។',
+          href: '/resource/ci-cd',
+          cta: 'មើលឯកសារ CI/CD',
+          tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
           icon: GitBranch,
-          imageSide: "right",
-          imageSrc: "/images/cicd-illustration.png",
-          imageAlt: "CI/CD illustration",
+          imageSide: 'right',
+          imageSrc: '/images/cicd-illustration.png',
+          imageAlt: 'CI/CD illustration',
         },
       ]
     : [
         {
-          title: "CLI Documents",
+          title: 'CLI Documents',
           description:
-            "Master the command line interface. Detailed documentation on automated offensive scripts, parameter tuning, and stealth execution modes.",
-          href: toDocsUrl("/cli"),
-          cta: "View CLI Reference",
-          meta: "Updated 2h ago",
+            'Master the command line interface. Detailed documentation on automated offensive scripts, parameter tuning, and stealth execution modes.',
+          href: '/resource/cli',
+          cta: 'View CLI Reference',
+          meta: 'Updated 2h ago',
           icon: TerminalSquare,
-          imageSide: "left",
-          imageSrc: "/images/cli-illustration.png",
-          imageAlt: "CLI illustration",
+          imageSide: 'left',
+          imageSrc: '/images/cli-illustration.png',
+          imageAlt: 'CLI illustration',
         },
         {
-          title: "API Documents",
+          title: 'API Documents',
           description:
-            "Full RESTful API endpoints for orchestrating automated penetration testing at scale.",
-          href: toDocsUrl("/api"),
-          cta: "Explore Endpoints",
+            'Full RESTful API endpoints for orchestrating automated penetration testing at scale.',
+          href: '/resource/api',
+          cta: 'Explore Endpoints',
           icon: Cpu,
-          imageSide: "right",
-          imageSrc: "/images/api-illustration.png",
-          imageAlt: "API illustration",
+          imageSide: 'right',
+          imageSrc: '/images/api-illustration.png',
+          imageAlt: 'API illustration',
         },
         {
-          title: "Tools Documents",
+          title: 'Tools Documents',
           description:
-            "Deep dives into the internal logic of our proprietary fuzzing and exploitation toolsets.",
-          href: toDocsUrl("/tools"),
-          cta: "Access Toolkits",
-          badge: "HOT",
+            'Deep dives into the internal logic of our proprietary fuzzing and exploitation toolsets.',
+          href: '/resource/tool',
+          cta: 'Access Toolkits',
+          badge: 'HOT',
           icon: Wrench,
-          imageSide: "left",
-          imageSrc: "/images/tools-illustration.png",
-          imageAlt: "Tools illustration",
+          imageSide: 'left',
+          imageSrc: '/images/tools-illustration.png',
+          imageAlt: 'Tools illustration',
         },
         {
-          title: "CI/CD Integration",
+          title: 'CI/CD Integration',
           description:
-            "Seamlessly inject Auto-Offensive audits into your GitLab, GitHub, or Jenkins pipelines. Ensure security remains continuous.",
-          href: toDocsUrl("/ci-cd"),
-          cta: "Open CI/CD Docs",
-          tags: ["GITHUB ACTIONS", "GITLAB CI", "AZURE DEVOPS"],
+            'Seamlessly inject Auto-Offensive audits into your GitLab, GitHub, or Jenkins pipelines. Ensure security remains continuous.',
+          href: '/resource/ci-cd',
+          cta: 'Open CI/CD Docs',
+          tags: ['GITHUB ACTIONS', 'GITLAB CI', 'AZURE DEVOPS'],
           icon: GitBranch,
-          imageSide: "right",
-          imageSrc: "/images/cicd-illustration.png",
-          imageAlt: "CI/CD illustration",
+          imageSide: 'right',
+          imageSrc: '/images/cicd-illustration.png',
+          imageAlt: 'CI/CD illustration',
         },
-      ];
+      ]
 
   const workflowSteps = isKhmer
     ? [
-        {
-          no: "1",
-          title: "Reconnaissance",
-          desc: "ស្វែងរក ports និង services ដោយស្វ័យប្រវត្តិ",
-        },
-        {
-          no: "2",
-          title: "Vulnerability Mapping",
-          desc: "ប្រើ AI ដើម្បីភ្ជាប់ទៅ CVE និងរកបញ្ហា",
-        },
-        { no: "3", title: "Exploitation", desc: "សាកល្បងបញ្ហាដោយសុវត្ថិភាព" },
+        { no: '1', title: 'Reconnaissance', desc: 'ស្វែងរក ports និង services ដោយស្វ័យប្រវត្តិ' },
+        { no: '2', title: 'Vulnerability Mapping', desc: 'ប្រើ AI ដើម្បីភ្ជាប់ទៅ CVE និងរកបញ្ហា' },
+        { no: '3', title: 'Exploitation', desc: 'សាកល្បងបញ្ហាដោយសុវត្ថិភាព' },
       ]
     : [
-        {
-          no: "1",
-          title: "Reconnaissance Phase",
-          desc: "Automated port & service discovery",
-        },
-        {
-          no: "2",
-          title: "Vulnerability Mapping",
-          desc: "AI-driven template matching",
-        },
-        {
-          no: "3",
-          title: "Exploitation Logic",
-          desc: "Safe verification of vulnerabilities",
-        },
-      ];
+        { no: '1', title: 'Reconnaissance Phase', desc: 'Automated port & service discovery' },
+        { no: '2', title: 'Vulnerability Mapping', desc: 'AI-driven template matching' },
+        { no: '3', title: 'Exploitation Logic', desc: 'Safe verification of vulnerabilities' },
+      ]
 
   const workflowCopy = isKhmer
     ? {
-        titleLine1: "Autonomous Penetration",
-        titleLine2: "Testing Workflow",
-        whatTitle: "វាជាអ្វី?",
+        titleLine1: 'Autonomous Penetration',
+        titleLine2: 'Testing Workflow',
+        whatTitle: 'វាជាអ្វី?',
         whatBody:
-          "ប្រព័ន្ធស្កេនច្រើនជំហាន ដែលដើរតាមលក្ខណៈគិតរបស់ pentester ប៉ុន្តែលឿន និងមានប្រសិទ្ធភាពខ្ពស់ជាង។",
-        whyTitle: "ហេតុអ្វីសំខាន់?",
+          'ប្រព័ន្ធស្កេនច្រើនជំហាន ដែលដើរតាមលក្ខណៈគិតរបស់ pentester ប៉ុន្តែលឿន និងមានប្រសិទ្ធភាពខ្ពស់ជាង។',
+        whyTitle: 'ហេតុអ្វីសំខាន់?',
         whyBody:
-          "scanner ធម្មតា រកបានតែ bug ប៉ុណ្ណោះ ប៉ុន្តែនេះអាចរក attack path និងបង្ហាញហានិភ័យពិតប្រាកដ។",
-        howTitle: "របៀបប្រើ",
+          'scanner ធម្មតា រកបានតែ bug ប៉ុណ្ណោះ ប៉ុន្តែនេះអាចរក attack path និងបង្ហាញហានិភ័យពិតប្រាកដ។',
+        howTitle: 'របៀបប្រើ',
         howBody:
-          "គ្រាន់តែកំណត់ scope → ប្រព័ន្ធនឹងដំណើរការដោយស្វ័យប្រវត្តិរហូតដល់ report ចុងក្រោយ។",
+          'គ្រាន់តែកំណត់ scope → ប្រព័ន្ធនឹងដំណើរការដោយស្វ័យប្រវត្តិរហូតដល់ report ចុងក្រោយ។',
       }
     : {
-        titleLine1: "Autonomous Penetration",
-        titleLine2: "Testing Workflow",
-        whatTitle: "What is the Workflow?",
+        titleLine1: 'Autonomous Penetration',
+        titleLine2: 'Testing Workflow',
+        whatTitle: 'What is the Workflow?',
         whatBody:
-          "A multi-staged recursive engine that mimics human pentester logic but at machine speed and scale, ensuring no corner of your infrastructure is left unchecked.",
-        whyTitle: "Why does it matter?",
+          'A multi-staged recursive engine that mimics human pentester logic but at machine speed and scale, ensuring no corner of your infrastructure is left unchecked.',
+        whyTitle: 'Why does it matter?',
         whyBody:
-          "Traditional scanners find bugs; the Autonomous Workflow finds attack paths. It correlates findings across multiple vectors to demonstrate real business risk.",
-        howTitle: "How do I activate it?",
+          'Traditional scanners find bugs; the Autonomous Workflow finds attack paths. It correlates findings across multiple vectors to demonstrate real business risk.',
+        howTitle: 'How do I activate it?',
         howBody:
-          "Simply define your scope and confidence level. Guardian handles the rest, from initial discovery to finalized remediation reports.",
-      };
+          'Simply define your scope and confidence level. Guardian handles the rest, from initial discovery to finalized remediation reports.',
+      }
 
   const statusRows: StatusItem[] = [
     {
@@ -773,13 +741,10 @@ export default function ResourceComponent() {
                 {sectionLabels.technicalSubtitle}
               </p>
             </div>
-            <a
-              href={toDocsUrl("/tools")}
-              className="inline-flex items-center gap-2 text-[15px] font-bold text-[#008C83]"
-            >
+            <Link href="/resource/tool" className="inline-flex items-center gap-2 text-[15px] font-bold text-[#008C83]">
               {sectionLabels.technicalCta}
               <ArrowRight size={16} />
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -1059,6 +1024,7 @@ export default function ResourceComponent() {
                       </p>
                     </div>
                   </div>
+                </div>
 
                   {/* Step 2 — Middle right */}
                   <div className="absolute top-55 right-[4%] flex items-center gap-3 z-10">

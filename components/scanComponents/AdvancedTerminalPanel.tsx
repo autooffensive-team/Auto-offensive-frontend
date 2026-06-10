@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Zap, PanelRight, X } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
@@ -31,13 +32,13 @@ const glitchAnimation = `
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 10px rgba(0,255,0,0.3), inset 0 0 10px rgba(0,255,0,0.1); }
-    50%       { box-shadow: 0 0 20px rgba(0,255,0,0.6), inset 0 0 20px rgba(0,255,0,0.2); }
+    0%, 100% { box-shadow: 0 0 10px rgba(var(--ao-accent-rgb),0.3), inset 0 0 10px rgba(var(--ao-accent-rgb),0.1); }
+    50%       { box-shadow: 0 0 20px rgba(var(--ao-accent-rgb),0.6), inset 0 0 20px rgba(var(--ao-accent-rgb),0.2); }
   }
 
   @keyframes cyber-border {
-    0%, 100% { border-color: rgba(0,255,0,0.3); box-shadow: 0 0 5px rgba(0,255,0,0.2); }
-    50%       { border-color: rgba(0,255,0,0.8); box-shadow: 0 0 15px rgba(0,255,0,0.5), inset 0 0 10px rgba(0,255,0,0.1); }
+    0%, 100% { border-color: rgba(var(--ao-accent-rgb),0.3); box-shadow: 0 0 5px rgba(var(--ao-accent-rgb),0.2); }
+    50%       { border-color: rgba(var(--ao-accent-rgb),0.8); box-shadow: 0 0 15px rgba(var(--ao-accent-rgb),0.5), inset 0 0 10px rgba(var(--ao-accent-rgb),0.1); }
   }
 
   @keyframes radar-spin {
@@ -156,7 +157,7 @@ const glitchAnimation = `
   .status-dot { animation: status-dot 1.2s ease-in-out infinite; }
 
   .terminal-glow {
-    box-shadow: 0 0 20px rgba(0,255,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+    box-shadow: 0 0 20px rgba(var(--ao-accent-rgb),0.3), inset 0 0 20px rgba(0,0,0,0.5);
   }
 
   /* ─── Circuit Traces ─────────────────────────────────────────────────── */
@@ -188,24 +189,24 @@ const glitchAnimation = `
     contain: strict;
   }
 
-  .trace-base { stroke: rgba(0,255,0,0.15); stroke-width: 1; fill: none; }
+  .trace-base { stroke: rgba(var(--ao-accent-rgb),0.15); stroke-width: 1; fill: none; }
   .trace-flow { fill: none; stroke-width: 1.5; stroke-dasharray: 12 180; stroke-dashoffset: 192; animation: trace-flow 4s cubic-bezier(0.4,0,0.85,1) infinite; }
 
-  .trace-c1 { stroke: #00ff00; }
-  .trace-c2 { stroke: #00ff88; animation-delay: -1.2s; }
-  .trace-c3 { stroke: #00ffaa; animation-delay: -2.4s; }
-  .trace-c4 { stroke: #00ffcc; animation-delay: -0.6s; }
-  .trace-dot { fill: rgba(0,255,0,0.4); }
+  .trace-c1 { stroke: rgba(var(--ao-accent-rgb),1); }
+  .trace-c2 { stroke: rgba(var(--ao-accent-rgb),0.85); animation-delay: -1.2s; }
+  .trace-c3 { stroke: rgba(var(--ao-accent-rgb),0.7); animation-delay: -2.4s; }
+  .trace-c4 { stroke: rgba(var(--ao-accent-rgb),0.9); animation-delay: -0.6s; }
+  .trace-dot { fill: rgba(var(--ao-accent-rgb),0.4); }
 
   /* ─── Corner Brackets ────────────────────────────────────────────────── */
   .corner-bracket { position: absolute; width: 80px; height: 80px; pointer-events: none; }
-  .corner-bracket-tl { top: 0; left: 0; border-top: 2px solid rgba(0,255,0,0.4); border-left: 2px solid rgba(0,255,0,0.4); border-top-left-radius: 4px; }
-  .corner-bracket-tl::before, .corner-bracket-tl::after { content: ''; position: absolute; background: rgba(0,255,0,0.6); }
+  .corner-bracket-tl { top: 0; left: 0; border-top: 2px solid rgba(var(--ao-accent-rgb),0.4); border-left: 2px solid rgba(var(--ao-accent-rgb),0.4); border-top-left-radius: 4px; }
+  .corner-bracket-tl::before, .corner-bracket-tl::after { content: ''; position: absolute; background: rgba(var(--ao-accent-rgb),0.6); }
   .corner-bracket-tl::before { width: 20px; height: 2px; top: -2px; left: 30px; }
   .corner-bracket-tl::after  { width: 2px; height: 20px; left: -2px; top: 30px; }
-  .corner-bracket-tr { top: 0; right: 0; border-top: 2px solid rgba(0,255,136,0.4); border-right: 2px solid rgba(0,255,136,0.4); border-top-right-radius: 4px; }
-  .corner-bracket-bl { bottom: 0; left: 0; border-bottom: 2px solid rgba(0,255,170,0.4); border-left: 2px solid rgba(0,255,170,0.4); border-bottom-left-radius: 4px; }
-  .corner-bracket-br { bottom: 0; right: 0; border-bottom: 2px solid rgba(0,255,204,0.4); border-right: 2px solid rgba(0,255,204,0.4); border-bottom-right-radius: 4px; }
+  .corner-bracket-tr { top: 0; right: 0; border-top: 2px solid rgba(var(--ao-accent-rgb),0.4); border-right: 2px solid rgba(var(--ao-accent-rgb),0.4); border-top-right-radius: 4px; }
+  .corner-bracket-bl { bottom: 0; left: 0; border-bottom: 2px solid rgba(var(--ao-accent-rgb),0.4); border-left: 2px solid rgba(var(--ao-accent-rgb),0.4); border-bottom-left-radius: 4px; }
+  .corner-bracket-br { bottom: 0; right: 0; border-bottom: 2px solid rgba(var(--ao-accent-rgb),0.4); border-right: 2px solid rgba(var(--ao-accent-rgb),0.4); border-bottom-right-radius: 4px; }
 
   .terminal-content { position: relative; z-index: 10; }
 
@@ -215,14 +216,14 @@ const glitchAnimation = `
     inset: 0;
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(4px);
-    z-index: 60;
+    z-index: 9998;
   }
 
   .sidebar-drawer {
     position: fixed;
     top: 0; right: 0; bottom: 0;
     width: min(320px, 85vw);
-    z-index: 61;
+    z-index: 9999;
     overflow-y: auto;
   }
 
@@ -239,13 +240,13 @@ const glitchAnimation = `
 // ─── Minimal splash ───────────────────────────────────────────────────────────
 const SPLASH_LINES = [
   "",
-  "  \x1b[1m\x1b[32mauto-offensive\x1b[0m  \x1b[90m·  advanced scan\x1b[0m",
-  "  \x1b[90m────────────────────────────────────────\x1b[0m",
+  "  \x1b[1m\x1b[92mauto-offensive\x1b[0m  \x1b[1m·  advanced scan\x1b[0m",
+  "  \x1b[2m────────────────────────────────────────\x1b[0m",
   "  \x1b[33mUsage   \x1b[0m  <tool> [flags] [| <tool> ...]",
-  "  \x1b[33mExample \x1b[0m  \x1b[32mnuclei -u https://example.com\x1b[0m",
-  "  \x1b[33mPipeline\x1b[0m  \x1b[32msubfinder -d example.com | httpx\x1b[0m",
-  "  \x1b[33mHelp    \x1b[0m  \x1b[90mCtrl+C to cancel  ·  clear to reset\x1b[0m",
-  "  \x1b[90m────────────────────────────────────────\x1b[0m",
+  "  \x1b[33mExample \x1b[0m  \x1b[92mnuclei -u https://example.com\x1b[0m",
+  "  \x1b[33mPipeline\x1b[0m  \x1b[92msubfinder -d example.com | httpx\x1b[0m",
+  "  \x1b[33mHelp    \x1b[0m  \x1b[1mCtrl+C to cancel  ·  clear to reset\x1b[0m",
+  "  \x1b[2m────────────────────────────────────────\x1b[0m",
   "",
 ];
 
@@ -254,47 +255,47 @@ const SPLASH = SPLASH_LINES.join("\r\n");
 // ─── Help text ────────────────────────────────────────────────────────────────
 const HELP_LINES = [
   "",
-  "  \x1b[1m\x1b[36mAuto-Offensive Advanced Scan — Help\x1b[0m",
-  "  \x1b[90m────────────────────────────────────────────────────────\x1b[0m",
+  "  \x1b[1m\x1b[96mAuto-Offensive Advanced Scan — Help\x1b[0m",
+  "  \x1b[2m────────────────────────────────────────────────────────\x1b[0m",
   "",
   "  \x1b[1m\x1b[33mSingle Tool:\x1b[0m",
-  "    \x1b[36m<tool>\x1b[0m [flags]",
-  "    Example: \x1b[32mnuclei -u https://example.com\x1b[0m",
-  "    Example: \x1b[32mnmap -sV -p 80,443 target.com\x1b[0m",
-  "    Example: \x1b[32msubfinder -d example.com -silent\x1b[0m",
+  "    \x1b[96m<tool>\x1b[0m [flags]",
+  "    Example: \x1b[92mnuclei -u https://example.com\x1b[0m",
+  "    Example: \x1b[92mnmap -sV -p 80,443 target.com\x1b[0m",
+  "    Example: \x1b[92msubfinder -d example.com -silent\x1b[0m",
   "",
   "  \x1b[1m\x1b[33mPipeline (chain tools with |):\x1b[0m",
-  "    \x1b[36m<tool>\x1b[0m [flags] \x1b[90m|\x1b[0m \x1b[36m<tool>\x1b[0m [flags] \x1b[90m|\x1b[0m ...",
-  "    Example: \x1b[32msubfinder -d example.com | httpx\x1b[0m",
-  "    Example: \x1b[32msubfinder -d example.com | httpx | nuclei\x1b[0m",
+  "    \x1b[96m<tool>\x1b[0m [flags] \x1b[1m|\x1b[0m \x1b[96m<tool>\x1b[0m [flags] \x1b[1m|\x1b[0m ...",
+  "    Example: \x1b[92msubfinder -d example.com | httpx\x1b[0m",
+  "    Example: \x1b[92msubfinder -d example.com | httpx | nuclei\x1b[0m",
   "",
   "  \x1b[1m\x1b[33mFlags:\x1b[0m",
   "    Any valid tool flag works — you do \x1b[1mnot\x1b[0m need it listed in medium mode.",
-  "    Use \x1b[36m-flag value\x1b[0m or \x1b[36m-flag=value\x1b[0m (e.g. \x1b[32mhttpx -fc 404\x1b[0m).",
-  "    Only globally denied flags (e.g. \x1b[90m-o, --proxy\x1b[0m) are blocked.",
+  "    Use \x1b[96m-flag value\x1b[0m or \x1b[96m-flag=value\x1b[0m (e.g. \x1b[92mhttpx -fc 404\x1b[0m).",
+  "    Only globally denied flags (e.g. \x1b[2m-o, --proxy\x1b[0m) are blocked.",
   "",
-  "    \x1b[36msubfinder\x1b[0m    Subdomain discovery",
-  "    \x1b[36mhttpx\x1b[0m        HTTP probing & tech detection",
-  "    \x1b[36mnuclei\x1b[0m       Vulnerability scanning",
-  "    \x1b[36mnmap\x1b[0m         Port scanning & service detection",
-  "    \x1b[36mnaabu\x1b[0m        Fast port scanning",
-  "    \x1b[36mkatana\x1b[0m       Web crawling",
-  "    \x1b[36mffuf\x1b[0m         Web fuzzing",
-  "    \x1b[36mamass\x1b[0m        Attack surface mapping",
+  "    \x1b[96msubfinder\x1b[0m    Subdomain discovery",
+  "    \x1b[96mhttpx\x1b[0m        HTTP probing & tech detection",
+  "    \x1b[96mnuclei\x1b[0m       Vulnerability scanning",
+  "    \x1b[96mnmap\x1b[0m         Port scanning & service detection",
+  "    \x1b[96mnaabu\x1b[0m        Fast port scanning",
+  "    \x1b[96mkatana\x1b[0m       Web crawling",
+  "    \x1b[96mffuf\x1b[0m         Web fuzzing",
+  "    \x1b[96mamass\x1b[0m        Attack surface mapping",
   "",
   "  \x1b[1m\x1b[33mCommands:\x1b[0m",
-  "    \x1b[36mclear\x1b[0m        Clear terminal and reset graph",
-  "    \x1b[36mhelp\x1b[0m         Show this help message",
-  "    \x1b[36mCtrl+C\x1b[0m       Cancel running scan",
+  "    \x1b[96mclear\x1b[0m        Clear terminal and reset graph",
+  "    \x1b[96mhelp\x1b[0m         Show this help message",
+  "    \x1b[96mCtrl+C\x1b[0m       Cancel running scan",
   "",
   "  \x1b[1m\x1b[33mKeyboard Shortcuts:\x1b[0m",
-  "    \x1b[90m↑/↓\x1b[0m          Browse command history",
-  "    \x1b[90mCtrl+A\x1b[0m       Move cursor to start",
-  "    \x1b[90mCtrl+E\x1b[0m       Move cursor to end",
-  "    \x1b[90mCtrl+U\x1b[0m       Clear line before cursor",
-  "    \x1b[90mCtrl+K\x1b[0m       Clear line after cursor",
+  "    \x1b[1m↑/↓\x1b[0m          Browse command history",
+  "    \x1b[1mCtrl+A\x1b[0m       Move cursor to start",
+  "    \x1b[1mCtrl+E\x1b[0m       Move cursor to end",
+  "    \x1b[1mCtrl+U\x1b[0m       Clear line before cursor",
+  "    \x1b[1mCtrl+K\x1b[0m       Clear line after cursor",
   "",
-  "  \x1b[90m────────────────────────────────────────────────────────\x1b[0m",
+  "  \x1b[2m────────────────────────────────────────────────────────\x1b[0m",
   "",
 ];
 
@@ -351,6 +352,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<{ fit: () => void } | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
   const { isMobile, isTablet, isNarrow } = useBreakpoint();
 
   const showDecorations = decorationsEnabled;
@@ -360,6 +362,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); 
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   // ── Input state ──────────────────────────────────────────────────────────
   const lineRef = useRef("");
@@ -377,6 +380,33 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const prevStatusRef = useRef("idle");
   const prevErrorsLenRef = useRef(0);
   const lastFailureSignatureRef = useRef("");
+
+  // ── Theme accent — drives border/glow colors across the whole panel ────────
+  // Uses the xterm cursor color as the primary accent for the current theme.
+  // The default theme cursor is #2dd4bf (teal-ish green), which matches the
+  // existing hardcoded green values so the default appearance is unchanged.
+  const themeAccent = useMemo(() => {
+    const hex = logTheme.xterm.cursor ?? "#2dd4bf";
+    // Parse #rrggbb into r,g,b integers
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const rgb = `${r},${g},${b}`;
+    return {
+      /** Full accent color at a given opacity */
+      at: (alpha: number) => `rgba(${rgb},${alpha})`,
+      /** Bare "r,g,b" string for CSS custom property */
+      rgb,
+      hex,
+    };
+  }, [logTheme.xterm.cursor]);
+
+  // Push the accent CSS variable directly to the DOM so CSS classes using
+  // var(--ao-accent-rgb) always stay in sync — bypasses any framer-motion
+  // style-prop caching and React.memo short-circuits.
+  useEffect(() => {
+    panelRef.current?.style.setProperty("--ao-accent-rgb", themeAccent.rgb);
+  }, [themeAccent.rgb]);
 
   const terminalTheme = useMemo(() => logTheme.xterm, [logTheme]);
   const terminalFontSize = useMemo(() => {
@@ -557,12 +587,45 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   }, []);
 
   // ── Splash / clear ───────────────────────────────────────────────────────
+  // Build a theme-aware splash — the "Ctrl+C..." hint line uses a lightened
+  // version of the theme's cursor (primary accent) so it always reads as a
+  // bright pastel of that hue: light-green on Matrix, light-purple on NeonCity,
+  // light-pink on Dracula, light-blue on Nord, etc.
+  // For light themes (Light, Solarized Light) the pastel would be invisible so
+  // we use black text instead.
+  const buildSplash = useCallback(() => {
+    const isLight = logTheme.html.isLight;
+    const hex = logTheme.xterm.cursor ?? "#86efac";
+    const r0 = parseInt(hex.slice(1, 3), 16);
+    const g0 = parseInt(hex.slice(3, 5), 16);
+    const b0 = parseInt(hex.slice(5, 7), 16);
+    // Blend 55% toward white → bright pastel of the accent hue.
+    const mix = 0.55;
+    const r = Math.round(r0 + (255 - r0) * mix);
+    const g = Math.round(g0 + (255 - g0) * mix);
+    const b = Math.round(b0 + (255 - b0) * mix);
+    // Light themes: use black (30) for all hint text so it's readable on pale bg.
+    const light = isLight ? `\x1b[30m` : `\x1b[38;2;${r};${g};${b}m`;
+    const lines = [
+      "",
+      `  \x1b[1m\x1b[92mauto-offensive\x1b[0m  \x1b[1m${light}·  advanced scan\x1b[0m`,
+      `  \x1b[2m${light}────────────────────────────────────────\x1b[0m`,
+      `  \x1b[33mUsage   \x1b[0m  <tool> [flags] [| <tool> ...]`,
+      `  \x1b[33mExample \x1b[0m  \x1b[92mnuclei -u https://example.com\x1b[0m`,
+      `  \x1b[33mPipeline\x1b[0m  \x1b[92msubfinder -d example.com | httpx\x1b[0m`,
+      `  \x1b[33mHelp    \x1b[0m  \x1b[1m${light}Ctrl+C to cancel  ·  clear to reset\x1b[0m`,
+      `  \x1b[2m${light}────────────────────────────────────────\x1b[0m`,
+      "",
+    ];
+    return lines.join("\r\n");
+  }, [logTheme.xterm.cursor, logTheme.html.isLight]);
+
   const showSplash = useCallback((term: Terminal) => {
     term.write("\x1b[3J\x1b[2J\x1b[H");
     term.write("\r\n");
-    term.write(SPLASH);
+    term.write(buildSplash());
     term.write("\r\n");
-  }, []);
+  }, [buildSplash]);
   const safeFit = useCallback((fitAddon: { fit: () => void }, maxTries = 5) => {
     let tries = 0;
     const attempt = () => {
@@ -753,6 +816,17 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => {
     if (termRef.current?.options) termRef.current.options.theme = terminalTheme;
   }, [terminalTheme]);
+  // When theme changes and terminal is idle, redraw the splash so the accent
+  // colors update immediately without needing a manual reset.
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+    // Don't wipe output while a scan is running
+    if (isSubmitting || isStreaming) return;
+    showSplash(term);
+    term.write(getPrompt());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terminalTheme]);
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.fontSize = terminalFontSize;
@@ -795,7 +869,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         frameIdx = (frameIdx + 1) % frames.length;
         tick++;
         if (tick % 30 === 0) msgIdx = (msgIdx + 1) % messages.length;
-        term.write(`\r\x1b[K\x1b[36m  ${frames[frameIdx]} \x1b[0m\x1b[90m${messages[msgIdx]}...\x1b[0m`);
+        term.write(`\r\x1b[K\x1b[96m  ${frames[frameIdx]} \x1b[0m\x1b[97m${messages[msgIdx]}...\x1b[0m`);
       }, 80);
     }
 
@@ -820,13 +894,13 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     // Write in a single chunk to avoid UI freezing on bursty output.
     const chunk = newLines.map((line) => {
       const time = new Date(line.timestamp).toLocaleTimeString();
-      let col = "\x1b[90m";
+      let col = "\x1b[0m";
       const lvl = line.level.toLowerCase();
-      if (lvl.includes("error") || lvl.includes("fail")) col = "\x1b[31m";
-      else if (lvl.includes("warn"))                      col = "\x1b[33m";
-      else if (lvl === "done" || lvl === "submitted")     col = "\x1b[32m";
-      else if (lvl === "log")                             col = "\x1b[36m";
-      term.write(`\r\x1b[90m[${time}]\x1b[0m \x1b[36m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
+      if (lvl.includes("error") || lvl.includes("fail")) col = "\x1b[91m";
+      else if (lvl.includes("warn"))                      col = "\x1b[93m";
+      else if (lvl === "done" || lvl === "submitted")     col = "\x1b[92m";
+      else if (lvl === "log")                             col = "\x1b[96m";
+      term.write(`\r\x1b[2m[${time}]\x1b[0m \x1b[96m[${line.source}]\x1b[0m ${col}${line.text}\x1b[0m\r\n`);
     });
   }, [logs]);
   useEffect(() => {
@@ -900,7 +974,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     if (isNarrow) {
       return {
         backgroundColor: "rgba(0,0,0,0.85)",
-        borderTop: "2px solid rgba(0,255,0,0.2)",
+        borderTop: `2px solid ${themeAccent.at(0.2)}`,
         position: "absolute" as const,
         inset: 0,
         right: 0,  
@@ -911,8 +985,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     }
     return {
       backgroundColor: "rgba(0,0,0,0.85)",
-      borderRight: "2px solid rgba(0,255,0,0.2)",
-      borderTop: "2px solid rgba(0,255,0,0.2)",
+      borderRight: `2px solid ${themeAccent.at(0.2)}`,
+      borderTop: `2px solid ${themeAccent.at(0.2)}`,
       position: "absolute" as const,
       inset: 0,
       right: "260px",
@@ -920,12 +994,17 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
       overflow: "hidden" as const,
       minWidth: 0,
     };
-  }, [isNarrow]);
+  }, [isNarrow, themeAccent]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
       <style>{glitchAnimation}</style>
       <motion.section
+        ref={panelRef}
         initial={{ opacity: 0, y: 8, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -933,7 +1012,10 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           requestAnimationFrame(() => fitAddonRef.current?.fit());
         }}
         className="relative rounded-xl overflow-hidden border-2 bg-black"
-        style={{ borderColor: "rgba(0,255,0,0.4)", boxShadow: "0 0 8px rgba(0,255,0,0.25)" }}
+        style={{
+          borderColor: themeAccent.at(0.4),
+          boxShadow: `0 0 8px ${themeAccent.at(0.25)}`,
+        }}
       >
         {/* ── Background glow — static, no animate-pulse (pulse caused terminal text flicker) ── */}
         <div className="absolute inset-0 pointer-events-none">
@@ -942,7 +1024,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         </div>
         <motion.div
           className="relative z-20 border-b-2 px-3 sm:px-6 py-3 sm:py-3.5 backdrop-blur-sm bg-black flex items-center justify-center overflow-hidden"
-          style={{ borderColor: "rgba(0,255,0,0.4)" }}
+          style={{ borderColor: themeAccent.at(0.4) }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -987,8 +1069,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 <span className="dot-green  h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500  cursor-pointer hover:scale-125 inline-block" />
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-center min-w-0">
-                <span className="status-dot h-2 w-2 rounded-full bg-green-500/80 shrink-0 inline-block" />
-                <span className="font-(family-name:--font-fira-code) text-[10px] sm:text-xs font-semibold tracking-wider text-green-400 dark:text-green-300 truncate">
+                <span className="status-dot h-2 w-2 rounded-full shrink-0 inline-block" style={{ backgroundColor: themeAccent.at(0.8) }} />
+                <span className="font-(family-name:--font-fira-code) text-[10px] sm:text-xs font-semibold tracking-wider truncate" style={{ color: themeAccent.at(1) }}>
                   {isMobile
                     ? (selectedProject ? `${selectedProject.name}` : "auto-offensive")
                     : (selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive")} :: ADVANCED_SCAN
@@ -997,8 +1079,14 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
             </div>
             <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {isSubmitting && (
-                <span className="rounded-md border border-green-500/40 bg-green-500/10 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold flex items-center gap-1.5 text-green-400 dark:text-green-300">
-                  {/* spin via CSS — no framer RAF */}
+                <span
+                  className="rounded-md px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold flex items-center gap-1.5"
+                  style={{
+                    border: `1px solid ${themeAccent.at(0.4)}`,
+                    backgroundColor: themeAccent.at(0.1),
+                    color: themeAccent.at(1),
+                  }}
+                >
                   <Zap size={10} className="animate-spin" style={{ animationDuration: "1s" }} />
                   <span className="hidden sm:inline">RUNNING</span>
                 </span>
@@ -1009,11 +1097,13 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={() => setShowSettings((v) => !v)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200 ${
-                  showSettings
-                    ? "border-green-500/70 bg-green-500/20 text-green-300 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
-                    : "border-green-500/30 bg-black/60 text-green-400/70 hover:border-green-500/50 hover:text-green-400"
-                }`}
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200"
+                style={{
+                  borderColor: showSettings ? themeAccent.at(0.7) : themeAccent.at(0.3),
+                  backgroundColor: showSettings ? themeAccent.at(0.2) : "rgba(0,0,0,0.6)",
+                  color: showSettings ? themeAccent.at(1) : themeAccent.at(0.7),
+                  boxShadow: showSettings ? `0 0 10px ${themeAccent.at(0.2)}` : undefined,
+                }}
               >
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="12" cy="12" r="3" />
@@ -1026,7 +1116,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={handleReset}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border border-green-500/40 bg-black/80 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold text-green-400 hover:bg-green-500/10 transition-all duration-300"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-300"
+                style={{ borderColor: themeAccent.at(0.4), color: themeAccent.at(1) }}
               >
                 <RotateCcw size={10} />
                 <span className="hidden sm:inline">RESET</span>
@@ -1037,11 +1128,12 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   onClick={() => setSidebarOpen((v) => !v)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200 ${
-                    sidebarOpen
-                      ? "border-cyan-500/60 bg-cyan-500/15 text-cyan-300"
-                      : "border-cyan-500/30 bg-black/60 text-cyan-400/70 hover:border-cyan-500/50 hover:text-cyan-400"
-                  }`}
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200"
+                  style={{
+                    borderColor: themeAccent.at(sidebarOpen ? 0.6 : 0.3),
+                    backgroundColor: themeAccent.at(sidebarOpen ? 0.15 : 0),
+                    color: themeAccent.at(sidebarOpen ? 1 : 0.7),
+                  }}
                   aria-label="Toggle analytics panel"
                 >
                   {sidebarOpen ? <X size={10} /> : <PanelRight size={10} />}
@@ -1173,59 +1265,64 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               isSubmitting={isSubmitting}
               showDecorations={showDecorations}
               systemProfile={systemProfile}
+              accentColor={themeAccent.at(0.2)}
             />
           )}
-          <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute top-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute bottom-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-l-2 border-green-500/40 pointer-events-none z-20" />
-          <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-green-500/40 pointer-events-none z-20" />
+          <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 pointer-events-none z-20" style={{ borderColor: themeAccent.at(0.4) }} />
+          <div className="absolute top-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-r-2 pointer-events-none z-20" style={{ borderColor: themeAccent.at(0.4) }} />
+          <div className="absolute bottom-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-l-2 pointer-events-none z-20" style={{ borderColor: themeAccent.at(0.4) }} />
+          <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 pointer-events-none z-20" style={{ borderColor: themeAccent.at(0.4) }} />
         </div>
       </motion.section>
 
-      <AnimatePresence>
-        {isNarrow && sidebarOpen && (
-          <>
-            <motion.div
-              className="sidebar-drawer-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-            />
-
-            <motion.div
-              className="sidebar-drawer"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            >
-
-              <div className="absolute top-3 left-3 z-10">
-                <motion.button
-                  type="button"
+      {mounted && isNarrow && sidebarOpen
+        ? createPortal(
+            <AnimatePresence>
+              <>
+                <motion.div
+                  className="sidebar-drawer-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   onClick={() => setSidebarOpen(false)}
-                  whileTap={{ scale: 0.9 }}
-                  className="rounded-md border border-green-500/30 bg-black/80 p-1.5 text-green-400/70 hover:text-green-400"
-                  aria-label="Close panel"
-                >
-                  <X size={12} />
-                </motion.button>
-              </div>
+                />
 
-              <TerminalSidebar
-                selectedProject={selectedProject}
-                logs={logs}
-                run={run}
-                errors={errors}
-                isSubmitting={isSubmitting}
-                showDecorations={showDecorations}
-                systemProfile={systemProfile}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                <motion.div
+                  className="sidebar-drawer"
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 28, stiffness: 280 }}
+                >
+
+                  <div className="absolute top-3 left-3 z-10">
+                    <motion.button
+                      type="button"
+                      onClick={() => setSidebarOpen(false)}
+                      whileTap={{ scale: 0.9 }}
+                      className="rounded-md border border-green-500/30 bg-black/80 p-1.5 text-green-400/70 hover:text-green-400"
+                      aria-label="Close panel"
+                    >
+                      <X size={12} />
+                    </motion.button>
+                  </div>
+
+                  <TerminalSidebar
+                    selectedProject={selectedProject}
+                    logs={logs}
+                    run={run}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    showDecorations={showDecorations}
+                    systemProfile={systemProfile}
+                    accentColor={themeAccent.at(0.2)}
+                  />
+                </motion.div>
+              </>
+            </AnimatePresence>,
+            document.body
+          )
+        : null}
 
 
       {showCancelModal && (

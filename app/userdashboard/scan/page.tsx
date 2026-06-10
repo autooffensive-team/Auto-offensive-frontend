@@ -364,6 +364,14 @@ export default function ScanPage() {
   // new function reference every render and defeat React.memo on AdvancedTerminalPanel
   const resetAdvanced = useCallback(() => resetRun("advanced"), [resetRun]);
 
+  // Pre-select a tool when navigating from the tools page via ?tool=<tool_id>
+  const requestedToolId = searchParams.get("tool");
+  useEffect(() => {
+    if (!requestedToolId || loadingMeta) return;
+    setBasicToolId(requestedToolId);
+    setActiveTab("basic");
+  }, [requestedToolId, loadingMeta, setBasicToolId]);
+
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
 

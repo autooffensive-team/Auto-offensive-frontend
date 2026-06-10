@@ -17,7 +17,7 @@ import {
   Code,
   FileText,
   User,
-  Settings,
+  Key,
   LogOut,
   Lock,
   LogIn,
@@ -73,7 +73,7 @@ const mainNavItems: NavItem[] = [
 
 const accountNavItems: NavItem[] = [
   { label: "Profile", path: "/userdashboard/profile", icon: User, description: "User profile", guestAllowed: false },
-  { label: "Settings", path: "/userdashboard/settings", icon: Settings, description: "Preferences", guestAllowed: false },
+  { label: "API Keys", path: "/userdashboard/settings", icon: Key, description: "Manage API keys", guestAllowed: false },
 ];
 
 function isItemActive(pathname: string, path: string) {
@@ -188,7 +188,7 @@ export default function UserDashboardShell({
   const desktopContentOffset = collapsed ? "md:pl-[72px]" : "md:pl-72";
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
+    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
       <MobileScreenWarning />
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -458,9 +458,9 @@ export default function UserDashboardShell({
         </div>
       </aside>
 
-      <div className={`transition-all duration-300 ${desktopContentOffset}`}>
+      <div className={`transition-all duration-300 overflow-x-hidden min-w-0 ${desktopContentOffset}`}>
         <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
-          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
+          <div className="flex w-full items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -511,9 +511,9 @@ export default function UserDashboardShell({
                     onClick={() => {
                       setProfileOpen((value) => !value);
                     }}
-                    className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                    className="flex items-center gap-3 rounded-full px-2 py-2 pr-4 text-left transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-slate-950">
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-black/10 text-sm font-bold text-slate-950 dark:border-white/20">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
@@ -581,7 +581,7 @@ export default function UserDashboardShell({
           </div>
         </header>
 
-        <main className={`mx-auto max-w-400 px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
+        <main className={`w-full px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
           {children}
         </main>
       </div>
