@@ -353,9 +353,9 @@ function AuthenticatedDashboard() {
               <MetricCard key={metric.label} metric={metric} index={index} total={scannedAssetMetrics.length} />
             ))}
           </div>
-          {/* Desktop: row 2 — 2 cards, same width as above (1/4 each), centered */}
+          {/* Desktop: row 2 — 2 cards, same width as above (1/4 each), left-aligned */}
           <div className="hidden lg:grid lg:grid-cols-4 gap-2">
-            <div className="col-start-2 col-span-1">
+            <div className="col-start-1 col-span-1">
               <MetricCard metric={scannedAssetMetrics[4]} index={4} total={scannedAssetMetrics.length} />
             </div>
             <div className="col-span-1">
