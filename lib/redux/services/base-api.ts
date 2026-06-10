@@ -75,6 +75,6 @@ const proxyBaseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: proxyBaseQueryWithReauth,
-  tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git", "CIToken"],
+  tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git", "CIToken", "ScannerProject"],
   endpoints: () => ({}),
 });

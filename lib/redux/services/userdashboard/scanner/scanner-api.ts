@@ -1,5 +1,6 @@
 import { baseApi } from "@/lib/redux/services/base-api";
 import type {
+  CreateScannerProjectRequest,
   DependencyListResponse,
   DependencySummaryResponse,
   GetFileIssuesRequest,
@@ -15,12 +16,14 @@ import type {
   ListDependenciesRequest,
   ListHotspotsRequest,
   ListIssuesRequest,
+  ListScannerProjectsResponse,
   ListProjectScansRequest,
   ScanDetailResponse,
   ProjectScansResponse,
   ScanLogsResponse,
   ScanStatusResponse,
   ScanSummaryResponse,
+  ScannerProjectResponse,
   StreamScanLogsRequest,
   TriggerScanRequest,
   TriggerScanResponse,
@@ -89,6 +92,23 @@ export const scannerApi = baseApi.injectEndpoints({
         { type: "Scan" as const, id: "LIST" },
         { type: "Scan" as const, id: `PROJECT:${project_key}` },
         { type: "Gateway" as const, id: "JOBS_LIST" },
+        { type: "ScannerProject" as const, id: "LIST" },
+      ],
+    }),
+    createScannerProject: builder.mutation<ScannerProjectResponse, CreateScannerProjectRequest>({
+      query: (body) => ({
+        url: buildScannerUrl(["projects"]),
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "ScannerProject" as const, id: "LIST" }],
+    }),
+    listScannerProjects: builder.query<ScannerProjectResponse[], void>({
+      query: () => buildScannerUrl(["projects"]),
+      transformResponse: (response: ListScannerProjectsResponse) => response.projects ?? [],
+      providesTags: (result) => [
+        { type: "ScannerProject" as const, id: "LIST" },
+        ...(result?.map((project) => ({ type: "ScannerProject" as const, id: project.project_id })) ?? []),
       ],
     }),
     getScanDetail: builder.query<ScanDetailResponse, string>({
@@ -256,6 +276,8 @@ export function buildScanLogStreamUrl({
 
 export const {
   useTriggerScanMutation,
+  useCreateScannerProjectMutation,
+  useListScannerProjectsQuery,
   useGetScanDetailQuery,
   useGetScanStatusQuery,
   useGetScanLogsQuery,

@@ -14,11 +14,14 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import {
+  useCreateScannerProjectMutation,
+  useListScannerProjectsQuery,
+} from "@/lib/redux/services/userdashboard/scanner/scanner-api";
+import {
   useCreateCITokenMutation,
   useListProjectCITokensQuery,
   useRevokeCITokenMutation,
 } from "@/lib/redux/services/userdashboard/scanner/ci-token-api";
-import { useGetProjectsQuery } from "@/lib/redux/services/userdashboard/project/project-api";
 import type { CITokenResponse } from "@/types/ci-token";
 
 type ExpiryPreset = "30d" | "90d" | "180d" | "custom" | "never";
@@ -100,9 +103,8 @@ function toExpiryISOString(preset: ExpiryPreset, customDate: string): string | n
   return expiresAt.toISOString();
 }
 
-function buildGithubPrivateRepoSnippet(projectId: string, projectKey: string): string {
+function buildGithubPrivateRepoSnippet(projectId: string): string {
   const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
-  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
 
   return `name: Platform code scan
 
@@ -118,26 +120,24 @@ jobs:
       # Assumptions:
       # 1. This repository is already connected in your platform with a GitHub account
       # 2. The connected GitHub account can access this private repository
-      # 3. PLATFORM_CI_TOKEN belongs to the same platform project shown in the UI
+      # 3. AUTO_OFFENSIVE_CI_TOKEN belongs to the same code-scanning project shown in the UI
       - name: Trigger backend-managed scan
         run: |
           cat <<EOF > payload.json
           {
             "project_id": "${resolvedProjectId}",
-            "project_key": "${resolvedProjectKey}",
             "repo_url": "https://github.com/\${{ github.repository }}.git",
             "branch": "\${{ github.ref_name }}"
           }
           EOF
-          curl -sS -X POST "\${{ secrets.PLATFORM_API_URL }}/api/v1/scanner/ci/start" \\
+          curl -sS -X POST "\${{ secrets.AUTO_OFFENSIVE_URL }}/api/scanner/ci/start" \\
             -H "Content-Type: application/json" \\
-            -H "X-CI-Token: \${{ secrets.PLATFORM_CI_TOKEN }}" \\
+            -H "X-CI-Token: \${{ secrets.AUTO_OFFENSIVE_CI_TOKEN }}" \\
             --data @payload.json`;
 }
 
-function buildGitlabSnippet(projectId: string, projectKey: string): string {
+function buildGitlabSnippet(projectId: string): string {
   const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
-  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
 
   return `platform_scan:
   script:
@@ -145,39 +145,36 @@ function buildGitlabSnippet(projectId: string, projectKey: string): string {
       cat <<EOF > payload.json
       {
         "project_id": "${resolvedProjectId}",
-        "project_key": "${resolvedProjectKey}",
         "repo_url": "$CI_PROJECT_URL.git",
         "branch": "$CI_COMMIT_REF_NAME"
       }
       EOF
-      curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/start" \\
+      curl -sS -X POST "$AUTO_OFFENSIVE_URL/api/scanner/ci/start" \\
         -H "Content-Type: application/json" \\
-        -H "X-CI-Token: $CI_TOKEN" \\
+        -H "X-CI-Token: $AUTO_OFFENSIVE_CI_TOKEN" \\
         --data @payload.json
   variables:
-    PLATFORM_API_URL: $PLATFORM_API_URL
-    CI_TOKEN: $CI_TOKEN`;
+    AUTO_OFFENSIVE_URL: $AUTO_OFFENSIVE_URL
+    AUTO_OFFENSIVE_CI_TOKEN: $AUTO_OFFENSIVE_CI_TOKEN`;
 }
 
-function buildJenkinsSnippet(projectId: string, projectKey: string): string {
+function buildJenkinsSnippet(projectId: string): string {
   const resolvedProjectId = projectId || "YOUR_PROJECT_ID";
-  const resolvedProjectKey = projectKey || "YOUR_PROJECT_KEY";
 
   return `stage('Platform Code Scan') {
   steps {
-    withCredentials([string(credentialsId: 'platform-ci-token', variable: 'CI_TOKEN')]) {
+    withCredentials([string(credentialsId: 'auto-offensive-ci-token', variable: 'AUTO_OFFENSIVE_CI_TOKEN')]) {
       sh '''
         cat <<EOF > payload.json
         {
           "project_id": "${resolvedProjectId}",
-          "project_key": "${resolvedProjectKey}",
           "repo_url": "$GIT_URL",
           "branch": "$BRANCH_NAME"
         }
         EOF
-        curl -sS -X POST "$PLATFORM_API_URL/api/v1/scanner/ci/start" \\
+        curl -sS -X POST "$AUTO_OFFENSIVE_URL/api/scanner/ci/start" \\
           -H "Content-Type: application/json" \\
-          -H "X-CI-Token: $CI_TOKEN" \\
+          -H "X-CI-Token: $AUTO_OFFENSIVE_CI_TOKEN" \\
           --data @payload.json
       '''
     }
@@ -225,17 +222,20 @@ export default function CodeScanningIntegrationsPageClient() {
   const requestedProjectId = searchParams.get("project");
 
   const [selectedProjectId, setSelectedProjectId] = useState("");
-  const [tokenName, setTokenName] = useState("");
-  const [description, setDescription] = useState("");
-  const [expiryPreset, setExpiryPreset] = useState<ExpiryPreset>("90d");
-  const [customDate, setCustomDate] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
   const [projectKeyInput, setProjectKeyInput] = useState("");
   const [projectKeyTouched, setProjectKeyTouched] = useState(false);
+  const [projectCreationError, setProjectCreationError] = useState<string | null>(null);
+  const [tokenName, setTokenName] = useState("");
+  const [tokenDescription, setTokenDescription] = useState("");
+  const [expiryPreset, setExpiryPreset] = useState<ExpiryPreset>("90d");
+  const [customDate, setCustomDate] = useState("");
   const [creationError, setCreationError] = useState<string | null>(null);
   const [latestPlainToken, setLatestPlainToken] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState(false);
 
-  const { data: projects = [], isLoading: isProjectsLoading } = useGetProjectsQuery();
+  const { data: projects = [], isLoading: isProjectsLoading } = useListScannerProjectsQuery();
   const effectiveSelectedProjectId = useMemo(() => {
     if (selectedProjectId && projects.some((project) => project.project_id === selectedProjectId)) {
       return selectedProjectId;
@@ -254,6 +254,7 @@ export default function CodeScanningIntegrationsPageClient() {
     { skip: !effectiveSelectedProjectId },
   );
 
+  const [createScannerProject, { isLoading: isCreatingProject }] = useCreateScannerProjectMutation();
   const [createToken, { isLoading: isCreating }] = useCreateCITokenMutation();
   const [revokeToken, { isLoading: isRevoking }] = useRevokeCITokenMutation();
 
@@ -261,26 +262,62 @@ export default function CodeScanningIntegrationsPageClient() {
     () => projects.find((project) => project.project_id === effectiveSelectedProjectId) ?? null,
     [projects, effectiveSelectedProjectId],
   );
-  const suggestedProjectKey = useMemo(() => {
-    if (!selectedProject) {
-      return "";
-    }
-    return normalizeProjectKey(selectedProject.name) || `project-${selectedProject.project_id.slice(0, 8)}`;
-  }, [selectedProject]);
-  const effectiveProjectKey = useMemo(() => {
+  const suggestedProjectKey = useMemo(
+    () => normalizeProjectKey(projectName) || "",
+    [projectName],
+  );
+  const pendingProjectKey = useMemo(() => {
     if (!projectKeyTouched) {
       return suggestedProjectKey;
     }
     return normalizeProjectKey(projectKeyInput);
   }, [projectKeyInput, projectKeyTouched, suggestedProjectKey]);
+  const effectiveProjectKey = selectedProject?.project_key ?? "";
 
   const snippets = useMemo(() => {
     return {
-      githubPrivate: buildGithubPrivateRepoSnippet(effectiveSelectedProjectId, effectiveProjectKey),
-      gitlab: buildGitlabSnippet(effectiveSelectedProjectId, effectiveProjectKey),
-      jenkins: buildJenkinsSnippet(effectiveSelectedProjectId, effectiveProjectKey),
+      githubPrivate: buildGithubPrivateRepoSnippet(effectiveSelectedProjectId),
+      gitlab: buildGitlabSnippet(effectiveSelectedProjectId),
+      jenkins: buildJenkinsSnippet(effectiveSelectedProjectId),
     };
-  }, [effectiveProjectKey, effectiveSelectedProjectId]);
+  }, [effectiveSelectedProjectId]);
+
+  async function handleCreateProject(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setProjectCreationError(null);
+
+    if (!projectName.trim()) {
+      setProjectCreationError("Project name is required.");
+      return;
+    }
+    if (!pendingProjectKey) {
+      setProjectCreationError("Project key is required.");
+      return;
+    }
+
+    try {
+      const response = await createScannerProject({
+        display_name: projectName.trim(),
+        project_key: pendingProjectKey,
+        description: projectDescription.trim() || undefined,
+      }).unwrap();
+
+      setSelectedProjectId(response.project_id);
+      setProjectName("");
+      setProjectDescription("");
+      setProjectKeyInput("");
+      setProjectKeyTouched(false);
+    } catch (error) {
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        "data" in error &&
+        typeof (error as { data?: { detail?: string } }).data?.detail === "string"
+          ? (error as { data: { detail: string } }).data.detail
+          : "Failed to create scanner project.";
+      setProjectCreationError(message);
+    }
+  }
 
   async function handleCreateToken(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -301,7 +338,7 @@ export default function CodeScanningIntegrationsPageClient() {
       const response = await createToken({
         project_id: effectiveSelectedProjectId,
         name: tokenName.trim(),
-        description: description.trim() || undefined,
+        description: tokenDescription.trim() || undefined,
         scopes: ["code_scan:ingest"],
         expires_at: expiresAt,
         no_expiry: expiryPreset === "never",
@@ -309,7 +346,7 @@ export default function CodeScanningIntegrationsPageClient() {
 
       setLatestPlainToken(response.plain_token);
       setTokenName("");
-      setDescription("");
+      setTokenDescription("");
       setExpiryPreset("90d");
       setCustomDate("");
       await refetchTokens();
@@ -377,22 +414,108 @@ export default function CodeScanningIntegrationsPageClient() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <div className="space-y-4">
+              <form className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/40" onSubmit={handleCreateProject}>
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    Create code-scanning project
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    This project is only for SonarQube code scanning and CI tokens.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                      Project name
+                    </label>
+                    <input
+                      value={projectName}
+                      onChange={(event) => setProjectName(event.target.value)}
+                      placeholder="Rumsay Client"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                      Project key
+                    </label>
+                    <input
+                      value={projectKeyTouched ? projectKeyInput : suggestedProjectKey}
+                      onChange={(event) => {
+                        setProjectKeyTouched(true);
+                        setProjectKeyInput(event.target.value);
+                      }}
+                      placeholder="github-rumsay-client"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      required
+                    />
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                      {pendingProjectKey ? (
+                        <>
+                          Normalized key:{" "}
+                          <span className="font-mono text-slate-700 dark:text-slate-200">{pendingProjectKey}</span>
+                        </>
+                      ) : (
+                        "Use the key you want to group scans under in the code-scanning dashboard."
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                    Description
+                  </label>
+                  <textarea
+                    value={projectDescription}
+                    onChange={(event) => setProjectDescription(event.target.value)}
+                    placeholder="Optional notes for this code-scanning project"
+                    rows={3}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  />
+                </div>
+
+                {projectCreationError ? (
+                  <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+                    <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                    <span>{projectCreationError}</span>
+                  </div>
+                ) : null}
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={isCreatingProject}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#00d0b2] px-4 text-sm font-semibold text-slate-900 transition hover:bg-[#00b89e] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isCreatingProject ? <LoaderCircle size={15} className="animate-spin" /> : <CheckCircle2 size={15} />}
+                    Create project
+                  </button>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Create this once, then generate CI tokens below.
+                  </span>
+                </div>
+              </form>
+
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                  Project
+                  Code-scanning project
                 </label>
                 <select
-                    value={effectiveSelectedProjectId}
-                    onChange={(event) => setSelectedProjectId(event.target.value)}
+                  value={effectiveSelectedProjectId}
+                  onChange={(event) => setSelectedProjectId(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   disabled={isProjectsLoading || projects.length === 0}
                 >
                   {projects.length === 0 ? (
-                    <option value="">No projects available</option>
+                    <option value="">No code-scanning projects yet</option>
                   ) : null}
                   {projects.map((project) => (
                     <option key={project.project_id} value={project.project_id}>
-                      {project.name}
+                      {project.display_name}
                     </option>
                   ))}
                 </select>
@@ -431,27 +554,15 @@ export default function CodeScanningIntegrationsPageClient() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                    CI project key
-                  </label>
-                  <input
-                    value={projectKeyTouched ? projectKeyInput : suggestedProjectKey}
-                    onChange={(event) => {
-                      setProjectKeyTouched(true);
-                      setProjectKeyInput(event.target.value);
-                    }}
-                    placeholder="my-private-repo"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                  />
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    Project key
+                  </p>
+                  <p className="mt-1 break-all font-mono text-xs text-slate-600 dark:text-slate-300">
+                    {effectiveProjectKey || "Select a code-scanning project to see its key"}
+                  </p>
                   <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                    This controls how CI-triggered scans are grouped in the code-scanning dashboard.
-                    {effectiveProjectKey ? (
-                      <>
-                        {" "}Normalized key:{" "}
-                        <span className="font-mono text-slate-700 dark:text-slate-200">{effectiveProjectKey}</span>
-                      </>
-                    ) : null}
+                    CI scans triggered with this project are grouped under this dashboard key.
                   </p>
                 </div>
 
@@ -474,8 +585,8 @@ export default function CodeScanningIntegrationsPageClient() {
                     Description
                   </label>
                   <textarea
-                    value={description}
-                    onChange={(event) => setDescription(event.target.value)}
+                    value={tokenDescription}
+                    onChange={(event) => setTokenDescription(event.target.value)}
                     placeholder="Optional notes for this CI runner"
                     rows={3}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
@@ -553,7 +664,7 @@ export default function CodeScanningIntegrationsPageClient() {
                   Selected project
                 </p>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                  {selectedProject?.name ?? "No project selected"}
+                  {selectedProject?.display_name ?? "No project selected"}
                 </p>
                 <p className="mt-2 break-all font-mono text-xs text-slate-500 dark:text-slate-400">
                   {effectiveSelectedProjectId || "Project ID will appear here"}
@@ -561,6 +672,11 @@ export default function CodeScanningIntegrationsPageClient() {
                 <p className="mt-2 break-all font-mono text-xs text-slate-500 dark:text-slate-400">
                   {effectiveProjectKey || "Project key will appear here"}
                 </p>
+                {selectedProject?.description ? (
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                    {selectedProject.description}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -585,7 +701,7 @@ export default function CodeScanningIntegrationsPageClient() {
             </div>
           ) : tokens.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/30 dark:text-slate-400">
-              No CI tokens for this project yet.
+              {effectiveSelectedProjectId ? "No CI tokens for this project yet." : "Create or select a code-scanning project first."}
             </div>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -654,7 +770,7 @@ export default function CodeScanningIntegrationsPageClient() {
               CI setup examples
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              CI only sends repository metadata and the platform CI token. The backend keeps SonarQube credentials server-side and uses the explicit `project_key` shown above.
+              Store only your frontend URL and the generated CI token in the CI system. The frontend proxies to the backend, and SonarQube credentials stay server-side.
             </p>
           </div>
 
