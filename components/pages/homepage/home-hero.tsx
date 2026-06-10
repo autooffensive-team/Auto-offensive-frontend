@@ -840,7 +840,9 @@ export default function HomeHero() {
             </Link>
 
             {/* Secondary */}
-            <button className="
+            <Link
+              href="/resource"
+              className="
               ripple-button
               bg-white dark:bg-[rgba(0,208,178,0.06)]
               text-black dark:text-white
@@ -856,7 +858,7 @@ export default function HomeHero() {
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
               <span className="min-w-0 whitespace-nowrap text-center text-black dark:text-white">{t("secondaryCta")}</span>
-            </button>
+            </Link>
           </motion.div>
 
           {/* Stats */}
