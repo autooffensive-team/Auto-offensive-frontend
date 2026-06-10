@@ -13,10 +13,17 @@ function generateSessionId(): string {
  * GET /api/guest/start
  * Initiates a guest session by setting a cookie directly on the redirect response.
  * This is the entry point for "Try as Guest" buttons.
+ * Accepts an optional `?redirect=<path>` param to control post-session destination.
  */
 export async function GET(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const redirectUrl = new URL("/userdashboard/scan", appUrl);
+
+  // Allow callers to supply a custom redirect path (e.g. with ?tool=<id>)
+  const redirectParam = request.nextUrl.searchParams.get("redirect");
+  const safePath =
+    redirectParam && redirectParam.startsWith("/") ? redirectParam : "/userdashboard/scan";
+
+  const redirectUrl = new URL(safePath, appUrl);
 
   // Generate a session ID
   const sessionId = generateSessionId();
