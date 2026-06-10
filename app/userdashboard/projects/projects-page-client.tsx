@@ -708,7 +708,7 @@ export default function ProjectsPageClient({
                 index={i}
                 onEdit={setEditingProject}
                 onDelete={handleDelete}
-                onOpen={(p) => router.push(`/userdashboard/scan?project=${p.project_id}`)}
+                onOpen={(p) => router.push(`/userdashboard/assets?project=${p.project_id}`)}
                 isDeleting={deletingId === project.project_id}
               />
             ))}

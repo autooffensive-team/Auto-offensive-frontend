@@ -114,13 +114,14 @@ function getTypePillClass(type: string): string {
 
 export type TargetsTableProps = {
   onRowClick?: (targetId: string, projectId: string) => void;
+  initialProjectFilter?: string;
 };
 
-export default function TargetsTable({ onRowClick }: TargetsTableProps) {
+export default function TargetsTable({ onRowClick, initialProjectFilter }: TargetsTableProps) {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [filterProject, setFilterProject] = useState("all");
+  const [filterProject, setFilterProject] = useState(initialProjectFilter ?? "all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_DEFAULT);
 
