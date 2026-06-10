@@ -1,8 +1,21 @@
 "use client";
 
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  Filter,
+  X,
+  ChevronRight,
+  Globe,
+  Server,
+  Code2,
+  HardDrive,
+  Wifi,
+  AlertTriangle,
+  Clock,
+  FolderOpen,
+} from "lucide-react";
 import { useGetProjectsQuery } from "@/lib/redux/services/userdashboard/project/project-api";
 import {
   useListJobsQuery,
@@ -11,10 +24,13 @@ import {
 import { useAppDispatch } from "@/lib/redux/hooks";
 import type { Target, TargetWithMeta, JobSummary } from "@/types/assets";
 import StatusBadge from "./StatusBadge";
-import TargetsTableSkeleton from "./TargetsTableSkeleton";
 import PaginationControls from "./PaginationControls";
 
-// --- Utility functions ---
+// ─── Constants ────────────────────────────────────────────────────────────────
+const ROW_H = 56; // px — fixed row height
+const PAGE_SIZE_DEFAULT = 10;
+
+// ─── Utility functions ────────────────────────────────────────────────────────
 
 export function computeTargetStatus(
   jobs: JobSummary[],
@@ -54,37 +70,71 @@ export function formatRelativeTime(isoDate: string | null): string {
   return `${days}d ago`;
 }
 
-// --- Component ---
+function getTypeIcon(type: string) {
+  switch (type.toLowerCase()) {
+    case "domain":
+    case "subdomain":
+      return <Globe size={13} className="text-cyan-500" />;
+    case "ip":
+    case "ip_range":
+      return <Wifi size={13} className="text-violet-500" />;
+    case "url":
+      return <Server size={13} className="text-blue-500" />;
+    case "cidr":
+      return <HardDrive size={13} className="text-amber-500" />;
+    case "repo":
+    case "repository":
+      return <Code2 size={13} className="text-emerald-500" />;
+    default:
+      return <Globe size={13} className="text-slate-400" />;
+  }
+}
+
+function getTypePillClass(type: string): string {
+  switch (type.toLowerCase()) {
+    case "domain":
+    case "subdomain":
+      return "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800/50";
+    case "ip":
+    case "ip_range":
+      return "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-800/50";
+    case "url":
+      return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/50";
+    case "cidr":
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50";
+    case "repo":
+    case "repository":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50";
+    default:
+      return "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
+  }
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export type TargetsTableProps = {
   onRowClick?: (targetId: string, projectId: string) => void;
 };
 
-export default function TargetsTable({
-  onRowClick,
-}: TargetsTableProps) {
-  // Internal state for search, filters, and pagination
+export default function TargetsTable({ onRowClick }: TargetsTableProps) {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_DEFAULT);
 
-  // Debounce search input by 300ms
+  // Debounce search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-    }, 300);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setDebouncedSearch(searchInput), 300);
+    return () => clearTimeout(t);
   }, [searchInput]);
 
-  // Reset pagination to page 1 when filters/search change
+  // Reset to page 1 on filter/search change
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch, filterType, filterProject]);
 
-  // Fetch projects
   const {
     data: projects,
     isLoading: projectsLoading,
@@ -92,16 +142,13 @@ export default function TargetsTable({
     refetch: refetchProjects,
   } = useGetProjectsQuery(undefined, { pollingInterval: 30000 });
 
-  // Fetch targets for each project
   const projectIds = useMemo(
     () => (projects ?? []).map((p) => p.project_id),
     [projects],
   );
 
-  // Fetch targets for each project
   const targetQueries = useTargetQueries(projectIds);
 
-  // Fetch all jobs to compute status and last scan
   const {
     data: jobsData,
     isLoading: jobsLoading,
@@ -109,42 +156,29 @@ export default function TargetsTable({
     refetch: refetchJobs,
   } = useListJobsQuery({ limit: 100 });
 
-  // Determine loading/error states
-  const isLoading =
-    projectsLoading || targetQueries.isLoading || jobsLoading;
+  const isLoading = projectsLoading || targetQueries.isLoading || jobsLoading;
   const isError = projectsError || targetQueries.isError || jobsError;
 
-  // Merge data into TargetWithMeta[]
   const allTargets: TargetWithMeta[] = useMemo(() => {
     if (!projects || !jobsData) return [];
-
     const jobs = jobsData.jobs ?? [];
     const projectMap = new Map(projects.map((p) => [p.project_id, p.name]));
 
     return targetQueries.targets.map((target) => {
       const targetJobs = jobs.filter((j) => j.target_name === target.name);
       const status = computeTargetStatus(targetJobs);
-
-      // Find most recent job for last_scan
       const mostRecentJob = targetJobs.reduce<JobSummary | null>(
-        (latest, job) => {
-          if (
-            !latest ||
-            new Date(job.created_at).getTime() >
-            new Date(latest.created_at).getTime()
-          ) {
-            return job;
-          }
-          return latest;
-        },
+        (latest, job) =>
+          !latest ||
+          new Date(job.created_at).getTime() > new Date(latest.created_at).getTime()
+            ? job
+            : latest,
         null,
       );
-
       const openFindings = targetJobs.reduce(
         (sum, j) => sum + (j.total_findings ?? 0),
         0,
       );
-
       return {
         ...target,
         project_name: projectMap.get(target.project_id) ?? "Unknown",
@@ -155,15 +189,11 @@ export default function TargetsTable({
     });
   }, [projects, targetQueries.targets, jobsData]);
 
-  // Compute distinct target types for the type filter dropdown
   const distinctTypes = useMemo(() => {
     const types = new Set(allTargets.map((t) => t.type));
     return Array.from(types).sort();
   }, [allTargets]);
 
-
-
-  // Sort targets by last_scan descending (most recent first, nulls at the bottom)
   const sortedTargets = useMemo(() => {
     return [...allTargets].sort((a, b) => {
       if (!a.last_scan && !b.last_scan) return 0;
@@ -173,57 +203,50 @@ export default function TargetsTable({
     });
   }, [allTargets]);
 
-  // Apply filters
   const filteredTargets = useMemo(() => {
     return sortedTargets.filter((target) => {
       const matchesSearch =
         !debouncedSearch ||
         target.name.toLowerCase().includes(debouncedSearch.toLowerCase());
-      const matchesType =
-        filterType === "all" || target.type === filterType;
+      const matchesType = filterType === "all" || target.type === filterType;
       const matchesProject =
         filterProject === "all" || target.project_id === filterProject;
       return matchesSearch && matchesType && matchesProject;
     });
   }, [sortedTargets, debouncedSearch, filterType, filterProject]);
 
-  // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(filteredTargets.length / pageSize));
 
-  // Paginate
   const paginatedTargets = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredTargets.slice(start, start + pageSize);
   }, [filteredTargets, currentPage, pageSize]);
 
-  // Handlers
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
-
+  const handlePageChange = useCallback((page: number) => setCurrentPage(page), []);
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setCurrentPage(1);
   }, []);
 
-  // Loading state
+  const hasActiveFilters = filterType !== "all" || filterProject !== "all";
+  const TBODY_H = ROW_H * pageSize; // always tall enough for a full page
+
+  // ── Loading skeleton ──────────────────────────────────────────────────────
   if (isLoading) {
-    return <TargetsTableSkeleton />;
+    return <TargetsTableSkeleton pageSize={pageSize} rowH={ROW_H} />;
   }
 
-  // Error state
+  // ── Error ─────────────────────────────────────────────────────────────────
   if (isError) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
-        <p className="text-sm sm:text-base text-red-500 dark:text-red-400 font-medium mb-4">
-          Failed to load target data. Please try again.
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 text-center">
+        <AlertTriangle size={28} className="mx-auto text-rose-400 mb-3" />
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">
+          Failed to load target data.
         </p>
         <button
-          onClick={() => {
-            refetchProjects();
-            refetchJobs();
-          }}
-          className="px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-teal-500 hover:bg-teal-600 text-white transition-colors"
+          onClick={() => { refetchProjects(); refetchJobs(); }}
+          className="px-5 py-2 text-xs font-semibold rounded-xl bg-teal-500 hover:bg-teal-600 text-white transition-colors"
         >
           Retry
         </button>
@@ -231,209 +254,305 @@ export default function TargetsTable({
     );
   }
 
-  // Empty state
+  // ── Empty (no targets at all) ─────────────────────────────────────────────
   if (allTargets.length === 0) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
-        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">
-          No targets available. Add targets to your projects to get started.
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 text-center">
+        <FolderOpen size={28} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          No targets yet. Add targets to a project to get started.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Search and Filter Controls */}
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-4 md:p-5">
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+    <div className="space-y-3 sm:space-y-4">
+
+      {/* ── Search + Filter bar ─────────────────────────────────────────────── */}
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
+        <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search targets by name..."
+              placeholder="Search targets by name…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               maxLength={200}
-              className="w-full pl-10 pr-4 py-2.5 text-sm sm:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+              className="w-full pl-9 pr-9 py-2 sm:py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
               aria-label="Search targets"
             />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => setSearchInput("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
-          {/* Filter dropdowns */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-            <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-              <Filter size={15} />
-              <span className="text-xs font-medium uppercase tracking-wider hidden sm:inline">Filters</span>
-            </div>
+          {/* Filters */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">
+              <Filter size={13} />
+              Filter
+            </span>
 
-            {/* Type filter */}
+            {/* Type */}
             <div className="relative">
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="appearance-none pl-3.5 pr-9 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[110px] sm:min-w-[130px]"
                 aria-label="Filter by type"
               >
                 <option value="all">All Types</option>
                 {distinctTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
+                  <option key={type} value={type}>{type}</option>
                 ))}
               </select>
-              <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
 
-            {/* Project filter */}
+            {/* Project */}
             <div className="relative">
               <select
                 value={filterProject}
                 onChange={(e) => setFilterProject(e.target.value)}
-                className="appearance-none pl-3.5 pr-9 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[160px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px] sm:min-w-[160px]"
                 aria-label="Filter by project"
               >
                 <option value="all">All Projects</option>
                 {(projects ?? []).map((project) => (
-                  <option key={project.project_id} value={project.project_id}>
-                    {project.name}
-                  </option>
+                  <option key={project.project_id} value={project.project_id}>{project.name}</option>
                 ))}
               </select>
-              <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
 
-            {/* Active filter indicator */}
-            {(filterType !== "all" || filterProject !== "all") && (
-              <button
-                type="button"
-                onClick={() => { setFilterType("all"); setFilterProject("all"); }}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-colors"
-              >
-                Clear filters
-              </button>
-            )}
+            {/* Clear */}
+            <AnimatePresence>
+              {hasActiveFilters && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  type="button"
+                  onClick={() => { setFilterType("all"); setFilterProject("all"); }}
+                  className="inline-flex items-center gap-1 px-2.5 py-2 sm:py-2.5 text-xs font-medium rounded-lg border border-teal-200 dark:border-teal-500/30 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-colors whitespace-nowrap"
+                >
+                  <X size={11} />
+                  Clear
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            {filteredTargets.length === allTargets.length
-              ? <><span className="font-semibold text-slate-700 dark:text-slate-300">{allTargets.length}</span> targets</>
-              : <><span className="font-semibold text-slate-700 dark:text-slate-300">{filteredTargets.length}</span> of {allTargets.length} targets</>
-            }
+        {/* Count row */}
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {filteredTargets.length === allTargets.length ? (
+              <><span className="font-semibold text-slate-700 dark:text-slate-200">{allTargets.length}</span> target{allTargets.length !== 1 ? "s" : ""}</>
+            ) : (
+              <><span className="font-semibold text-slate-700 dark:text-slate-200">{filteredTargets.length}</span> of {allTargets.length} targets</>
+            )}
           </p>
           {debouncedSearch && (
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              Searching: &ldquo;{debouncedSearch}&rdquo;
+            <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 truncate max-w-[180px]">
+              &ldquo;{debouncedSearch}&rdquo;
             </p>
           )}
         </div>
       </div>
 
-      {/* Table — desktop/tablet */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        {/* Desktop table view */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-              <tr>
-                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Target
-                </th>
-                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Project
-                </th>
-                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-3 sm:px-4 md:px-5 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                  Last Scan
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+      {/* ── Table card ──────────────────────────────────────────────────────── */}
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+
+        {/* ── Desktop/tablet table ── */}
+        <div className="hidden sm:flex flex-col">
+          {/* thead — always visible */}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[35%]">
+                    Target
+                  </th>
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[22%]">
+                    Project
+                  </th>
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[13%]">
+                    Type
+                  </th>
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[14%]">
+                    Status
+                  </th>
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[12%]">
+                    Last Scan
+                  </th>
+                  <th className="px-4 md:px-6 py-3.5 w-[4%]" />
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+          {/* Fixed-height tbody — always sized for pageSize rows */}
+          <div
+            className="overflow-x-auto border-b border-slate-100 dark:border-slate-800"
+            style={{ height: TBODY_H }}
+          >
+            {filteredTargets.length === 0 ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="flex flex-col items-center gap-2 py-6">
+                  <Search size={24} className="text-slate-300 dark:text-slate-600" />
+                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                    No targets match the current filters
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <table className="w-full min-w-[640px]">
+                <tbody>
+                  {/* Real rows */}
+                  {paginatedTargets.map((target, index) => (
+                    <motion.tr
+                      key={target.target_id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.025 }}
+                      onClick={() => onRowClick?.(target.target_id, target.project_id)}
+                      className="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
+                      style={{ height: ROW_H }}
+                    >
+                      {/* Target name */}
+                      <td className="px-4 md:px-6 w-[35%]">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/40 transition-colors">
+                            {getTypeIcon(target.type)}
+                          </div>
+                          <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate max-w-[220px] md:max-w-xs">
+                            {target.name}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Project */}
+                      <td className="px-4 md:px-6 w-[22%]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <FolderOpen size={12} className="shrink-0 text-slate-400 dark:text-slate-500" />
+                          <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
+                            {target.project_name}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Type */}
+                      <td className="px-4 md:px-6 w-[13%]">
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap ${getTypePillClass(target.type)}`}>
+                          {target.type}
+                        </span>
+                      </td>
+                      {/* Status */}
+                      <td className="px-4 md:px-6 w-[14%]">
+                        <StatusBadge status={target.status} />
+                      </td>
+                      {/* Last scan */}
+                      <td className="px-4 md:px-6 w-[12%]">
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={11} className="shrink-0 text-slate-400 dark:text-slate-500" />
+                          <span className="text-xs sm:text-sm tabular-nums text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                            {formatRelativeTime(target.last_scan)}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Arrow */}
+                      <td className="px-4 md:px-6 w-[4%]">
+                        <ChevronRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors" />
+                      </td>
+                    </motion.tr>
+                  ))}
+
+                  {/* Ghost rows — keep height stable */}
+                  {Array.from({ length: pageSize - paginatedTargets.length }).map((_, i) => (
+                    <tr
+                      key={`ghost-${i}`}
+                      className="border-b border-slate-50 dark:border-slate-800/30"
+                      style={{ height: ROW_H }}
+                    >
+                      <td colSpan={6} />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* ── Mobile card list ── */}
+        <div
+          className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800 border-b border-slate-100 dark:border-slate-800"
+          style={{ minHeight: ROW_H * Math.min(paginatedTargets.length, 3) }}
+        >
+          {filteredTargets.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center gap-2">
+                <Search size={22} className="text-slate-300 dark:text-slate-600" />
+                <p className="text-xs text-slate-400 dark:text-slate-500">No targets match filters</p>
+              </div>
+            </div>
+          ) : (
+            <AnimatePresence initial={false}>
               {paginatedTargets.map((target, index) => (
-                <motion.tr
+                <motion.div
                   key={target.target_id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: index * 0.03 }}
+                  transition={{ delay: index * 0.025 }}
                   onClick={() => onRowClick?.(target.target_id, target.project_id)}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors group"
+                  className="flex items-center justify-between gap-3 px-3.5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer active:bg-slate-100 dark:active:bg-slate-800 transition-colors"
                 >
-                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
-                    <span className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                      {target.name}
-                    </span>
-                  </td>
-                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4 text-sm text-slate-600 dark:text-slate-400">
-                    {target.project_name}
-                  </td>
-                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
-                    <span className="inline-flex px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400">
-                      {target.type}
-                    </span>
-                  </td>
-                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
+                      {getTypeIcon(target.type)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                        {target.name}
+                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+                          <FolderOpen size={10} />
+                          {target.project_name}
+                        </span>
+                        <span className={`inline-flex items-center rounded-full border px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide ${getTypePillClass(target.type)}`}>
+                          {target.type}
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500">
+                          <Clock size={9} />
+                          {formatRelativeTime(target.last_scan)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
                     <StatusBadge status={target.status} />
-                  </td>
-                  <td className="px-3 sm:px-4 md:px-5 py-3 sm:py-4 text-sm text-slate-500 dark:text-slate-400">
-                    {formatRelativeTime(target.last_scan)}
-                  </td>
-                </motion.tr>
+                    <ChevronRight size={13} className="text-slate-300 dark:text-slate-600" />
+                  </div>
+                </motion.div>
               ))}
-            </tbody>
-          </table>
+            </AnimatePresence>
+          )}
         </div>
 
-        {/* Mobile card view */}
-        <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
-          {paginatedTargets.map((target, index) => (
-            <motion.div
-              key={target.target_id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: index * 0.03 }}
-              onClick={() => onRowClick?.(target.target_id, target.project_id)}
-              className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors active:bg-slate-100 dark:active:bg-slate-800"
-            >
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <span className="text-sm font-semibold text-slate-900 dark:text-white leading-snug">
-                  {target.name}
-                </span>
-                <StatusBadge status={target.status} />
-              </div>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                <span>{target.project_name}</span>
-                <span className="inline-flex px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">
-                  {target.type}
-                </span>
-                <span>{formatRelativeTime(target.last_scan)}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* No results after filtering */}
-        {filteredTargets.length === 0 && allTargets.length > 0 && (
-          <div className="px-4 py-8 text-center">
-            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">
-              No targets match the current filters.
-            </p>
-          </div>
-        )}
-
-        {/* Pagination Controls */}
+        {/* ── Pagination ── */}
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -448,8 +567,80 @@ export default function TargetsTable({
   );
 }
 
-// --- Custom hook to fetch targets for multiple projects ---
-// Uses RTK Query's dispatch-based approach to avoid hook-in-loop violations.
+// ─── Inline skeleton that matches the new layout ─────────────────────────────
+
+function TargetsTableSkeleton({ pageSize = 10, rowH = 56 }: { pageSize?: number; rowH?: number }) {
+  return (
+    <div className="space-y-3 sm:space-y-4">
+      {/* Filter bar skeleton */}
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
+        <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3 animate-pulse">
+          <div className="h-9 sm:h-10 flex-1 rounded-lg bg-slate-100 dark:bg-slate-800" />
+          <div className="flex gap-2">
+            <div className="h-9 sm:h-10 w-32 rounded-lg bg-slate-100 dark:bg-slate-800" />
+            <div className="h-9 sm:h-10 w-40 rounded-lg bg-slate-100 dark:bg-slate-800" />
+          </div>
+        </div>
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 animate-pulse">
+          <div className="h-3.5 w-24 rounded bg-slate-100 dark:bg-slate-800" />
+        </div>
+      </div>
+
+      {/* Table skeleton */}
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
+                {["35%", "22%", "13%", "14%", "12%", "4%"].map((w, i) => (
+                  <th key={i} className="px-4 md:px-6 py-3.5" style={{ width: w }}>
+                    {i < 5 && <div className="h-3 w-16 rounded bg-slate-200 dark:bg-slate-700 animate-pulse" />}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: pageSize }).map((_, i) => (
+                <tr
+                  key={i}
+                  className="border-b border-slate-50 dark:border-slate-800/50 animate-pulse"
+                  style={{ height: rowH }}
+                >
+                  <td className="px-4 md:px-6">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-7 w-7 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0" />
+                      <div className="h-4 w-40 rounded bg-slate-100 dark:bg-slate-800" />
+                    </div>
+                  </td>
+                  <td className="px-4 md:px-6"><div className="h-4 w-28 rounded bg-slate-100 dark:bg-slate-800" /></td>
+                  <td className="px-4 md:px-6"><div className="h-5 w-16 rounded-full bg-slate-100 dark:bg-slate-800" /></td>
+                  <td className="px-4 md:px-6"><div className="h-4 w-20 rounded bg-slate-100 dark:bg-slate-800" /></td>
+                  <td className="px-4 md:px-6"><div className="h-4 w-14 rounded bg-slate-100 dark:bg-slate-800" /></td>
+                  <td className="px-4 md:px-6" />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile skeleton */}
+        <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800 animate-pulse">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-3.5 py-3">
+              <div className="h-7 w-7 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-40 rounded bg-slate-100 dark:bg-slate-800" />
+                <div className="h-3 w-24 rounded bg-slate-100 dark:bg-slate-800" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Custom hook: fetch targets for multiple projects ─────────────────────────
 
 function useTargetQueries(projectIds: string[], pollingInterval = 0) {
   const dispatch = useAppDispatch();
@@ -457,7 +648,6 @@ function useTargetQueries(projectIds: string[], pollingInterval = 0) {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  // Serialize projectIds to avoid infinite re-render from array reference changes
   const projectIdsKey = JSON.stringify(projectIds);
 
   useEffect(() => {
@@ -477,23 +667,19 @@ function useTargetQueries(projectIds: string[], pollingInterval = 0) {
 
       Promise.all(
         ids.map((id) =>
-          dispatch(assetsApi.endpoints.listTargets.initiate(id, { forceRefetch: true })).unwrap(),
+          dispatch(
+            assetsApi.endpoints.listTargets.initiate(id, { forceRefetch: true }),
+          ).unwrap(),
         ),
       )
         .then((results) => {
-          if (!cancelled) {
-            setTargets(results.flat());
-          }
+          if (!cancelled) setTargets(results.flat());
         })
         .catch(() => {
-          if (!cancelled) {
-            setIsError(true);
-          }
+          if (!cancelled) setIsError(true);
         })
         .finally(() => {
-          if (!cancelled) {
-            setIsLoading(false);
-          }
+          if (!cancelled) setIsLoading(false);
         });
     };
 
@@ -501,15 +687,10 @@ function useTargetQueries(projectIds: string[], pollingInterval = 0) {
 
     if (pollingInterval > 0) {
       const timer = setInterval(fetchAll, pollingInterval);
-      return () => {
-        cancelled = true;
-        clearInterval(timer);
-      };
+      return () => { cancelled = true; clearInterval(timer); };
     }
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [dispatch, projectIdsKey, pollingInterval]);
 
   return { targets, isLoading, isError };
