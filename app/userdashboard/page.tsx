@@ -295,7 +295,7 @@ function AuthenticatedDashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto space-y-2.5 sm:space-y-3 md:space-y-3 lg:space-y-4">
+      <div className="w-full space-y-2.5 sm:space-y-3 md:space-y-3 lg:space-y-4">
 
         {/* ── Header ─────────────────────────────────────────────── */}
         <motion.div
@@ -347,20 +347,11 @@ function AuthenticatedDashboard() {
               <MetricCard key={metric.label} metric={metric} index={index} total={scannedAssetMetrics.length} />
             ))}
           </div>
-          {/* Desktop: row 1 — 4 cards */}
+          {/* Desktop: single 4-col grid for all 6 cards — last 2 fill cols 1+2 naturally */}
           <div className="hidden lg:grid lg:grid-cols-4 gap-2">
-            {scannedAssetMetrics.slice(0, 4).map((metric, index) => (
+            {scannedAssetMetrics.map((metric, index) => (
               <MetricCard key={metric.label} metric={metric} index={index} total={scannedAssetMetrics.length} />
             ))}
-          </div>
-          {/* Desktop: row 2 — 2 cards, same width as above (1/4 each), left-aligned */}
-          <div className="hidden lg:grid lg:grid-cols-4 gap-2">
-            <div className="col-start-1 col-span-1">
-              <MetricCard metric={scannedAssetMetrics[4]} index={4} total={scannedAssetMetrics.length} />
-            </div>
-            <div className="col-span-1">
-              <MetricCard metric={scannedAssetMetrics[5]} index={5} total={scannedAssetMetrics.length} />
-            </div>
           </div>
         </div>
 
@@ -607,7 +598,7 @@ function AuthenticatedDashboard() {
               <div className="flex flex-col">
                 {/* thead always visible */}
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[520px]">
+                  <table className="w-full min-w-130">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
                         <th className="px-3 py-3 sm:px-4 md:px-6 text-left text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[45%]">
@@ -654,7 +645,7 @@ function AuthenticatedDashboard() {
                       />
                     </div>
                   ) : (
-                    <table className="w-full min-w-[520px]">
+                    <table className="w-full min-w-130">
                       <tbody>
                         {/* Real rows */}
                         {pageItems.map((report, index) => (
@@ -804,7 +795,7 @@ function MetricCard({ metric, index, total }: { metric: MetricCardData; index: n
         <p className="mt-2 sm:mt-3 md:mt-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white">
           {formatCompactNumber(metric.value)}
         </p>
-        <p className="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs lg:text-sm text-slate-400 dark:text-slate-500 pr-12 sm:pr-16 md:pr-20 break-words">
+        <p className="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs lg:text-sm text-slate-400 dark:text-slate-500 pr-12 sm:pr-16 md:pr-20 wrap-break-word">
           {metric.note}
         </p>
       </div>

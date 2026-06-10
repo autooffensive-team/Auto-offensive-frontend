@@ -188,7 +188,7 @@ export default function UserDashboardShell({
   const desktopContentOffset = collapsed ? "md:pl-[72px]" : "md:pl-72";
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
+    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
       <MobileScreenWarning />
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -458,9 +458,9 @@ export default function UserDashboardShell({
         </div>
       </aside>
 
-      <div className={`transition-all duration-300 ${desktopContentOffset}`}>
+      <div className={`transition-all duration-300 overflow-x-hidden min-w-0 ${desktopContentOffset}`}>
         <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
-          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
+          <div className="flex w-full items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -581,7 +581,7 @@ export default function UserDashboardShell({
           </div>
         </header>
 
-        <main className={`mx-auto max-w-400 px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
+        <main className={`w-full px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
           {children}
         </main>
       </div>
