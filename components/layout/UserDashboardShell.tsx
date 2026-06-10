@@ -17,7 +17,7 @@ import {
   Code,
   FileText,
   User,
-  Settings,
+  Key,
   LogOut,
   Lock,
   LogIn,
@@ -73,7 +73,7 @@ const mainNavItems: NavItem[] = [
 
 const accountNavItems: NavItem[] = [
   { label: "Profile", path: "/userdashboard/profile", icon: User, description: "User profile", guestAllowed: false },
-  { label: "Settings", path: "/userdashboard/settings", icon: Settings, description: "Preferences", guestAllowed: false },
+  { label: "API Keys", path: "/userdashboard/settings", icon: Key, description: "Manage API keys", guestAllowed: false },
 ];
 
 function isItemActive(pathname: string, path: string) {
