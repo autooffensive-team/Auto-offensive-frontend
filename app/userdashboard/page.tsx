@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 import {
   Activity,
   AlertCircle,
-  Cpu,
-  Database,
   ChevronLeft,
   ChevronRight,
+  Cpu,
+  Database,
+  Download,
+  FileText,
   Globe,
   Lock,
-  Network,
   Radar,
   Server,
   TrendingUp,
@@ -18,20 +19,20 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import {
   useGetDashboardAssetsTrendQuery,
-  useGetDashboardMostVulnerableAssetsQuery,
   useGetDashboardOverviewQuery,
   useGetDashboardTopPortsQuery,
   useGetDashboardTopServicesQuery,
   useGetDashboardTopTechnologiesQuery,
   useGetDashboardVulnerabilitySeverityQuery,
 } from "@/lib/redux/services/userdashboard/overiew/overview-api";
+import { useListReportsQuery, useDownloadStoredReportMutation } from "@/lib/redux/services/userdashboard/assets/reports-api";
 import DashboardOverviewSkeleton from "@/components/skeletons/dashboard-overview-skeleton";
-import type { DashboardMostVulnerableAsset } from "@/types/overview";
+import type { ReportMetaResponse } from "@/types/reports";
 
 import { useOptionalGuestContext } from "@/lib/guest/GuestContext";
 
@@ -54,7 +55,7 @@ type SeverityVisual = {
   bar: string;
 };
 
-const HIGH_RISK_ASSETS_PAGE_SIZE = 10;
+const RECENT_REPORTS_DAYS = 7;
 
 // ─── Responsive breakpoints for easier reference ─────────────────────────────
 // sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
@@ -146,21 +147,6 @@ function getSeverityMeta(label: string, count: number) {
   };
 }
 
-function getRiskTone(severity: string): string {
-  switch (severity.toLowerCase()) {
-    case "critical":
-      return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50";
-    case "high":
-      return "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800/50";
-    case "medium":
-      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50";
-    case "low":
-      return "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800/50";
-    default:
-      return "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/50";
-  }
-}
-
 function readErrorMessage(error: unknown): string {
   if (!error || typeof error !== "object") return "Unable to load dashboard data.";
   if ("status" in error && "data" in error) {
@@ -190,7 +176,6 @@ function AuthenticatedDashboard() {
   const guestCtx = useOptionalGuestContext();
   const isGuest = guestCtx?.isGuest ?? false;
 
-  const [highRiskAssetsPage, setHighRiskAssetsPage] = useState(1);
   const { data: authMe } = useGetAuthMeQuery(undefined, { skip: isGuest });
   const overviewQuery = useGetDashboardOverviewQuery(undefined, { skip: isGuest });
   const severityQuery = useGetDashboardVulnerabilitySeverityQuery(undefined, { skip: isGuest });
@@ -198,12 +183,9 @@ function AuthenticatedDashboard() {
   const topPortsQuery = useGetDashboardTopPortsQuery({ limit: 1 }, { skip: isGuest });
   const topServicesQuery = useGetDashboardTopServicesQuery({ limit: 1 }, { skip: isGuest });
   const topTechnologiesQuery = useGetDashboardTopTechnologiesQuery({ limit: 1 }, { skip: isGuest });
-  const mostVulnerableQuery = useGetDashboardMostVulnerableAssetsQuery({
-    page: highRiskAssetsPage,
-    pageSize: HIGH_RISK_ASSETS_PAGE_SIZE,
-    sortBy: "riskScore",
-    order: "desc",
-  }, { skip: isGuest });
+  // Fetch up to 100 reports and filter client-side to last 7 days
+  const reportsQuery = useListReportsQuery({ page: 1, page_size: 100 }, { skip: isGuest });
+  const [downloadReport, downloadState] = useDownloadStoredReportMutation();
 
   const displayName = isGuest
     ? "Guest"
@@ -214,24 +196,16 @@ function AuthenticatedDashboard() {
   const topPort = topPortsQuery.data?.[0];
   const topService = topServicesQuery.data?.[0];
   const topTechnology = topTechnologiesQuery.data?.[0];
-  const vulnerableAssets = mostVulnerableQuery.data?.items ?? [];
-  const totalHighRiskAssets = mostVulnerableQuery.data?.total ?? 0;
-  const totalHighRiskAssetPages = Math.max(
-    1,
-    Math.ceil(totalHighRiskAssets / HIGH_RISK_ASSETS_PAGE_SIZE),
-  );
-  const highRiskAssetsStart = totalHighRiskAssets
-    ? (highRiskAssetsPage - 1) * HIGH_RISK_ASSETS_PAGE_SIZE + 1
-    : 0;
-  const highRiskAssetsEnd = totalHighRiskAssets
-    ? Math.min(highRiskAssetsPage * HIGH_RISK_ASSETS_PAGE_SIZE, totalHighRiskAssets)
-    : 0;
 
-  useEffect(() => {
-    if (highRiskAssetsPage > totalHighRiskAssetPages) {
-      setHighRiskAssetsPage(totalHighRiskAssetPages);
-    }
-  }, [highRiskAssetsPage, totalHighRiskAssetPages]);
+  // Filter reports to the last 7 days on the frontend
+  const cutoff = Date.now() - RECENT_REPORTS_DAYS * 24 * 60 * 60 * 1000;
+  const recentReports = (reportsQuery.data?.reports ?? []).filter(
+    (r) => new Date(r.created_at).getTime() >= cutoff,
+  );
+
+  const [reportsFormatFilter, setReportsFormatFilter] = useState<string>("all");
+  const [reportsPage, setReportsPage] = useState(1);
+  const REPORTS_PAGE_SIZE = 10;
 
   const scannedAssetMetrics: MetricCardData[] = [
     {
@@ -305,12 +279,11 @@ function AuthenticatedDashboard() {
   const isLoading =
     overviewQuery.isLoading ||
     severityQuery.isLoading ||
-    mostVulnerableQuery.isLoading;
+    reportsQuery.isLoading;
 
   const loadError =
     overviewQuery.error ||
     severityQuery.error ||
-    mostVulnerableQuery.error ||
     topPortsQuery.error ||
     topServicesQuery.error ||
     topTechnologiesQuery.error;
@@ -564,92 +537,223 @@ function AuthenticatedDashboard() {
           </div>
         </motion.div>
 
-        {/* ── High-Risk Assets table ───────────────────────────────── */}
+        {/* ── Recent Reports (last 7 days) ─────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
         >
+          {/* Card header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate">High-risk assets</p>
-              <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Assets ranked by security risk score</p>
+              <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate">
+                Recent reports
+              </p>
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Generated reports in the last 7 days
+              </p>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {totalHighRiskAssets > 0 && (
-                <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[8px] sm:text-[10px] md:text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 whitespace-nowrap">
-                  {highRiskAssetsStart}-{highRiskAssetsEnd}
-                </span>
-              )}
-              <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 md:px-3 text-[10px] md:text-sm font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap">
-                {formatFullNumber(totalHighRiskAssets)} assets
-              </span>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap">
+              {(["all", "pdf", "docx", "xlsx", "json"] as const).map((fmt) => {
+                const allFiltered =
+                  reportsFormatFilter === "all"
+                    ? recentReports
+                    : recentReports.filter((r) => r.format === reportsFormatFilter);
+                const count =
+                  fmt === "all"
+                    ? recentReports.length
+                    : recentReports.filter((r) => r.format === fmt).length;
+                void allFiltered;
+                if (fmt !== "all" && count === 0) return null;
+                return (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => {
+                      setReportsFormatFilter(fmt);
+                      setReportsPage(1);
+                    }}
+                    className={`rounded-lg border px-2 py-1 md:px-3 text-[10px] md:text-xs font-semibold transition whitespace-nowrap ${
+                      reportsFormatFilter === fmt
+                        ? "border-teal-500 bg-teal-50 text-teal-700 dark:border-teal-600 dark:bg-teal-950/40 dark:text-teal-300"
+                        : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600"
+                    }`}
+                  >
+                    {fmt === "all" ? `All (${count})` : `${fmt.toUpperCase()} (${count})`}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {vulnerableAssets.length > 0 ? (
-            <div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-full">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40">
-                      {["Asset", "IP Address", "Severity", "Findings", "Risk Score", "Status"].map((h) => (
-                        <th
-                          key={h}
-                          className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-left text-[8px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                    {vulnerableAssets.map((asset, index) => (
-                      <AssetRow key={asset.assetId} asset={asset} index={index} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          {/* Fixed-height table area — always sized for 10 rows */}
+          {(() => {
+            const filtered =
+              reportsFormatFilter === "all"
+                ? recentReports
+                : recentReports.filter((r) => r.format === reportsFormatFilter);
 
-              <div className="flex flex-col items-center gap-2.5 sm:gap-3 border-t border-slate-100 px-3 py-2.5 text-center sm:px-4 sm:py-3 md:flex-row md:items-center md:justify-between md:px-6 md:text-left dark:border-slate-800">
-                <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400">
-                  Showing {highRiskAssetsStart}-{highRiskAssetsEnd} of {formatFullNumber(totalHighRiskAssets)} high-risk assets
-                </p>
-                <div className="flex w-full items-center justify-center gap-1 md:w-auto md:gap-1.5 shrink-0">
-                  <PaginationButton
-                    label="Previous page"
-                    onClick={() => setHighRiskAssetsPage((page) => Math.max(1, page - 1))}
-                    disabled={highRiskAssetsPage === 1 || mostVulnerableQuery.isFetching}
-                    icon={<ChevronLeft size={14} />}
-                  />
-                  <span className="px-1.5 sm:px-2 text-[10px] sm:text-xs md:text-sm font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                    Page {highRiskAssetsPage} of {totalHighRiskAssetPages}
-                  </span>
-                  <PaginationButton
-                    label="Next page"
-                    onClick={() =>
-                      setHighRiskAssetsPage((page) =>
-                        Math.min(totalHighRiskAssetPages, page + 1),
-                      )
-                    }
-                    disabled={
-                      highRiskAssetsPage === totalHighRiskAssetPages ||
-                      mostVulnerableQuery.isFetching
-                    }
-                    icon={<ChevronRight size={14} />}
-                  />
+            const totalPages = Math.max(1, Math.ceil(filtered.length / REPORTS_PAGE_SIZE));
+            const safePage = Math.min(reportsPage, totalPages);
+            const pageStart = (safePage - 1) * REPORTS_PAGE_SIZE;
+            const pageEnd = pageStart + REPORTS_PAGE_SIZE;
+            const pageItems = filtered.slice(pageStart, pageEnd);
+
+            // 10 rows × 48px each = 480px — padded to 500px so it breathes a little
+            const TABLE_BODY_H = 480;
+
+            return (
+              <div className="flex flex-col">
+                {/* thead always visible */}
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[520px]">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
+                        <th className="px-3 py-3 sm:px-4 md:px-6 text-left text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[45%]">
+                          Report
+                        </th>
+                        <th className="px-3 py-3 sm:px-4 md:px-6 text-left text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[12%]">
+                          Format
+                        </th>
+                        <th className="px-3 py-3 sm:px-4 md:px-6 text-left text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[12%]">
+                          Size
+                        </th>
+                        <th className="px-3 py-3 sm:px-4 md:px-6 text-left text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[18%]">
+                          Generated
+                        </th>
+                        <th className="px-3 py-3 sm:px-4 md:px-6 text-right text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap w-[13%]">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+
+                {/* Fixed-height body */}
+                <div
+                  className="overflow-x-auto border-b border-slate-100 dark:border-slate-800"
+                  style={{ height: `${TABLE_BODY_H}px` }}
+                >
+                  {reportsQuery.isLoading ? (
+                    <div className="flex h-full items-center justify-center">
+                      <EmptyState
+                        icon={<FileText size={28} className="sm:size-8 text-slate-300 dark:text-slate-600" />}
+                        message="Loading recent reports…"
+                      />
+                    </div>
+                  ) : filtered.length === 0 ? (
+                    <div className="flex h-full items-center justify-center">
+                      <EmptyState
+                        icon={<FileText size={28} className="sm:size-8 text-slate-300 dark:text-slate-600" />}
+                        message={
+                          reportsFormatFilter === "all"
+                            ? "No reports generated in the last 7 days"
+                            : `No ${reportsFormatFilter.toUpperCase()} reports in the last 7 days`
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <table className="w-full min-w-[520px]">
+                      <tbody>
+                        {/* Real rows */}
+                        {pageItems.map((report, index) => (
+                          <ReportRow
+                            key={report.report_id}
+                            report={report}
+                            index={index}
+                            onDownload={() =>
+                              downloadReport({
+                                reportId: report.report_id,
+                                fileName: report.file_name,
+                              })
+                            }
+                            isDownloading={downloadState.isLoading}
+                          />
+                        ))}
+                        {/* Ghost rows — fill remaining slots so height stays fixed */}
+                        {Array.from({ length: REPORTS_PAGE_SIZE - pageItems.length }).map((_, i) => (
+                          <tr
+                            key={`ghost-${i}`}
+                            className="border-b border-slate-50 dark:border-slate-800/40"
+                            style={{ height: 48 }}
+                          >
+                            <td colSpan={5} />
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* Pagination footer */}
+                <div className="flex flex-col items-center gap-2 px-3 py-3 sm:px-4 sm:py-3 md:flex-row md:items-center md:justify-between md:px-6 dark:border-slate-800">
+                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                    {filtered.length === 0
+                      ? "No reports"
+                      : `Showing ${pageStart + 1}–${Math.min(pageEnd, filtered.length)} of ${filtered.length} report${filtered.length !== 1 ? "s" : ""}`}
+                  </p>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {/* Prev */}
+                    <button
+                      type="button"
+                      disabled={safePage === 1}
+                      onClick={() => setReportsPage((p) => Math.max(1, p - 1))}
+                      aria-label="Previous page"
+                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                    >
+                      <ChevronLeft size={13} />
+                    </button>
+
+                    {/* Page number pills */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((p) => {
+                        if (totalPages <= 5) return true;
+                        return p === 1 || p === totalPages || Math.abs(p - safePage) <= 1;
+                      })
+                      .reduce<(number | "…")[]>((acc, p, idx, arr) => {
+                        if (idx > 0 && typeof arr[idx - 1] === "number" && (p as number) - (arr[idx - 1] as number) > 1) {
+                          acc.push("…");
+                        }
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((p, idx) =>
+                        p === "…" ? (
+                          <span key={`ellipsis-${idx}`} className="px-1 text-[10px] text-slate-400 dark:text-slate-500 select-none">
+                            …
+                          </span>
+                        ) : (
+                          <button
+                            key={p}
+                            type="button"
+                            onClick={() => setReportsPage(p as number)}
+                            className={`inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border text-[10px] sm:text-xs font-semibold transition ${
+                              safePage === p
+                                ? "border-teal-500 bg-teal-50 text-teal-700 dark:border-teal-600 dark:bg-teal-950/40 dark:text-teal-300"
+                                : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        ),
+                      )}
+
+                    {/* Next */}
+                    <button
+                      type="button"
+                      disabled={safePage === totalPages}
+                      onClick={() => setReportsPage((p) => Math.min(totalPages, p + 1))}
+                      aria-label="Next page"
+                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                    >
+                      <ChevronRight size={13} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="py-8 sm:py-10 md:py-12">
-              <EmptyState
-                icon={<Network size={28} className="sm:size-8 text-slate-300 dark:text-slate-600" />}
-                message={isLoading ? "Loading asset data…" : "No vulnerable assets found"}
-              />
-            </div>
-          )}
+            );
+          })()}
         </motion.div>
 
       </div>
@@ -859,58 +963,95 @@ function VulnerabilityBarChart({ data }: { data: VulnItem[] }) {
   );
 }
 
-function AssetRow({ asset, index }: { asset: DashboardMostVulnerableAsset; index: number }) {
+function ReportRow({
+  report,
+  index,
+  onDownload,
+  isDownloading,
+}: {
+  report: ReportMetaResponse;
+  index: number;
+  onDownload: () => void;
+  isDownloading: boolean;
+}) {
+  const FORMAT_STYLES: Record<string, string> = {
+    pdf: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50",
+    docx: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/50",
+    xlsx: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50",
+    json: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50",
+  };
+
+  function formatBytes(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function formatRelativeDate(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  }
+
+  const fmtClass = FORMAT_STYLES[report.format] ?? "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+
   return (
     <motion.tr
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: index * 0.03 }}
-      className="group transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40"
+      style={{ height: 48 }}
+      className="group border-b border-slate-100 dark:border-slate-800/60 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40"
     >
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
+      {/* Report name */}
+      <td className="px-3 sm:px-4 md:px-6 w-[45%]">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
-            <Network size={12} className="sm:size-3.5 text-slate-500 dark:text-slate-400" />
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
+            <FileText size={13} className="text-slate-500 dark:text-slate-400" />
           </div>
-          <span className="max-w-20 sm:max-w-32 md:max-w-50 truncate text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200">
-            {asset.hostname || "Unknown"}
+          <span className="max-w-32 sm:max-w-52 md:max-w-72 truncate text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200">
+            {report.file_name}
           </span>
         </div>
       </td>
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
-        {asset.ip ? (
-          <code className="rounded-md bg-slate-100 px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 text-[8px] sm:text-[9px] md:text-xs font-mono text-slate-600 dark:bg-slate-800 dark:text-slate-300 block truncate">
-            {asset.ip}
-          </code>
-        ) : (
-          <span className="text-xs text-slate-400">—</span>
-        )}
+      {/* Format badge */}
+      <td className="px-3 sm:px-4 md:px-6 w-[12%]">
+        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap ${fmtClass}`}>
+          {report.format}
+        </span>
       </td>
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
+      {/* Size */}
+      <td className="px-3 sm:px-4 md:px-6 w-[12%]">
+        <span className="text-xs sm:text-sm tabular-nums text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          {formatBytes(report.size_bytes)}
+        </span>
+      </td>
+      {/* Date */}
+      <td className="px-3 sm:px-4 md:px-6 w-[18%]">
         <span
-          className={`inline-flex items-center rounded-full border px-1.5 py-0.5 sm:px-2 sm:py-0.5 md:px-2.5 text-[8px] sm:text-[9px] md:text-xs font-semibold uppercase tracking-wide whitespace-nowrap ${getRiskTone(asset.highestSeverity)}`}
+          className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap"
+          title={new Date(report.created_at).toLocaleString()}
         >
-          {asset.highestSeverity}
+          {formatRelativeDate(report.created_at)}
         </span>
       </td>
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
-        <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-          {formatFullNumber(asset.vulnerabilityCount)}
-        </span>
-      </td>
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full bg-rose-500 shrink-0" />
-          <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-            {formatFullNumber(asset.riskScore)}
-          </span>
-        </div>
-      </td>
-      <td className="px-2 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3">
-        <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 sm:px-2 sm:py-0.5 md:px-2.5 text-[8px] sm:text-[9px] md:text-xs font-medium text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-400 whitespace-nowrap">
-          <span className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full bg-emerald-500 shrink-0" />
-          Monitored
-        </span>
+      {/* Download */}
+      <td className="px-3 sm:px-4 md:px-6 w-[13%] text-right">
+        <button
+          type="button"
+          onClick={onDownload}
+          disabled={isDownloading}
+          aria-label={`Download ${report.file_name}`}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-slate-600 transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-teal-600 dark:hover:bg-teal-950/30 dark:hover:text-teal-300"
+        >
+          <Download size={12} />
+          <span className="hidden sm:inline">Download</span>
+        </button>
       </td>
     </motion.tr>
   );
@@ -1116,30 +1257,6 @@ function EmptyState({ icon, message }: { icon: React.ReactNode; message: string 
       {icon}
       <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-500 text-center">{message}</p>
     </div>
-  );
-}
-
-function PaginationButton({
-  disabled,
-  icon,
-  label,
-  onClick,
-}: {
-  disabled: boolean;
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-45 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
-    >
-      {icon}
-    </button>
   );
 }
 
