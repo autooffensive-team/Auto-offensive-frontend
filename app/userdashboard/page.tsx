@@ -754,14 +754,34 @@ function AuthenticatedDashboard() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function MetricCard({ metric, index }: { metric: MetricCardData; index: number }) {
+function MetricCard({ metric, index, total }: { metric: MetricCardData; index: number; total: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.04 + index * 0.04 }}
-      className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:p-6 lg:p-7 dark:border-slate-800 dark:bg-slate-900 transition-all hover:shadow-sm dark:hover:shadow-lg/10"
+      className="relative p-4 sm:p-5 md:p-6 lg:p-7 bg-white dark:bg-slate-900 transition-all"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+
       {/* Large half-circle icon on the right */}
       <div className="absolute -right-16 sm:-right-20 md:-right-24 lg:-right-32 top-1/2 -translate-y-1/2">
         <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-64 lg:h-64 rounded-full flex items-center justify-center ${metric.gradient} opacity-20`}>

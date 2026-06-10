@@ -17,11 +17,6 @@ import {
   useCreateScannerProjectMutation,
   useListScannerProjectsQuery,
 } from "@/lib/redux/services/userdashboard/scanner/scanner-api";
-import {
-  useCreateCITokenMutation,
-  useListProjectCITokensQuery,
-  useRevokeCITokenMutation,
-} from "@/lib/redux/services/userdashboard/scanner/ci-token-api";
 import type { CITokenResponse } from "@/types/ci-token";
 
 type ExpiryPreset = "30d" | "90d" | "180d" | "custom" | "never";
@@ -245,18 +240,8 @@ export default function CodeScanningIntegrationsPageClient() {
     }
     return projects[0]?.project_id ?? "";
   }, [projects, requestedProjectId, selectedProjectId]);
-  const {
-    data: tokens = [],
-    isLoading: isTokensLoading,
-    refetch: refetchTokens,
-  } = useListProjectCITokensQuery(
-    { projectId: effectiveSelectedProjectId, activeOnly: false },
-    { skip: !effectiveSelectedProjectId },
-  );
 
   const [createScannerProject, { isLoading: isCreatingProject }] = useCreateScannerProjectMutation();
-  const [createToken, { isLoading: isCreating }] = useCreateCITokenMutation();
-  const [revokeToken, { isLoading: isRevoking }] = useRevokeCITokenMutation();
 
   const selectedProject = useMemo(
     () => projects.find((project) => project.project_id === effectiveSelectedProjectId) ?? null,
@@ -319,49 +304,6 @@ export default function CodeScanningIntegrationsPageClient() {
     }
   }
 
-  async function handleCreateToken(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setCreationError(null);
-
-    if (!effectiveSelectedProjectId) {
-      setCreationError("Select a project first.");
-      return;
-    }
-
-    if (expiryPreset === "custom" && !customDate) {
-      setCreationError("Choose a custom expiry date.");
-      return;
-    }
-
-    try {
-      const expiresAt = toExpiryISOString(expiryPreset, customDate);
-      const response = await createToken({
-        project_id: effectiveSelectedProjectId,
-        name: tokenName.trim(),
-        description: tokenDescription.trim() || undefined,
-        scopes: ["code_scan:ingest"],
-        expires_at: expiresAt,
-        no_expiry: expiryPreset === "never",
-      }).unwrap();
-
-      setLatestPlainToken(response.plain_token);
-      setTokenName("");
-      setTokenDescription("");
-      setExpiryPreset("90d");
-      setCustomDate("");
-      await refetchTokens();
-    } catch (error) {
-      const message =
-        typeof error === "object" &&
-        error !== null &&
-        "data" in error &&
-        typeof (error as { data?: { detail?: string } }).data?.detail === "string"
-          ? (error as { data: { detail: string } }).data.detail
-          : "Failed to create token.";
-      setCreationError(message);
-    }
-  }
-
   async function handleCopyToken() {
     if (!latestPlainToken) {
       return;
@@ -369,17 +311,6 @@ export default function CodeScanningIntegrationsPageClient() {
     await navigator.clipboard.writeText(latestPlainToken);
     setCopiedToken(true);
     window.setTimeout(() => setCopiedToken(false), 1500);
-  }
-
-  async function handleRevokeToken(token: CITokenResponse) {
-    const confirmed = window.confirm(`Revoke CI token "${token.name}"?`);
-    if (!confirmed) {
-      return;
-    }
-    await revokeToken({
-      tokenId: token.token_id,
-      projectId: token.project_id,
-    }).unwrap();
   }
 
   return (
@@ -520,100 +451,6 @@ export default function CodeScanningIntegrationsPageClient() {
                   ))}
                 </select>
               </div>
-
-              <form className="space-y-4" onSubmit={handleCreateToken}>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                      Token name
-                    </label>
-                    <input
-                      value={tokenName}
-                      onChange={(event) => setTokenName(event.target.value)}
-                      placeholder="Production Jenkins runner"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                      Expiry
-                    </label>
-                    <select
-                      value={expiryPreset}
-                      onChange={(event) => setExpiryPreset(event.target.value as ExpiryPreset)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                    >
-                      <option value="30d">30 days</option>
-                      <option value="90d">90 days</option>
-                      <option value="180d">180 days</option>
-                      <option value="custom">Custom date</option>
-                      <option value="never">No expiry</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                    Project key
-                  </p>
-                  <p className="mt-1 break-all font-mono text-xs text-slate-600 dark:text-slate-300">
-                    {effectiveProjectKey || "Select a code-scanning project to see its key"}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                    CI scans triggered with this project are grouped under this dashboard key.
-                  </p>
-                </div>
-
-                {expiryPreset === "custom" ? (
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                      Custom expiry date
-                    </label>
-                    <input
-                      type="date"
-                      value={customDate}
-                      onChange={(event) => setCustomDate(event.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                  </div>
-                ) : null}
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                    Description
-                  </label>
-                  <textarea
-                    value={tokenDescription}
-                    onChange={(event) => setTokenDescription(event.target.value)}
-                    placeholder="Optional notes for this CI runner"
-                    rows={3}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#00d0b2] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                  />
-                </div>
-
-                {creationError ? (
-                  <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                    <AlertCircle size={15} className="mt-0.5 shrink-0" />
-                    <span>{creationError}</span>
-                  </div>
-                ) : null}
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="submit"
-                  disabled={isCreating || !effectiveSelectedProjectId}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#00d0b2] px-4 text-sm font-semibold text-slate-900 transition hover:bg-[#00b89e] disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {isCreating ? <LoaderCircle size={15} className="animate-spin" /> : <KeyRound size={15} />}
-                    Generate token
-                  </button>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    Scope: <span className="font-medium text-slate-700 dark:text-slate-200">code_scan:ingest</span> for CI submission
-                  </span>
-                </div>
-              </form>
             </div>
 
             <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
@@ -693,75 +530,6 @@ export default function CodeScanningIntegrationsPageClient() {
               </p>
             </div>
           </div>
-
-          {isTokensLoading ? (
-            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
-              <LoaderCircle size={16} className="animate-spin" />
-              Loading tokens...
-            </div>
-          ) : tokens.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/30 dark:text-slate-400">
-              {effectiveSelectedProjectId ? "No CI tokens for this project yet." : "Create or select a code-scanning project first."}
-            </div>
-          ) : (
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-              <div className="grid grid-cols-[minmax(0,1.4fr)_0.8fr_0.9fr_0.9fr_0.8fr] gap-4 border-b border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <span>Name</span>
-                <span>Prefix</span>
-                <span>Expires</span>
-                <span>Last used</span>
-                <span>Status</span>
-              </div>
-              <div className="divide-y divide-slate-200 dark:divide-slate-800">
-                {tokens.map((token) => {
-                  const status = deriveTokenStatus(token);
-                  const canRevoke = !token.revoked_at && token.is_active && !isTokenExpired(token);
-                  return (
-                    <div
-                      key={token.token_id}
-                      className="grid grid-cols-[minmax(0,1.4fr)_0.8fr_0.9fr_0.9fr_0.8fr] gap-4 px-4 py-4 text-sm text-slate-700 dark:text-slate-200"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900 dark:text-slate-100">
-                          {token.name}
-                        </p>
-                        {token.description ? (
-                          <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">
-                            {token.description}
-                          </p>
-                        ) : null}
-                      </div>
-                      <div className="font-mono text-xs text-slate-600 dark:text-slate-300">
-                        {token.prefix}
-                      </div>
-                      <div className="text-xs text-slate-600 dark:text-slate-300">
-                        {token.expires_at ? formatDateTime(token.expires_at) : "No expiry"}
-                      </div>
-                      <div className="text-xs text-slate-600 dark:text-slate-300">
-                        {token.last_used_at ? formatDateTime(token.last_used_at) : "Never"}
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={`inline-flex rounded-full border px-2 py-1 text-[11px] font-medium ${status.className}`}>
-                          {status.label}
-                        </span>
-                        {canRevoke ? (
-                          <button
-                            type="button"
-                            disabled={isRevoking}
-                            onClick={() => void handleRevokeToken(token)}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-red-300 hover:text-red-600 disabled:opacity-50 dark:border-slate-700 dark:text-slate-400 dark:hover:border-red-500/30 dark:hover:text-red-300"
-                            title="Revoke token"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </section>
 
         <section className="space-y-4">

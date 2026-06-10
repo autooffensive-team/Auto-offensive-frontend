@@ -92,7 +92,7 @@ export const scannerApi = baseApi.injectEndpoints({
         { type: "Scan" as const, id: "LIST" },
         { type: "Scan" as const, id: `PROJECT:${project_key}` },
         { type: "Gateway" as const, id: "JOBS_LIST" },
-        { type: "ScannerProject" as const, id: "LIST" },
+        { type: "Project" as const, id: "LIST" },
       ],
     }),
     createScannerProject: builder.mutation<ScannerProjectResponse, CreateScannerProjectRequest>({
@@ -101,14 +101,14 @@ export const scannerApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: "ScannerProject" as const, id: "LIST" }],
+      invalidatesTags: [{ type: "Project" as const, id: "LIST" }],
     }),
     listScannerProjects: builder.query<ScannerProjectResponse[], void>({
       query: () => buildScannerUrl(["projects"]),
       transformResponse: (response: ListScannerProjectsResponse) => response.projects ?? [],
       providesTags: (result) => [
-        { type: "ScannerProject" as const, id: "LIST" },
-        ...(result?.map((project) => ({ type: "ScannerProject" as const, id: project.project_id })) ?? []),
+        { type: "Project" as const, id: "LIST" },
+        ...(result?.map((project) => ({ type: "Project" as const, id: project.project_id })) ?? []),
       ],
     }),
     getScanDetail: builder.query<ScanDetailResponse, string>({
