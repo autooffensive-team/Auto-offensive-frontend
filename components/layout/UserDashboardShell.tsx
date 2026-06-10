@@ -511,9 +511,9 @@ export default function UserDashboardShell({
                     onClick={() => {
                       setProfileOpen((value) => !value);
                     }}
-                    className="flex items-center gap-3 rounded-full border border-black/8 bg-white/80 px-2 py-2 pr-4 text-left transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                    className="flex items-center gap-3 rounded-full px-2 py-2 pr-4 text-left transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-slate-950">
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-black/10 text-sm font-bold text-slate-950 dark:border-white/20">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}

@@ -816,6 +816,17 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => {
     if (termRef.current?.options) termRef.current.options.theme = terminalTheme;
   }, [terminalTheme]);
+  // When theme changes and terminal is idle, redraw the splash so the accent
+  // colors update immediately without needing a manual reset.
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+    // Don't wipe output while a scan is running
+    if (isSubmitting || isStreaming) return;
+    showSplash(term);
+    term.write(getPrompt());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terminalTheme]);
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.fontSize = terminalFontSize;
