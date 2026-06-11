@@ -429,9 +429,12 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showThemeConfirm, setShowThemeConfirm] = useState(false);
+  const [showNavigationConfirm, setShowNavigationConfirm] = useState(false);
+  const [showRefreshConfirm, setShowRefreshConfirm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const pendingThemeRef = useRef<LogThemeKey | null>(null);
+  const pendingNavigationHrefRef = useRef<string | null>(null);
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -999,22 +1002,23 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     if (term) { term.reset(); showSplash(term); term.write(getPrompt()); }
   }, [getPrompt, showSplash]);
 
-  const handleThemeChange = useCallback((nextTheme: LogThemeKey) => {
-    const hasTerminalResult =
-      logs.length > 0 ||
-      errors.length > 0 ||
-      isSubmitting ||
-      isStreaming ||
-      (run.status !== "idle" && !/idle/i.test(run.status));
+  const hasTerminalResult = useCallback(() =>
+    logs.length > 0 ||
+    errors.length > 0 ||
+    isSubmitting ||
+    isStreaming ||
+    (run.status !== "idle" && !/idle/i.test(run.status)),
+  [errors.length, isStreaming, isSubmitting, logs.length, run.status]);
 
-    if (!hasTerminalResult) {
+  const handleThemeChange = useCallback((nextTheme: LogThemeKey) => {
+    if (!hasTerminalResult()) {
       setTheme(nextTheme);
       return;
     }
 
     pendingThemeRef.current = nextTheme;
     setShowThemeConfirm(true);
-  }, [errors.length, isStreaming, isSubmitting, logs.length, run.status, setTheme]);
+  }, [hasTerminalResult, setTheme]);
 
   const handleConfirmThemeChange = useCallback(() => {
     setShowThemeConfirm(false);
@@ -1026,6 +1030,27 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const handleCancelThemeChange = useCallback(() => {
     setShowThemeConfirm(false);
     pendingThemeRef.current = null;
+  }, []);
+
+  const handleConfirmNavigation = useCallback(() => {
+    setShowNavigationConfirm(false);
+    const href = pendingNavigationHrefRef.current;
+    pendingNavigationHrefRef.current = null;
+    if (href) window.location.assign(href);
+  }, []);
+
+  const handleCancelNavigation = useCallback(() => {
+    setShowNavigationConfirm(false);
+    pendingNavigationHrefRef.current = null;
+  }, []);
+
+  const handleConfirmRefresh = useCallback(() => {
+    setShowRefreshConfirm(false);
+    window.location.reload();
+  }, []);
+
+  const handleCancelRefresh = useCallback(() => {
+    setShowRefreshConfirm(false);
   }, []);
 
   const handleDismissCancel = useCallback(() => setShowCancelModal(false), []);
@@ -1058,6 +1083,59 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      const anchor = target?.closest?.("a") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      if (panelRef.current?.contains(anchor)) return;
+
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
+      if (!hasTerminalResult()) return;
+
+      try {
+        pendingNavigationHrefRef.current = new URL(href, window.location.origin).href;
+      } catch {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      setShowNavigationConfirm(true);
+    };
+
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [hasTerminalResult]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasTerminalResult()) return;
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasTerminalResult]);
+
+  useEffect(() => {
+    const handleRefreshShortcut = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      const isReloadShortcut = key === "f5" || ((event.ctrlKey || event.metaKey) && key === "r");
+      if (!isReloadShortcut || !hasTerminalResult()) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setShowRefreshConfirm(true);
+    };
+
+    window.addEventListener("keydown", handleRefreshShortcut, true);
+    return () => window.removeEventListener("keydown", handleRefreshShortcut, true);
+  }, [hasTerminalResult]);
 
   return (
     <>
@@ -1366,7 +1444,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
       {showThemeConfirm && (
         <AnimatePresence>
           <motion.div
-            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
+            className="fixed inset-0 z-10000 flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1403,6 +1481,102 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                     className="rounded-md border border-emerald-400 bg-emerald-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-emerald-100 transition-all shadow-[0_0_18px_rgba(16,185,129,0.25)]"
                   >
                     Continue
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+
+      {showNavigationConfirm && (
+        <AnimatePresence>
+          <motion.div
+            className="fixed inset-0 z-10000 flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full max-w-sm rounded-xl border-2 border-amber-400/60 bg-black/95 p-5 sm:p-6 shadow-2xl relative overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 8 }}
+            >
+              <div className="absolute inset-0 opacity-10 bg-linear-to-br from-amber-500 to-red-500 pointer-events-none" />
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold font-(family-name:--font-fira-code) text-amber-200 tracking-wider">
+                  Leave advanced scan?
+                </h3>
+                <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-amber-100/80 leading-relaxed">
+                  Navigating away during an advanced scan will close this terminal and reset the current output. Continue to the selected page?
+                </p>
+                <div className="mt-5 flex items-center justify-end gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={handleCancelNavigation}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-amber-400/40 bg-amber-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-200 transition-all"
+                  >
+                    Stay here
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={handleConfirmNavigation}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-amber-400 bg-amber-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-100 transition-all shadow-[0_0_18px_rgba(245,158,11,0.25)]"
+                  >
+                    Continue
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+
+      {showRefreshConfirm && (
+        <AnimatePresence>
+          <motion.div
+            className="fixed inset-0 z-10000 flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full max-w-sm rounded-xl border-2 border-amber-400/60 bg-black/95 p-5 sm:p-6 shadow-2xl relative overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 8 }}
+            >
+              <div className="absolute inset-0 opacity-10 bg-linear-to-br from-amber-500 to-red-500 pointer-events-none" />
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold font-(family-name:--font-fira-code) text-amber-200 tracking-wider">
+                  Refresh advanced scan?
+                </h3>
+                <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-amber-100/80 leading-relaxed">
+                  Refreshing this page will close the advanced terminal and reset the current scan output. Continue refreshing?
+                </p>
+                <div className="mt-5 flex items-center justify-end gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={handleCancelRefresh}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-amber-400/40 bg-amber-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-200 transition-all"
+                  >
+                    Stay here
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={handleConfirmRefresh}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-amber-400 bg-amber-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-100 transition-all shadow-[0_0_18px_rgba(245,158,11,0.25)]"
+                  >
+                    Refresh anyway
                   </motion.button>
                 </div>
               </div>
