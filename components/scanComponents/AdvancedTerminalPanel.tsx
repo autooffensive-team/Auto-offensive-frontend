@@ -1124,8 +1124,15 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
 
   useEffect(() => {
     const handleRefreshShortcut = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+
       const key = event.key.toLowerCase();
-      const isReloadShortcut = key === "f5" || ((event.ctrlKey || event.metaKey) && key === "r");
+      const code = event.code.toLowerCase();
+      const isReloadShortcut =
+        key === "f5" ||
+        code === "f5" ||
+        ((event.ctrlKey || event.metaKey) && (key === "r" || code === "keyr"));
+
       if (!isReloadShortcut || !hasTerminalResult()) return;
 
       event.preventDefault();
@@ -1134,7 +1141,11 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     };
 
     window.addEventListener("keydown", handleRefreshShortcut, true);
-    return () => window.removeEventListener("keydown", handleRefreshShortcut, true);
+    document.addEventListener("keydown", handleRefreshShortcut, true);
+    return () => {
+      window.removeEventListener("keydown", handleRefreshShortcut, true);
+      document.removeEventListener("keydown", handleRefreshShortcut, true);
+    };
   }, [hasTerminalResult]);
 
   return (

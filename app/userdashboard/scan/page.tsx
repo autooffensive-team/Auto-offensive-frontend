@@ -289,6 +289,7 @@ export default function ScanPage() {
   const initialProjectId = searchParams.get("project") || undefined;
   const [pendingScanMode, setPendingScanMode] = useState<ScanMode | null>(null);
   const [showModeChangeConfirm, setShowModeChangeConfirm] = useState(false);
+  const [showRefreshConfirm, setShowRefreshConfirm] = useState(false);
   const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // ── Guest scan guard ──────────────────────────────────────────────────────
@@ -389,6 +390,15 @@ export default function ScanPage() {
     setShowModeChangeConfirm(false);
   }, []);
 
+  const handleConfirmRefresh = useCallback(() => {
+    setShowRefreshConfirm(false);
+    window.location.reload();
+  }, []);
+
+  const handleCancelRefresh = useCallback(() => {
+    setShowRefreshConfirm(false);
+  }, []);
+
   // Pre-select a tool when navigating from the tools page via ?tool=<tool_id>
   const requestedToolId = searchParams.get("tool");
   useEffect(() => {
@@ -404,6 +414,8 @@ export default function ScanPage() {
   const activeLogs = activeTab === "basic" ? basicLogs : activeTab === "medium" ? mediumLogs : advancedLogs;
   const activeErrors = activeTab === "basic" ? basicErrors : activeTab === "medium" ? mediumErrors : advancedErrors;
 
+  const shouldWarnForRefresh = activeTab !== "advanced";
+
   const isIdle = activeLogs.length === 0;
   // Show loading until scan reaches a terminal state (completed/failed/cancelled/partial)
   const isScanRunning = isSubmitting || (
@@ -413,6 +425,45 @@ export default function ScanPage() {
   const showViewResults =
     activeRun.status !== "idle" &&
     /completed|cancelled|partial/i.test(activeRun.status);
+
+  useEffect(() => {
+    if (!shouldWarnForRefresh) return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [shouldWarnForRefresh]);
+
+  useEffect(() => {
+    const handleRefreshShortcut = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+
+      const key = event.key.toLowerCase();
+      const code = event.code.toLowerCase();
+      const isReloadShortcut =
+        key === "f5" ||
+        code === "f5" ||
+        ((event.ctrlKey || event.metaKey) && (key === "r" || code === "keyr"));
+
+      if (!shouldWarnForRefresh || !isReloadShortcut) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setShowRefreshConfirm(true);
+    };
+
+    window.addEventListener("keydown", handleRefreshShortcut, true);
+    document.addEventListener("keydown", handleRefreshShortcut, true);
+    return () => {
+      window.removeEventListener("keydown", handleRefreshShortcut, true);
+      document.removeEventListener("keydown", handleRefreshShortcut, true);
+    };
+  }, [shouldWarnForRefresh]);
 
   return (
     <>
@@ -819,6 +870,52 @@ export default function ScanPage() {
                   className="rounded-md border border-amber-400 bg-amber-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-100 transition-all shadow-[0_0_18px_rgba(245,158,11,0.25)]"
                 >
                   Continue
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {showRefreshConfirm && (
+        <motion.div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="w-full max-w-sm rounded-xl border-2 border-amber-400/60 bg-black/95 p-5 sm:p-6 shadow-2xl relative overflow-hidden"
+            initial={{ scale: 0.95, opacity: 0, y: 8 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 8 }}
+          >
+            <div className="absolute inset-0 opacity-10 bg-linear-to-br from-amber-500 to-red-500 pointer-events-none" />
+            <div className="relative z-10">
+              <h3 className="text-lg font-bold font-(family-name:--font-fira-code) text-amber-200 tracking-wider">
+                Refresh current scan?
+              </h3>
+              <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-amber-100/80 leading-relaxed">
+                Refreshing this page will close the current scan console and reset the current Basic or Medium scan output. Continue refreshing?
+              </p>
+              <div className="mt-5 flex items-center justify-end gap-3">
+                <motion.button
+                  type="button"
+                  onClick={handleCancelRefresh}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="rounded-md border border-amber-400/40 bg-amber-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-200 transition-all"
+                >
+                  Stay here
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={handleConfirmRefresh}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="rounded-md border border-amber-400 bg-amber-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-amber-100 transition-all shadow-[0_0_18px_rgba(245,158,11,0.25)]"
+                >
+                  Refresh anyway
                 </motion.button>
               </div>
             </div>
