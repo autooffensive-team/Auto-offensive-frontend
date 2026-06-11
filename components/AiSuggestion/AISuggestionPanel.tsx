@@ -53,11 +53,12 @@ async function generateSuggestion(
   return res.json();
 }
 
-async function fetchSuggestionById(
-  suggestion_id: string
+async function fetchSuggestionByJob(
+  job_id: string,
+  mode: Mode
 ): Promise<AISuggestionResponse> {
   const res = await fetch(
-    `/api/backend/ai-suggestions/${suggestion_id}`
+    `/api/backend/ai-suggestions/by-job/${job_id}?mode=${mode}`
   );
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
@@ -906,12 +907,12 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
-  // Re-fetch an already-generated suggestion by its saved ID (no new LLM call).
-  const handleRefetchById = async (id: string, mode: Mode) => {
+  // Re-fetch a saved suggestion by (job_id, mode) — no new LLM call.
+  const handleRefetchByJob = async (job_id: string, mode: Mode) => {
     setError(null);
     setLoading(true);
     try {
-      const data = await fetchSuggestionById(id);
+      const data = await fetchSuggestionByJob(job_id, mode);
       setResults((prev) => ({ ...prev, [mode]: data }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -1017,7 +1018,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
         <div className="ai-panel-header">
           <div className="ai-header-left">
             <StarIcon />
-            <span className="ai-panel-title">AI Suggestion</span>
+            <span className="ai-panel-title">AI Accelerate</span>
             <span className="ai-panel-badge">AI</span>
           </div>
           <button className="ai-close-btn" onClick={() => setIsOpen(false)}>×</button>
@@ -1053,7 +1054,11 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
               <div className="ai-dots">
                 <span /><span /><span />
               </div>
-              <p className="ai-hint-text">Fetching suggestions…</p>
+              <p className="ai-hint-text">
+                {activeMode === "analysis"
+                  ? "Analysing target…"
+                  : "Generating next steps…"}
+              </p>
             </div>
           )}
 
@@ -1131,8 +1136,8 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                 <div style={{ display: "flex", gap: 6 }}>
                   <button
                     className="ai-icon-btn"
-                    title="Re-fetch by suggestion ID"
-                    onClick={() => handleRefetchById(current.id, activeMode)}
+                    title="Re-fetch saved result"
+                    onClick={() => handleRefetchByJob(jobId, activeMode)}
                   >
                     <RefetchIcon />
                   </button>
