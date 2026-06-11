@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Globe } from "lucide-react";
 import TargetsTable from "@/components/assets/TargetsTable";
 
 export default function AssetsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialProject = searchParams.get("project") ?? undefined;
 
   const handleRowClick = (targetId: string, _projectId: string) => {
     router.push(`/userdashboard/assets/${targetId}`);
@@ -45,7 +47,7 @@ export default function AssetsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
       >
-        <TargetsTable onRowClick={handleRowClick} />
+        <TargetsTable onRowClick={handleRowClick} initialProjectFilter={initialProject} />
       </motion.div>
 
       </div>

@@ -167,7 +167,7 @@ export default function AdvanceScanPage() {
     : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
   const logStreamAbortRef = useRef<AbortController | null>(null);
-  const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
+  const { themeKey, sizeKey, decorationsEnabled, size: logSize, setTheme, setSize, setDecorations, resetToDefault } = useLogPreferences();
 
   const [command, setCommand] = useState("");
   const [stepId, setStepId] = useState("");
@@ -760,8 +760,10 @@ export default function AdvanceScanPage() {
                     <LogToolbar
                       themeKey={themeKey}
                       sizeKey={sizeKey}
+                      decorationsEnabled={decorationsEnabled}
                       onThemeChange={setTheme}
                       onSizeChange={setSize}
+                      onDecorationsChange={setDecorations}
                       onReset={resetToDefault}
                       className="mb-4"
                     />

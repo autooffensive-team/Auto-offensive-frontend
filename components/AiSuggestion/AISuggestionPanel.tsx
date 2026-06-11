@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Mode = "analysis" | "next_steps";
@@ -69,26 +69,751 @@ const PRIORITY_CONFIG: Record<
   { color: string; bg: string; border: string }
 > = {
   critical: {
-    color: "#ff5c5c",
-    bg: "rgba(255,92,92,0.08)",
-    border: "rgba(255,92,92,0.25)",
+    color: "var(--ai-critical)",
+    bg: "var(--ai-critical-bg)",
+    border: "var(--ai-critical-border)",
   },
   high: {
-    color: "#ff9f43",
-    bg: "rgba(255,159,67,0.08)",
-    border: "rgba(255,159,67,0.25)",
+    color: "var(--ai-high)",
+    bg: "var(--ai-high-bg)",
+    border: "var(--ai-high-border)",
   },
   medium: {
-    color: "#ffd32a",
-    bg: "rgba(255,211,42,0.08)",
-    border: "rgba(255,211,42,0.25)",
+    color: "var(--ai-medium)",
+    bg: "var(--ai-medium-bg)",
+    border: "var(--ai-medium-border)",
   },
   low: {
-    color: "#01d0b3",
-    bg: "rgba(0,200,150,0.08)",
-    border: "rgba(0,200,150,0.25)",
+    color: "var(--ai-neon)",
+    bg: "var(--ai-neon-bg)",
+    border: "var(--ai-neon-border)",
   },
 };
+
+// ─── Injected global styles ────────────────────────────────────────────────────
+const AI_PANEL_STYLES = `
+/* ── AI Panel CSS Variables ── */
+:root {
+  --ai-neon:            #00d0b2;
+  --ai-neon-rgb:        0,208,178;
+  --ai-neon2:           #00aaff;
+  --ai-neon3:           #ff3cac;
+
+  --ai-critical:        #ef4444;
+  --ai-critical-bg:     rgba(239,68,68,0.08);
+  --ai-critical-border: rgba(239,68,68,0.25);
+  --ai-high:            #f59e0b;
+  --ai-high-bg:         rgba(245,158,11,0.08);
+  --ai-high-border:     rgba(245,158,11,0.25);
+  --ai-medium:          #eab308;
+  --ai-medium-bg:       rgba(234,179,8,0.08);
+  --ai-medium-border:   rgba(234,179,8,0.25);
+  --ai-neon-bg:         rgba(0,208,178,0.08);
+  --ai-neon-border:     rgba(0,208,178,0.25);
+
+  /* panel surfaces */
+  --ai-panel-bg:        rgba(248,250,252,0.99);
+  --ai-panel-border:    rgba(0,208,178,0.28);
+  --ai-panel-hot:       rgba(0,208,178,0.55);
+  --ai-header-bg:       rgba(241,245,249,0.97);
+  --ai-card-bg:         rgba(255,255,255,0.94);
+  --ai-card-border:     rgba(0,208,178,0.18);
+  --ai-cmd-bg:          rgba(240,245,250,0.95);
+  --ai-shimmer:         rgba(0,208,178,0.08);
+
+  /* typography */
+  --ai-text:            #0f172a;
+  --ai-text-muted:      rgba(15,23,42,0.5);
+  --ai-text-dim:        rgba(15,23,42,0.3);
+  --ai-text-accent:     #0d9488;
+  --ai-label:           rgba(15,23,42,0.42);
+
+  /* backdrop */
+  --ai-backdrop:        rgba(0,0,0,0.25);
+
+  /* fonts — match LiveConsole */
+  --ai-font-mono:       var(--font-fira-code), 'Fira Code', 'JetBrains Mono', monospace;
+  --ai-font-ui:         var(--font-google-sans), 'Google Sans', sans-serif;
+  --ai-font-display:    var(--font-hackdaddy), 'Hackdaddy', monospace;
+}
+
+.dark {
+  --ai-panel-bg:        rgba(16,24,40,0.98);
+  --ai-panel-border:    rgba(0,208,178,0.18);
+  --ai-panel-hot:       rgba(0,208,178,0.45);
+  --ai-header-bg:       rgba(12,19,33,0.99);
+  --ai-card-bg:         rgba(20,29,46,0.88);
+  --ai-card-border:     rgba(0,208,178,0.14);
+  --ai-cmd-bg:          #080d15;
+  --ai-shimmer:         rgba(0,208,178,0.05);
+  --ai-text:            #e2e8f0;
+  --ai-text-muted:      rgba(226,232,240,0.6);
+  --ai-text-dim:        rgba(226,232,240,0.28);
+  --ai-text-accent:     #00d0b2;
+  --ai-label:           rgba(0,208,178,0.55);
+  --ai-backdrop:        rgba(0,0,0,0.45);
+}
+
+/* ── Keyframes ── */
+@keyframes ai-corner-pulse {
+  0%,100% { opacity: 0.5; }
+  50%      { opacity: 1;   }
+}
+@keyframes ai-shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+@keyframes ai-blink {
+  0%,100% { opacity: 1;   }
+  50%      { opacity: 0.1; }
+}
+@keyframes ai-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ai-slide-in {
+  from { transform: translateX(420px); }
+  to   { transform: translateX(0); }
+}
+@keyframes ai-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-7px); }
+}
+@keyframes ai-conf-fill {
+  from { width: 0; }
+}
+@keyframes ai-stream-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes ai-rotate-border {
+  to { transform: rotate(360deg); }
+}
+@keyframes ai-path-sparkle {
+  0%, 34%, 71%, 100% { transform: scale(1); }
+  17%  { transform: scale(var(--scale_path_1, 1)); }
+  49%  { transform: scale(var(--scale_path_2, 1)); }
+  83%  { transform: scale(var(--scale_path_3, 1)); }
+}
+
+/* ── Trigger Button ── */
+.ai-trigger-btn {
+  --ai-btn-radius: 0.75rem;
+  --ai-btn-transition: 0.3s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--ai-btn-radius);
+  transition: transform var(--ai-btn-transition);
+}
+.ai-trigger-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ai-panel-bg);
+  border: 1px solid var(--ai-neon);
+  border-radius: var(--ai-btn-radius);
+  transition: all var(--ai-btn-transition);
+  z-index: 0;
+}
+.ai-trigger-btn .ai-dots-border {
+  --size_border: calc(100% + 2px);
+  overflow: hidden;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--size_border);
+  height: var(--size_border);
+  border-radius: var(--ai-btn-radius);
+  z-index: -1;
+}
+.ai-trigger-btn .ai-dots-border::before,
+.ai-trigger-btn .ai-dots-border::after {
+  content: "";
+  position: absolute;
+  top: 30%; left: 50%;
+  transform-origin: left;
+  transform: rotate(0deg);
+  width: 100%; height: 2rem;
+  background: conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b);
+  mask: linear-gradient(transparent 0%, white 120%);
+  animation: ai-rotate-border 2s linear infinite;
+}
+.ai-trigger-btn .ai-dots-border::after {
+  transform: rotate(180deg);
+}
+.ai-trigger-btn:is(:hover, :focus-visible) .ai-dots-border::before,
+.ai-trigger-btn:is(:hover, :focus-visible) .ai-dots-border::after {
+  animation-duration: 0.8s;
+}
+.ai-trigger-btn .ai-sparkle {
+  position: relative;
+  z-index: 10;
+  width: 1.25rem;
+}
+.ai-trigger-btn .ai-sparkle .path {
+  fill: var(--ai-text);
+  stroke: var(--ai-text);
+  transform-origin: center;
+}
+.ai-trigger-btn .ai-sparkle .path:nth-child(1) { --scale_path_1: 1.2; }
+.ai-trigger-btn .ai-sparkle .path:nth-child(2) { --scale_path_2: 1.2; }
+.ai-trigger-btn .ai-sparkle .path:nth-child(3) { --scale_path_3: 1.2; }
+.ai-trigger-btn:is(:hover, :focus) .ai-sparkle .path {
+  animation: ai-path-sparkle 1.5s linear 0.5s infinite;
+}
+.ai-trigger-btn .ai-btn-text {
+  position: relative;
+  z-index: 10;
+  font-family: var(--ai-font-ui);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ai-text);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
+/* ── Backdrop ── */
+.ai-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--ai-backdrop);
+  backdrop-filter: blur(2px);
+}
+
+/* ── Panel shell ── */
+.ai-panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 400px;
+  height: 100vh;
+  background: var(--ai-panel-bg);
+  outline: 1px solid var(--ai-panel-border);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 0px) 100%, 0 100%, 0 14px);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transform: translateX(420px);
+  transition: transform 0.32s cubic-bezier(0.16,1,0.3,1), outline-color 0.25s;
+  font-family: var(--ai-font-mono);
+  box-shadow: -12px 0 60px rgba(0,0,0,0.5);
+}
+.ai-panel::before {
+  content: '';
+  pointer-events: none;
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(135deg, var(--ai-neon) 0%, transparent 55%) top left / 18px 18px no-repeat,
+    linear-gradient(315deg, var(--ai-neon) 0%, transparent 55%) bottom right / 18px 18px no-repeat;
+  opacity: 0.6;
+  z-index: 2;
+  animation: ai-corner-pulse 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.ai-panel.open {
+  transform: translateX(0);
+}
+
+/* ── Panel header ── */
+.ai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--ai-panel-border);
+  background: rgba(var(--ai-neon-rgb),0.025);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.ai-panel-header::after {
+  content: '';
+  pointer-events: none;
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 32%, var(--ai-shimmer) 50%, transparent 68%);
+  background-size: 200% 100%;
+  animation: ai-shimmer 4s linear infinite;
+}
+.ai-panel-header::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(180deg, var(--ai-neon), transparent);
+  opacity: 0.8;
+}
+.ai-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ai-neon);
+  position: relative;
+  z-index: 1;
+}
+.ai-panel-title {
+  font-family: var(--ai-font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ai-text);
+  letter-spacing: 0.05em;
+}
+.ai-panel-badge {
+  font-family: var(--ai-font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  background: rgba(var(--ai-neon-rgb),0.12);
+  color: var(--ai-neon);
+  outline: 1px solid rgba(var(--ai-neon-rgb),0.28);
+}
+.ai-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ai-text-dim);
+  transition: color 0.15s;
+  position: relative;
+  z-index: 1;
+  font-family: var(--ai-font-mono);
+}
+.ai-close-btn:hover { color: var(--ai-text); }
+
+/* ── Job strip ── */
+.ai-job-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border-bottom: 1px solid rgba(var(--ai-neon-rgb),0.06);
+  background: rgba(var(--ai-neon-rgb),0.015);
+  flex-shrink: 0;
+}
+.ai-job-label {
+  font-family: var(--ai-font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ai-text-dim);
+}
+.ai-job-id {
+  font-family: var(--ai-font-mono);
+  font-size: 11px;
+  color: var(--ai-text-accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+/* ── Mode tabs ── */
+.ai-mode-tabs {
+  display: flex;
+  padding: 12px 18px;
+  gap: 0;
+  border-bottom: 1px solid rgba(var(--ai-neon-rgb),0.07);
+  flex-shrink: 0;
+}
+.ai-mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 0;
+  border: 1px solid rgba(var(--ai-neon-rgb),0.12);
+  background: transparent;
+  color: var(--ai-text-muted);
+  font-family: var(--ai-font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.ai-mode-tab:first-child {
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  border-radius: 0;
+}
+.ai-mode-tab:last-child {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%, 0 0);
+  border-left: none;
+}
+.ai-mode-tab.active {
+  background: rgba(var(--ai-neon-rgb),0.09);
+  border-color: rgba(var(--ai-neon-rgb),0.35);
+  color: var(--ai-neon);
+}
+.ai-mode-tab:hover:not(.active) {
+  background: rgba(var(--ai-neon-rgb),0.04);
+  color: var(--ai-text);
+}
+.ai-tab-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ai-neon);
+  box-shadow: 0 0 5px var(--ai-neon);
+  position: absolute;
+  top: 6px; right: 10px;
+}
+
+/* ── Panel body ── */
+.ai-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--ai-neon-rgb),0.1) transparent;
+}
+
+/* ── Centered empty/loading states ── */
+.ai-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  gap: 12px;
+}
+.ai-empty-icon {
+  color: rgba(var(--ai-neon-rgb),0.2);
+  margin-bottom: 4px;
+}
+.ai-empty-title {
+  font-family: var(--ai-font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ai-text);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+.ai-hint-text {
+  font-family: var(--ai-font-ui);
+  font-size: 11px;
+  color: var(--ai-text-muted);
+  line-height: 1.7;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.ai-error-icon {
+  font-size: 26px;
+  color: var(--ai-critical);
+}
+
+/* ── Loading dots ── */
+.ai-dots { display: flex; gap: 6px; }
+.ai-dots span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ai-neon);
+  box-shadow: 0 0 6px var(--ai-neon);
+  animation: ai-bounce 1.2s ease-in-out infinite;
+}
+.ai-dots span:nth-child(2) { animation-delay: 0.2s; opacity: 0.7; }
+.ai-dots span:nth-child(3) { animation-delay: 0.4s; opacity: 0.4; }
+
+/* ── Action buttons ── */
+.ai-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border: none;
+  font-family: var(--ai-font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+}
+.ai-action-btn.primary {
+  background: linear-gradient(135deg, var(--ai-neon) 0%, #00a87a 100%);
+  color: #fff;
+  box-shadow: 0 2px 16px rgba(var(--ai-neon-rgb),0.3);
+}
+.ai-action-btn.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 22px rgba(var(--ai-neon-rgb),0.45);
+}
+.ai-action-btn.primary:disabled { opacity: 0.35; cursor: not-allowed; }
+.ai-action-btn.danger {
+  background: rgba(239,68,68,0.1);
+  outline: 1px solid rgba(239,68,68,0.28);
+  color: var(--ai-critical);
+}
+.ai-action-btn.danger:hover { background: rgba(239,68,68,0.2); }
+
+/* ── Icon buttons ── */
+.ai-icon-btn {
+  background: rgba(var(--ai-neon-rgb),0.04);
+  outline: 1px solid rgba(var(--ai-neon-rgb),0.1);
+  border: none;
+  color: var(--ai-text-dim);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.ai-icon-btn:hover {
+  color: var(--ai-neon);
+  outline-color: rgba(var(--ai-neon-rgb),0.35);
+  background: rgba(var(--ai-neon-rgb),0.08);
+}
+
+/* ── Result wrap ── */
+.ai-result-wrap { display: flex; flex-direction: column; gap: 12px; }
+.ai-result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ai-result-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ai-result-count {
+  font-family: var(--ai-font-ui);
+  font-size: 11px;
+  color: var(--ai-text-muted);
+  letter-spacing: 0.06em;
+}
+.ai-prio-chip {
+  font-family: var(--ai-font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 8px;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+
+/* ── Cards list ── */
+.ai-cards-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Suggestion card ── */
+.ai-s-card {
+  background: var(--ai-card-bg);
+  outline: 1px solid var(--ai-card-border);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: outline-color 0.15s, filter 0.15s;
+}
+.ai-s-card::before {
+  content: '';
+  pointer-events: none;
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(135deg, var(--ai-neon) 0%, transparent 42%) top left / 12px 12px no-repeat,
+    linear-gradient(315deg, var(--ai-neon) 0%, transparent 42%) bottom right / 12px 12px no-repeat;
+  opacity: 0.3;
+  z-index: 1;
+}
+.ai-s-card:hover {
+  outline-color: var(--ai-panel-hot);
+  filter: brightness(1.02);
+}
+
+.ai-s-card-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+}
+.ai-s-index {
+  min-width: 22px; height: 22px;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  background: rgba(var(--ai-neon-rgb),0.1);
+  outline: 1px solid rgba(var(--ai-neon-rgb),0.22);
+  color: var(--ai-neon);
+  font-family: var(--ai-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.ai-s-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.ai-s-title {
+  font-family: var(--ai-font-ui);
+  color: var(--ai-text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.ai-s-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ai-s-tool {
+  font-family: var(--ai-font-mono);
+  background: rgba(var(--ai-neon-rgb),0.06);
+  color: var(--ai-text-muted);
+  font-size: 10px;
+  padding: 2px 8px;
+  clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));
+  outline: 1px solid rgba(var(--ai-neon-rgb),0.1);
+}
+.ai-s-priority {
+  font-family: var(--ai-font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+
+/* ── Command row ── */
+.ai-s-command-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ai-cmd-bg);
+  outline: 1px solid rgba(var(--ai-neon-rgb),0.1);
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+  padding: 8px 10px;
+  position: relative;
+  z-index: 2;
+}
+.ai-s-command {
+  flex: 1;
+  font-family: var(--ai-font-mono);
+  font-size: 11px;
+  color: var(--ai-neon);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ai-s-copy {
+  background: none;
+  border: none;
+  color: var(--ai-text-dim);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.ai-s-copy:hover { color: var(--ai-neon); }
+
+/* ── Reasoning ── */
+.ai-s-reasoning {
+  font-family: var(--ai-font-ui);
+  font-size: 11px;
+  color: var(--ai-text-muted);
+  line-height: 1.65;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  letter-spacing: 0.01em;
+}
+
+/* ── Confidence bar ── */
+.ai-s-confidence-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+.ai-s-conf-label {
+  font-family: var(--ai-font-ui);
+  font-size: 9px;
+  color: var(--ai-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.ai-s-conf-bar-wrap {
+  flex: 1;
+  height: 3px;
+  background: rgba(var(--ai-neon-rgb),0.07);
+  clip-path: polygon(0 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 2px 100%, 0 calc(100% - 2px));
+}
+.ai-s-conf-bar-fill {
+  height: 100%;
+  animation: ai-conf-fill 0.8s ease-out;
+}
+.ai-s-conf-pct {
+  font-family: var(--ai-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ── Content fallback ── */
+.ai-content-fallback {
+  font-family: var(--ai-font-ui);
+  color: var(--ai-text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  background: var(--ai-card-bg);
+  outline: 1px solid var(--ai-card-border);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
+/* ── Result footer ── */
+.ai-result-footer {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--ai-font-ui);
+  font-size: 10px;
+  color: var(--ai-text-dim);
+  letter-spacing: 0.07em;
+  padding-top: 6px;
+  border-top: 1px solid rgba(var(--ai-neon-rgb),0.06);
+}
+`;
+
+function InjectAIStyles() {
+  useEffect(() => {
+    const id = "ai-suggestion-panel-v3";
+    if (!document.getElementById(id)) {
+      const el = document.createElement("style");
+      el.id = id;
+      el.textContent = AI_PANEL_STYLES;
+      document.head.appendChild(el);
+    }
+  }, []);
+  return null;
+}
 
 // ─── Suggestion Card ─────────────────────────────────────────────────────────
 function SuggestionCard({ s, index }: { s: Suggestion; index: number }) {
@@ -103,19 +828,19 @@ function SuggestionCard({ s, index }: { s: Suggestion; index: number }) {
   };
 
   return (
-    <div className="s-card">
-      <div className="s-card-top">
-        <div className="s-index">{index + 1}</div>
-        <div className="s-title-wrap">
-          <p className="s-title">{s.title}</p>
-          <div className="s-meta">
-            <span className="s-tool">{s.tool_id}</span>
+    <div className="ai-s-card">
+      <div className="ai-s-card-top">
+        <div className="ai-s-index">{index + 1}</div>
+        <div className="ai-s-title-wrap">
+          <p className="ai-s-title">{s.title}</p>
+          <div className="ai-s-meta">
+            <span className="ai-s-tool">{s.tool_id}</span>
             <span
-              className="s-priority"
+              className="ai-s-priority"
               style={{
                 color: cfg.color,
                 background: cfg.bg,
-                border: `1px solid ${cfg.border}`,
+                outline: `1px solid ${cfg.border}`,
               }}
             >
               {s.priority}
@@ -124,165 +849,27 @@ function SuggestionCard({ s, index }: { s: Suggestion; index: number }) {
         </div>
       </div>
 
-      <div className="s-command-row">
-        <code className="s-command">{s.command}</code>
-        <button className="s-copy" onClick={handleCopy} title="Copy command">
+      <div className="ai-s-command-row">
+        <code className="ai-s-command">{s.command}</code>
+        <button className="ai-s-copy" onClick={handleCopy} title="Copy command">
           {copied ? <CheckIcon /> : <CopyIcon />}
         </button>
       </div>
 
-      <p className="s-reasoning">{s.reasoning}</p>
+      <p className="ai-s-reasoning">{s.reasoning}</p>
 
-      <div className="s-confidence-row">
-        <span className="s-conf-label">Confidence</span>
-        <div className="s-conf-bar-wrap">
+      <div className="ai-s-confidence-row">
+        <span className="ai-s-conf-label">Confidence</span>
+        <div className="ai-s-conf-bar-wrap">
           <div
-            className="s-conf-bar-fill"
+            className="ai-s-conf-bar-fill"
             style={{ width: `${confidencePct}%`, background: cfg.color }}
           />
         </div>
-        <span className="s-conf-pct" style={{ color: cfg.color }}>
+        <span className="ai-s-conf-pct" style={{ color: cfg.color }}>
           {confidencePct}%
         </span>
       </div>
-
-      <style jsx>{`
-        .s-card {
-          background: rgba(255, 255, 255, 0.025);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 10px;
-          padding: 14px;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          transition: border-color 0.15s;
-        }
-        .s-card:hover {
-          border-color: rgba(255, 255, 255, 0.12);
-        }
-        .s-card-top {
-          display: flex;
-          gap: 10px;
-          align-items: flex-start;
-        }
-        .s-index {
-          min-width: 22px;
-          height: 22px;
-          border-radius: 6px;
-          background: rgba(1, 208, 179, 0.1);
-          border: 1px solid rgba(1, 208, 179, 0.2);
-          color: #01d0b3;
-          font-size: 10px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 1px;
-        }
-        .s-title-wrap {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          flex: 1;
-          min-width: 0;
-        }
-        .s-title {
-          color: #d8e0f0;
-          font-size: 12px;
-          font-weight: 700;
-          line-height: 1.4;
-          margin: 0;
-        }
-        .s-meta {
-          display: flex;
-          gap: 6px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .s-tool {
-          background: rgba(255, 255, 255, 0.06);
-          color: #8b9ab0;
-          font-size: 10px;
-          padding: 2px 8px;
-          border-radius: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .s-priority {
-          font-size: 9px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          padding: 2px 8px;
-          border-radius: 20px;
-        }
-        .s-command-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: #0a0d12;
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 6px;
-          padding: 8px 10px;
-        }
-        .s-command {
-          flex: 1;
-          font-size: 11px;
-          color: #01d0b3;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          font-family: "JetBrains Mono", monospace;
-        }
-        .s-copy {
-          background: none;
-          border: none;
-          color: #5a6880;
-          cursor: pointer;
-          padding: 2px;
-          display: flex;
-          flex-shrink: 0;
-          transition: color 0.15s;
-        }
-        .s-copy:hover {
-          color: #01d0b3;
-        }
-        .s-reasoning {
-          font-size: 11px;
-          color: #5a6880;
-          line-height: 1.6;
-          margin: 0;
-        }
-        .s-confidence-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .s-conf-label {
-          font-size: 9px;
-          color: #3d4d66;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          white-space: nowrap;
-        }
-        .s-conf-bar-wrap {
-          flex: 1;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.06);
-          border-radius: 99px;
-          overflow: hidden;
-        }
-        .s-conf-bar-fill {
-          height: 100%;
-          border-radius: 99px;
-          transition: width 0.6s ease;
-        }
-        .s-conf-pct {
-          font-size: 10px;
-          font-weight: 700;
-          min-width: 30px;
-          text-align: right;
-        }
-      `}</style>
     </div>
   );
 }
@@ -349,93 +936,102 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
 
   return (
     <>
+      <InjectAIStyles />
+
+      {/* ── Trigger Button ── */}
       <button className="ai-trigger-btn" onClick={() => setIsOpen((v) => !v)}>
-        <div className="dots_border"></div>
+        <div className="ai-dots-border" />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          className="sparkle"
+          className="ai-sparkle"
         >
           <path
             className="path"
             strokeLinejoin="round"
             strokeLinecap="round"
-            stroke="#0f172a"
-            fill="#0f172a"
+            stroke="currentColor"
+            fill="currentColor"
             d="M14.187 8.096L15 5.25L15.813 8.096C16.0231 8.83114 16.4171 9.50062 16.9577 10.0413C17.4984 10.5819 18.1679 10.9759 18.903 11.186L21.75 12L18.904 12.813C18.1689 13.0231 17.4994 13.4171 16.9587 13.9577C16.4181 14.4984 16.0241 15.1679 15.814 15.903L15 18.75L14.187 15.904C13.9769 15.1689 13.5829 14.4994 13.0423 13.9587C12.5016 13.4181 11.8321 13.0241 11.097 12.814L8.25 12L11.096 11.187C11.8311 10.9769 12.5006 10.5829 13.0413 10.0423C13.5819 9.50162 13.9759 8.83214 14.186 8.097L14.187 8.096Z"
-          ></path>
+          />
           <path
             className="path"
             strokeLinejoin="round"
             strokeLinecap="round"
-            stroke="#0f172a"
-            fill="#0f172a"
+            stroke="currentColor"
+            fill="currentColor"
             d="M6 14.25L5.741 15.285C5.59267 15.8785 5.28579 16.4206 4.85319 16.8532C4.42059 17.2858 3.87853 17.5927 3.285 17.741L2.25 18L3.285 18.259C3.87853 18.4073 4.42059 18.7142 4.85319 19.1468C5.28579 19.5794 5.59267 20.1215 5.741 20.715L6 21.75L6.259 20.715C6.40725 20.1216 6.71398 19.5796 7.14639 19.147C7.5788 18.7144 8.12065 18.4075 8.714 18.259L9.75 18L8.714 17.741C8.12065 17.5925 7.5788 17.2856 7.14639 16.853C6.71398 16.4204 6.40725 15.8784 6.259 15.285L6 14.25Z"
-          ></path>
+          />
           <path
             className="path"
             strokeLinejoin="round"
             strokeLinecap="round"
-            stroke="#0f172a"
-            fill="#0f172a"
+            stroke="currentColor"
+            fill="currentColor"
             d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 6.09226 6.24777 6.24282 6.303 6.4085L6.5 7L6.697 6.4085C6.75223 6.24282 6.84528 6.09226 6.96877 5.96877C7.09226 5.84528 7.24282 5.75223 7.4085 5.697L8 5.5L7.4085 5.303C7.24282 5.24777 7.09226 5.15472 6.96877 5.03123C6.84528 4.90774 6.75223 4.75718 6.697 4.5915L6.5 4Z"
-          ></path>
+          />
         </svg>
-        <span className="text_button">AI Suggestion</span>
+        <span className="ai-btn-text">AI Suggestion</span>
       </button>
 
-      {isOpen && <div className="backdrop" onClick={() => setIsOpen(false)} />}
+      {/* ── Backdrop ── */}
+      {isOpen && <div className="ai-backdrop" onClick={() => setIsOpen(false)} />}
 
-      <aside className={`ai-panel ${isOpen ? "open" : ""}`}>
+      {/* ── Panel ── */}
+      <aside className={`ai-panel${isOpen ? " open" : ""}`}>
+
         {/* Header */}
-        <div className="panel-header">
-          <div className="panel-title-row">
+        <div className="ai-panel-header">
+          <div className="ai-header-left">
             <StarIcon />
-            <span className="panel-title">AI Suggestion</span>
-            <span className="panel-badge">Simulation</span>
+            <span className="ai-panel-title">AI Suggestion</span>
+            <span className="ai-panel-badge">Simulation</span>
           </div>
-          <button className="close-btn" onClick={() => setIsOpen(false)}>×</button>
+          <button className="ai-close-btn" onClick={() => setIsOpen(false)}>×</button>
         </div>
 
         {/* Job strip */}
-        <div className="job-strip">
-          <span className="job-label">JOB ID</span>
-          <code className="job-id">{jobId || "—"}</code>
+        <div className="ai-job-strip">
+          <span className="ai-job-label">Job ID</span>
+          <code className="ai-job-id">{jobId || "—"}</code>
         </div>
 
         {/* Tabs */}
-        <div className="mode-tabs">
+        <div className="ai-mode-tabs">
           {(["analysis", "next_steps"] as Mode[]).map((m) => (
             <button
               key={m}
-              className={`mode-tab ${activeMode === m ? "active" : ""}`}
+              className={`ai-mode-tab${activeMode === m ? " active" : ""}`}
               onClick={() => handleGenerate(m)}
             >
               {m === "analysis" ? <AnalystIcon /> : <BulbIcon />}
               {m === "analysis" ? "Analyst" : "Suggestion"}
-              {results[m] && <span className="tab-dot" />}
+              {results[m] && <span className="ai-tab-dot" />}
             </button>
           ))}
         </div>
 
         {/* Body */}
-        <div className="panel-body">
+        <div className="ai-panel-body">
+
+          {/* Loading */}
           {loading && (
-            <div className="centered">
-              <div className="dots">
+            <div className="ai-centered">
+              <div className="ai-dots">
                 <span /><span /><span />
               </div>
-              <p className="hint-text">Fetching suggestions…</p>
+              <p className="ai-hint-text">Fetching suggestions…</p>
             </div>
           )}
 
+          {/* Error */}
           {!loading && error && (
-            <div className="centered">
-              <span className="error-icon">⚠</span>
-              <p className="hint-text">{error}</p>
+            <div className="ai-centered">
+              <span className="ai-error-icon">⚠</span>
+              <p className="ai-hint-text">{error}</p>
               <button
-                className="action-btn danger"
+                className="ai-action-btn danger"
                 onClick={() => { clearCache(activeMode); handleGenerate(activeMode); }}
               >
                 Retry
@@ -443,21 +1039,22 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
             </div>
           )}
 
+          {/* Empty */}
           {!loading && !error && !current && (
-            <div className="centered">
-              <div className="empty-icon">
+            <div className="ai-centered">
+              <div className="ai-empty-icon">
                 {activeMode === "analysis" ? <AnalystIcon size={32} /> : <BulbIcon size={32} />}
               </div>
-              <p className="empty-title">
+              <p className="ai-empty-title">
                 {activeMode === "analysis" ? "Target Analysis" : "Next Steps"}
               </p>
-              <p className="hint-text" style={{ textAlign: "center", maxWidth: 240 }}>
+              <p className="ai-hint-text" style={{ textAlign: "center", maxWidth: 240 }}>
                 {activeMode === "analysis"
                   ? "AI-powered risk and attack surface assessment."
                   : "Actionable tool suggestions ranked by priority."}
               </p>
               <button
-                className="action-btn primary"
+                className="ai-action-btn primary"
                 onClick={() => handleGenerate(activeMode)}
                 disabled={!jobId}
               >
@@ -465,20 +1062,21 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                 Generate {activeMode === "analysis" ? "Analysis" : "Suggestions"}
               </button>
               {!jobId && (
-                <p className="hint-text" style={{ color: "#e05c5c" }}>
+                <p className="ai-hint-text" style={{ color: "var(--ai-critical)" }}>
                   Start a scan first to get a job ID.
                 </p>
               )}
             </div>
           )}
 
+          {/* Results */}
           {!loading && !error && current && (
-            <div className="result-wrap">
-              <div className="result-toolbar">
-                <div className="result-summary">
+            <div className="ai-result-wrap">
+              <div className="ai-result-toolbar">
+                <div className="ai-result-summary">
                   {suggestions.length > 0 && (
                     <>
-                      <span className="result-count">
+                      <span className="ai-result-count">
                         {suggestions.length} suggestion{suggestions.length !== 1 ? "s" : ""}
                       </span>
                       {(["critical", "high", "medium", "low"] as Priority[]).map((p) => {
@@ -488,8 +1086,8 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                         return (
                           <span
                             key={p}
-                            className="prio-chip"
-                            style={{ color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}` }}
+                            className="ai-prio-chip"
+                            style={{ color: cfg.color, background: cfg.bg, outline: `1px solid ${cfg.border}` }}
                           >
                             {count} {p}
                           </span>
@@ -500,14 +1098,14 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button
-                    className="icon-btn"
+                    className="ai-icon-btn"
                     title="Re-fetch by suggestion ID"
                     onClick={() => handleRefetchById(current.id, activeMode)}
                   >
                     <RefetchIcon />
                   </button>
                   <button
-                    className="icon-btn"
+                    className="ai-icon-btn"
                     title="Regenerate"
                     onClick={() => { clearCache(activeMode); handleGenerate(activeMode); }}
                   >
@@ -517,432 +1115,24 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
               </div>
 
               {sorted.length > 0 ? (
-                <div className="cards-list">
+                <div className="ai-cards-list">
                   {sorted.map((s, i) => <SuggestionCard key={i} s={s} index={i} />)}
                 </div>
               ) : (
-                <div className="content-fallback">
+                <div className="ai-content-fallback">
                   {current.content || "No suggestions returned."}
                 </div>
               )}
 
-              <div className="result-footer">
+              <div className="ai-result-footer">
                 <span>{current.provider} · {current.model}</span>
                 <span>{current.input_tokens + current.output_tokens} tokens</span>
               </div>
             </div>
           )}
+
         </div>
       </aside>
-
-      <style jsx>{`
-        .ai-trigger-btn {
-          --border_radius: 0.75rem;
-          --transtion: 0.3s ease-in-out;
-          --offset: 2px;
-          cursor: pointer;
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          transform-origin: center;
-          padding: 0.55rem 1.1rem;
-          background-color: transparent;
-          border: none;
-          border-radius: var(--border_radius);
-          transform: scale(1);
-          transition: transform var(--transtion);
-        }
-        .ai-trigger-btn::before {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 100%;
-          height: 100%;
-          background: white;
-          border: 1px solid #00d0b2;
-          border-radius: var(--border_radius);
-          box-shadow: none;
-          transition: all var(--transtion);
-          z-index: 0;
-        }
-        :global(.dark) .ai-trigger-btn::before {
-          background: #020618;
-        }
-        .ai-trigger-btn::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 100%;
-          height: 100%;
-          background-color: transparent;
-          border-radius: var(--border_radius);
-          transition: opacity var(--transtion);
-          z-index: 2;
-        }
-        .ai-trigger-btn:is(:hover, :focus-visible) {
-          --active: 1;
-        }
-        .ai-trigger-btn:is(:hover, :focus-visible) .dots_border::before,
-        .ai-trigger-btn:is(:hover, :focus-visible) .dots_border::after {
-          animation-duration: 0.8s;
-        }
-        .ai-trigger-btn .dots_border {
-          --size_border: calc(100% + 2px);
-          overflow: hidden;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: var(--size_border);
-          height: var(--size_border);
-          background-color: transparent;
-          border-radius: var(--border_radius);
-          z-index: -10;
-        }
-        .ai-trigger-btn .dots_border::before {
-          content: "";
-          position: absolute;
-          top: 30%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          transform-origin: left;
-          transform: rotate(0deg);
-          width: 100%;
-          height: 2rem;
-          background: conic-gradient(
-            from 0deg,
-            #ff6b6b,
-            #feca57,
-            #48dbfb,
-            #ff9ff3,
-            #54a0ff,
-            #5f27cd,
-            #ff6b6b
-          );
-          mask: linear-gradient(transparent 0%, white 120%);
-          animation: rotate 2s linear infinite;
-        }
-        .ai-trigger-btn .dots_border::after {
-          content: "";
-          position: absolute;
-          top: 30%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          transform-origin: left;
-          transform: rotate(180deg);
-          width: 100%;
-          height: 2rem;
-          background: conic-gradient(
-            from 0deg,
-            #ff6b6b,
-            #feca57,
-            #48dbfb,
-            #ff9ff3,
-            #54a0ff,
-            #5f27cd,
-            #ff6b6b
-          );
-          mask: linear-gradient(transparent 0%, white 120%);
-          animation: rotate 2s linear infinite;
-        }
-        @keyframes rotate {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        .ai-trigger-btn .sparkle {
-          position: relative;
-          z-index: 10;
-          width: 1.25rem;
-        }
-        .ai-trigger-btn .sparkle .path {
-          fill: currentColor;
-          stroke: currentColor;
-          transform-origin: center;
-          color: #0f172a;
-        }
-        :global(.dark) .ai-trigger-btn .sparkle .path {
-          color: white;
-        }
-        .ai-trigger-btn:is(:hover, :focus) .sparkle .path {
-          animation: path 1.5s linear 0.5s infinite;
-        }
-        .ai-trigger-btn .sparkle .path:nth-child(1) {
-          --scale_path_1: 1.2;
-        }
-        .ai-trigger-btn .sparkle .path:nth-child(2) {
-          --scale_path_2: 1.2;
-        }
-        .ai-trigger-btn .sparkle .path:nth-child(3) {
-          --scale_path_3: 1.2;
-        }
-        @keyframes path {
-          0%, 34%, 71%, 100% {
-            transform: scale(1);
-          }
-          17% {
-            transform: scale(var(--scale_path_1, 1));
-          }
-          49% {
-            transform: scale(var(--scale_path_2, 1));
-          }
-          83% {
-            transform: scale(var(--scale_path_3, 1));
-          }
-        }
-        .ai-trigger-btn .text_button {
-          position: relative;
-          z-index: 10;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #0f172a;
-          white-space: nowrap;
-        }
-        :global(.dark) .ai-trigger-btn .text_button {
-          color: white;
-        }
-        .chevron {
-          font-size: 16px;
-          transition: transform 0.25s ease;
-          line-height: 1;
-        }
-        .chevron.open { transform: rotate(90deg); }
-        .backdrop {
-          position: fixed;
-          inset: 0;
-          z-index: 999;
-          background: rgba(0, 0, 0, 0.35);
-        }
-        .ai-panel {
-          position: fixed;
-          top: 0;
-          right: -420px;
-          width: 400px;
-          height: 100vh;
-          background: #0f1117;
-          border-left: 1px solid rgba(255, 255, 255, 0.07);
-          display: flex;
-          flex-direction: column;
-          z-index: 1000;
-          transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-          font-family: "JetBrains Mono", "Fira Code", monospace;
-          box-shadow: -10px 0 50px rgba(0, 0, 0, 0.6);
-        }
-        .ai-panel.open { right: 0; }
-        .panel-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          background: rgba(1, 208, 179, 0.04);
-          flex-shrink: 0;
-        }
-        .panel-title-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #01d0b3;
-        }
-        .panel-title { color: #e8eaf0; font-size: 14px; font-weight: 700; }
-        .panel-badge {
-          background: rgba(1, 208, 179, 0.12);
-          color: #01d0b3;
-          border: 1px solid rgba(1, 208, 179, 0.25);
-          font-size: 9px;
-          font-weight: 700;
-          padding: 2px 7px;
-          border-radius: 20px;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-        .close-btn {
-          background: none;
-          border: none;
-          color: #5a6880;
-          font-size: 22px;
-          cursor: pointer;
-          line-height: 1;
-          transition: color 0.15s;
-        }
-        .close-btn:hover { color: #e8eaf0; }
-        .job-strip {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 10px 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          background: rgba(255, 255, 255, 0.015);
-          flex-shrink: 0;
-        }
-        .job-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; color: #3d4d66; }
-        .job-id {
-          font-size: 11px;
-          color: #5a8080;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          max-width: 300px;
-        }
-        .mode-tabs {
-          display: flex;
-          padding: 12px 20px;
-          gap: 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          flex-shrink: 0;
-        }
-        .mode-tab {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 7px;
-          padding: 9px 0;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: transparent;
-          color: #5a6880;
-          font-size: 12px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-family: inherit;
-          position: relative;
-        }
-        .mode-tab:first-child { border-radius: 6px 0 0 6px; }
-        .mode-tab:last-child { border-radius: 0 6px 6px 0; border-left: none; }
-        .mode-tab.active {
-          background: rgba(1, 208, 179, 0.1);
-          border-color: rgba(1, 208, 179, 0.35);
-          color: #01d0b3;
-        }
-        .mode-tab:hover:not(.active) {
-          background: rgba(255, 255, 255, 0.04);
-          color: #8b9ab0;
-        }
-        .tab-dot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #01d0b3;
-          position: absolute;
-          top: 6px;
-          right: 10px;
-        }
-        .panel-body {
-          flex: 1;
-          overflow-y: auto;
-          padding: 16px 20px;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
-        }
-        .centered {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 260px;
-          gap: 12px;
-        }
-        .empty-icon { color: rgba(1, 208, 179, 0.25); margin-bottom: 4px; }
-        .empty-title { color: #c8d0de; font-size: 14px; font-weight: 700; margin: 0; }
-        .hint-text { color: #5a6880; font-size: 11px; line-height: 1.6; margin: 0; }
-        .error-icon { font-size: 26px; color: #e05c5c; }
-        .dots { display: flex; gap: 6px; }
-        .dots span {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #01d0b3;
-          animation: bounce 1.2s ease-in-out infinite;
-        }
-        .dots span:nth-child(2) { animation-delay: 0.2s; opacity: 0.7; }
-        .dots span:nth-child(3) { animation-delay: 0.4s; opacity: 0.4; }
-        @keyframes bounce {
-          0%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-8px); }
-        }
-        .action-btn {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 8px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          font-family: inherit;
-          transition: all 0.2s;
-        }
-        .action-btn.primary {
-          background: linear-gradient(135deg, #01d0b3 0%, #00a87a 100%);
-          color: #fff;
-          box-shadow: 0 2px 14px rgba(1, 208, 179, 0.3);
-        }
-        .action-btn.primary:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 20px rgba(1, 208, 179, 0.45);
-        }
-        .action-btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
-        .action-btn.danger {
-          background: rgba(224, 92, 92, 0.12);
-          border: 1px solid rgba(224, 92, 92, 0.3);
-          color: #e05c5c;
-        }
-        .action-btn.danger:hover { background: rgba(224, 92, 92, 0.22); }
-        .icon-btn {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 5px;
-          color: #5a6880;
-          cursor: pointer;
-          padding: 5px;
-          display: flex;
-          align-items: center;
-          transition: all 0.15s;
-        }
-        .icon-btn:hover {
-          color: #01d0b3;
-          border-color: rgba(1, 208, 179, 0.3);
-          background: rgba(1, 208, 179, 0.06);
-        }
-        .result-wrap { display: flex; flex-direction: column; gap: 12px; }
-        .result-toolbar { display: flex; align-items: center; justify-content: space-between; }
-        .result-summary { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .result-count { font-size: 11px; color: #5a6880; }
-        .prio-chip {
-          font-size: 9px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          padding: 2px 7px;
-          border-radius: 20px;
-        }
-        .cards-list { display: flex; flex-direction: column; gap: 10px; }
-        .content-fallback {
-          color: #8b9ab0;
-          font-size: 12px;
-          line-height: 1.7;
-          background: rgba(255, 255, 255, 0.025);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 9px;
-          padding: 14px;
-          white-space: pre-wrap;
-        }
-        .result-footer {
-          display: flex;
-          justify-content: space-between;
-          font-size: 10px;
-          color: #3d4d66;
-          padding-top: 4px;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
-        }
-      `}</style>
     </>
   );
 }
@@ -1002,7 +1192,7 @@ function CopyIcon() {
 function CheckIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="#01d0b3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 6L9 17l-5-5" stroke="var(--ai-neon)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

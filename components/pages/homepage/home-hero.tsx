@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import HolographicPlanetLazy from "./holographic-planet-lazy";
 import FocusWord from "@/components/ui/focus-word";
+import { authClient } from "@/lib/auth-client";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -275,6 +276,8 @@ export default function HomeHero() {
   const t       = useTranslations("homepage.hero");
   const locale  = useLocale();
   const isKhmer = locale === "km";
+  const { data: session } = authClient.useSession();
+  const scanHref = session ? "/userdashboard/scan" : "/api/guest/start";
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
@@ -814,7 +817,7 @@ export default function HomeHero() {
           >
             {/* Primary */}
             <Link
-              href="/userdashboard"
+              href={scanHref}
               className="
                 group relative inline-flex w-full min-w-0 items-center justify-center
                 overflow-hidden rounded-xl border-2 border-primary bg-primary

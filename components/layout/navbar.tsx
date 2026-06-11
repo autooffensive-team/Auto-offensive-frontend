@@ -124,9 +124,26 @@ const iconBoxCls =
 // ── Logo ─────────────────────────────────────────────────────────────────────
 function Logo() {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // During SSR and before mount, render a placeholder with the same dimensions
+  // to avoid layout shift. Once mounted, swap in the theme-correct image.
+  if (!mounted) {
+    return (
+      <Link href="/" className="cursor-pointer shrink-0" suppressHydrationWarning>
+        <div className="h-10 w-[100px] md:h-auto md:w-auto" aria-hidden />
+      </Link>
+    );
+  }
+
   const src = resolvedTheme === 'dark'
     ? '/Auto_Offensive_Dark-mode.png'
     : '/Auto_Offensive_Light-mode.png';
+
   return (
     <Link href="/" className="cursor-pointer shrink-0" suppressHydrationWarning>
       <Image

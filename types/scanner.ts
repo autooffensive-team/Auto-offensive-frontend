@@ -14,6 +14,26 @@ export type TriggerScanResponse = {
   created_at: string | null;
 };
 
+export type CreateScannerProjectRequest = {
+  project_key: string;
+  display_name: string;
+  description?: string | null;
+};
+
+export type ScannerProjectResponse = {
+  project_id: string;
+  user_id: string;
+  project_key: string;
+  display_name: string;
+  description: string | null;
+  created_at: string | null;
+  last_modified: string | null;
+};
+
+export type ListScannerProjectsResponse = {
+  projects: ScannerProjectResponse[];
+};
+
 export type ScanPhaseResponse = {
   key: string;
   status: string;

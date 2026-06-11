@@ -1,5 +1,6 @@
 "use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
+import { GridBackground } from "@/components/shared/GridBackground";
 import { motion } from "framer-motion";
 import { AlertCircle, ArrowRight, BarChart3, Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
@@ -359,6 +360,18 @@ export default function ScanPage() {
     onGuestScanConsumed: updateRateLimitDirect,
   });
 
+  // Stable reset callback — inline `() => resetRun("advanced")` would create a
+  // new function reference every render and defeat React.memo on AdvancedTerminalPanel
+  const resetAdvanced = useCallback(() => resetRun("advanced"), [resetRun]);
+
+  // Pre-select a tool when navigating from the tools page via ?tool=<tool_id>
+  const requestedToolId = searchParams.get("tool");
+  useEffect(() => {
+    if (!requestedToolId || loadingMeta) return;
+    setBasicToolId(requestedToolId);
+    setActiveTab("basic");
+  }, [requestedToolId, loadingMeta, setBasicToolId]);
+
   // For guests, suppress the meta error about projects failing to load
   const displayMetaError = isGuest ? "" : metaError;
 
@@ -378,8 +391,12 @@ export default function ScanPage() {
 
   return (
     <>
-      <div className="min-h-screen">
-        <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
+      <div className="relative min-h-screen">
+        <GridBackground
+          variant="dashed"
+          gridSize={22}
+        />
+        <div className="relative z-10 mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
           {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
           {isGuest && <GuestScanTour />}
@@ -415,31 +432,42 @@ export default function ScanPage() {
             </div>
           )}
 
-          <div id="tour-project-selector" className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
-            {isGuest ? (
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <Scan size={16} className="text-teal-500" />
-                <span>Guest Scan Session</span>
-                <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                  Guest Mode
-                </span>
-              </div>
-            ) : loadingMeta ? (
-              <ProjectSelectorSkeleton />
-            ) : (
-              <ProjectSelector
-                projects={projects}
-                value={projectId}
-                onChange={setProjectId}
-                disabled={loadingMeta}
-                loading={loadingMeta}
-              />
-            )}
-          </div>
-
           <div className={cn("grid gap-3", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
             <div className="space-y-3 sm:space-y-4">
               <ScanModeTabs value={activeTab} onChange={handleTabChange} />
+
+              {activeTab !== "advanced" && (
+                <div
+                  id="tour-project-selector"
+                  className="p-3 sm:p-4"
+                  style={{
+                    background: "var(--lc-panel-bg)",
+                    outline: "1px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+                    clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+                    position: "relative",
+                  }}
+                >
+                  {isGuest ? (
+                    <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                      <Scan size={16} className="text-teal-500" />
+                      <span>Guest Scan Session</span>
+                      <span className="ml-auto rounded-xl bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                        Guest Mode
+                      </span>
+                    </div>
+                  ) : loadingMeta ? (
+                    <ProjectSelectorSkeleton />
+                  ) : (
+                    <ProjectSelector
+                      projects={projects}
+                      value={projectId}
+                      onChange={setProjectId}
+                      disabled={loadingMeta}
+                      loading={loadingMeta}
+                    />
+                  )}
+                </div>
+              )}
 
               <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
                 <ScanModeHeader
@@ -483,12 +511,47 @@ export default function ScanPage() {
 
               {activeTab === "advanced" && (
                 <>
-                  {/* Info banner about 4-tool limit */}
-                  <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
-                    <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
-                      Advanced scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
-                    </p>
+                  {/* Compact inline row: project selector + info banner side by side */}
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                    <div id="tour-project-selector" className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2.5">
+                      {isGuest ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 h-full">
+                          <Scan size={15} className="text-teal-500 shrink-0" />
+                          <span>Guest Scan Session</span>
+                          <span className="ml-auto rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                            Guest Mode
+                          </span>
+                        </div>
+                      ) : loadingMeta ? (
+                        <ProjectSelectorSkeleton />
+                      ) : (
+                        <ProjectSelector
+                          projects={projects}
+                          value={projectId}
+                          onChange={setProjectId}
+                          disabled={loadingMeta}
+                          loading={loadingMeta}
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 shrink-0 sm:max-w-xs">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle size={15} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                          Advanced Scan
+                        </p>
+                      </div>
+                      <ul className="space-y-1 text-xs text-blue-700/80 dark:text-blue-300/70 leading-relaxed">
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-blue-500 shrink-0 mt-px">·</span>
+                          Pipeline up to <strong className="font-semibold text-blue-700 dark:text-blue-300">4 tools</strong> per scan
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-blue-500 shrink-0 mt-px">·</span>
+                          Chain with <code className="font-mono bg-blue-100 dark:bg-blue-900/40 px-1 rounded">|</code> e.g. <code className="font-mono bg-blue-100 dark:bg-blue-900/40 px-1 rounded">subfinder | httpx</code>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
 
                   <AdvancedTerminalPanel
@@ -499,7 +562,7 @@ export default function ScanPage() {
                   errors={advancedErrors}
                   isSubmitting={isSubmitting}
                   onSubmit={submitAdvanced}
-                  onReset={() => resetRun("advanced")}
+                  onReset={resetAdvanced}
                 />
 
                   <ScanExecutionGraph
@@ -512,10 +575,19 @@ export default function ScanPage() {
             </div>
 
             {activeTab !== "advanced" && (
-              <div id="tour-terminal">
+              <div id="tour-terminal" className="space-y-3">
+                {activeTab === "medium" && (
+                  <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
+                    <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
+                      Medium scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
+                    </p>
+                  </div>
+                )}
                 <LiveConsole
                   run={activeRun}
                   errors={activeErrors}
+                  logs={activeLogs}
                 />
               </div>
             )}
@@ -647,7 +719,7 @@ export default function ScanPage() {
 
         {showViewResults && (
           <motion.div 
-            className="fixed bottom-8 right-8 z-[60]"
+            className="fixed bottom-8 right-8 z-60"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

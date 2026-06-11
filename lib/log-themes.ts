@@ -10,7 +10,10 @@ export type LogThemeKey =
   | "dracula"
   | "solarized"
   | "nord"
-  | "monokai";
+  | "monokai"
+  | "autoOffensive"  // NEW: Custom branded theme
+  | "cyberPunk"      // NEW: Ultra hacker theme
+  | "neonCity";      // NEW: Neon aesthetic
 
 export type LogThemeColors = {
   name: string;
@@ -264,6 +267,110 @@ export const LOG_THEMES: Record<LogThemeKey, LogTheme> = {
       white: "#f8f8f2",
       brightBlack: "#75715e",
       brightCyan: "#a1efe4",
+    },
+  },
+
+  // ─── Custom Branded Themes ──────────────────────────────────────────────────
+
+  autoOffensive: {
+    name: "Auto-Offensive",
+    html: {
+      name: "Auto-Offensive",
+      bg: "bg-[#101c29]",
+      timestamp: "text-emerald-600",
+      source: "text-emerald-400",
+      error: "text-red-400",
+      warn: "text-amber-400",
+      info: "text-emerald-300",
+      text: "text-gray-100",
+      muted: "text-emerald-800",
+      asciiColor: "#10b981",
+      isLight: false,
+    },
+    xterm: {
+      background: "#101c29",
+      foreground: "#e0f5f0",
+      cursor: "#10b981",
+      cursorAccent: "#101c29",
+      selectionBackground: "#065f46",
+      black: "#0a1f1a",
+      red: "#ef4444",
+      green: "#10b981",
+      yellow: "#fbbf24",
+      blue: "#3b82f6",
+      magenta: "#a78bfa",
+      cyan: "#14b8a6",
+      white: "#e0f5f0",
+      brightBlack: "#6b7280",
+      brightCyan: "#5eead4",
+    },
+  },
+
+  cyberPunk: {
+    name: "CyberPunk",
+    html: {
+      name: "CyberPunk",
+      bg: "bg-[#0d0208]",
+      timestamp: "text-[#00f5ff]",
+      source: "text-[#ff006e]",
+      error: "text-[#ff0040]",
+      warn: "text-[#ffbe0b]",
+      info: "text-[#00f5ff]",
+      text: "text-[#f0f0f0]",
+      muted: "text-[#8338ec]",
+      asciiColor: "#ff006e",
+      isLight: false,
+    },
+    xterm: {
+      background: "#0d0208",
+      foreground: "#f0f0f0",
+      cursor: "#ff006e",
+      cursorAccent: "#0d0208",
+      selectionBackground: "#3a0ca3",
+      black: "#0d0208",
+      red: "#ff0040",
+      green: "#00f5ff",
+      yellow: "#ffbe0b",
+      blue: "#3a86ff",
+      magenta: "#8338ec",
+      cyan: "#00f5ff",
+      white: "#f0f0f0",
+      brightBlack: "#4a4e69",
+      brightCyan: "#00f5ff",
+    },
+  },
+
+  neonCity: {
+    name: "Neon City",
+    html: {
+      name: "Neon City",
+      bg: "bg-[#0a0118]",
+      timestamp: "text-[#ff00ff]",
+      source: "text-[#00ffff]",
+      error: "text-[#ff1744]",
+      warn: "text-[#ffd600]",
+      info: "text-[#00e5ff]",
+      text: "text-[#e0e0e0]",
+      muted: "text-[#7b1fa2]",
+      asciiColor: "#00ffff",
+      isLight: false,
+    },
+    xterm: {
+      background: "#0a0118",
+      foreground: "#e0e0e0",
+      cursor: "#ff00ff",
+      cursorAccent: "#0a0118",
+      selectionBackground: "#4a148c",
+      black: "#0a0118",
+      red: "#ff1744",
+      green: "#00e676",
+      yellow: "#ffd600",
+      blue: "#2979ff",
+      magenta: "#d500f9",
+      cyan: "#00e5ff",
+      white: "#e0e0e0",
+      brightBlack: "#9c27b0",
+      brightCyan: "#18ffff",
     },
   },
 

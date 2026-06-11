@@ -17,6 +17,7 @@ const STORAGE_KEY = "ao-log-preferences";
 type LogPreferences = {
   theme: LogThemeKey;
   size: LogSizeKey;
+  decorations: boolean; // NEW: Track decoration preference
 };
 
 function readFromStorage(): LogPreferences {
@@ -27,12 +28,13 @@ function readFromStorage(): LogPreferences {
       return {
         theme: parsed.theme && parsed.theme in LOG_THEMES ? parsed.theme : DEFAULT_THEME,
         size: parsed.size && parsed.size in LOG_SIZES ? parsed.size : DEFAULT_SIZE,
+        decorations: parsed.decorations !== undefined ? parsed.decorations : true, // Default to true
       };
     }
   } catch {
     // Corrupted storage — use defaults
   }
-  return { theme: DEFAULT_THEME, size: DEFAULT_SIZE };
+  return { theme: DEFAULT_THEME, size: DEFAULT_SIZE, decorations: true };
 }
 
 function savePreferences(prefs: LogPreferences) {
@@ -45,7 +47,7 @@ function savePreferences(prefs: LogPreferences) {
 
 export function useLogPreferences() {
   // Always start with defaults to match SSR output and avoid hydration mismatch
-  const [prefs, setPrefs] = useState<LogPreferences>({ theme: DEFAULT_THEME, size: DEFAULT_SIZE });
+  const [prefs, setPrefs] = useState<LogPreferences>({ theme: DEFAULT_THEME, size: DEFAULT_SIZE, decorations: true });
   const [hydrated, setHydrated] = useState(false);
 
   // After mount, read the real preferences from localStorage
@@ -70,8 +72,16 @@ export function useLogPreferences() {
     });
   }, []);
 
+  const setDecorations = useCallback((decorations: boolean) => {
+    setPrefs((prev) => {
+      const next = { ...prev, decorations };
+      savePreferences(next);
+      return next;
+    });
+  }, []);
+
   const resetToDefault = useCallback(() => {
-    const defaults: LogPreferences = { theme: DEFAULT_THEME, size: DEFAULT_SIZE };
+    const defaults: LogPreferences = { theme: DEFAULT_THEME, size: DEFAULT_SIZE, decorations: true };
     setPrefs(defaults);
     savePreferences(defaults);
   }, []);
@@ -82,10 +92,12 @@ export function useLogPreferences() {
   return {
     themeKey: prefs.theme,
     sizeKey: prefs.size,
+    decorationsEnabled: prefs.decorations,
     theme: currentTheme,
     size: currentSize,
     setTheme,
     setSize,
+    setDecorations,
     resetToDefault,
     allThemes: LOG_THEMES,
     allSizes: LOG_SIZES,

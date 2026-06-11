@@ -7,7 +7,6 @@ import {
   ComboboxContent,
   ComboboxList,
   ComboboxItem,
-  useComboboxAnchor,
 } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
 
@@ -28,41 +27,47 @@ export function ToolSelector({
   label = "Tool",
   id = "tool-selector",
 }: ToolSelectorProps) {
-  const anchorRef = useComboboxAnchor();
   const selectedTool = tools.find((t) => t.tool_id === value);
   const isEmpty = tools.length === 0;
 
   return (
     <div className="space-y-2">
-      <label 
+      <label
         htmlFor={id}
         className="text-[10px] sm:text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         {label}
       </label>
-      
+
       <Combobox
         value={value}
-        onValueChange={(newValue) => { if (newValue) onChange(newValue); }}
+        onValueChange={(newValue) => {
+          if (newValue) onChange(newValue);
+        }}
         disabled={disabled || isEmpty}
       >
-        <div ref={anchorRef}>
-          <ComboboxInput
-            id={id}
-            placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
-            showTrigger
-            openOnClick
-            className={cn(
-              "w-full [&_button[data-slot=combobox-trigger]:hover]:bg-teal-50 dark:[&_button[data-slot=combobox-trigger]:hover]:bg-teal-500/10 [&_button[data-slot=combobox-trigger]:hover]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover]:text-teal-400 [&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-400",
-              isEmpty && "text-gray-500 dark:text-gray-400"
-            )}
-            value={selectedTool?.tool_name ?? ""}
-            readOnly
-            aria-label={`Select ${label.toLowerCase()}`}
-          />
-        </div>
-        
-        <ComboboxContent anchor={anchorRef.current}>
+        <ComboboxInput
+          id={id}
+          placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
+          showTrigger
+          openOnClick
+          className={cn(
+            "w-full",
+            "[&_button[data-slot=combobox-trigger]:hover]:bg-teal-50",
+            "dark:[&_button[data-slot=combobox-trigger]:hover]:bg-teal-500/10",
+            "[&_button[data-slot=combobox-trigger]:hover]:text-teal-600",
+            "dark:[&_button[data-slot=combobox-trigger]:hover]:text-teal-400",
+            "[&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-600",
+            "dark:[&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-400",
+            isEmpty && "text-gray-500 dark:text-gray-400"
+          )}
+          value={selectedTool?.tool_name ?? ""}
+          readOnly
+          aria-label={`Select ${label.toLowerCase()}`}
+        />
+
+        {/* ComboboxContent now portals to document.body — no anchor ref needed */}
+        <ComboboxContent>
           <ComboboxList>
             {isEmpty ? (
               <ComboboxItem value="" disabled>
@@ -70,14 +75,22 @@ export function ToolSelector({
               </ComboboxItem>
             ) : (
               tools.map((tool, index) => (
-                <ComboboxItem 
-                  key={tool.tool_id} 
+                <ComboboxItem
+                  key={tool.tool_id}
                   value={tool.tool_id}
                   aria-selected={tool.tool_id === value}
                   className={cn(
-                    "rounded-none border-b border-gray-200/30 dark:border-gray-800/30 last:border-b-0 font-normal data-[selected=true]:font-bold data-[selected=true]:text-black hover:text-black",
-                    index % 2 === 0 ? "bg-gray-100/20 dark:bg-gray-800/20" : "bg-transparent",
-                    "hover:bg-primary/10 data-[selected=true]:bg-primary/12"
+                    "rounded-none border-b border-gray-200/30 dark:border-gray-700/40 last:border-b-0",
+                    // alternating row tint — light + dark
+                    index % 2 === 0
+                      ? "bg-gray-50/60 dark:bg-gray-800/40"
+                      : "bg-transparent",
+                    // hover + selected — light
+                    "hover:bg-teal-50 hover:text-gray-900",
+                    "data-[selected=true]:bg-teal-50 data-[selected=true]:text-gray-900",
+                    // hover + selected — dark
+                    "dark:hover:bg-teal-500/15 dark:hover:text-gray-100",
+                    "dark:data-[selected=true]:bg-teal-500/20 dark:data-[selected=true]:text-gray-100",
                   )}
                 >
                   <div className="flex flex-col items-start gap-0.5 py-0.5">
