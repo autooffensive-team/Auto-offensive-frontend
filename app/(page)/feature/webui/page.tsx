@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { GridBackground } from "@/components/shared/GridBackground";
+import { toDocsUrl } from "@/lib/utils";
 import {
   ArrowRight,
   ExternalLink,
@@ -49,7 +50,7 @@ const fadeInScale = {
 function DocsButton({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <Link
-      href="/resource"
+      href={toDocsUrl('/scanning')}
       className="group relative inline-flex h-[2.55em] w-fit items-center justify-start overflow-hidden rounded-xl border border-[#E2DDD5] bg-white px-[0.95em] pr-[2.2em] text-[13px] font-semibold text-[#01509E] transition-[transform,background-color,color,border-color] duration-300 hover:-translate-y-px hover:border-[#01509E] hover:bg-[#01509E] hover:text-white dark:border-white/10 dark:bg-[#111113] dark:text-[#7AAEF7] dark:hover:border-[#00BCA1] dark:hover:bg-[#00BCA1] dark:hover:text-[#09090B] sm:h-[2.8em] sm:px-[1.2em] sm:pr-[3.3em]"
     >
       <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
@@ -539,7 +540,7 @@ export default function WebUIFeature() {
                     <span className="whitespace-nowrap">{webuiLabels.heroPrimary}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
+                <Link href={toDocsUrl('/scanning')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{webuiLabels.heroSecondary}</span>
                 </Link>
@@ -990,7 +991,7 @@ export default function WebUIFeature() {
                     <span className="whitespace-nowrap">{webuiLabels.ctaPrimary}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
+                <Link href={toDocsUrl('/scanning')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{webuiLabels.ctaSecondary}</span>
                 </Link>

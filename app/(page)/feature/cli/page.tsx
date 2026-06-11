@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Download, FileText, Monitor, Lock, Zap, Shield, Cpu, Radio, ClipboardCheck, Terminal, Copy, Check, ArrowRight, ExternalLink } from "lucide-react";
 import { GridBackground } from "@/components/shared/GridBackground";
+import { toDocsUrl } from "@/lib/utils";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -285,7 +286,7 @@ export default function CLIFeature() {
                     <span className="whitespace-nowrap">{t("hero.primaryCta")}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
+                <Link href={toDocsUrl('/cli')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <FileText className="w-4 h-4" />
                   <span className="whitespace-nowrap">{t("hero.secondaryCta")}</span>
                 </Link>
@@ -574,7 +575,7 @@ export default function CLIFeature() {
                     <span className="whitespace-nowrap">{t("cta.primaryCta")}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
+                <Link href={toDocsUrl('/cli')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{t("cta.secondaryCta")}</span>
                 </Link>

@@ -22,6 +22,7 @@ import type { ReactNode } from "react";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { GridBackground } from "@/components/shared/GridBackground";
+import { toDocsUrl } from "@/lib/utils";
 
 const githubYaml = `name: Security Scan
 on: [push, pull_request]
@@ -227,7 +228,7 @@ export default function CICDFeature() {
                     <span className="whitespace-nowrap">{t("hero.primaryCta")}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
+                <Link href={toDocsUrl('/ci-cd')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{t("hero.secondaryCta")}</span>
                 </Link>
@@ -627,7 +628,7 @@ export default function CICDFeature() {
                     <span className="whitespace-nowrap">{t("cta.primaryCta")}</span>
                   </span>
                 </Link>
-                <Link href="/resource" className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
+                <Link href={toDocsUrl('/ci-cd')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{t("cta.secondaryCta")}</span>
                 </Link>

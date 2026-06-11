@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useTheme } from "@/components/theme-provider";
 import { HeroBackground } from "@/components/shared/HeroBackground";
 import AnimatedCta from "@/components/pages/homepage/animated-cta";
+import { toDocsUrl } from "@/lib/utils";
 import webAutomationImage from "../../../public/document/card_icon_web_automation_dark.webp";
 
 import {
@@ -251,7 +252,7 @@ export default function PlatformCapabilities() {
                 </span>
               </Link>
               <Link
-                href="/resource"
+                href={toDocsUrl('/getting-started')}
                 className={`${secondaryButtonClass}`}
               >
                 <span className="sm:hidden">Read the Docs</span>
@@ -548,7 +549,7 @@ export default function PlatformCapabilities() {
                 custom={4}
               >
                 <Link
-                  href="/resource"
+                  href={toDocsUrl('/getting-started')}
                   className={`${primaryButtonClass} w-fit`}
                 >
                   <span className="relative z-10 inline-flex items-center justify-center gap-2">
@@ -717,7 +718,7 @@ export default function PlatformCapabilities() {
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
           <Link
-            href="/resource"
+            href={toDocsUrl('/getting-started')}
             className="group inline-flex items-center gap-2 text-sm font-semibold text-[#52525B] dark:text-[#A1A1AA]
               transition-all duration-300 hover:-translate-y-0.5 hover:text-[#18181B] dark:hover:text-white"
           >
