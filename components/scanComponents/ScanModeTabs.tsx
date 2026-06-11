@@ -160,10 +160,10 @@ export function ScanModeHeader({
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
       <div>
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-card-foreground">
+        <h2 className="text-lg sm:text-xl font-semibold text-card-foreground">
           {title}
         </h2>
-        <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
           {description}
         </p>
       </div>

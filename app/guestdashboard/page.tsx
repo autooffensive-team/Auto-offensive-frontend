@@ -19,9 +19,8 @@ function MainContent() {
                 BASIC SCAN
               </h1>
 
-              <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
-                Sophisticated penetration testing automation, tailored for
-                precision and speed.
+              <p className="text-gray-600 dark:text-gray-400 text-xl leading-relaxed">
+                Execute Basic, Medium, or Advanced scans with live log visibility throughout the run.
               </p>
             </div>
 
@@ -37,7 +36,7 @@ function MainContent() {
                 <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   Today&Apos;s Usage
                 </p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                <p className="text-2xl lg:text-4xl font-semibold text-gray-900 dark:text-white">
                   0/3 Scans Used
                 </p>
               </div>

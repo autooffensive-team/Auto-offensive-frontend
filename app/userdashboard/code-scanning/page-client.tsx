@@ -283,7 +283,7 @@ function HexStatCard({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider sm:text-xs sm:tracking-widest md:text-sm" style={{ color: labelColor }}>
+        <p className="text-[10px] font-semibold uppercase tracking-wider sm:text-xs sm:tracking-widest md:text-sm lg:text-base" style={{ color: labelColor }}>
           {label}
         </p>
         <span
@@ -426,10 +426,10 @@ function ScanProjectCard({
         </div>
 
         {/* Project name */}
-        <p className="mb-1 truncate text-[14px] font-medium text-[#111] sm:text-[17px] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
+        <p className="mb-1 truncate text-[14px] font-medium text-[#111] sm:text-[17px] lg:text-[20px] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
           {project.projectKey}
         </p>
-        <p className="mb-3 text-[11px] text-[#888] sm:mb-4 sm:text-[12px] dark:text-white/40">
+        <p className="mb-3 text-[11px] text-[#888] sm:mb-4 sm:text-[12px] lg:text-[14px] dark:text-white/40">
           {providerLabel} · Code scanning project
         </p>
 
@@ -699,7 +699,7 @@ export default function CodeScanningPageClient() {
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
             Code Scanning
           </h1>
-          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-xl text-slate-500 dark:text-slate-400 leading-relaxed">
             Review code scanning projects and continue repository onboarding
           </p>
         </div>
@@ -813,7 +813,7 @@ export default function CodeScanningPageClient() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search project keys..."
-          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-base dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
+          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-base lg:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
         />
         <AnimatePresence>
           {searchTerm ? (
@@ -882,10 +882,10 @@ export default function CodeScanningPageClient() {
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 sm:mb-4 sm:h-12 sm:w-12 dark:border-slate-700 dark:bg-slate-800">
               <FolderGit2 size={20} className="text-slate-400 dark:text-slate-500" />
             </div>
-            <h3 className="text-base font-semibold text-slate-900 sm:text-lg dark:text-white">
+            <h3 className="text-base font-semibold text-slate-900 sm:text-lg lg:text-xl dark:text-white">
               {searchTerm ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="mt-1 max-w-60 text-xs text-slate-500 sm:max-w-xs sm:text-sm md:text-base dark:text-slate-400">
+            <p className="mt-1 max-w-60 text-xs text-slate-500 sm:max-w-xs sm:text-sm md:text-base lg:text-lg dark:text-slate-400">
               {searchTerm
                 ? "Try adjusting your project-key search"
                 : "Import a repository to start scanning your code"}
