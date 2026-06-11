@@ -126,7 +126,7 @@ export default function RegisterForm() {
           onClick={() => {
             void authClient.signIn.oauth2({
               providerId: "keycloak-google",
-              callbackURL: "/dashboard",
+              callbackURL: "/userdashboard",
             });
           }}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-900"
