@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useTheme } from "@/components/theme-provider";
@@ -110,20 +110,20 @@ export default function PlatformCapabilities() {
 
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const heroTitleFontFamily = isKhmer
-    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : displayFontFamily;
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
   const sectionTitleFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const sectionDescriptionFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
+    ? "var(--font-kantumruy-pro), sans-serif"
     : "var(--font-google-sans), sans-serif";
   const sectionDescriptionClass =
     "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.7]";

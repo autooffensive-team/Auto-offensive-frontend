@@ -558,8 +558,8 @@ export function Header() {
   const sessionHealthy = useSessionHealth(!!session);
   const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
-    ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
-    : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
+    ? 'var(--font-kantumruy-pro), var(--font-google-sans), sans-serif'
+    : 'var(--font-google-sans), var(--font-kantumruy-pro), sans-serif';
   const [open, setOpen] = React.useState(false);
   const [expandedMobileItem, setExpandedMobileItem] = React.useState<string>('');
   const scrolled = useScroll(10);

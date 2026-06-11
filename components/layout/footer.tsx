@@ -3,8 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebook, FaLinkedin, FaTelegram, FaYoutube } from "@/components/icons/social-icons";
-import { useTranslations } from "next-intl";
-import { useTheme } from "../theme-provider";
+import { useLocale, useTranslations } from "next-intl";
 
 const socialLinks = [
   { icon: FaFacebook,  href: "https://www.facebook.com/share/1DMqBN53KR/?mibextid=wwXIfr", label: "Facebook",  color: "hover:bg-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_0_4px_rgba(24,119,242,0.2)]" },
@@ -15,17 +14,12 @@ const socialLinks = [
 
 export function Footer() {
   const t = useTranslations('footer');
-  const { resolvedTheme } = useTheme();
+  const locale = useLocale();
+  const displayFontFamily =
+    locale === "km" ? "var(--font-hanuman), sans-serif" : "var(--font-hackdaddy), monospace";
 
   const DOCS_HOST = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
   const toDocsUrl = (path: string) => `${DOCS_HOST}/docs/${path.replace(/^\//, '')}`;
-
-  const logoSrc =
-    resolvedTheme === "dark"
-      ? "/Auto_Offensive_Dark-mode.png"
-      : "/Auto_Offensive_Light-mode.png";
-
-  const istadLogoSrc = resolvedTheme === "dark" ? "/istad-logo-white.png" : "/istad_logo.png";
 
   return (
     <footer suppressHydrationWarning className="relative mt-auto w-full overflow-hidden border-t border-zinc-200 bg-white text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
@@ -61,7 +55,7 @@ export function Footer() {
         <h1
           className="font-black tracking-tighter whitespace-nowrap"
           style={{
-            fontFamily: "var(--font-hackdaddy), monospace",
+            fontFamily: displayFontFamily,
             fontSize: "clamp(2rem, 12vw, 15rem)",
             transform: "translateY(25%)",
             background:
@@ -107,13 +101,13 @@ export function Footer() {
 
           <div className="flex w-full flex-col items-center gap-4 sm:hidden">
             <p className="max-w-xs px-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Automated penetration testing platform for developers, security engineers, and DevSecOps teams. Built to find vulnerabilities before attackers do.
+              {t("description")}
             </p>
 
             <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1.5 dark:border-zinc-700 dark:bg-zinc-900">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-sm font-medium tracking-wide italic text-zinc-600 dark:text-zinc-400">
-                &quot;Your recon stack, without the stack&quot;
+                &quot;{t("tagline")}&quot;
               </span>
             </div>
 
@@ -178,19 +172,19 @@ export function Footer() {
                 style={{ width: "auto", height: "auto" }}
               />
               <p className="order-3 max-w-70 text-center text-xs leading-snug text-zinc-600 dark:text-zinc-400 sm:max-w-50">
-                Institute of Science and Technology Advanced Development
+                {t("sponsorName")}
               </p>
             </div>
           </div>
 
           <p className="hidden max-w-3xl px-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:block sm:px-0 sm:text-lg">
-            Automated penetration testing platform for developers, security engineers, and DevSecOps teams. Built to find vulnerabilities before attackers do.
+            {t("description")}
           </p>
 
           <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1.5 dark:border-zinc-700 dark:bg-zinc-900 sm:inline-flex">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-sm font-medium tracking-wide italic text-zinc-600 dark:text-zinc-400 sm:text-base">
-              &quot;Your recon stack, without the stack&quot;
+              &quot;{t("tagline")}&quot;
             </span>
           </div>
 
@@ -239,12 +233,12 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link href="/feature/ai" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  AI Security
+                  {t("aiSecurity")}
                 </Link>
               </li>
               <li>
                 <Link href="/feature/webui" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Web UI
+                  {t("webUi")}
                 </Link>
               </li>
               <li>
@@ -262,22 +256,22 @@ export function Footer() {
 
           <div>
             <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-              Documentation
+              {t("documentation")}
             </h3>
             <ul className="space-y-3">
               <li>
                 <a href={toDocsUrl('/')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Introduction
+                  {t("introduction")}
                 </a>
               </li>
               <li>
                 <a href={toDocsUrl('/scanning')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Platform Features
+                  {t("platformFeatures")}
                 </a>
               </li>
               <li>
                 <a href={toDocsUrl('/api')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
-                  Developer Reference
+                  {t("developerReference")}
                 </a>
               </li>
             </ul>
@@ -302,12 +296,12 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/help-center" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  FAQ
+                  {t("faq")}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Legal
+                  {t("legal")}
                 </Link>
               </li>
             </ul>
@@ -315,17 +309,17 @@ export function Footer() {
 
           <div>
             <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-              Help
+              {t("help")}
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/terms-of-service" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Terms and Conditions
+                  {t("termsAndConditions")}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Privacy Policy
+                  {t("privacyPolicy")}
                 </Link>
               </li>
             </ul>
@@ -334,7 +328,7 @@ export function Footer() {
 
         <div className="border-t border-zinc-100 py-6 text-center dark:border-zinc-800">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            © Copyright 2026, {t("allRightsReserved")} Auto-Offensive · Built for Security Engineers &amp; Pentesters
+            © Copyright 2026, {t("allRightsReserved")} Auto-Offensive · {t("builtFor")}
           </p>
         </div>
       </div>

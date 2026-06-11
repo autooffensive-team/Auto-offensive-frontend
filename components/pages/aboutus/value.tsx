@@ -72,11 +72,11 @@ export default function Values() {
   const isKhmer = locale === "km";
   const values = isKhmer ? VALUES_KH : VALUES_EN;
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
 
   const ui = isKhmer
     ? {

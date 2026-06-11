@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Cpu, Database, Globe, Server, Shield, Zap } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 type NodeTone = 'primary' | 'secondary'
 
@@ -222,8 +223,12 @@ function PathBadge({
 }
 
 export function Architecture() {
-  const bodyFontFamily = 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
-  const displayFontFamily = 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
+  const locale = useLocale()
+  const isKhmer = locale === 'km'
+  const bodyFontFamily = 'var(--font-google-sans), var(--font-kantumruy-pro), sans-serif'
+  const displayFontFamily = isKhmer
+    ? 'var(--font-hanuman), sans-serif'
+    : 'var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif'
   const copy = {
         titleLine1: 'Branded Data Paths,',
         titleLine2: 'Real-Time System Flow',

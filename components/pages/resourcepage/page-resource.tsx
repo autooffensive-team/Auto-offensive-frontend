@@ -115,20 +115,20 @@ export default function ResourceComponent() {
   const isDark = mounted && resolvedTheme === "dark";
 
   const bodyFontFamily = isKhmer
-    ? 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif'
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? 'var(--font-kantumruy-pro), "Kantumruy Pro", sans-serif'
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   const displayFontFamily = isKhmer
-    ? 'var(--font-noto-khmer), "Noto Sans Khmer", sans-serif'
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   const heroTitleFontFamily = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? 'var(--font-hanuman), sans-serif'
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
 
   const featureTitleFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
 
   /* ── Hero bg computed styles ── */
   const heroBottomFadeStyle = useMemo(

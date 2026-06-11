@@ -201,13 +201,13 @@ export default function WebUIFeature() {
   const isKhmer = locale === "km";
 
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFont = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const heroTitleFont = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    ? 'var(--font-hanuman), sans-serif'
     : displayFont;
   const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
   const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";

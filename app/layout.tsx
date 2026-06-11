@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanuman, Noto_Sans_Khmer, Geist, Fira_Code } from "next/font/google"; 
+import { Hanuman, Kantumruy_Pro, Geist, Fira_Code } from "next/font/google"; 
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -25,10 +25,10 @@ const hackdaddy = localFont({
   display: "swap",
 });
 
-// Font khmer (Noto Sans Khmer)
-const notoKhmer = Noto_Sans_Khmer({
+// Font khmer (Kantumruy Pro) for text content and UI elements
+const kantumruyPro = Kantumruy_Pro({
   subsets: ["khmer"],
-  variable: "--font-noto-khmer",
+  variable: "--font-kantumruy-pro",
   display: "swap",
   weight: ["400", "700"],
 });
@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   const messages = await getMessages();
   return (
-    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, notoKhmer.variable, hanuman.variable, firaCode.variable, "font-sans", geist.variable)}
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={cn("h-full", "antialiased", googleSans.variable, hackdaddy.variable, kantumruyPro.variable, hanuman.variable, firaCode.variable, "font-sans", geist.variable, locale === "km" && "locale-km")}
     >
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>

@@ -32,11 +32,11 @@ export default function AboutHero() {
       };
 
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
   const titleLineHeight = isKhmer ? 1.2 : 1.08;
   const titleTracking = isKhmer ? "-0.02em" : "-0.04em";
   const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";

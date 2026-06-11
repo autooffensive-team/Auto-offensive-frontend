@@ -318,7 +318,6 @@ export default function ScanPage() {
 
   const {
     projects,
-    tools,
     projectId,
     setProjectId,
     loadingMeta,

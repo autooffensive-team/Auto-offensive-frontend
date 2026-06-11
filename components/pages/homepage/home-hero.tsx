@@ -610,8 +610,8 @@ export default function HomeHero() {
         "
         style={{
           fontFamily: isKhmer
-            ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-            : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+            ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+            : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif",
         }}
       >
 
@@ -777,7 +777,7 @@ export default function HomeHero() {
                             {index < array.length - 1 ? (
                               <span
                                 style={{
-                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif',
+                                  fontFamily: "var(--font-hanuman), sans-serif",
                                   fontWeight: 800,
                                 }}
                               >
