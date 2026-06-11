@@ -591,14 +591,24 @@ export default function AdvanceScanPage() {
 
   return (
     <div
-      className="flex min-h-screen bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.12),_transparent_36%),linear-gradient(180deg,_#f8fbfb_0%,_#ffffff_42%,_#f7fafc_100%)] text-gray-900 transition-colors dark:bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.14),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#020617_52%,_#000000_100%)] dark:text-white"
+        className="flex min-h-screen bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_36%),linear-gradient(180deg,#f8fbfb_0%,#ffffff_42%,#f7fafc_100%)] text-gray-900 transition-colors dark:bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.14),transparent_30%),linear-gradient(180deg,#020617_0%,#020617_52%,#000000_100%)] dark:text-white"
       style={{ fontFamily: bodyFontFamily }}
     >
-      <aside className="hidden w-64 border-r border-gray-200/70 dark:border-gray-900 md:block">
+      <style>{`
+        body.terminal-fullscreen-active .advance-scan-sidebar {
+          display: none !important;
+        }
+      `}</style>
+
+      <aside
+        className="hidden w-64 border-r border-gray-200/70 dark:border-gray-900 md:block transition-transform duration-200 advance-scan-sidebar"
+        aria-hidden
+      >
         <Sidebar />
       </aside>
 
       <main className="flex-1 overflow-y-auto">
+
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 py-8 sm:py-10 lg:py-12">
           {/* Header */}
           <section className="rounded-2xl sm:rounded-3xl border border-white/70 bg-white/80 p-6 sm:p-8 lg:p-10 shadow-[0_25px_80px_-45px_rgba(15,23,42,0.45)] backdrop-blur dark:border-white/10 dark:bg-slate-950/70">
@@ -617,15 +627,15 @@ export default function AdvanceScanPage() {
               </div>
 
               <div className="grid gap-3 sm:gap-4 sm:grid-cols-3 w-full lg:w-auto">
-                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                <div className="rounded-2xl border border-gray-200/80 bg-linear-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-linear-to-br dark:from-gray-800/80 dark:to-gray-900">
                   <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Step ID</p>
                   <p className="mt-3 truncate text-sm font-mono font-semibold text-gray-900 dark:text-emerald-200">{stepId || "—"}</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                <div className="rounded-2xl border border-gray-200/80 bg-linear-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-linear-to-br dark:from-gray-800/80 dark:to-gray-900">
                   <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Findings</p>
                   <p className="mt-3 text-3xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{findings.length}</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800/80 dark:to-gray-900">
+                <div className="rounded-2xl border border-gray-200/80 bg-linear-to-br from-gray-50 to-gray-50/50 px-4 py-5 dark:border-gray-700 dark:bg-linear-to-br dark:from-gray-800/80 dark:to-gray-900">
                   <p className="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400 font-semibold">Status</p>
                   <div className={`mt-3 inline-flex rounded-full px-3 py-1.5 text-xs font-bold capitalize ${statusTone(status)}`}>
                     {humanizeStatus(status)}
@@ -670,7 +680,7 @@ export default function AdvanceScanPage() {
 
               <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/80 p-4 sm:p-5 text-sm dark:border-amber-600/40 dark:bg-amber-950/20">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="mt-1 text-amber-700 dark:text-amber-500 flex-shrink-0" size={20} />
+                  <AlertCircle className="mt-1 text-amber-700 dark:text-amber-500 shrink-0" size={20} />
                   <div className="w-full">
                     <p className="font-bold text-amber-900 dark:text-amber-100">
                       ⚠️ Authorized Tools Only — Off-Topic Commands Will Be Rejected
@@ -686,8 +696,8 @@ export default function AdvanceScanPage() {
 
               {pageError ? (
                 <div className="rounded-2xl border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 flex items-start gap-3">
-                  <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
-                  <p className="whitespace-pre-wrap break-words leading-relaxed font-mono text-xs">{pageError}</p>
+                  <AlertCircle size={18} className="mt-0.5 shrink-0" />
+                  <p className="whitespace-pre-wrap wrap-break-word leading-relaxed font-mono text-xs">{pageError}</p>
                 </div>
               ) : null}
 
@@ -725,7 +735,7 @@ export default function AdvanceScanPage() {
             {/* Right: Results panel */}
             <div className={`rounded-2xl sm:rounded-3xl border border-white/70 bg-[#04110a] p-0 ${cyberGlow} dark:border-emerald-400/20 flex flex-col overflow-hidden`}>
               {/* Tab bar */}
-              <div className="flex items-center gap-2 border-b border-emerald-500/10 px-4 sm:px-6 py-4 bg-gradient-to-r from-transparent via-emerald-950/20 to-transparent dark:from-transparent dark:via-emerald-950/30 dark:to-transparent">
+              <div className="flex items-center gap-2 border-b border-emerald-500/10 px-4 sm:px-6 py-4 bg-linear-to-r from-transparent via-emerald-950/20 to-transparent dark:from-transparent dark:via-emerald-950/30 dark:to-transparent">
                 <div className="flex flex-wrap items-center gap-2">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
@@ -755,7 +765,7 @@ export default function AdvanceScanPage() {
               </div>
 
               {/* Tab content */}
-              <div className="flex-1 overflow-y-auto bg-[#06150d] p-5 sm:p-6 space-y-4 max-h-[600px] sm:max-h-[700px]">{activeTab === "logs" ? (
+              <div className="flex-1 overflow-y-auto bg-[#06150d] p-5 sm:p-6 space-y-4 max-h-150 sm:max-h-175">{activeTab === "logs" ? (
                   <div className="space-y-3">
                     <LogToolbar
                       themeKey={themeKey}
@@ -888,7 +898,7 @@ export default function AdvanceScanPage() {
                             </table>
                           </div>
                         ) : parsedData.lines && parsedData.lines.length > 0 ? (
-                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 whitespace-pre-wrap break-words">
+                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 whitespace-pre-wrap wrap-break-word">
                             {parsedData.lines.join("\n")}
                           </pre>
                         ) : (
@@ -906,7 +916,7 @@ export default function AdvanceScanPage() {
                         Raw output will appear here during the scan.
                       </p>
                     ) : (
-                      <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 break-words">
+                      <pre className="max-h-125 overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 wrap-break-word">
                         {rawLines.join("\n")}
                       </pre>
                     )}
@@ -927,7 +937,7 @@ export default function AdvanceScanPage() {
                     onClick={() => router.push("/userdashboard/assets")}
                     whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(16, 185, 129, 0.8)" }}
                     whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-3 rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-950 to-emerald-950/80 px-6 py-3.5 text-sm font-bold text-emerald-300 shadow-lg hover:shadow-emerald-500/40 transition-all duration-300"
+                    className="inline-flex items-center gap-3 rounded-2xl border-2 border-emerald-400 bg-linear-to-r from-emerald-950 to-emerald-950/80 px-6 py-3.5 text-sm font-bold text-emerald-300 shadow-lg hover:shadow-emerald-500/40 transition-all duration-300"
                     style={{
                       boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)",
                     }}

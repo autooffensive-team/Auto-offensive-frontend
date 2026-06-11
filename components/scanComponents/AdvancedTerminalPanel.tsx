@@ -3,7 +3,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, Zap, PanelRight, X } from "lucide-react";
+import { RotateCcw, Zap, PanelRight, X, Maximize2, Minimize2, Lightbulb } from "lucide-react";
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
@@ -12,6 +12,7 @@ import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
 import { LOG_SIZES } from "@/lib/log-themes";
 import { TerminalSidebar } from "./TerminalSidebar";
+import { cn } from "@/lib/utils";
 
 type NavigatorWithExtras = Navigator & {
   userAgentData?: {
@@ -235,9 +236,78 @@ const glitchAnimation = `
     /* prevent the xterm canvas from overflowing its wrapper */
     max-width: 100% !important;
   }
-`;
 
-// ─── Minimal splash ───────────────────────────────────────────────────────────
+  /* ─── Fullscreen Mode ─────────────────────────────────────────────────── */
+  .advanced-terminal-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 !important;
+    background: #000 !important;
+  }
+
+  .advanced-terminal-fullscreen .terminal-topbar {
+    flex-shrink: 0;
+  }
+
+  .advanced-terminal-fullscreen .terminal-flex-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    width: 100%;
+  }
+
+  .advanced-terminal-fullscreen .terminal-main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    width: 100%;
+  }
+
+  .advanced-terminal-fullscreen .xterm {
+    width: 100%;
+    height: 100%;
+  }
+
+  .advanced-terminal-fullscreen .xterm-viewport {
+    height: 100% !important;
+  }
+
+  /* Ensure body doesn't scroll in fullscreen */
+  body.terminal-fullscreen-active {
+    overflow: hidden !important;
+  }
+
+  body.terminal-fullscreen-active .dashboard-topbar,
+  body.terminal-fullscreen-active .dashboard-sidebar {
+    display: none !important;
+  }
+
+  body.terminal-fullscreen-active .dashboard-content-shell {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* Guest standalone advanced scan sidebar */
+  body.terminal-fullscreen-active .advance-scan-sidebar {
+    display: none !important;
+  }
+
+  /* Responsive adjustments for fullscreen */
+  @media (max-width: 768px) {
+    .advanced-terminal-fullscreen .terminal-topbar {
+      padding: 0.75rem !important;
+    }
+
+    .advanced-terminal-fullscreen {
+      font-size: 12px;
+    }
+  }
+`;
 const SPLASH_LINES = [
   "",
   "  \x1b[1m\x1b[92mauto-offensive\x1b[0m  \x1b[1m·  advanced scan\x1b[0m",
@@ -358,7 +428,8 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const showDecorations = decorationsEnabled;
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -495,6 +566,28 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => { selectedProjectRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { onSubmitRef.current = onSubmit; }, [onSubmit]);
   useEffect(() => { onResetRef.current = onReset; }, [onReset]);
+
+  // ── Fullscreen ESC key handler ───────────────────────────────────────────
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isFullscreen]);
+
+  // ── Fullscreen body class management ──────────────────────────────────────
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.classList.add("terminal-fullscreen-active");
+    } else {
+      document.body.classList.remove("terminal-fullscreen-active");
+    }
+    return () => document.body.classList.remove("terminal-fullscreen-active");
+  }, [isFullscreen]);
   const getPrompt = useCallback(() => {
     const project = selectedProjectRef.current?.name ?? "no-project";
     if (isMobileRef.current) {
@@ -946,10 +1039,13 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
         onAnimationComplete={() => {
           requestAnimationFrame(() => fitAddonRef.current?.fit());
         }}
-        className="relative rounded-xl overflow-hidden border-2 bg-black"
+        className={cn(
+          "relative rounded-xl overflow-hidden border-2 bg-black",
+          isFullscreen && "advanced-terminal-fullscreen"
+        )}
         style={{
-          borderColor: themeAccent.at(0.4),
-          boxShadow: `0 0 8px ${themeAccent.at(0.25)}`,
+          borderColor: isFullscreen ? "transparent" : themeAccent.at(0.4),
+          boxShadow: isFullscreen ? "none" : `0 0 8px ${themeAccent.at(0.25)}`,
         }}
       >
         {/* ── Background glow — static, no animate-pulse (pulse caused terminal text flicker) ── */}
@@ -995,7 +1091,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               <circle className="trace-dot" cx="1055" cy="34" r="1.5" />
             </svg>
           )}
-          <div className="w-full flex items-center justify-between gap-2">
+          <div className="w-full flex items-center justify-between gap-1 sm:gap-3">
             {/* Left — window controls + title */}
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <div className="flex gap-1.5 sm:gap-2 shrink-0">
@@ -1005,15 +1101,15 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-center min-w-0">
                 <span className="status-dot h-2 w-2 rounded-full shrink-0 inline-block" style={{ backgroundColor: themeAccent.at(0.8) }} />
-                <span className="font-(family-name:--font-fira-code) text-xs lg:text-sm font-semibold tracking-wider truncate" style={{ color: themeAccent.at(1) }}>
+                <span className="font-(family-name:--font-fira-code) text-[11px] sm:text-xs lg:text-sm font-semibold tracking-wider truncate" style={{ color: themeAccent.at(1) }}>
                   {isMobile
-                    ? (selectedProject ? `${selectedProject.name}` : "auto-offensive")
+                    ? (selectedProject ? selectedProject.name : "AO")
                     : (selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive")} :: ADVANCED_SCAN
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-              {isSubmitting && (
+            <div className="flex items-center gap-0.5 sm:gap-3 shrink-0">
+              {isSubmitting && !isMobile && (
                 <span
                   className="rounded-md px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold flex items-center gap-1.5"
                   style={{
@@ -1032,7 +1128,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={() => setShowSettings((v) => !v)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold transition-all duration-200"
+                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 rounded-md border px-1.5 sm:px-3 py-1 h-7 sm:h-auto text-xs lg:text-sm font-bold transition-all duration-200"
                 style={{
                   borderColor: showSettings ? themeAccent.at(0.7) : themeAccent.at(0.3),
                   backgroundColor: showSettings ? themeAccent.at(0.2) : "rgba(0,0,0,0.6)",
@@ -1051,11 +1147,28 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={handleReset}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold transition-all duration-300"
+                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-1.5 sm:px-3 py-1 h-7 sm:h-auto text-xs lg:text-sm font-bold transition-all duration-300"
                 style={{ borderColor: themeAccent.at(0.4), color: themeAccent.at(1) }}
               >
                 <RotateCcw size={10} />
                 <span className="hidden sm:inline">RESET</span>
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={() => setIsFullscreen((v) => !v)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-1.5 sm:px-3 py-1 h-7 sm:h-auto text-xs lg:text-sm font-bold transition-all duration-300"
+                style={{
+                  borderColor: themeAccent.at(isFullscreen ? 0.7 : 0.4),
+                  color: themeAccent.at(isFullscreen ? 1 : 1),
+                  backgroundColor: isFullscreen ? themeAccent.at(0.15) : "rgba(0,0,0,0.8)",
+                }}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                title={isFullscreen ? "Exit fullscreen (ESC)" : "Fullscreen mode"}
+              >
+                {isFullscreen ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
+                <span className="hidden sm:inline">{isFullscreen ? "EXIT" : "FULL"}</span>
               </motion.button>
               {isNarrow && (
                 <motion.button
@@ -1063,7 +1176,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   onClick={() => setSidebarOpen((v) => !v)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs lg:text-sm font-bold transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-1 rounded-md border px-1.5 py-1 h-7 text-xs lg:text-sm font-bold transition-all duration-200"
                   style={{
                     borderColor: themeAccent.at(sidebarOpen ? 0.6 : 0.3),
                     backgroundColor: themeAccent.at(sidebarOpen ? 0.15 : 0),
@@ -1087,6 +1200,20 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           >
             <span className="text-red-400 font-bold">⚠ ERROR:</span>{" "}
             <span className="text-red-300">Select a project above before running a scan.</span>
+          </motion.div>
+        )}
+        {isMobile && isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative m-3 sm:m-4 rounded-lg border-2 border-blue-500/40 bg-blue-950/30 backdrop-blur p-2.5 sm:p-3 text-xs sm:text-sm font-(family-name:--font-fira-code)"
+            style={{ boxShadow: "0 0 10px rgba(59,130,246,0.2)" }}
+          >
+            <span className="text-blue-400 font-bold inline-flex items-center gap-1">
+              <Lightbulb size={12} />
+              TIP:
+            </span>{" "}
+            <span className="text-blue-300">Try rotating your device to landscape for a better experience with the terminal UI.</span>
           </motion.div>
         )}
         {showSettings && (

@@ -20,7 +20,7 @@ export function GuestScanLimitModal({ isOpen, onClose }: GuestScanLimitModalProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm"
           />
 
           {/* Modal */}
@@ -29,7 +29,7 @@ export function GuestScanLimitModal({ isOpen, onClose }: GuestScanLimitModalProp
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.4, bounce: 0.15 }}
-            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+            className="fixed inset-0 z-101 flex items-center justify-center p-4"
           >
             <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
               {/* Close button */}
