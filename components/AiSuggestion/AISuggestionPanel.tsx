@@ -890,14 +890,23 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Switch to a mode; only generate if no result exists yet for that mode.
+  // Switch to a mode.
+  // On first click: check backend for an existing result first.
+  // Only calls POST /generate if no saved suggestion exists yet (404).
   const handleGenerate = async (mode: Mode) => {
     setActiveMode(mode);
     setError(null);
-    // If we already have a result, just display it — never re-generate automatically.
+    // Already in local state — display immediately.
     if (results[mode]) return;
     setLoading(true);
     try {
+      // 1. Try fetching the already-saved result from the backend.
+      const existing = await fetchSuggestionByJob(jobId, mode).catch(() => null);
+      if (existing) {
+        setResults((prev) => ({ ...prev, [mode]: existing }));
+        return;
+      }
+      // 2. No saved result — generate a new one (one-time per job+mode).
       const data = await generateSuggestion(jobId, mode);
       setResults((prev) => ({ ...prev, [mode]: data }));
     } catch (err) {
@@ -921,30 +930,16 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
-  // Force a brand-new generation (explicit user action via Regenerate button).
-  const handleRegenerate = async (mode: Mode) => {
-    setResults((prev) => {
-      const next = { ...prev };
-      delete next[mode];
-      return next;
-    });
-    setError(null);
-    setLoading(true);
-    try {
-      const data = await generateSuggestion(jobId, mode);
-      setResults((prev) => ({ ...prev, [mode]: data }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Simple retry after an error — tries to generate once more.
+  // Retry after an error: check if a result was saved before attempting a new generation.
   const handleRetry = async (mode: Mode) => {
     setError(null);
     setLoading(true);
     try {
+      const existing = await fetchSuggestionByJob(jobId, mode).catch(() => null);
+      if (existing) {
+        setResults((prev) => ({ ...prev, [mode]: existing }));
+        return;
+      }
       const data = await generateSuggestion(jobId, mode);
       setResults((prev) => ({ ...prev, [mode]: data }));
     } catch (err) {
@@ -1140,13 +1135,6 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                     onClick={() => handleRefetchByJob(jobId, activeMode)}
                   >
                     <RefetchIcon />
-                  </button>
-                  <button
-                    className="ai-icon-btn"
-                    title="Regenerate (new AI call)"
-                    onClick={() => handleRegenerate(activeMode)}
-                  >
-                    <RefreshIcon />
                   </button>
                 </div>
               </div>
