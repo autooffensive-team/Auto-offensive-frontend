@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import { useLocale } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -273,7 +274,7 @@ export default function AboutHero() {
           text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
           transition-[background] duration-400
         "
-        style={{ fontFamily: bodyFont }}
+        style={{ fontFamily: bodyFont } as CSSProperties}
       >
         <div className="absolute inset-0 z-0">
           <GridPattern

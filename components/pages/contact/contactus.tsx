@@ -214,8 +214,6 @@ const SOCIALS = [
   },
 ];
 
-const MAP_EMBED_URL =
-  "https://www.google.com/maps?q=ISTAD%20-%20Science%20%26%20Technology%20Advanced%20Development%20Co.,%20Ltd.%2C%20Phnom%20Penh&z=15&output=embed";
 const MAP_LINK =
   "https://www.google.com/maps/search/?api=1&query=ISTAD%20-%20Science%20%26%20Technology%20Advanced%20Development%20Co.,%20Ltd.%2C%20Phnom%20Penh";
 
@@ -889,14 +887,24 @@ export default function ContactUs() {
               </p>
             </div>
             <div className="relative w-full" style={{ height: '420px' }}>
-              <iframe
-                title={copy.map.title}
-                src={MAP_EMBED_URL}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="absolute inset-0 h-full w-full border-0"
-                allowFullScreen
-              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[linear-gradient(135deg,rgba(0,188,161,0.12),rgba(1,80,158,0.08),rgba(255,255,255,0.92))] dark:bg-[linear-gradient(135deg,rgba(0,188,161,0.12),rgba(1,80,158,0.10),rgba(13,18,17,0.95))] px-6 text-center">
+                <div className="max-w-xl space-y-3">
+                  <p className="text-[0.75rem] font-bold tracking-[0.08em] uppercase text-[#00BCA1]">
+                    {copy.map.title}
+                  </p>
+                  <p className="text-responsive text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]">
+                    The live Google Maps embed is blocked by the current Content Security Policy, so we show a direct map link here instead.
+                  </p>
+                </div>
+                <a
+                  href={MAP_LINK}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-lg bg-[#00BCA1] px-4 py-2.5 text-sm font-bold text-black transition-colors hover:bg-[#009f88]"
+                >
+                  {copy.map.button}
+                </a>
+              </div>
             </div>
             <div className="p-5 sm:p-6 flex items-center justify-between gap-4 flex-wrap">
               <p className="text-responsive text-[oklch(0.556_0_0)] dark:text-[oklch(0.708_0_0)]">

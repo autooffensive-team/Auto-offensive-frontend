@@ -189,7 +189,7 @@ function ProjectCard({
             </div>
             <div>
               <p className="text-[12px] font-medium text-[#555] dark:text-white/70">
-                Project · Repository
+                Project
               </p>
               <p className="mt-0.5 text-[11px] text-[#999] dark:text-white/40">
                 Created {formatProjectDate(project.created_at)}
