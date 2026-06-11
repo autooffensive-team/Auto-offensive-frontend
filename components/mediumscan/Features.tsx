@@ -44,7 +44,7 @@ export default function Features() {
       </div>
 
       {/* Card 3 */}
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-green-900 to-emerald-800 text-white">
+      <div className="p-6 rounded-2xl bg-linear-to-br from-green-900 to-emerald-800 text-white">
         <h3 className="text-xl font-bold mb-4">Why Register?</h3>
 
         <ul className="space-y-3 text-sm">

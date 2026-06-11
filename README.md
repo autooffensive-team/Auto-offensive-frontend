@@ -71,7 +71,7 @@ No local setup. No tool configuration. Just scan.
 
 Access our production-ready platform:
 
-**🌐 [Auto-OffensivePlatform](https://auto-offensive.com/)**
+**🌐 [Auto-OffensivePlatform](https://auto-offensive.org/)**
 
 ---
 
@@ -159,27 +159,27 @@ Clear and intuitive navigation across **public**, **user**, and **admin** areas 
 ### 🌐 Public Navigation
 
 - 🏠 **Home**  
-  [https://auto-offensive.vercel.app/](https://auto-offensive.vercel.app/)  
+  [https://auto-offensive.org/](https://auto-offensive.org/)  
   → Platform overview and introduction  
 
 - 🛠 **Tools**  
-  [https://auto-offensive.vercel.app/tools](https://auto-offensive.vercel.app/tools)  
+  [https://auto-offensive.org/tools](https://auto-offensive.org/tools)  
   → Explore automated security tools  
 
 - ✨ **Features**  
-  [https://auto-offensive.vercel.app/feature](https://auto-offensive.vercel.app/feature)  
+  [https://auto-offensive.org/feature](https://auto-offensive.org/feature)  
   → Discover orchestration & automation capabilities  
 
 - 📚 **Resources**  
-  [https://auto-offensive.vercel.app/resource](https://auto-offensive.vercel.app/resource)  
+  [https://auto-offensive.org/resource](https://auto-offensive.org/resource)  
   → Knowledge base and security documentation  
 
 - 🔑 **Login**  
-  [https://auto-offensive.vercel.app/login](https://auto-offensive.vercel.app/login)  
+  [https://auto-offensive.org/login](https://auto-offensive.org/login)  
   → Access your secure dashboard  
 
 - 📝 **Register**  
-  [https://auto-offensive.vercel.app/register](https://auto-offensive.vercel.app/register)  
+  [https://auto-offensive.org/register](https://auto-offensive.org/register)  
   → Create an account for full access  
 
 ---
@@ -187,23 +187,23 @@ Clear and intuitive navigation across **public**, **user**, and **admin** areas 
 ### 🔐 Authenticated User Pages
 
 - 📊 **Dashboard**  
-  https://auto-offensive.vercel.app/userdashboard 
+  https://auto-offensive.org/userdashboard 
   → View scan history, recent results, and quick actions  
 
 - 🔍 **New Scan**  
-  https://auto-offensive.vercel.app/userdashboard/scan 
+  https://auto-offensive.org/userdashboard/scan 
   → Configure and launch automated security workflows  
 
 - 🔍 **Code Scan**  
-  https://auto-offensive.vercel.app/userdashboard/code-scanning
+  https://auto-offensive.org/userdashboard/code-scanning
   → Scan code from your repository in github and gitlab when connect 
 
 - 📄 **Reports**  
-  https://auto-offensive.vercel.app/userdashboard/reports 
+  https://auto-offensive.org/userdashboard/reports 
   → Manage, view, and export scan results  
 
 - ⚙️ **Profile Settings**  
-  https://auto-offensive.vercel.app/userdashboard/profile  
+  https://auto-offensive.org/userdashboard/profile  
   → Update account details and manage API keys  
 
 ---
@@ -239,7 +239,7 @@ Their technical expertise and strategic guidance were the cornerstones of **Auto
 
 ## 💡 Our Mission
 
-### 🔐  **"Automate the Attack. Secure the Stack."**
+### 🔐  **"Your recon stack, without the stack"**
 
 *Empowering security professionals, developers, and researchers with accessible, automated penetration testing tools — without the infrastructure complexity.*
 
@@ -250,4 +250,4 @@ Their technical expertise and strategic guidance were the cornerstones of **Auto
 <strong>🚀 Ready to automate your security workflow?</strong>
 
 
-<a href="https://auto-offensive.vercel.app/">🌐 Visit Auto-Offensive Today!</a>
+<a href="https://auto-offensive.org/">🌐 Visit Auto-Offensive Today!</a>

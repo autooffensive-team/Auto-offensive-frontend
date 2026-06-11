@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 
 /* ─── Types ─────────────────────────────────── */
 interface AccordionItem {
@@ -64,10 +65,6 @@ const BodyP = ({ children, className = "" }: { children: React.ReactNode; classN
   <p className={`text-[20px] leading-[1.9] text-[#5C5C5C] dark:text-[#9A9A9A] mb-4 ${className}`}>
     {children}
   </p>
-);
-
-const Em = ({ children }: { children: React.ReactNode }) => (
-  <strong className="text-[#1A1A1A] dark:text-[#EDEDED] font-medium">{children}</strong>
 );
 
 const Notice = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
@@ -135,224 +132,209 @@ const ContactCard = ({
   </div>
 );
 
-/* ─── Accordion data ─────────────────────────── */
-const accordionItems: AccordionItem[] = [
-  {
-    id: "collect",
-    index: "01",
-    title: "What We Collect",
-    content: (
-      <>
-        <BodyP>We only collect what&apos;s needed to run the platform and keep your account secure.</BodyP>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
-          <ItemCard label="Account" val="Email, username, bcrypt-hashed password, encrypted API tokens" />
-          <ItemCard label="Scan Data" val="Targets, findings, logs, metadata — isolated to your account" />
-          <ItemCard label="Usage Signals" val="Features used, scan frequency, tool selection, login history" />
-          <ItemCard label="Technical" val="IP address, browser/OS, device type — for security & abuse prevention" />
-        </div>
-        <Notice>
-          <strong className="text-[#00BCA1]">Repository scanning is opt-in.</strong> We only access GitHub/GitLab when you explicitly authorize it.
-        </Notice>
-      </>
-    ),
-  },
-  {
-    id: "gdpr",
-    index: "02",
-    title: "GDPR & Legal Compliance",
-    content: (
-      <>
-        <BodyP>Auto-Offensive is fully compliant with the <Em>General Data Protection Regulation (GDPR)</Em> and other international data protection laws.</BodyP>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
-          <ItemCard label="Compliance" val="GDPR (EU/UK), CCPA (California), LGPD (Brazil)" />
-          <ItemCard label="Data Controller" val="Auto-Offensive Technologies Ltd." />
-          <ItemCard label="DPO Contact" val="dpo@auto-offensive.com" />
-          <ItemCard label="Data Protection" val="SHA-256 encryption, annual audits" />
-        </div>
-        <Notice>
-          <strong className="text-[#00BCA1]">Your data stays yours.</strong> We are committed to data sovereignty — your scan data is stored in your designated region unless you choose otherwise.
-        </Notice>
-        <CheckList
-          items={[
-            { text: <><Em>Lawful Basis:</Em> Performance of contract (service delivery) and legitimate interests (security)</> },
-            { text: <><Em>Right to Access:</Em> Get a copy of all personal data we hold within 30 days</> },
-            { text: <><Em>Right to Rectification:</Em> Correct inaccurate personal data instantly</> },
-            { text: <><Em>Right to Erasure:</Em> Request deletion (&quot;right to be forgotten&quot;) with no delay</> },
-            { text: <><Em>Data Portability:</Em> Receive your data in machine-readable format (JSON/CSV)</> },
-            { text: <><Em>Right to Object:</Em> Opt out of processing for marketing or legitimate interests</> },
-            { text: <><Em>International Transfers:</Em> Protected by Standard Contractual Clauses (SCCs)</> },
-            { text: <><Em>Cross-Border Transfers:</Em> GDPR-compliant via EU-US Data Privacy Framework</> },
-          ]}
-        />
-        <BodyP className="mt-4">
-          For GDPR data requests, email <Em>dpo@auto-offensive.com</Em> — we respond within <Em>72 hours</Em> as required by Article 12.
-        </BodyP>
-      </>
-    ),
-  },
-  {
-    id: "use",
-    index: "03",
-    title: "How We Use It",
-    content: (
-      <CheckList
-        items={[
-          { text: "Run and store your scans, display results in your dashboard" },
-          { text: "Manage authentication and account security" },
-          { text: "Enforce fair usage limits (3 scans/day on free tier)" },
-          { text: "Detect and prevent platform abuse or DDoS misuse" },
-          { text: <><Em>anonymized</Em> scan patterns to improve vulnerability detection</> },
-          { text: "Send scan completion alerts and security notifications" },
-          { text: "Sell, rent, or trade your data to anyone", no: true },
-          { text: "Use your personal scan results for commercial purposes", no: true },
-        ]}
-      />
-    ),
-  },
-  {
-    id: "scan",
-    index: "04",
-    title: "Your Scan Data",
-    content: (
-      <>
-        <BodyP>
-          <Em>You own it entirely.</Em> Scan configs, findings, reports, history — all yours. Each account is fully isolated at the database level.
-        </BodyP>
-        <Notice dark>
-          <strong className="text-[#00BCA1]">On AI training:</strong> We may use anonymized, aggregated patterns to improve detection models. We never identify your org, expose specific findings, or use raw data commercially.
-        </Notice>
-        <BodyP className="mt-4">
-          Export your data anytime in <Em>JSON</Em>, <Em>CSV</Em>, or <Em>PDF</Em> from the dashboard.
-        </BodyP>
-      </>
-    ),
-  },
-  {
-    id: "limits",
-    index: "05",
-    title: "Free Tier Limits",
-    content: (
-      <>
-        <DataRow label="Daily scans" val="3 scans / day" />
-        <DataRow label="Max scan duration" val="30 minutes" />
-        <DataRow label="Concurrent scans" val="1 at a time" />
-        <DataRow label="Target scope" val="Single domain per scan" />
-        <DataRow label="Storage" val="100 GB scan history" />
-        <DataRow label="Tools available" val="All 14+ tools" last />
-        <Notice>
-          Accounts that abuse free resources (e.g. mass automated scanning of targets you don&apos;t own) may be suspended. Legitimate learning and testing is always welcome.
-        </Notice>
-      </>
-    ),
-  },
-  {
-    id: "sharing",
-    index: "06",
-    title: "Who We Share With",
-    content: (
-      <>
-        <BodyP>We share the minimum necessary with trusted providers who help us operate.</BodyP>
-        <div className="flex flex-wrap gap-2 my-4">
-          {["AWS — Hosting", "SendGrid — Email", "Google Analytics — Aggregated metrics", "GitHub / GitLab — If you authorize", "Intercom — Support"].map((p) => (
-            <Pill key={p}>{p}</Pill>
-          ))}
-        </div>
-        <BodyP>
-          All providers are contractually required to protect your data and use it only for the specified purpose. We may disclose data to authorities when required by law — and we&apos;ll notify you when legally permitted to do so.
-        </BodyP>
-      </>
-    ),
-  },
-  {
-    id: "retention",
-    index: "07",
-    title: "Data Retention",
-    content: (
-      <>
-        <DataRow label="Account deleted" val="Credentials removed immediately" />
-        <DataRow label="Scan results" val="Deleted within 7 days" />
-        <DataRow label="Backups" val="Purged within 30 days" />
-        <DataRow label="Anonymized analytics" val="Up to 90 days" />
-        <DataRow label="Security logs" val="Up to 1 year (abuse prevention)" last />
-        <Notice>
-          <strong className="text-[#00BCA1]">Heads up:</strong> Download your data before deleting your account — deletion is permanent.
-        </Notice>
-      </>
-    ),
-  },
-  {
-    id: "rights",
-    index: "08",
-    title: "Your Rights",
-    content: (
-      <CheckList
-        items={[
-          { text: "View and download all your account data anytime" },
-          { text: "Edit or correct your account information in settings" },
-          { text: "Request full data export in portable format (within 30 days)" },
-          { text: "Delete your account and all associated data permanently" },
-          { text: "Unsubscribe from non-essential emails at any time" },
-          { text: 'Opt out of analytics via browser "Do Not Track" or account settings' },
-          { text: "File a complaint with your local data protection authority" },
-        ]}
-      />
-    ),
-  },
-  {
-    id: "security",
-    index: "09",
-    title: "Security",
-    content: (
-      <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
-          <ItemCard label="In Transit" val="HTTPS / TLS 256-bit encryption on all connections" />
-          <ItemCard label="At Rest" val="AES-256 for sensitive data, bcrypt for passwords" />
-          <ItemCard label="Access" val="Role-based controls, MFA available, session timeouts" />
-          <ItemCard label="Monitoring" val="24/7 intrusion detection, WAF, DDoS protection on AWS" />
-        </div>
-        <BodyP>
-          If we detect a breach, we notify you within <Em>48 hours</Em> with details and protective steps.
-        </BodyP>
-      </>
-    ),
-  },
-  {
-    id: "contact",
-    index: "10",
-    title: "Contact",
-    content: (
-      <>
-        <BodyP>
-          Questions about your data? We respond to all privacy requests within 7 business days, security issues within 24 hours.
-        </BodyP>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          <ContactCard type="Privacy" email="privacy@auto-offensive.com" note="Within 7 business days" />
-          <ContactCard type="DPO (GDPR)" email="dpo@auto-offensive.com" note="Within 72 hours" />
-          <ContactCard type="Security" email="security@auto-offensive.com" note="Within 24 hours" />
-        </div>
-      </>
-    ),
-  },
-];
-
-const navItems = [
-  { href: "collect", label: "What We Collect" },
-  { href: "gdpr", label: "GDPR & Legal Compliance" },
-  { href: "use", label: "How We Use It" },
-  { href: "scan", label: "Your Scan Data" },
-  { href: "limits", label: "Free Tier Limits" },
-  { href: "sharing", label: "Who We Share With" },
-  { href: "retention", label: "Data Retention" },
-  { href: "rights", label: "Your Rights" },
-  { href: "security", label: "Security" },
-  { href: "contact", label: "Contact" },
-];
+const sectionIds = [
+  "collect",
+  "gdpr",
+  "use",
+  "scan",
+  "limits",
+  "sharing",
+  "retention",
+  "rights",
+  "security",
+  "contact",
+] as const;
 
 /* ─── Main Export ────────────────────────────── */
 export default function PrivacyContent() {
+  const t = useTranslations("privacy");
   const [openId, setOpenId] = useState<string>("collect");
   const [activeNav, setActiveNav] = useState<string>("collect");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const navItems = sectionIds.map((id) => ({
+    href: id,
+    label: t(`nav.${id}`),
+  }));
+
+  const providers = t.raw("accordion.sharing.providers") as string[];
+
+  const accordionItems: AccordionItem[] = [
+    {
+      id: "collect",
+      index: "01",
+      title: t("accordion.collect.title"),
+      content: (
+        <>
+          <BodyP>{t("accordion.collect.lead")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
+            <ItemCard label={t("accordion.collect.items.account")} val={t("accordion.collect.items.accountVal")} />
+            <ItemCard label={t("accordion.collect.items.scanData")} val={t("accordion.collect.items.scanDataVal")} />
+            <ItemCard label={t("accordion.collect.items.usageSignals")} val={t("accordion.collect.items.usageSignalsVal")} />
+            <ItemCard label={t("accordion.collect.items.technical")} val={t("accordion.collect.items.technicalVal")} />
+          </div>
+          <Notice>{t("accordion.collect.notice")}</Notice>
+        </>
+      ),
+    },
+    {
+      id: "gdpr",
+      index: "02",
+      title: t("accordion.gdpr.title"),
+      content: (
+        <>
+          <BodyP>{t("accordion.gdpr.lead")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
+            <ItemCard label={t("accordion.gdpr.items.compliance")} val={t("accordion.gdpr.items.complianceVal")} />
+            <ItemCard label={t("accordion.gdpr.items.dataController")} val={t("accordion.gdpr.items.dataControllerVal")} />
+            <ItemCard label={t("accordion.gdpr.items.dpoContact")} val={t("accordion.gdpr.items.dpoContactVal")} />
+            <ItemCard label={t("accordion.gdpr.items.dataProtection")} val={t("accordion.gdpr.items.dataProtectionVal")} />
+          </div>
+          <Notice>{t("accordion.gdpr.notice")}</Notice>
+          <CheckList
+            items={[
+              { text: t("accordion.gdpr.rights.lawfulBasis") },
+              { text: t("accordion.gdpr.rights.rightToAccess") },
+              { text: t("accordion.gdpr.rights.rightToRectification") },
+              { text: t("accordion.gdpr.rights.rightToErasure") },
+              { text: t("accordion.gdpr.rights.dataPortability") },
+              { text: t("accordion.gdpr.rights.rightToObject") },
+              { text: t("accordion.gdpr.rights.internationalTransfers") },
+              { text: t("accordion.gdpr.rights.crossBorderTransfers") },
+            ]}
+          />
+          <BodyP className="mt-4">{t("accordion.gdpr.gdprFooter")}</BodyP>
+        </>
+      ),
+    },
+    {
+      id: "use",
+      index: "03",
+      title: t("accordion.use.title"),
+      content: (
+        <CheckList
+          items={[
+            { text: t("accordion.use.items.runScans") },
+            { text: t("accordion.use.items.auth") },
+            { text: t("accordion.use.items.limits") },
+            { text: t("accordion.use.items.abuse") },
+            { text: t("accordion.use.items.anonymized") },
+            { text: t("accordion.use.items.alerts") },
+            { text: t("accordion.use.items.sellData"), no: true },
+            { text: t("accordion.use.items.commercial"), no: true },
+          ]}
+        />
+      ),
+    },
+    {
+      id: "scan",
+      index: "04",
+      title: t("accordion.scan.title"),
+      content: (
+        <>
+          <BodyP>{t("accordion.scan.lead")}</BodyP>
+          <Notice dark>{t("accordion.scan.notice")}</Notice>
+          <BodyP className="mt-4">{t("accordion.scan.export")}</BodyP>
+        </>
+      ),
+    },
+    {
+      id: "limits",
+      index: "05",
+      title: t("accordion.limits.title"),
+      content: (
+        <>
+          <DataRow label={t("accordion.limits.items.dailyScans")} val={t("accordion.limits.items.dailyScansVal")} />
+          <DataRow label={t("accordion.limits.items.maxScanDuration")} val={t("accordion.limits.items.maxScanDurationVal")} />
+          <DataRow label={t("accordion.limits.items.concurrentScans")} val={t("accordion.limits.items.concurrentScansVal")} />
+          <DataRow label={t("accordion.limits.items.targetScope")} val={t("accordion.limits.items.targetScopeVal")} />
+          <DataRow label={t("accordion.limits.items.storage")} val={t("accordion.limits.items.storageVal")} />
+          <DataRow label={t("accordion.limits.items.toolsAvailable")} val={t("accordion.limits.items.toolsAvailableVal")} last />
+          <Notice>{t("accordion.limits.notice")}</Notice>
+        </>
+      ),
+    },
+    {
+      id: "sharing",
+      index: "06",
+      title: t("accordion.sharing.title"),
+      content: (
+        <>
+          <BodyP>{t("accordion.sharing.lead")}</BodyP>
+          <div className="flex flex-wrap gap-2 my-4">
+            {providers.map((provider) => (
+              <Pill key={provider}>{provider}</Pill>
+            ))}
+          </div>
+          <BodyP>{t("accordion.sharing.notice")}</BodyP>
+        </>
+      ),
+    },
+    {
+      id: "retention",
+      index: "07",
+      title: t("accordion.retention.title"),
+      content: (
+        <>
+          <DataRow label={t("accordion.retention.items.accountDeleted")} val={t("accordion.retention.items.accountDeletedVal")} />
+          <DataRow label={t("accordion.retention.items.scanResults")} val={t("accordion.retention.items.scanResultsVal")} />
+          <DataRow label={t("accordion.retention.items.backups")} val={t("accordion.retention.items.backupsVal")} />
+          <DataRow label={t("accordion.retention.items.anonymizedAnalytics")} val={t("accordion.retention.items.anonymizedAnalyticsVal")} />
+          <DataRow label={t("accordion.retention.items.securityLogs")} val={t("accordion.retention.items.securityLogsVal")} last />
+          <Notice>{t("accordion.retention.notice")}</Notice>
+        </>
+      ),
+    },
+    {
+      id: "rights",
+      index: "08",
+      title: t("accordion.rights.title"),
+      content: (
+        <CheckList
+          items={[
+            { text: t("accordion.rights.items.viewData") },
+            { text: t("accordion.rights.items.editData") },
+            { text: t("accordion.rights.items.exportData") },
+            { text: t("accordion.rights.items.deleteAccount") },
+            { text: t("accordion.rights.items.unsubscribe") },
+            { text: t("accordion.rights.items.optOutAnalytics") },
+            { text: t("accordion.rights.items.complaint") },
+          ]}
+        />
+      ),
+    },
+    {
+      id: "security",
+      index: "09",
+      title: t("accordion.security.title"),
+      content: (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
+            <ItemCard label={t("accordion.security.items.inTransit")} val={t("accordion.security.items.inTransitVal")} />
+            <ItemCard label={t("accordion.security.items.atRest")} val={t("accordion.security.items.atRestVal")} />
+            <ItemCard label={t("accordion.security.items.access")} val={t("accordion.security.items.accessVal")} />
+            <ItemCard label={t("accordion.security.items.monitoring")} val={t("accordion.security.items.monitoringVal")} />
+          </div>
+          <BodyP>{t("accordion.security.lead")}</BodyP>
+        </>
+      ),
+    },
+    {
+      id: "contact",
+      index: "10",
+      title: t("accordion.contact.title"),
+      content: (
+        <>
+          <BodyP>{t("accordion.contact.lead")}</BodyP>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <ContactCard type={t("accordion.contact.privacy")} email={t("accordion.contact.privacyEmail")} note={t("accordion.contact.privacyNote")} />
+            <ContactCard type={t("accordion.contact.dpo")} email={t("accordion.contact.dpoEmail")} note={t("accordion.contact.dpoNote")} />
+            <ContactCard type={t("accordion.contact.security")} email={t("accordion.contact.securityEmail")} note={t("accordion.contact.securityNote")} />
+          </div>
+        </>
+      ),
+    },
+  ];
 
   /* Scroll spy */
   useEffect(() => {
@@ -388,7 +370,7 @@ export default function PrivacyContent() {
         {/* Sidebar */}
         <aside className="hidden md:block sticky top-8 h-fit">
           <div className="text-[11px] tracking-[0.2em] uppercase text-[#9A9A9A] mb-3.5 font-sans">
-            Sections
+            {t("sectionsLabel")}
           </div>
           <ul className="list-none border-l border-black/[0.14] dark:border-white/[0.14]">
             {navItems.map((nav) => (
@@ -431,7 +413,7 @@ export default function PrivacyContent() {
         style={{ padding: "32px clamp(24px,6vw,80px)" }}
       >
         <p className="text-[11px] text-[#9A9A9A] tracking-[0.06em] text-right leading-[1.8]">
-          Privacy Policy v2.0 · March 2026<br />Free Platform · Open Source Friendly
+          {t("footerLine1")}<br />{t("footerLine2")}
         </p>
       </footer>
     </>

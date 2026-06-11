@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import { useLocale } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,11 +33,11 @@ export default function AboutHero() {
       };
 
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
   const titleLineHeight = isKhmer ? 1.2 : 1.08;
   const titleTracking = isKhmer ? "-0.02em" : "-0.04em";
   const ctaText = isKhmer ? "ស្វែងយល់រឿងរ៉ាវរបស់យើង" : "Discover Our Story";
@@ -273,7 +274,7 @@ export default function AboutHero() {
           text-[oklch(0.145_0_0)] dark:text-[oklch(0.985_0_0)]
           transition-[background] duration-400
         "
-        style={{ fontFamily: bodyFont }}
+        style={{ fontFamily: bodyFont } as CSSProperties}
       >
         <div className="absolute inset-0 z-0">
           <GridPattern

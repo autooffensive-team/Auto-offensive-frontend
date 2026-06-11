@@ -25,7 +25,7 @@ export default function Terminal() {
           text-green-400 
           font-mono text-sm 
           p-4 
-          h-[260px] md:h-[320px] 
+          h-65 md:h-80
           overflow-y-auto
         "
       >

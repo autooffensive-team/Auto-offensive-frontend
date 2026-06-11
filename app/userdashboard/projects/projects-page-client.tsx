@@ -140,10 +140,10 @@ function StatCard({
 
       <div className="relative z-10 flex items-start justify-between">
         <div>
-          <p className={`text-xl font-bold leading-none sm:text-2xl md:text-[28px] ${s.value}`}>
+          <p className={`text-xl font-bold leading-none sm:text-2xl md:text-[28px] lg:text-4xl ${s.value}`}>
             {value}
           </p>
-          <p className="mt-1.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sm:mt-2 sm:text-[12px]">
+          <p className="mt-1.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sm:mt-2 sm:text-[12px] lg:text-sm">
             {label}
           </p>
         </div>
@@ -189,7 +189,7 @@ function ProjectCard({
             </div>
             <div>
               <p className="text-[12px] font-medium text-[#555] dark:text-white/70">
-                Project · Repository
+                Project
               </p>
               <p className="mt-0.5 text-[11px] text-[#999] dark:text-white/40">
                 Created {formatProjectDate(project.created_at)}
@@ -213,10 +213,10 @@ function ProjectCard({
         </div>
 
         {/* Project name */}
-        <p className="mb-1 truncate text-[14px] font-medium text-[#111] sm:text-[17px] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
+        <p className="mb-1 truncate text-[14px] font-medium text-[#111] sm:text-[17px] lg:text-[20px] dark:text-white/90" style={{ fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace" }}>
           {project.name}
         </p>
-        <p className="mb-3 text-[11px] text-[#888] sm:mb-4 sm:text-[12px] dark:text-white/40 truncate">
+        <p className="mb-3 text-[11px] text-[#888] sm:mb-4 sm:text-[12px] lg:text-[14px] dark:text-white/40 truncate">
           {project.description || "No description provided"}
         </p>
 
@@ -607,7 +607,7 @@ export default function ProjectsPageClient({
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
             Projects
           </h1>
-          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-xl text-gray-500 dark:text-gray-400 leading-relaxed">
             Manage project connected for Tools scanning
           </p>
         </div>
@@ -652,7 +652,7 @@ export default function ProjectsPageClient({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search projects..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[14px] lg:text-base focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
         />
         <AnimatePresence>
           {searchTerm && (
@@ -722,10 +722,10 @@ export default function ProjectsPageClient({
             <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
               <FolderGit2 size={22} className="text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-sm sm:text-[16px] font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm sm:text-[16px] lg:text-lg font-semibold text-gray-900 dark:text-white">
               {searchTerm ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="mt-1 text-xs sm:text-[13px] text-gray-500 dark:text-gray-400 max-w-xs">
+            <p className="mt-1 text-xs sm:text-[13px] lg:text-sm text-gray-500 dark:text-gray-400 max-w-xs">
               {searchTerm
                 ? "Try adjusting your search term"
                 : "Import a repository to start scanning for vulnerabilities"}

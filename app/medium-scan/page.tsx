@@ -230,8 +230,8 @@ export default function MediumScanPage() {
   const router = useRouter();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const streamAbortRef = useRef<AbortController | null>(null);
   const { themeKey, sizeKey, size: logSize, setTheme, setSize, resetToDefault } = useLogPreferences();
 

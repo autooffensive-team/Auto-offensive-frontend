@@ -153,13 +153,13 @@ export default function CLIFeature() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const heroTitleFontFamily = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    ? 'var(--font-hanuman), sans-serif'
     : displayFontFamily;
   const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
   const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";

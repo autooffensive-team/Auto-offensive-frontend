@@ -277,7 +277,8 @@ export default function HomeHero() {
   const locale  = useLocale();
   const isKhmer = locale === "km";
   const { data: session } = authClient.useSession();
-  const scanHref = session ? "/userdashboard/scan" : "/api/guest/start";
+  const [mounted, setMounted] = useState(false);
+  const scanHref = mounted && session ? "/userdashboard/scan" : "/api/guest/start";
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
@@ -292,6 +293,7 @@ export default function HomeHero() {
   const [focusStarted, setFocusStarted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const cleanupHexLeft = setupMagneticHover(hexLeftRef.current);
     const cleanupHexRight = setupMagneticHover(hexRightRef.current);
 
@@ -608,8 +610,8 @@ export default function HomeHero() {
         "
         style={{
           fontFamily: isKhmer
-            ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-            : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+            ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+            : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif",
         }}
       >
 
@@ -775,7 +777,7 @@ export default function HomeHero() {
                             {index < array.length - 1 ? (
                               <span
                                 style={{
-                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif',
+                                  fontFamily: "var(--font-hanuman), sans-serif",
                                   fontWeight: 800,
                                 }}
                               >

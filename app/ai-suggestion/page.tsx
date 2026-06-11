@@ -137,8 +137,8 @@ export default function AISuggestionPage() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   const [jobId, setJobId] = useState("e6eeb9a1-6c51-4bbb-95aa-97d9f74382d6");
   const [mode, setMode] = useState<SuggestionMode>("analysis");
@@ -232,7 +232,7 @@ export default function AISuggestionPage() {
               <button
                 type="button"
                 onClick={handleGenerate}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/25 transition hover:scale-[1.01]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-cyan-500 via-teal-500 to-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/25 transition hover:scale-[1.01]"
               >
                 Generate {selectedMode.label}
                 <ArrowRight size={16} />

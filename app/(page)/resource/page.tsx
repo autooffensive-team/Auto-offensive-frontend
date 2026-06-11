@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from "next-intl";
-import ResourceComponent from "@/components/pages/resourcepage/page-resource";
+import ResourceComponent from "@/components/resourcepage/page-resource";
 
 export default function ResourcePage() {
   const locale = useLocale();

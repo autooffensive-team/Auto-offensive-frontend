@@ -135,12 +135,12 @@ export default function ProfilePage() {
 
             {/* Name & meta */}
             <div className="pb-1">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
                 {user ? displayName : (
                   <span className="inline-block h-7 w-36 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse" />
                 )}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              <p className="text-base sm:text-lg lg:text-xl text-gray-500 dark:text-gray-400 mt-0.5">
                 {user?.email ?? (
                   <span className="inline-block h-4 w-48 rounded-md bg-gray-100 dark:bg-gray-800 animate-pulse" />
                 )}
@@ -154,10 +154,10 @@ export default function ProfilePage() {
             whileTap={{ scale: 0.97 }}
             onClick={() => (isEditing ? handleSave() : handleEdit())}
             disabled={!user || isSaving}
-            className={`self-end sm:self-auto flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors ${
+            className={`self-end sm:self-auto flex items-center gap-2 px-5 py-2.5 rounded-xl text-base lg:text-lg font-semibold shadow-sm transition-colors ${
               isEditing
-                ? "bg-green-500 hover:bg-green-600 text-white shadow-green-200 dark:shadow-green-900/40"
-                : "bg-teal-500 hover:bg-teal-600 text-white shadow-teal-200 dark:shadow-teal-900/40"
+                ? "bg-green-500 hover:bg-green-600 text-black shadow-green-200 dark:shadow-green-900/40"
+                : "bg-teal-500 hover:bg-teal-600 text-black shadow-teal-200 dark:shadow-teal-900/40"
             } disabled:cursor-not-allowed disabled:opacity-70`}
           >
             {isSaving ? (
@@ -182,7 +182,7 @@ export default function ProfilePage() {
               {/* Teal top accent */}
               <div  />
               <div className="p-5 space-y-4">
-                <p className="text-xs font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
+                <p className="text-sm lg:text-base font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
                   Account Details
                 </p>
 
@@ -231,7 +231,7 @@ export default function ProfilePage() {
                 <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">
                   <User size={14} className="text-teal-600 dark:text-teal-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Account Information</h3>
+                <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Account Information</h3>
               </div>
               <div className="p-6 grid sm:grid-cols-2 gap-4">
                 <FieldWrapper label="Display Name" icon={<User size={15} />}>
@@ -267,7 +267,7 @@ export default function ProfilePage() {
                 <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">
                   <Lock size={14} className="text-teal-600 dark:text-teal-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Change Password</h3>
+                <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Change Password</h3>
               </div>
               <div className="p-6 space-y-4">
                 <FieldWrapper label="Current Password" icon={<Lock size={15} />}>
@@ -302,38 +302,8 @@ export default function ProfilePage() {
                     />
                   </FieldWrapper>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Password update is not connected to a backend endpoint on this page yet.
-                </p>
               </div>
             </motion.div>
-
-            {/* Danger Zone */}
-            <motion.div
-              custom={3} variants={fadeUp} initial="hidden" animate="show"
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-red-100 dark:border-red-900/40 shadow-sm overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b border-red-100 dark:border-red-900/40 flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/50 flex items-center justify-center">
-                  <AlertCircle size={14} className="text-red-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-red-600 dark:text-red-400">Danger Zone</h3>
-              </div>
-              <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
-                  Once you delete your account, there is no going back. All data will be permanently removed.
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-                >
-                  <Lock size={14} />
-                  Delete Account
-                </motion.button>
-              </div>
-            </motion.div>
-
           </div>
         </div>
       </div>
@@ -345,7 +315,7 @@ export default function ProfilePage() {
 
 function fieldClass(editing: boolean) {
   return [
-    "w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border transition-all outline-none",
+    "w-full pl-9 pr-4 py-2.5 text-base lg:text-lg rounded-xl border transition-all outline-none",
     editing
       ? "border-teal-300 dark:border-teal-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
       : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 cursor-not-allowed opacity-70",
@@ -363,7 +333,7 @@ function FieldWrapper({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+      <label className="block text-sm lg:text-base font-medium text-gray-500 dark:text-gray-400 mb-1.5">
         {label}
       </label>
       <div className="relative">
@@ -389,14 +359,14 @@ function StatRow({
 }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
-      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs">
+      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm lg:text-base">
         {icon}
         {label}
       </div>
       {loading ? (
         <span className="h-3.5 w-20 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
       ) : (
-        <span className="text-xs font-medium text-gray-900 dark:text-white">{value}</span>
+        <span className="text-sm lg:text-base font-medium text-gray-900 dark:text-white">{value}</span>
       )}
     </div>
   );

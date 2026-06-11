@@ -14,7 +14,7 @@ export function Field({ label, htmlFor, children, className }: FieldProps) {
     <div className={cn("space-y-2", className)}>
       <label 
         htmlFor={htmlFor}
-        className="text-[10px] sm:text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        className="text-sm sm:text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         {label}
       </label>

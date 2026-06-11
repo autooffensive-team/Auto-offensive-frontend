@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
+import Image from "next/image";
 import FocusWord from "@/components/ui/focus-word";
 
 const SOCIAL_LINKS = {
@@ -158,7 +159,7 @@ function CardInner({ member: m, index, isKhmer }: { member: Member; index: numbe
       <div className="tf-node-badge">{String(index + 1).padStart(2, "0")}</div>
       <div className="relative z-2 flex justify-center pt-3 mb-5">
         <div className="tf-photo-outer relative w-50 h-50 bg-[rgba(0,208,178,0.05)] rounded-full flex items-center justify-center">
-          <img src={m.img} alt={displayName} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
+          <Image src={m.img} alt={displayName} width={200} height={200} className="w-50 h-50 rounded-full object-cover object-top border-[3px] border-[#F7F5F0] shadow-[0_4px_32px_rgba(0,0,0,0.15)] block" />
           <span className="tf-status-dot" />
         </div>
       </div>
@@ -195,11 +196,11 @@ export default function TeamAndFooter() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+    ? "var(--font-hanuman), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
 
   const copy = isKhmer
     ? {
@@ -402,7 +403,7 @@ export default function TeamAndFooter() {
         <div className="relative z-10 w-full h-px bg-linear-to-r from-transparent via-[rgba(0,208,177,0.45)] to-transparent" />
 
         <div className="relative z-10 tf-intro px-[6%] pt-23 pb-10 text-center overflow-hidden">
-          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={heroTitleRef}>
+          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: titleFont }} ref={heroTitleRef}>
             {copy.heroLine1}<br />
             {copy.heroLine2Lead}{" "}
             <FocusWord startAnimation={heroAnimStarted}>
@@ -414,7 +415,7 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-6 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={mentorsTitleRef}>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }} ref={mentorsTitleRef}>
               {copy.mentorsLead}{" "}
               <FocusWord startAnimation={mentorsAnimStarted}>
                 <em className="text-primary not-italic">{copy.mentorsAccent}</em>
@@ -453,7 +454,7 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-2 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-noto-khmer), monospace" }} ref={teamTitleRef}>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }} ref={teamTitleRef}>
               {copy.teamLead}{" "}
               <FocusWord startAnimation={teamAnimStarted}>
                 <em className="text-primary not-italic">{copy.teamAccent}</em>

@@ -3,7 +3,7 @@
 import { FileText, Link2, Code2, Circle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import AnimatedCta from '../homepage/animated-cta'
+import AnimatedCta from '../../components/pages/homepage/animated-cta'
 
 export default function ResourceSections() {
   const t = useTranslations("resourcePage")

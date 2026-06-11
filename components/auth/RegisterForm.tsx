@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { EyeOff, Lock, Mail, Rocket, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 type RegisterFormState = {
   username: string;
@@ -120,8 +121,14 @@ export default function RegisterForm() {
       </p>
 
       <div className="mb-6">
-        <Link
-          href="/login?manual=1"
+        <button
+          type="button"
+          onClick={() => {
+            void authClient.signIn.oauth2({
+              providerId: "keycloak-google",
+              callbackURL: "/userdashboard",
+            });
+          }}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-900"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -143,7 +150,7 @@ export default function RegisterForm() {
             />
           </svg>
           Continue with Google
-        </Link>
+        </button>
       </div>
 
       <div className="mb-6 flex items-center">

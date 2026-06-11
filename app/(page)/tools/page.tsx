@@ -760,8 +760,8 @@ export default function ToolsPage() {
 
   const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
-    ? 'var(--font-noto-khmer), sans-serif'
-    : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
+    ? 'var(--font-kantumruy-pro), sans-serif'
+    : 'var(--font-google-sans), var(--font-kantumruy-pro), sans-serif';
   const descriptionTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const subtitleTextClass = 'text-[16px] md:text-[17px] lg:text-[18px]';
 

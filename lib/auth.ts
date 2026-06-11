@@ -14,32 +14,45 @@ const appUrl = readOptionalEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
 const docsAppUrl = readOptionalEnv("DOCS_APP_URL", "http://localhost:3001");
 const keycloakIssuer = readRequiredEnv("KEYCLOAK_ISSUER");
 
+// Shared Keycloak config to avoid repetition
+const keycloakBase = {
+  clientId: readRequiredEnv("KEYCLOAK_WEB_CLIENT_ID"),
+  clientSecret: readRequiredEnv("KEYCLOAK_WEB_CLIENT_SECRET"),
+  issuer: keycloakIssuer,
+  requireIssuerValidation: true,
+  authorizationUrl: `${keycloakIssuer}/protocol/openid-connect/auth`,
+  tokenUrl: `${keycloakIssuer}/protocol/openid-connect/token`,
+  userInfoUrl: `${keycloakIssuer}/protocol/openid-connect/userinfo`,
+  scopes: ["openid", "profile", "email"],
+  pkce: true,
+};
+
 export const auth = betterAuth({
   appName: "Auto Offensive",
   baseURL: appUrl,
   basePath: "/api/auth",
   secret: readRequiredEnv("BETTER_AUTH_SECRET"),
-  // Trust both the main app and the docs app (dev + production)
   trustedOrigins: [
     appUrl,
     docsAppUrl,
     "http://localhost:3001",
-    "https://auto-offensive-document.vercel.app" 
+    "https://auto-offensive-document.vercel.app",
   ],
   plugins: [
     genericOAuth({
       config: [
+        // Shows Keycloak login form (existing)
         {
+          ...keycloakBase,
           providerId: "keycloak",
-          clientId: readRequiredEnv("KEYCLOAK_WEB_CLIENT_ID"),
-          clientSecret: readRequiredEnv("KEYCLOAK_WEB_CLIENT_SECRET"),
-          issuer: keycloakIssuer,
-          requireIssuerValidation: true,
-          authorizationUrl: `${keycloakIssuer}/protocol/openid-connect/auth`,
-          tokenUrl: `${keycloakIssuer}/protocol/openid-connect/token`,
-          userInfoUrl: `${keycloakIssuer}/protocol/openid-connect/userinfo`,
-          scopes: ["openid", "profile", "email"],
-          pkce: true,
+        },
+        // Skips Keycloak form → goes straight to Google
+        {
+          ...keycloakBase,
+          providerId: "keycloak-google",
+          authorizationUrlParams: {
+            kc_idp_hint: "google", // must match the alias in Keycloak Admin → Identity Providers
+          },
         },
       ],
     }),

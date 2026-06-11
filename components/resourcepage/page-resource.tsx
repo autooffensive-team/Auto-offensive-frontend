@@ -10,11 +10,11 @@ import { useTheme } from "@/components/theme-provider";
 import { useState, useEffect, useMemo } from "react";
 import { HeroBackground } from "@/components/shared/HeroBackground";
 import AnimatedCta from "@/components/pages/homepage/animated-cta";
-import resourceCenterImage from "../../../public/images/ddoc.png";
-import darkIconApi from "../../../public/document/dark_icon_api.webp";
-import darkIconCicd from "../../../public/document/dark_icon_cicd.webp";
-import darkIconCli from "../../../public/document/dark_icon_cli.webp";
-import darkIconTools from "../../../public/document/dark_icon_tools.webp";
+import resourceCenterImage from "@/public/images/ddoc.png";
+import darkIconApi from "@/public/document/dark_icon_api.webp";
+import darkIconCicd from "@/public/document/dark_icon_cicd.webp";
+import darkIconCli from "@/public/document/dark_icon_cli.webp";
+import darkIconTools from "@/public/document/dark_icon_tools.webp";
 import {
   ArrowRight,
   Cpu,
@@ -330,7 +330,7 @@ export default function ResourceComponent() {
           title: "ឯកសារ CLI",
           description:
             "រៀនប្រើ command line សម្រាប់ automation, កំណត់ parameter និង stealth execution។",
-          href: "/resource/cli",
+          href: "/docs/cli",
           cta: "មើល CLI Reference",
           meta: "បានអាប់ដេត 2 ម៉ោងមុន",
           icon: TerminalSquare,
@@ -342,7 +342,7 @@ export default function ResourceComponent() {
           title: "ឯកសារ API",
           description:
             "ឯកសារ REST API សម្រាប់ដំណើរការ penetration testing ដោយស្វ័យប្រវត្តិ។",
-          href: "/resource/api",
+          href: "/docs/api",
           cta: "Explore Endpoints",
           icon: Cpu,
           imageSide: "right",
@@ -353,7 +353,7 @@ export default function ResourceComponent() {
           title: "ឯកសារ Tools",
           description:
             "ពន្យល់លម្អិតអំពីរបៀបដំណើរការនៃ fuzzing និង exploitation tools។",
-          href: "/resource/tool",
+          href: "/docs/tools",
           cta: "Access Toolkits",
           badge: "HOT",
           icon: Wrench,
@@ -365,7 +365,7 @@ export default function ResourceComponent() {
           title: "ការភ្ជាប់ CI/CD",
           description:
             "ភ្ជាប់ Auto-Offensive ទៅក្នុង GitHub, GitLab ឬ Jenkins ដើម្បីធ្វើ security scan ដោយស្វ័យប្រវត្តិ។",
-          href: "/resource/ci-cd",
+          href: "/docs/ci-cd",
           cta: "មើលឯកសារ CI/CD",
           tags: ["GITHUB ACTIONS", "GITLAB CI", "AZURE DEVOPS"],
           icon: GitBranch,
@@ -379,7 +379,7 @@ export default function ResourceComponent() {
           title: "CLI Documents",
           description:
             "Master the command line interface. Detailed documentation on automated offensive scripts, parameter tuning, and stealth execution modes.",
-          href: "/resource/cli",
+          href: "/docs/cli",
           cta: "View CLI Reference",
           meta: "Updated 2h ago",
           icon: TerminalSquare,
@@ -391,7 +391,7 @@ export default function ResourceComponent() {
           title: "API Documents",
           description:
             "Full RESTful API endpoints for orchestrating automated penetration testing at scale.",
-          href: "/resource/api",
+          href: "/docs/api",
           cta: "Explore Endpoints",
           icon: Cpu,
           imageSide: "right",
@@ -402,7 +402,7 @@ export default function ResourceComponent() {
           title: "Tools Documents",
           description:
             "Deep dives into the internal logic of our proprietary fuzzing and exploitation toolsets.",
-          href: "/resource/tool",
+          href: "/docs/tools",
           cta: "Access Toolkits",
           badge: "HOT",
           icon: Wrench,
@@ -414,7 +414,7 @@ export default function ResourceComponent() {
           title: "CI/CD Integration",
           description:
             "Seamlessly inject Auto-Offensive audits into your GitLab, GitHub, or Jenkins pipelines. Ensure security remains continuous.",
-          href: "/resource/ci-cd",
+          href: "/docs/ci-cd",
           cta: "Open CI/CD Docs",
           tags: ["GITHUB ACTIONS", "GITLAB CI", "AZURE DEVOPS"],
           icon: GitBranch,
@@ -781,7 +781,7 @@ export default function ResourceComponent() {
               </p>
             </div>
             <Link
-              href="/resource/tool"
+              href="/docs/tools"
               className="inline-flex items-center gap-2 text-[15px] font-bold text-[#008C83]"
             >
               {sectionLabels.technicalCta}

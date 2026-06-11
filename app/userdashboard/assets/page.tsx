@@ -29,7 +29,7 @@ export default function AssetsPage() {
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-900 dark:text-white leading-tight">
             Assets
           </h1>
-          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-xl text-slate-500 dark:text-slate-400 leading-relaxed">
             View and manage your discovered targets across all projects
           </p>
         </div>
