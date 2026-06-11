@@ -331,7 +331,7 @@ export function TerminalSidebar({
       </div>
 
       {/* ── Recent logs ── */}
-      <div className="relative z-10 px-4 py-3 border-b flex-1 min-h-0" style={{ borderBottomColor: a(0.12) }}>
+      <div className="relative z-10 px-4 py-4 border-b flex-1 min-h-0" style={{ borderBottomColor: a(0.12) }}>
         {showDecorations && (
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -355,12 +355,12 @@ export function TerminalSidebar({
         )}
         <div className="relative z-10">
           <div className="text-[11px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-2" style={{ color: "rgba(125,211,252,0.95)" }}>Recent</div>
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             {logs.slice(-4).length > 0
               ? logs.slice(-4).map((log, idx) => (
                   <motion.div
                     key={idx}
-                    className="text-[10px] font-(family-name:--font-fira-code) truncate leading-relaxed"
+                    className="text-[10px] font-(family-name:--font-fira-code) truncate leading-loose"
                     style={{ color: "rgba(186,230,253,0.75)" }}
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 0.6 }}

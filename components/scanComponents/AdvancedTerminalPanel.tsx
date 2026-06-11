@@ -10,7 +10,7 @@ import type { ActiveRun, LogLine, Project, ScanStep } from "@/types/scan";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "./LogToolbar";
 import { useGraphStore } from "@/components/scanning/graph.store";
-import { LOG_SIZES } from "@/lib/log-themes";
+import { LOG_SIZES, type LogThemeKey } from "@/lib/log-themes";
 import { TerminalSidebar } from "./TerminalSidebar";
 import { cn } from "@/lib/utils";
 
@@ -428,8 +428,10 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   const showDecorations = decorationsEnabled;
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showThemeConfirm, setShowThemeConfirm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const pendingThemeRef = useRef<LogThemeKey | null>(null);
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -858,7 +860,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   useEffect(() => {
     if (termRef.current?.options) {
       termRef.current.options.fontSize = terminalFontSize;
-      termRef.current.options.lineHeight = logSize.terminalLineHeight;
+      termRef.current.options.lineHeight = terminalLineHeight;
       termRef.current.options.letterSpacing = terminalLetterSpacing;
       fitAddonRef.current?.fit();
     }
@@ -996,6 +998,35 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     useGraphStore.getState().reset();
     if (term) { term.reset(); showSplash(term); term.write(getPrompt()); }
   }, [getPrompt, showSplash]);
+
+  const handleThemeChange = useCallback((nextTheme: LogThemeKey) => {
+    const hasTerminalResult =
+      logs.length > 0 ||
+      errors.length > 0 ||
+      isSubmitting ||
+      isStreaming ||
+      (run.status !== "idle" && !/idle/i.test(run.status));
+
+    if (!hasTerminalResult) {
+      setTheme(nextTheme);
+      return;
+    }
+
+    pendingThemeRef.current = nextTheme;
+    setShowThemeConfirm(true);
+  }, [errors.length, isStreaming, isSubmitting, logs.length, run.status, setTheme]);
+
+  const handleConfirmThemeChange = useCallback(() => {
+    setShowThemeConfirm(false);
+    const nextTheme = pendingThemeRef.current;
+    pendingThemeRef.current = null;
+    if (nextTheme) setTheme(nextTheme);
+  }, [setTheme]);
+
+  const handleCancelThemeChange = useCallback(() => {
+    setShowThemeConfirm(false);
+    pendingThemeRef.current = null;
+  }, []);
 
   const handleDismissCancel = useCallback(() => setShowCancelModal(false), []);
   const termContainerStyle = useMemo(() => {
@@ -1234,7 +1265,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   themeKey={themeKey}
                   sizeKey={sizeKey}
                   decorationsEnabled={decorationsEnabled}
-                  onThemeChange={setTheme}
+                  onThemeChange={handleThemeChange}
                   onSizeChange={setSize}
                   onDecorationsChange={setDecorations}
                   onReset={resetToDefault}
@@ -1331,6 +1362,54 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           )
         : null}
 
+
+      {showThemeConfirm && (
+        <AnimatePresence>
+          <motion.div
+            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full max-w-sm rounded-xl border-2 border-emerald-400/60 bg-black/95 p-5 sm:p-6 shadow-2xl relative overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 8 }}
+            >
+              <div className="absolute inset-0 opacity-10 bg-linear-to-br from-emerald-500 to-cyan-500 pointer-events-none" />
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold font-(family-name:--font-fira-code) text-emerald-200 tracking-wider">
+                  Theme change resets terminal
+                </h3>
+                <p className="mt-3 text-sm font-(family-name:--font-fira-code) text-emerald-100/80 leading-relaxed">
+                  Changing the theme will clear the current advanced scan terminal output. Do you want to continue?
+                </p>
+                <div className="mt-5 flex items-center justify-end gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={handleCancelThemeChange}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-emerald-400/40 bg-emerald-950/30 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-emerald-200 transition-all"
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={handleConfirmThemeChange}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="rounded-md border border-emerald-400 bg-emerald-500/20 px-4 py-2 text-sm font-bold font-(family-name:--font-fira-code) text-emerald-100 transition-all shadow-[0_0_18px_rgba(16,185,129,0.25)]"
+                  >
+                    Continue
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      )}
 
       {showCancelModal && (
         <motion.div
