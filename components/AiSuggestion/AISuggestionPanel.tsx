@@ -41,14 +41,14 @@ async function generateSuggestion(
   job_id: string,
   mode: Mode
 ): Promise<AISuggestionResponse> {
-  const res = await fetch(`/api/backend/ai-suggestions/simulate/generate`, {
+  const res = await fetch(`/api/backend/ai-suggestions/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ job_id, mode }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.detail?.[0]?.msg ?? `Error ${res.status}`);
+    throw new Error(err?.detail?.[0]?.msg ?? err?.detail ?? `Error ${res.status}`);
   }
   return res.json();
 }
@@ -57,7 +57,7 @@ async function fetchSuggestionById(
   suggestion_id: string
 ): Promise<AISuggestionResponse> {
   const res = await fetch(
-    `/api/backend/ai-suggestions/simulate/${suggestion_id}`
+    `/api/backend/ai-suggestions/${suggestion_id}`
   );
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
@@ -84,7 +84,7 @@ const PRIORITY_CONFIG: Record<
     border: "var(--ai-medium-border)",
   },
   low: {
-    color: "var(--ai-neon)",
+    color: "var(--ai-text-accent)",
     bg: "var(--ai-neon-bg)",
     border: "var(--ai-neon-border)",
   },
@@ -349,27 +349,27 @@ const AI_PANEL_STYLES = `
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--ai-neon);
+  color: var(--ai-text-accent);
   position: relative;
   z-index: 1;
 }
 .ai-panel-title {
   font-family: var(--ai-font-ui);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ai-text);
   letter-spacing: 0.05em;
 }
 .ai-panel-badge {
   font-family: var(--ai-font-ui);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
   background: rgba(var(--ai-neon-rgb),0.12);
-  color: var(--ai-neon);
+  color: var(--ai-text-accent);
   outline: 1px solid rgba(var(--ai-neon-rgb),0.28);
 }
 .ai-close-btn {
@@ -398,7 +398,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-job-label {
   font-family: var(--ai-font-ui);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -406,7 +406,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-job-id {
   font-family: var(--ai-font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ai-text-accent);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -433,7 +433,7 @@ const AI_PANEL_STYLES = `
   background: transparent;
   color: var(--ai-text-muted);
   font-family: var(--ai-font-ui);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -452,7 +452,7 @@ const AI_PANEL_STYLES = `
 .ai-mode-tab.active {
   background: rgba(var(--ai-neon-rgb),0.09);
   border-color: rgba(var(--ai-neon-rgb),0.35);
-  color: var(--ai-neon);
+  color: var(--ai-text-accent);
 }
 .ai-mode-tab:hover:not(.active) {
   background: rgba(var(--ai-neon-rgb),0.04);
@@ -491,7 +491,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-empty-title {
   font-family: var(--ai-font-ui);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ai-text);
   margin: 0;
@@ -499,7 +499,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-hint-text {
   font-family: var(--ai-font-ui);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ai-text-muted);
   line-height: 1.7;
   margin: 0;
@@ -530,7 +530,7 @@ const AI_PANEL_STYLES = `
   padding: 10px 20px;
   border: none;
   font-family: var(--ai-font-ui);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -569,7 +569,7 @@ const AI_PANEL_STYLES = `
   clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
 }
 .ai-icon-btn:hover {
-  color: var(--ai-neon);
+  color: var(--ai-text-accent);
   outline-color: rgba(var(--ai-neon-rgb),0.35);
   background: rgba(var(--ai-neon-rgb),0.08);
 }
@@ -589,13 +589,13 @@ const AI_PANEL_STYLES = `
 }
 .ai-result-count {
   font-family: var(--ai-font-ui);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ai-text-muted);
   letter-spacing: 0.06em;
 }
 .ai-prio-chip {
   font-family: var(--ai-font-ui);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -646,9 +646,9 @@ const AI_PANEL_STYLES = `
   clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
   background: rgba(var(--ai-neon-rgb),0.1);
   outline: 1px solid rgba(var(--ai-neon-rgb),0.22);
-  color: var(--ai-neon);
+  color: var(--ai-text-accent);
   font-family: var(--ai-font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -666,7 +666,7 @@ const AI_PANEL_STYLES = `
 .ai-s-title {
   font-family: var(--ai-font-ui);
   color: var(--ai-text);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.4;
   margin: 0;
@@ -682,14 +682,14 @@ const AI_PANEL_STYLES = `
   font-family: var(--ai-font-mono);
   background: rgba(var(--ai-neon-rgb),0.06);
   color: var(--ai-text-muted);
-  font-size: 10px;
+  font-size: 12px;
   padding: 2px 8px;
   clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));
   outline: 1px solid rgba(var(--ai-neon-rgb),0.1);
 }
 .ai-s-priority {
   font-family: var(--ai-font-ui);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -712,11 +712,14 @@ const AI_PANEL_STYLES = `
 .ai-s-command {
   flex: 1;
   font-family: var(--ai-font-mono);
-  font-size: 11px;
-  color: var(--ai-neon);
+  font-size: 13px;
+  color: var(--ai-text-accent);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ai-s-command::-webkit-scrollbar {
+  display: none;
 }
 .ai-s-copy {
   background: none;
@@ -728,12 +731,12 @@ const AI_PANEL_STYLES = `
   flex-shrink: 0;
   transition: color 0.15s;
 }
-.ai-s-copy:hover { color: var(--ai-neon); }
+.ai-s-copy:hover { color: var(--ai-text-accent); }
 
 /* ── Reasoning ── */
 .ai-s-reasoning {
   font-family: var(--ai-font-ui);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--ai-text-muted);
   line-height: 1.65;
   margin: 0;
@@ -752,7 +755,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-s-conf-label {
   font-family: var(--ai-font-ui);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--ai-text-dim);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -770,7 +773,7 @@ const AI_PANEL_STYLES = `
 }
 .ai-s-conf-pct {
   font-family: var(--ai-font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   min-width: 32px;
   text-align: right;
@@ -780,7 +783,7 @@ const AI_PANEL_STYLES = `
 .ai-content-fallback {
   font-family: var(--ai-font-ui);
   color: var(--ai-text-muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.7;
   background: var(--ai-card-bg);
   outline: 1px solid var(--ai-card-border);
@@ -794,7 +797,7 @@ const AI_PANEL_STYLES = `
   display: flex;
   justify-content: space-between;
   font-family: var(--ai-font-ui);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--ai-text-dim);
   letter-spacing: 0.07em;
   padding-top: 6px;
@@ -886,9 +889,11 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Switch to a mode; only generate if no result exists yet for that mode.
   const handleGenerate = async (mode: Mode) => {
     setActiveMode(mode);
     setError(null);
+    // If we already have a result, just display it — never re-generate automatically.
     if (results[mode]) return;
     setLoading(true);
     try {
@@ -901,6 +906,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
+  // Re-fetch an already-generated suggestion by its saved ID (no new LLM call).
   const handleRefetchById = async (id: string, mode: Mode) => {
     setError(null);
     setLoading(true);
@@ -914,12 +920,38 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
-  const clearCache = (mode: Mode) =>
+  // Force a brand-new generation (explicit user action via Regenerate button).
+  const handleRegenerate = async (mode: Mode) => {
     setResults((prev) => {
       const next = { ...prev };
       delete next[mode];
       return next;
     });
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await generateSuggestion(jobId, mode);
+      setResults((prev) => ({ ...prev, [mode]: data }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Simple retry after an error — tries to generate once more.
+  const handleRetry = async (mode: Mode) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await generateSuggestion(jobId, mode);
+      setResults((prev) => ({ ...prev, [mode]: data }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const current = results[activeMode];
   const suggestions = current?.output?.suggestions ?? [];
@@ -986,7 +1018,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
           <div className="ai-header-left">
             <StarIcon />
             <span className="ai-panel-title">AI Suggestion</span>
-            <span className="ai-panel-badge">Simulation</span>
+            <span className="ai-panel-badge">AI</span>
           </div>
           <button className="ai-close-btn" onClick={() => setIsOpen(false)}>×</button>
         </div>
@@ -1032,7 +1064,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
               <p className="ai-hint-text">{error}</p>
               <button
                 className="ai-action-btn danger"
-                onClick={() => { clearCache(activeMode); handleGenerate(activeMode); }}
+                onClick={() => handleRetry(activeMode)}
               >
                 Retry
               </button>
@@ -1106,8 +1138,8 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
                   </button>
                   <button
                     className="ai-icon-btn"
-                    title="Regenerate"
-                    onClick={() => { clearCache(activeMode); handleGenerate(activeMode); }}
+                    title="Regenerate (new AI call)"
+                    onClick={() => handleRegenerate(activeMode)}
                   >
                     <RefreshIcon />
                   </button>
@@ -1192,7 +1224,7 @@ function CopyIcon() {
 function CheckIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="var(--ai-neon)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 6L9 17l-5-5" stroke="var(--ai-text-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
