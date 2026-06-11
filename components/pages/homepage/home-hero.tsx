@@ -277,7 +277,8 @@ export default function HomeHero() {
   const locale  = useLocale();
   const isKhmer = locale === "km";
   const { data: session } = authClient.useSession();
-  const scanHref = session ? "/userdashboard/scan" : "/api/guest/start";
+  const [mounted, setMounted] = useState(false);
+  const scanHref = mounted && session ? "/userdashboard/scan" : "/api/guest/start";
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
@@ -292,6 +293,7 @@ export default function HomeHero() {
   const [focusStarted, setFocusStarted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const cleanupHexLeft = setupMagneticHover(hexLeftRef.current);
     const cleanupHexRight = setupMagneticHover(hexRightRef.current);
 

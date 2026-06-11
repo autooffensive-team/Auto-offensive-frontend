@@ -367,7 +367,7 @@ export default function ReportsPage() {
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
               Reports
             </h1>
-            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-xl text-gray-500 dark:text-gray-400 leading-relaxed">
               Generate and download security scan reports in multiple formats
             </p>
           </div>
@@ -558,9 +558,9 @@ export default function ReportsPage() {
               <div className="w-[140px] h-[140px]" style={{ color: "#14b8a6", opacity: 0.12 }}><FileText className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Reports</p>
-              <p className="mt-1.5 text-3xl font-bold text-gray-900 dark:text-white">{isLoading ? "—" : allReports.length}</p>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 pr-10">All formats combined</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Reports</p>
+              <p className="mt-1.5 text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">{isLoading ? "—" : allReports.length}</p>
+              <p className="mt-1 text-xs lg:text-sm text-gray-400 dark:text-gray-500 pr-10">All formats combined</p>
             </div>
           </div>
           {/* PDF */}
@@ -570,9 +570,9 @@ export default function ReportsPage() {
               <div className="w-[140px] h-[140px]" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
-              <p className="mt-1.5 text-3xl font-bold text-red-500">{isLoading ? "—" : formatCounts.pdf}</p>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 pr-10">Portable document format</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
+              <p className="mt-1.5 text-3xl lg:text-4xl font-bold text-red-500">{isLoading ? "—" : formatCounts.pdf}</p>
+              <p className="mt-1 text-xs lg:text-sm text-gray-400 dark:text-gray-500 pr-10">Portable document format</p>
             </div>
           </div>
           {/* DOCX */}
@@ -582,9 +582,9 @@ export default function ReportsPage() {
               <div className="w-[140px] h-[140px]" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
-              <p className="mt-1.5 text-3xl font-bold text-blue-500">{isLoading ? "—" : formatCounts.docx}</p>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 pr-10">Word document format</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
+              <p className="mt-1.5 text-3xl lg:text-4xl font-bold text-blue-500">{isLoading ? "—" : formatCounts.docx}</p>
+              <p className="mt-1 text-xs lg:text-sm text-gray-400 dark:text-gray-500 pr-10">Word document format</p>
             </div>
           </div>
           {/* Excel */}
@@ -594,9 +594,9 @@ export default function ReportsPage() {
               <div className="w-[140px] h-[140px]" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
-              <p className="mt-1.5 text-3xl font-bold text-green-500">{isLoading ? "—" : formatCounts.xlsx}</p>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 pr-10">Spreadsheet format</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
+              <p className="mt-1.5 text-3xl lg:text-4xl font-bold text-green-500">{isLoading ? "—" : formatCounts.xlsx}</p>
+              <p className="mt-1 text-xs lg:text-sm text-gray-400 dark:text-gray-500 pr-10">Spreadsheet format</p>
             </div>
           </div>
           {/* JSON */}
@@ -606,9 +606,9 @@ export default function ReportsPage() {
               <div className="w-[140px] h-[140px]" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
-              <p className="mt-1.5 text-3xl font-bold text-amber-500">{isLoading ? "—" : formatCounts.json}</p>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 pr-10">Machine-readable format</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
+              <p className="mt-1.5 text-3xl lg:text-4xl font-bold text-amber-500">{isLoading ? "—" : formatCounts.json}</p>
+              <p className="mt-1 text-xs lg:text-sm text-gray-400 dark:text-gray-500 pr-10">Machine-readable format</p>
             </div>
           </div>
         </div>
@@ -620,7 +620,7 @@ export default function ReportsPage() {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[13px] sm:text-[14px] md:text-[15px] font-medium transition whitespace-nowrap ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[13px] sm:text-[14px] md:text-[15px] lg:text-[17px] font-medium transition whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-teal-500/10 text-teal-600 dark:text-teal-400"
                     : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -657,7 +657,7 @@ export default function ReportsPage() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 text-[14px] sm:text-[15px] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 text-[14px] sm:text-[15px] lg:text-[17px] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
 
@@ -696,22 +696,22 @@ export default function ReportsPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-800/50">
                     <tr>
-                      <th className="px-6 py-4 text-left text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-left text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Report Name
                       </th>
-                      <th className="px-6 py-4 text-left text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-left text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Format
                       </th>
-                      <th className="px-6 py-4 text-left text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-left text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Job ID
                       </th>
-                      <th className="px-6 py-4 text-left text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-left text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Generated
                       </th>
-                      <th className="px-6 py-4 text-left text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-left text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Size
                       </th>
-                      <th className="px-6 py-4 text-right text-[15px] font-semibold text-gray-600 dark:text-gray-400">
+                      <th className="px-6 py-4 text-right text-[15px] lg:text-[17px] font-semibold text-gray-600 dark:text-gray-400">
                         Actions
                       </th>
                     </tr>
@@ -736,14 +736,14 @@ export default function ReportsPage() {
                               <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
                                 <FileText size={20} className="text-teal-500" />
                               </div>
-                              <p className="text-[15px] font-semibold text-gray-900 dark:text-white max-w-[260px] truncate">
+                              <p className="text-[15px] lg:text-[17px] font-semibold text-gray-900 dark:text-white max-w-[260px] truncate">
                                 {report.file_name}
                               </p>
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`px-3 py-1.5 rounded-lg text-[13px] font-medium uppercase ${
+                              className={`px-3 py-1.5 rounded-lg text-[13px] lg:text-[15px] font-medium uppercase ${
                                 formatColors[report.format] ??
                                 "bg-gray-500/10 text-gray-500"
                               }`}
@@ -752,17 +752,17 @@ export default function ReportsPage() {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-[13px] font-mono text-gray-500 dark:text-gray-400">
+                            <span className="text-[13px] lg:text-[15px] font-mono text-gray-500 dark:text-gray-400">
                               {report.job_id.slice(0, 8)}…
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2 text-[14px] text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-2 text-[14px] lg:text-[16px] text-gray-600 dark:text-gray-400">
                               <Calendar size={14} />
                               {formatDate(report.created_at)}
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-[14px] text-gray-600 dark:text-gray-400">
+                          <td className="px-6 py-4 text-[14px] lg:text-[16px] text-gray-600 dark:text-gray-400">
                             {formatBytes(report.size_bytes)}
                           </td>
                           <td className="px-6 py-4">
@@ -930,7 +930,7 @@ export default function ReportsPage() {
           {/* ── Pagination ── */}
           {!isLoading && !isError && (
             <div className="px-3 py-3.5 sm:px-6 sm:py-5 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-[12px] sm:text-[14px] text-gray-500 dark:text-gray-400 order-2 sm:order-1">
+              <p className="text-[12px] sm:text-[14px] lg:text-[16px] text-gray-500 dark:text-gray-400 order-2 sm:order-1">
                 Showing {filteredReports.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
                 {Math.min(currentPage * ITEMS_PER_PAGE, filteredReports.length)} of{" "}
                 {filteredReports.length} reports

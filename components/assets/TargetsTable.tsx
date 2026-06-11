@@ -282,7 +282,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               maxLength={200}
-              className="w-full pl-9 pr-9 py-2 sm:py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+              className="w-full pl-9 pr-9 py-2 sm:py-2.5 text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
               aria-label="Search targets"
             />
             {searchInput && (
@@ -309,7 +309,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[110px] sm:min-w-[130px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[110px] sm:min-w-[130px]"
                 aria-label="Filter by type"
               >
                 <option value="all">All Types</option>
@@ -327,7 +327,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               <select
                 value={filterProject}
                 onChange={(e) => setFilterProject(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px] sm:min-w-[160px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px] sm:min-w-[160px]"
                 aria-label="Filter by project"
               >
                 <option value="all">All Projects</option>
@@ -361,7 +361,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
 
         {/* Count row */}
         <div className="mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400">
             {filteredTargets.length === allTargets.length ? (
               <><span className="font-semibold text-slate-700 dark:text-slate-200">{allTargets.length}</span> target{allTargets.length !== 1 ? "s" : ""}</>
             ) : (
@@ -386,19 +386,19 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
             <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[35%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[35%]">
                     Target
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[22%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[22%]">
                     Project
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[13%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[13%]">
                     Type
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[14%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[14%]">
                     Status
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[12%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[12%]">
                     Last Scan
                   </th>
                   <th className="px-4 md:px-6 py-3.5 w-[4%]" />
@@ -441,7 +441,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/40 transition-colors">
                             {getTypeIcon(target.type)}
                           </div>
-                          <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate max-w-[220px] md:max-w-xs">
+                          <span className="text-sm lg:text-base font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate max-w-[220px] md:max-w-xs">
                             {target.name}
                           </span>
                         </div>
@@ -450,14 +450,14 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                       <td className="px-4 md:px-6 w-[22%]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <FolderOpen size={12} className="shrink-0 text-slate-400 dark:text-slate-500" />
-                          <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
+                          <span className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 truncate">
                             {target.project_name}
                           </span>
                         </div>
                       </td>
                       {/* Type */}
                       <td className="px-4 md:px-6 w-[13%]">
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap ${getTypePillClass(target.type)}`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] sm:text-[10px] lg:text-xs font-semibold uppercase tracking-wide whitespace-nowrap ${getTypePillClass(target.type)}`}>
                           {target.type}
                         </span>
                       </td>
@@ -469,7 +469,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                       <td className="px-4 md:px-6 w-[12%]">
                         <div className="flex items-center gap-1.5">
                           <Clock size={11} className="shrink-0 text-slate-400 dark:text-slate-500" />
-                          <span className="text-xs sm:text-sm tabular-nums text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                          <span className="text-xs sm:text-sm lg:text-base tabular-nums text-slate-500 dark:text-slate-400 whitespace-nowrap">
                             {formatRelativeTime(target.last_scan)}
                           </span>
                         </div>

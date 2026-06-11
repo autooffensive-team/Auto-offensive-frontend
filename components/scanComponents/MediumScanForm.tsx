@@ -99,7 +99,7 @@ export function MediumScanForm({
             onChange={(e) => onTargetChange(e.target.value)}
             placeholder="example.com or https://example.com"
             disabled={disabled}
-            className="font-mono text-xs sm:text-sm"
+            className="font-mono text-sm sm:text-base"
           />
         </Field>
       </DraggableWidget>
@@ -120,7 +120,7 @@ export function MediumScanForm({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs sm:text-sm md:text-base font-medium text-gray-900 dark:text-white">Pipeline Steps</h3>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">Pipeline Steps</h3>
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
@@ -147,7 +147,7 @@ export function MediumScanForm({
               <Plus className="h-3.5 w-3.5" />
               Add Step
               {!canAddStep && (
-                <span className="ml-1 text-[10px] text-gray-500 dark:text-gray-400">(max)</span>
+                <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">(max)</span>
               )}
             </Button>
           </div>
@@ -162,7 +162,7 @@ export function MediumScanForm({
               }}
               role="status"
             >
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">No pipeline steps yet. Add a step to begin.</p>
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">No pipeline steps yet. Add a step to begin.</p>
             </div>
           )}
 
@@ -219,7 +219,7 @@ export function MediumScanForm({
       >
         <div className="flex items-center gap-2">
           <LayoutGrid className="h-3.5 w-3.5" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }} />
-          <span className="text-[10px] sm:text-xs" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }}>
+          <span className="text-xs" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }}>
             Drag sections to reorder your layout
           </span>
         </div>
@@ -335,8 +335,8 @@ function DraggableWidget({
       >
         <GripVertical className="h-4 w-4 transition-colors"
           style={{ color: "color-mix(in srgb, var(--color-primary) 40%, transparent)" }} />
-        <span className="text-[10px] sm:text-[11px] md:text-xs font-semibold uppercase tracking-widest"
-          style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)", letterSpacing: "0.18em" }}>
+        <span className="text-xs font-semibold uppercase tracking-widest"
+          style={{ color: "color-mix(in srgb, var(--color-primary) 100%, black 40%)", letterSpacing: "0.18em" }}>
           {label}
         </span>
         {isDragOver && !isDragging && (
@@ -429,7 +429,7 @@ function PipelineStep({
             >
               {index + 1}
             </span>
-            <span className="text-xs sm:text-sm font-medium text-gray-900/80 dark:text-white/80">
+            <span className="text-sm sm:text-base font-medium text-gray-900/80 dark:text-white/80">
               Pipeline Step
             </span>
             {totalSteps > 1 && index < totalSteps - 1 && (
@@ -471,7 +471,7 @@ function PipelineStep({
               onChange={(e) => onChange(step.id, { timeout: e.target.value })}
               placeholder="Optional"
               disabled={disabled}
-              className="font-mono text-xs sm:text-sm"
+              className="font-mono text-sm sm:text-base"
             />
           </Field>
         </div>

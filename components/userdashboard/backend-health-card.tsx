@@ -19,8 +19,8 @@ export default function BackendHealthCard() {
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
         Backend Health (RTK Query via Next API)
       </p>
-      <p className="mt-2 text-lg font-semibold">{statusText}</p>
-      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-2 text-xl font-semibold">{statusText}</p>
+      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
         Browser calls <code>/api/backend/health</code>, backend URL stays server-side.
       </p>
     </div>
