@@ -10,8 +10,6 @@ import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import { Providers } from "@/components/providers/providers";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-
-// Font english (Google Sans)
 const googleSans = localFont({
   src: "./fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf",
   variable: "--font-google-sans",
