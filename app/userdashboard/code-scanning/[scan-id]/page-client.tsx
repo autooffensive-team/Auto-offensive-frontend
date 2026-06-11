@@ -304,6 +304,31 @@ function formatStatusLabel(value: string | null | undefined): string {
     .join(" ");
 }
 
+function formatPlatformFailureMessage(
+  summary: {
+    env_file_policy?: string;
+    env_files?: string[];
+    failure_message?: string;
+    final_status?: string;
+  } | null | undefined,
+): string | null {
+  if (summary?.final_status !== "FAILED") {
+    return null;
+  }
+
+  if (summary.env_file_policy === "FAILED") {
+    const envFiles = summary.env_files ?? [];
+    if (envFiles.length > 0) {
+      const shown = envFiles.slice(0, 4).join(", ");
+      const suffix = envFiles.length > 4 ? `, and ${envFiles.length - 4} more` : "";
+      return `Environment file policy failed. Remove secret env files from source control: ${shown}${suffix}.`;
+    }
+    return "Environment file policy failed. Remove .env files from source control.";
+  }
+
+  return summary.failure_message?.trim() || "Platform security checks failed.";
+}
+
 function markProjectAsSeen(projectKey: string): void {
   if (typeof window === "undefined" || !projectKey.trim()) {
     return;
@@ -479,6 +504,31 @@ function StatusPill({ status }: { status: string | null | undefined }) {
   );
 }
 
+function PlatformStatusPill({
+  status,
+}: {
+  status: string | null | undefined;
+}) {
+  if (!status) {
+    return null;
+  }
+
+  const failed = status === "FAILED";
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+        failed
+          ? "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20"
+          : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
+      )}
+    >
+      Policy {formatStatusLabel(status)}
+    </span>
+  );
+}
+
 function getQualityGateTone(
   status: QualityGateStatus | null | undefined
 ): string {
@@ -502,6 +552,7 @@ function PageHeader({
   branch,
   relativeTime,
   status,
+  platformStatus,
   qualityGate,
   repoUrl,
 }: {
@@ -510,6 +561,7 @@ function PageHeader({
   branch: string;
   relativeTime: string;
   status: string | null | undefined;
+  platformStatus: string | null | undefined;
   qualityGate: QualityGateStatus | null | undefined;
   repoUrl: string;
 }) {
@@ -554,6 +606,7 @@ function PageHeader({
 
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={status} />
+          <PlatformStatusPill status={platformStatus} />
           {qualityGate ? (
             <span
               className={cn(
@@ -941,6 +994,8 @@ export default function CodeScanningDetailPageClient({
         : Math.max(unreadHotspots - (seenSectionCounts.hotspots ?? 0), 0),
   };
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
+  const platformStatus = scanSummary?.final_status || null;
+  const platformFailureMessage = formatPlatformFailureMessage(scanSummary);
   const qualityGateMessage =
     qualityGate === "WARN"
       ? "The latest analysis passed with warnings."
@@ -1106,12 +1161,13 @@ export default function CodeScanningDetailPageClient({
             scanDetail.created_at
         )}
         status={status}
+        platformStatus={platformStatus}
         qualityGate={qualityGate}
         repoUrl={scanDetail.repo_url}
       />
 
       <AlertSection
-        warningMessage={warningMessage}
+        warningMessage={warningMessage || platformFailureMessage}
         qualityGateMessage={qualityGateMessage}
       />
 
@@ -1134,6 +1190,8 @@ export default function CodeScanningDetailPageClient({
           acceptedIssues={acceptedIssues}
           scanCount={scanCount}
           scanStatusLabel={formatStatusLabel(status)}
+          platformStatus={platformStatus}
+          platformFailureMessage={platformFailureMessage}
           scanProgress={progress}
           isScanRunning={isRunning}
           formatCount={formatCount}

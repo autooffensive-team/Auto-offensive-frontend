@@ -523,7 +523,7 @@ interface TopStatCardProps {
   label: string;
   value: string;
   helper: string;
-  accent: "teal" | "emerald" | "amber" | "slate";
+  accent: "teal" | "emerald" | "amber" | "red" | "slate";
   icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 }
 
@@ -531,6 +531,7 @@ const accentColor: Record<string, string> = {
   teal: "#14b8a6",
   emerald: "#10b981",
   amber: "#f59e0b",
+  red: "#ef4444",
   slate: "#94a3b8",
 };
 
@@ -1291,6 +1292,8 @@ export interface CodeScanOverviewProps {
   acceptedIssues: number;
   scanCount: number;
   scanStatusLabel: string;
+  platformStatus: string | null | undefined;
+  platformFailureMessage: string | null;
   scanProgress: number;
   isScanRunning: boolean;
   formatCount: (value: number | null | undefined) => string;
@@ -1313,6 +1316,8 @@ export function CodeScanOverview({
   acceptedIssues,
   scanCount,
   scanStatusLabel,
+  platformStatus,
+  platformFailureMessage,
   scanProgress,
   isScanRunning,
   formatCount,
@@ -1333,6 +1338,12 @@ export function CodeScanOverview({
   const depMedium   = dependencySummary?.medium ?? 0;
   const depLow      = dependencySummary?.low ?? 0;
   const depTotal    = depCritical + depHigh + depMedium + depLow;
+  const platformFailed = platformStatus === "FAILED";
+  const policyStatusLabel = platformFailed
+    ? "Policy Failed"
+    : platformStatus === "PASSED"
+      ? "Policy Passed"
+      : scanStatusLabel;
 
   const rawRiskScore =
     depTotal > 0
@@ -1436,16 +1447,18 @@ export function CodeScanOverview({
         />
         <TopStatCard
           label="Scan Status"
-          value={scanStatusLabel}
+          value={policyStatusLabel}
           helper={
             isScanRunning
               ? `${normalizedScanProgress}% progress`
+              : platformFailed
+                ? platformFailureMessage ?? "Source policy failed"
               : scanSummary
                 ? "100% progress"
                 : "Waiting for scan results"
           }
-          accent={isScanRunning ? "teal" : scanSummary ? "emerald" : "slate"}
-          icon={normalizedScanProgress < 100 ? LoadingIcon : scanSummary ? CheckCircle2 : RefreshCw}
+          accent={isScanRunning ? "teal" : platformFailed ? "red" : scanSummary ? "emerald" : "slate"}
+          icon={normalizedScanProgress < 100 ? LoadingIcon : platformFailed ? ShieldAlert : scanSummary ? CheckCircle2 : RefreshCw}
         />
         <TopStatCard
           label="Issues"

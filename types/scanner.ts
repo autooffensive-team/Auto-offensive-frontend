@@ -114,6 +114,12 @@ export type ScanSummaryResponse = {
   duplications: number;
   security_hotspots: number;
   dependency_summary: DependencySummaryResponse | null;
+  env_file_policy?: string;
+  env_files?: string[];
+  gitleaks_status?: string;
+  gitleaks_findings?: number;
+  final_status?: string;
+  failure_message?: string;
 };
 
 export type IssueResponse = {
