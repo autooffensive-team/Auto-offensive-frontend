@@ -302,38 +302,8 @@ export default function ProfilePage() {
                     />
                   </FieldWrapper>
                 </div>
-                <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">
-                  Password update is not connected to a backend endpoint on this page yet.
-                </p>
               </div>
             </motion.div>
-
-            {/* Danger Zone */}
-            <motion.div
-              custom={3} variants={fadeUp} initial="hidden" animate="show"
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-red-100 dark:border-red-900/40 shadow-sm overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b border-red-100 dark:border-red-900/40 flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/50 flex items-center justify-center">
-                  <AlertCircle size={14} className="text-red-500" />
-                </div>
-                <h3 className="text-base lg:text-lg font-semibold text-red-600 dark:text-red-400">Danger Zone</h3>
-              </div>
-              <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <p className="text-base lg:text-lg text-gray-500 dark:text-gray-400 max-w-sm">
-                  Once you delete your account, there is no going back. All data will be permanently removed.
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-base lg:text-lg font-semibold hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-                >
-                  <Lock size={14} />
-                  Delete Account
-                </motion.button>
-              </div>
-            </motion.div>
-
           </div>
         </div>
       </div>

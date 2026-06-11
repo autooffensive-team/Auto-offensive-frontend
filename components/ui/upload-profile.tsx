@@ -8,6 +8,7 @@ import "react-image-crop/dist/ReactCrop.css";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +52,7 @@ function getInitials(name?: string): string {
 /** Pixel-inspect canvas to detect any semi-transparent pixels in a PNG. */
 function checkTransparency(src: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const img = new Image();
+    const img = new window.Image();
     img.onload = () => {
       const canvas = document.createElement("canvas");
       // Sample a max 200×200 region to keep it fast
@@ -335,7 +336,7 @@ export function UploadProfile({
         style={bgStyle}
       >
         {src ? (
-          <img src={src} alt="Preview" className="h-full w-full object-cover" />
+          <Image src={src} alt="Preview" className="h-full w-full object-cover" width={80} height={80} unoptimized />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-800">
             <ImagePlus className="size-10 text-gray-300 dark:text-gray-600" />
