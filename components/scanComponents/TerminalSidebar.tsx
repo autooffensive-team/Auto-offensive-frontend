@@ -189,30 +189,30 @@ export function TerminalSidebar({
       >
         <div className="flex items-center gap-2">
           <span className="status-dot w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: a(0.9) }} />
-          <span className="text-[11px] font-mono font-bold tracking-[0.22em] uppercase" style={{ color: a(0.85) }}>
+          <span className="text-xs font-mono font-bold tracking-[0.22em] uppercase" style={{ color: a(0.85) }}>
             Scan Analytics
           </span>
         </div>
-        <span className="text-[9px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: a(0.6) }}>SYS</span>
+        <span className="text-[10px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: a(0.6) }}>SYS</span>
       </div>
 
       {/* ── Project + Status row ── */}
       <div className="relative z-10 px-4 py-3 grid grid-cols-2 gap-3 border-b" style={{ borderBottomColor: a(0.12) }}>
         <div>
-          <div className="text-[9px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-1" style={{ color: a(0.6) }}>Project</div>
-          <div className="text-[11px] font-(family-name:--font-fira-code) truncate" style={{ color: a(0.9) }}>
+          <div className="text-[10px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-1" style={{ color: a(0.6) }}>Project</div>
+          <div className="text-xs font-(family-name:--font-fira-code) truncate" style={{ color: a(0.9) }}>
             {selectedProject?.name || "—"}
           </div>
         </div>
         <div>
-          <div className="text-[9px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-1" style={{ color: a(0.6) }}>Status</div>
+          <div className="text-[10px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-1" style={{ color: a(0.6) }}>Status</div>
           <div className="flex items-center gap-1.5">
             <span
               className="status-dot w-1.5 h-1.5 rounded-full inline-block"
               style={{ backgroundColor: isSubmitting ? a(0.9) : a(0.3) }}
             />
             <span
-              className="text-[10px] font-(family-name:--font-fira-code)"
+              className="text-xs font-(family-name:--font-fira-code)"
               style={{ color: isSubmitting ? a(1) : "rgba(251,191,36,0.8)" }}
             >
               {isSubmitting ? "RUNNING" : "IDLE"}
@@ -234,10 +234,10 @@ export function TerminalSidebar({
           },
         ].map((s) => (
           <div key={s.label} className="bg-black/40 border rounded-lg p-2 text-center" style={s.borderStyle}>
-            <div className="text-xl font-(family-name:--font-fira-code) font-bold" style={s.colorStyle}>
+            <div className="text-2xl font-(family-name:--font-fira-code) font-bold" style={s.colorStyle}>
               {s.value}
             </div>
-            <div className="text-[8px] font-(family-name:--font-fira-code) tracking-widest uppercase mt-0.5" style={{ color: "rgba(34,211,238,0.6)" }}>
+            <div className="text-[10px] font-(family-name:--font-fira-code) tracking-widest uppercase mt-0.5" style={{ color: "rgba(34,211,238,0.6)" }}>
               {s.label}
             </div>
           </div>
@@ -246,14 +246,14 @@ export function TerminalSidebar({
 
       {/* ── Performance metrics ── */}
       <div className="relative z-10 px-4 py-3 border-b space-y-2" style={{ borderBottomColor: a(0.12) }}>
-        <div className="text-[9px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase" style={{ color: a(0.6) }}>Performance</div>
+        <div className="text-[11px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase" style={{ color: "rgba(125,211,252,0.95)" }}>Performance</div>
 
         {/* FPS — segmented LED */}
         <div>
           <div className="flex justify-between items-baseline mb-1">
-            <span className="text-[9px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: a(0.7) }}>FPS</span>
+            <span className="text-[10px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: a(0.7) }}>FPS</span>
             <motion.span
-              className="text-[13px] font-(family-name:--font-fira-code) font-black tabular-nums"
+              className="text-sm font-(family-name:--font-fira-code) font-black tabular-nums"
               style={{
                 color: perfStats.fps >= 45 ? "rgba(74,222,128,1)" : perfStats.fps >= 20 ? "rgba(250,204,21,1)" : "rgba(239,68,68,1)",
                 textShadow: perfStats.fps >= 45 ? "0 0 8px rgba(74,222,128,0.8)" : perfStats.fps >= 20 ? "0 0 8px rgba(250,204,21,0.8)" : "0 0 8px rgba(239,68,68,0.8)",
@@ -278,10 +278,10 @@ export function TerminalSidebar({
         {/* HEAP */}
         <div>
           <div className="flex justify-between items-baseline mb-1">
-            <span className="text-[9px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: "rgba(34,211,238,0.8)" }}>HEAP</span>
-            <span className="text-[13px] font-(family-name:--font-fira-code) font-black tabular-nums" style={{ color: "rgba(34,211,238,1)", textShadow: "0 0 8px rgba(34,211,238,0.7)" }}>
+            <span className="text-[10px] font-(family-name:--font-fira-code) tracking-widest" style={{ color: "rgba(34,211,238,0.8)" }}>HEAP</span>
+            <span className="text-sm font-(family-name:--font-fira-code) font-black tabular-nums" style={{ color: "rgba(34,211,238,1)", textShadow: "0 0 8px rgba(34,211,238,0.7)" }}>
               {perfStats.memory > 0 ? `${perfStats.memory}` : "—"}
-              <span className="text-[9px] font-normal" style={{ color: "rgba(34,211,238,0.6)" }}>MB</span>
+              <span className="text-[10px] font-normal" style={{ color: "rgba(34,211,238,0.6)" }}>MB</span>
             </span>
           </div>
           {perfStats.memory > 0 && perfStats.memoryMax > 0 ? (
@@ -305,14 +305,14 @@ export function TerminalSidebar({
         {/* Log/s + Uptime */}
         <div className="grid grid-cols-2 gap-1.5 pt-1">
           <div className="rounded-md px-2 py-1.5" style={{ backgroundColor: "rgba(168,85,247,0.05)", border: "1px solid rgba(168,85,247,0.15)" }}>
-            <div className="text-[8px] font-(family-name:--font-fira-code) tracking-widest uppercase" style={{ color: "rgba(168,85,247,0.8)" }}>Log/s</div>
-            <div className="text-[16px] font-(family-name:--font-fira-code) font-black tabular-nums leading-tight" style={{ color: "rgba(168,85,247,1)", textShadow: "0 0 10px rgba(168,85,247,0.7)" }}>
+            <div className="text-[10px] font-(family-name:--font-fira-code) tracking-widest uppercase" style={{ color: "rgba(168,85,247,0.8)" }}>Log/s</div>
+            <div className="text-lg font-(family-name:--font-fira-code) font-black tabular-nums leading-tight" style={{ color: "rgba(168,85,247,1)", textShadow: "0 0 10px rgba(168,85,247,0.7)" }}>
               {perfStats.logRate}
             </div>
           </div>
           <div className="rounded-md px-2 py-1.5" style={{ backgroundColor: a(0.05), border: `1px solid ${a(0.1)}` }}>
-            <div className="text-[8px] font-(family-name:--font-fira-code) tracking-widest uppercase" style={{ color: a(0.7) }}>Uptime</div>
-            <div className="text-[13px] font-(family-name:--font-fira-code) font-bold tabular-nums leading-tight" style={{ color: a(0.9) }}>
+            <div className="text-[10px] font-(family-name:--font-fira-code) tracking-widest uppercase" style={{ color: a(0.7) }}>Uptime</div>
+            <div className="text-sm font-(family-name:--font-fira-code) font-bold tabular-nums leading-tight" style={{ color: a(0.9) }}>
               {perfStats.timing}s
             </div>
           </div>
@@ -321,11 +321,11 @@ export function TerminalSidebar({
 
       {/* ── Environment rows ── */}
       <div className="relative z-10 px-4 py-3 border-b space-y-1.5" style={{ borderBottomColor: a(0.12) }}>
-        <div className="text-[9px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-2" style={{ color: a(0.6) }}>Client Environment</div>
+        <div className="text-[11px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-2" style={{ color: a(0.6) }}>Client Environment</div>
         {systemProfile.map((item) => (
           <div key={item.label} className="flex items-center justify-between">
-            <span className="text-[9px] font-(family-name:--font-fira-code) uppercase tracking-wider" style={{ color: "rgba(251,146,60,0.7)" }}>{item.label}</span>
-            <span className={`text-[10px] font-(family-name:--font-fira-code) font-semibold ${item.tone}`}>{item.value}</span>
+            <span className="text-[10px] font-(family-name:--font-fira-code) uppercase tracking-wider" style={{ color: "rgba(251,146,60,0.7)" }}>{item.label}</span>
+            <span className={`text-xs font-(family-name:--font-fira-code) font-semibold ${item.tone}`}>{item.value}</span>
           </div>
         ))}
       </div>
@@ -354,24 +354,24 @@ export function TerminalSidebar({
           </svg>
         )}
         <div className="relative z-10">
-          <div className="text-[9px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-2" style={{ color: a(0.6) }}>Recent</div>
+          <div className="text-[11px] font-(family-name:--font-fira-code) tracking-[0.18em] uppercase mb-2" style={{ color: "rgba(125,211,252,0.95)" }}>Recent</div>
           <div className="space-y-1.5">
             {logs.slice(-4).length > 0
               ? logs.slice(-4).map((log, idx) => (
                   <motion.div
                     key={idx}
-                    className="text-[9px] font-(family-name:--font-fira-code) truncate leading-relaxed"
-                    style={{ color: a(0.5) }}
+                    className="text-[10px] font-(family-name:--font-fira-code) truncate leading-relaxed"
+                    style={{ color: "rgba(186,230,253,0.75)" }}
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 0.6 }}
                     transition={{ delay: idx * 0.05 }}
                   >
-                    <span style={{ color: a(0.3), marginRight: "4px" }}>›</span>
+                    <span style={{ color: "rgba(125,211,252,0.55)", marginRight: "4px" }}>›</span>
                     {log.text.substring(0, 28)}
                   </motion.div>
                 ))
               : (
-                <div className="text-[9px] font-(family-name:--font-fira-code) italic" style={{ color: a(0.4) }}>
+                <div className="text-[10px] font-(family-name:--font-fira-code) italic" style={{ color: "rgba(186,230,253,0.8)" }}>
                   awaiting output…
                 </div>
               )}
@@ -403,14 +403,14 @@ export function TerminalSidebar({
           </svg>
         )}
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[9px] font-(family-name:--font-fira-code) tracking-widest uppercase opacity-80" style={{ color: "rgba(239,68,68,1)" }}>
+          <span className="text-[10px] font-(family-name:--font-fira-code) tracking-widest uppercase opacity-80" style={{ color: "rgba(239,68,68,1)" }}>
             Connection
           </span>
-          <span className="text-[9px] font-(family-name:--font-fira-code) tracking-widest uppercase opacity-80" style={{ color: a(1) }}>
+          <span className="text-[10px] font-(family-name:--font-fira-code) tracking-widest uppercase opacity-80" style={{ color: a(1) }}>
             Active
           </span>
         </div>
-        <div className="text-[9px] font-(family-name:--font-fira-code)">
+        <div className="text-[10px] font-(family-name:--font-fira-code)">
           <span style={{ color: "rgba(234,179,8,1)" }}>v7.2.1-</span>
           <span style={{ color: "rgba(239,68,68,1)" }}>advanced</span>
         </div>

@@ -752,7 +752,7 @@ export default function AdvanceScanPage() {
                         }`}
                       >
                         <Icon size={16} />
-                        <span className="text-xs">{tab.label}</span>
+                        <span className="text-sm sm:text-base">{tab.label}</span>
                         {tab.key === "findings" && findings.length > 0 ? (
                           <span className="ml-1 rounded-full bg-emerald-500/40 px-2.5 py-0.5 text-[10px] font-bold text-emerald-50 border border-emerald-400/30">
                             {findings.length}
@@ -765,7 +765,7 @@ export default function AdvanceScanPage() {
               </div>
 
               {/* Tab content */}
-              <div className="flex-1 overflow-y-auto bg-[#06150d] p-5 sm:p-6 space-y-4 max-h-150 sm:max-h-175">{activeTab === "logs" ? (
+              <div className="flex-1 overflow-y-auto bg-[#06150d] p-6 sm:p-7 space-y-4 max-h-150 sm:max-h-175">{activeTab === "logs" ? (
                   <div className="space-y-3">
                     <LogToolbar
                       themeKey={themeKey}
@@ -778,7 +778,7 @@ export default function AdvanceScanPage() {
                       className="mb-4"
                     />
                     {logs.length === 0 && !(isSubmitting || isStreaming) ? (
-                      <p className="text-center text-sm text-emerald-300/50 py-8">
+                      <p className="text-center text-lg text-emerald-300/50 py-8">
                         Logs will appear here after you start a scan.
                       </p>
                     ) : (
@@ -786,7 +786,7 @@ export default function AdvanceScanPage() {
                         {logs.map((entry) => (
                           <div
                             key={entry.id}
-                            className={`rounded-lg border px-3.5 py-2 leading-snug font-bold font-[Consolas,monospace] text-xs sm:text-sm transition-all duration-200 ${
+                            className={`rounded-lg border px-4 py-3 leading-snug font-bold font-[Consolas,monospace] text-base sm:text-lg transition-all duration-200 ${
                               entry.tone === "danger"
                                 ? "border-red-500/40 bg-red-500/10 text-red-200"
                                 : entry.tone === "success"
@@ -795,7 +795,7 @@ export default function AdvanceScanPage() {
                                     ? "border-amber-500/40 bg-amber-500/15 text-amber-200"
                                     : "border-emerald-400/20 bg-emerald-950/40 text-emerald-100/90"
                             }`}
-                            style={{ fontSize: `${logSize.xtermFontSize - 2}px` }}
+                            style={{ fontSize: `${logSize.xtermFontSize}px` }}
                           >
                             <span className="mr-2 text-emerald-500/60">[{entry.createdAt}]</span>
                             <span className="font-bold text-emerald-300">{entry.event}</span>
@@ -806,7 +806,7 @@ export default function AdvanceScanPage() {
                       </>
                     )}
                     {isStreaming ? (
-                      <div className="flex items-center gap-2 text-xs text-emerald-300 pt-4 animate-pulse">
+                      <div className="flex items-center gap-2 text-base text-emerald-300 pt-4 animate-pulse">
                         <LoaderCircle size={14} className="animate-spin" />
                         <span className="font-semibold">Streaming in progress...</span>
                       </div>
@@ -817,7 +817,7 @@ export default function AdvanceScanPage() {
                 {activeTab === "findings" ? (
                   <div className="space-y-3">
                     {findings.length === 0 ? (
-                      <p className="text-center text-sm text-emerald-300/50 py-8">
+                      <p className="text-center text-lg text-emerald-300/50 py-8">
                         No findings yet. Discoveries will appear after the scan completes.
                       </p>
                     ) : (
@@ -828,10 +828,10 @@ export default function AdvanceScanPage() {
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
-                              <h4 className="text-sm font-bold text-emerald-50">
+                              <h4 className="text-lg font-bold text-emerald-50">
                                 {finding.title || finding.fingerprint || "Untitled Finding"}
                               </h4>
-                              <p className="mt-2 text-xs text-emerald-300/70 font-mono">
+                              <p className="mt-2 text-base text-emerald-300/70 font-mono">
                                 {finding.host}
                                 {finding.port ? `:${finding.port}` : ""}
                                 {finding.protocol ? ` (${finding.protocol})` : ""}
@@ -842,11 +842,11 @@ export default function AdvanceScanPage() {
                             </span>
                           </div>
                           {finding.description ? (
-                            <p className="mt-3 text-xs text-emerald-100/80 leading-relaxed">{finding.description}</p>
+                            <p className="mt-3 text-base text-emerald-100/80 leading-relaxed">{finding.description}</p>
                           ) : null}
                           {finding.remediation ? (
                             <div className="mt-3 pt-3 border-t border-emerald-400/10">
-                              <p className="text-xs text-emerald-300/80">
+                              <p className="text-base text-emerald-300/80">
                                 <span className="font-bold">Remediation:</span> {finding.remediation}
                               </p>
                             </div>
@@ -860,13 +860,13 @@ export default function AdvanceScanPage() {
                 {activeTab === "parsed" ? (
                   <div>
                     {!parsedData ? (
-                      <p className="text-center text-sm text-emerald-300/50 py-8">
+                      <p className="text-center text-lg text-emerald-300/50 py-8">
                         Parsed data will appear after the scan completes.
                       </p>
                     ) : (
                       <div className="space-y-4">
                         {parsedData.tool_name ? (
-                          <p className="text-xs text-emerald-300/70">
+                          <p className="text-base text-emerald-300/70">
                             <span className="font-bold text-emerald-200">Tool:</span> <span className="font-mono text-emerald-100">{parsedData.tool_name}</span>
                             {parsedData.parse_method ? ` • <span className="font-bold">Method:</span> ${parsedData.parse_method}` : ""}
                           </p>
@@ -874,7 +874,7 @@ export default function AdvanceScanPage() {
 
                         {parsedColumns.length > 0 && parsedData.data && parsedData.data.length > 0 ? (
                           <div className="overflow-x-auto rounded-xl border border-emerald-400/20 bg-emerald-950/30">
-                            <table className="w-full text-left text-xs">
+                            <table className="w-full text-left text-base">
                               <thead className="border-b border-emerald-400/20 bg-emerald-950/40">
                                 <tr>
                                   {parsedColumns.map((col) => (
@@ -888,7 +888,7 @@ export default function AdvanceScanPage() {
                                 {parsedData.data.map((row, index) => (
                                   <tr key={index} className="border-b border-emerald-400/10 hover:bg-emerald-950/50 transition-colors">
                                     {parsedColumns.map((col) => (
-                                      <td key={col.key} className="px-3 py-2.5 text-emerald-100/80 font-mono text-xs">
+                                      <td key={col.key} className="px-3 py-3 text-emerald-100/80 font-mono text-base">
                                         {String(row[col.key] ?? "")}
                                       </td>
                                     ))}
@@ -898,11 +898,11 @@ export default function AdvanceScanPage() {
                             </table>
                           </div>
                         ) : parsedData.lines && parsedData.lines.length > 0 ? (
-                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 whitespace-pre-wrap wrap-break-word">
+                          <pre className="max-h-96 overflow-auto rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-base leading-relaxed font-mono text-emerald-100/85 whitespace-pre-wrap wrap-break-word">
                             {parsedData.lines.join("\n")}
                           </pre>
                         ) : (
-                          <p className="text-sm text-emerald-300/50">No structured data available.</p>
+                          <p className="text-lg text-emerald-300/50">No structured data available.</p>
                         )}
                       </div>
                     )}
@@ -912,11 +912,11 @@ export default function AdvanceScanPage() {
                 {activeTab === "raw" ? (
                   <div>
                     {rawLines.length === 0 ? (
-                      <p className="text-center text-sm text-emerald-300/50 py-8">
+                      <p className="text-center text-lg text-emerald-300/50 py-8">
                         Raw output will appear here during the scan.
                       </p>
                     ) : (
-                      <pre className="max-h-125 overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-xs leading-relaxed font-mono text-emerald-100/85 wrap-break-word">
+                      <pre className="max-h-125 overflow-auto whitespace-pre-wrap rounded-lg border border-emerald-400/20 bg-emerald-950/30 p-4 text-base leading-relaxed font-mono text-emerald-100/85 wrap-break-word">
                         {rawLines.join("\n")}
                       </pre>
                     )}
