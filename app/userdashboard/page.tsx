@@ -310,7 +310,7 @@ function AuthenticatedDashboard() {
             <h1 className="mt-1.5 sm:mt-2 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-900 dark:text-white leading-tight">
               Security Overview
             </h1>
-            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-xl text-slate-500 dark:text-slate-400 leading-relaxed">
               Real-time visibility across your infrastructure, vulnerabilities, and code security.
             </p>
           </div>
@@ -368,10 +368,10 @@ function AuthenticatedDashboard() {
             {/* card header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate">Vulnerability distribution</p>
-                <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Security findings by severity level</p>
+                <p className="text-xs sm:text-sm md:text-base lg:text-xl font-semibold text-slate-900 dark:text-white truncate">Vulnerability distribution</p>
+                <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-500 dark:text-slate-400 mt-0.5">Security findings by severity level</p>
               </div>
-              <span className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 md:px-3 text-[10px] md:text-sm font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap shrink-0">
+              <span className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 md:px-3 text-[10px] md:text-sm lg:text-base font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap shrink-0">
                 {formatFullNumber(totalFindings)} total
               </span>
             </div>
@@ -387,7 +387,7 @@ function AuthenticatedDashboard() {
                           className="inline-block h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: item.bar }}
                         />
-                        <span className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 truncate">{item.label}</span>
+                        <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-500 dark:text-slate-400 truncate">{item.label}</span>
                       </div>
                     ))}
                   </div>
@@ -405,7 +405,7 @@ function AuthenticatedDashboard() {
                         <p className={`text-sm sm:text-base md:text-xl lg:text-2xl font-bold ${item.textColor} truncate w-full text-center`}>
                           {formatCompactNumber(item.count)}
                         </p>
-                        <p className="mt-0.5 text-[7px] sm:text-[8px] md:text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 text-center line-clamp-2">
+                        <p className="mt-0.5 text-[7px] sm:text-[8px] md:text-[10px] lg:text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400 text-center line-clamp-2">
                           {item.label}
                         </p>
                       </div>
@@ -430,8 +430,8 @@ function AuthenticatedDashboard() {
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate">Scan activity</p>
-                <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Code security scanner metrics</p>
+                <p className="text-xs sm:text-sm md:text-base lg:text-xl font-semibold text-slate-900 dark:text-white truncate">Scan activity</p>
+                <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-500 dark:text-slate-400 mt-0.5">Code security scanner metrics</p>
               </div>
               <div className="rounded-lg bg-teal-50 p-1.5 dark:bg-teal-950/40 shrink-0">
                 <Activity size={16} className="text-teal-600 dark:text-teal-400" />
@@ -456,7 +456,7 @@ function AuthenticatedDashboard() {
                       <RadialChart rings={rings} totalCodeScans={totalCodeScans} totalIssues={overview?.totalCodeScanIssues ?? 0} />
                       <div className="w-full space-y-1.5 sm:space-y-2 md:space-y-2.5">
                         {rings.map((ring) => (
-                          <div key={ring.label} className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                          <div key={ring.label} className="flex items-center justify-between gap-2 text-xs sm:text-sm lg:text-base">
                             <div className="flex items-center gap-2 min-w-0">
                               <span
                                 className="inline-block h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full shrink-0"
@@ -467,14 +467,14 @@ function AuthenticatedDashboard() {
                               </span>
                             </div>
                             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                              <span className="hidden sm:inline text-xs tabular-nums text-slate-500 dark:text-slate-400">
+                              <span className="hidden sm:inline text-xs lg:text-sm tabular-nums text-slate-500 dark:text-slate-400">
                                 {formatFullNumber(ring.scans)} scans · {formatFullNumber(ring.issues)} issues
                               </span>
                               <span className="sm:hidden text-[9px] tabular-nums text-slate-500 dark:text-slate-400">
                                 {formatCompactNumber(ring.scans)}/{formatCompactNumber(ring.issues)}
                               </span>
                               <span
-                                className="min-w-8 text-right text-xs sm:text-sm font-bold tabular-nums shrink-0"
+                                className="min-w-8 text-right text-xs sm:text-sm lg:text-base font-bold tabular-nums shrink-0"
                                 style={{ color: ring.color }}
                               >
                                 {ring.percent}%
@@ -505,10 +505,10 @@ function AuthenticatedDashboard() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate">Asset discovery trend</p>
-              <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">New assets discovered over the last 30 days</p>
+              <p className="text-xs sm:text-sm md:text-base lg:text-xl font-semibold text-slate-900 dark:text-white truncate">Asset discovery trend</p>
+              <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-500 dark:text-slate-400 mt-0.5">New assets discovered over the last 30 days</p>
             </div>
-            <span className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 md:px-3 text-[10px] md:text-sm font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap shrink-0">
+            <span className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 md:px-3 text-[10px] md:text-sm lg:text-base font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap shrink-0">
               30 days
             </span>
           </div>
@@ -791,11 +791,11 @@ function MetricCard({ metric, index, total }: { metric: MetricCardData; index: n
 
       {/* Content on the left */}
       <div className="relative z-10">
-        <p className="text-xs sm:text-sm md:text-base font-medium text-slate-500 dark:text-slate-400 line-clamp-2 pr-8 sm:pr-10 md:pr-12">{metric.label}</p>
+        <p className="text-xs sm:text-sm md:text-base lg:text-xl font-medium text-slate-500 dark:text-slate-400 line-clamp-2 pr-8 sm:pr-10 md:pr-12">{metric.label}</p>
         <p className="mt-2 sm:mt-3 md:mt-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white">
           {formatCompactNumber(metric.value)}
         </p>
-        <p className="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs lg:text-sm text-slate-400 dark:text-slate-500 pr-12 sm:pr-16 md:pr-20 wrap-break-word">
+        <p className="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs lg:text-base text-slate-400 dark:text-slate-500 pr-12 sm:pr-16 md:pr-20 wrap-break-word">
           {metric.note}
         </p>
       </div>
