@@ -46,6 +46,13 @@ async function generateSuggestion(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ job_id, mode }),
   });
+
+  // 409 = suggestion already exists for this job+mode.
+  // Transparently fall back to fetching the saved result.
+  if (res.status === 409) {
+    return fetchSuggestionByJob(job_id, mode);
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.detail?.[0]?.msg ?? err?.detail ?? `Error ${res.status}`);
