@@ -3,7 +3,7 @@
 import { Database, BarChart3, Zap} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
-import AnimatedCta from '../homepage/animated-cta'
+import AnimatedCta from '../../components/pages/homepage/animated-cta'
 
 const containerVariants = {
   hidden: { opacity: 0 },
