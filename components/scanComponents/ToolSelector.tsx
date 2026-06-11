@@ -34,7 +34,7 @@ export function ToolSelector({
     <div className="space-y-2">
       <label
         htmlFor={id}
-        className="text-[10px] sm:text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        className="text-sm sm:text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         {label}
       </label>
@@ -99,7 +99,7 @@ export function ToolSelector({
                       {tool.tool_name}
                     </span>
                     {tool.tool_description && (
-                      <span className="text-[10px] sm:text-[11px] md:text-xs text-gray-500 dark:text-gray-400 leading-tight text-left pl-3.5">
+                      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-tight text-left pl-3.5">
                         {tool.tool_description}
                       </span>
                     )}

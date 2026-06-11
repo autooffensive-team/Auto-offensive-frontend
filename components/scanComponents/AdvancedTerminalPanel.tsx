@@ -357,8 +357,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
 
   const showDecorations = decorationsEnabled;
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const radarTickRef = useRef(0);
-  const radarElRef = useRef<HTMLDivElement | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); 
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
@@ -425,69 +423,6 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
   }, [logSize.xtermFontSize, isMobile]);
 
   const terminalLineHeight = useMemo(() => logSize.terminalLineHeight, [logSize.terminalLineHeight]);
-
-  const radarState = useMemo(() => {
-    const findingCount = run.findings || 0;
-    const status = String(run.status || "").toLowerCase();
-    const isRunning =
-      isSubmitting || isStreaming ||
-      status.includes("running") || status.includes("scanning") ||
-      status.includes("processing") || status.includes("active");
-    const isFailed = status.includes("failed");
-    const isDone = status.includes("completed");
-
-    const blips = Array.from(
-      { length: Math.min(4, Math.max(2, findingCount > 0 ? findingCount : 2)) },
-      (_, index) => ({
-        x: [-26, 18, 10, -12][index % 4],
-        y: [ 14,-16, -8,  10][index % 4],
-        delay: index * 0.45,
-      })
-    );
-
-    return {
-      sweepDuration: isRunning ? 2.8 : isDone ? 4.2 : isFailed ? 5.5 : 3.8,
-      sweepTone: isFailed
-        ? "rgba(248,113,113,0.32)"
-        : isDone    ? "rgba(45,212,191,0.34)"
-        : isRunning ? "rgba(74,222,128,0.42)"
-        :             "rgba(74,222,128,0.28)",
-      pulseTone: isFailed
-        ? "rgba(248,113,113,0.55)"
-        : isDone ? "rgba(45,212,191,0.55)"
-        :          "rgba(52,211,153,0.55)",
-      blips,
-      badge: isFailed ? "alert" : isDone ? "locked" : isRunning ? "tracking" : "idle",
-    };
-  }, [isSubmitting, isStreaming, run.findings, run.status]);
-
-  useEffect(() => {
-    const status = String(run.status || "").toLowerCase();
-    const isRadarActive =
-      isSubmitting || isStreaming ||
-      status.includes("running") || status.includes("scanning") ||
-      status.includes("processing") || status.includes("active");
-
-    if (!isRadarActive) { radarTickRef.current = 0; return; }
-
-    const interval = window.setInterval(() => {
-      radarTickRef.current = (radarTickRef.current + 1) % 360;
-      // Push the new angle directly to each blip element via CSS transform —
-      // zero React re-renders involved.
-      const el = radarElRef.current;
-      if (!el) return;
-      const blips = el.querySelectorAll<HTMLElement>(".radar-blip");
-      blips.forEach((blip, idx) => {
-        const radius = 28 + (idx % 2) * 8;
-        const angle = idx * 90 + radarTickRef.current * 0.5;
-        const x = Math.cos((angle * Math.PI) / 180) * radius;
-        const y = Math.sin((angle * Math.PI) / 180) * radius;
-        blip.style.left = `calc(50% + ${x}px)`;
-        blip.style.top  = `calc(50% + ${y}px)`;
-      });
-    }, 24);
-    return () => window.clearInterval(interval);
-  }, [isSubmitting, isStreaming, run.status]);
 
   // ── System profile ────────────────────────────────────────────────────────
   const buildProfile = useCallback(() => {
@@ -1199,62 +1134,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 <span className="corner-bracket corner-bracket-br" />
               </>
             )}
-            {!isMobile && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-                className="absolute top-0 right-0 z-50"
-                style={{ pointerEvents: "none" }}
-              >
-                <div className="bg-black/60 backdrop-blur-sm border-l-2 border-b-2 border-emerald-600/20 rounded-bl-lg p-1.5 sm:p-2">
-                  <div className="text-[8px] font-(family-name:--font-fira-code) uppercase tracking-[0.2em] text-emerald-400/60 mb-1 text-center">
-                    Threat Map
-                  </div>
-                  <div
-                    ref={radarElRef}
-                    className="radar-container border border-emerald-600/15"
-                    style={{ width: "100px", height: "100px" }}
-                  >
-                    <div className="radar-base">
-                      <div className="radar-ring radar-ring-1" />
-                      <div className="radar-ring radar-ring-2" />
-                      <div className="radar-ring radar-ring-3" />
-                      <div
-                        className={`radar-sweep ${
-                          isSubmitting || isStreaming ||
-                          (run.status && !String(run.status).toLowerCase().includes("completed") && !String(run.status).toLowerCase().includes("idle"))
-                            ? "scanning"
-                            : ""
-                        }`}
-                      />
-                      <div
-                        className={`radar-center ${
-                          isSubmitting || isStreaming ? "scanning"
-                          : run.findings && run.findings > 0 ? "found"
-                          : ""
-                        }`}
-                      />
-                      {run.findings && run.findings > 0
-                        ? radarState.blips.map((_, idx) => (
-                            <div
-                              key={idx}
-                              className="radar-blip"
-                              style={{
-                                left: `calc(50% + ${Math.cos((idx * 90 * Math.PI) / 180) * (35 + (idx % 2) * 9)}px)`,
-                                top:  `calc(50% + ${Math.sin((idx * 90 * Math.PI) / 180) * (35 + (idx % 2) * 9)}px)`,
-                                transform: "translate(-50%, -50%)",
-                                width: "6px",
-                                height: "6px",
-                              }}
-                            />
-                          ))
-                        : null}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+
           </div>
           {!isNarrow && (
             <TerminalSidebar
