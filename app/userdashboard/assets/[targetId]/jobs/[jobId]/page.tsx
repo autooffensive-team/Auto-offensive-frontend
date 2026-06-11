@@ -31,7 +31,7 @@ export default function ScanResultsPage({ params }: PageProps) {
 
   const targetName = isLoadingJob
     ? "Loading..."
-    : jobDetails?.target_name ?? "Unknown";
+    : (jobDetails?.target_name ?? "Unknown");
 
   const breadcrumbSegments = [
     { label: "Assets", href: "/userdashboard/assets" },
@@ -76,7 +76,11 @@ export default function ScanResultsPage({ params }: PageProps) {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" as const },
+    },
   };
 
   return (
@@ -89,13 +93,19 @@ export default function ScanResultsPage({ params }: PageProps) {
           className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6"
         >
           {/* Breadcrumb + Back link */}
-          <motion.div variants={itemVariants} className="flex items-center justify-between">
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between"
+          >
             <Breadcrumb segments={breadcrumbSegments} />
             <Link
               href={`/userdashboard/assets/${targetId}`}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors group"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors group self-start sm:self-auto"
             >
-              <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft
+                size={14}
+                className="group-hover:-translate-x-0.5 transition-transform"
+              />
               Back to Target
             </Link>
           </motion.div>
@@ -124,14 +134,18 @@ export default function ScanResultsPage({ params }: PageProps) {
             </div>
 
             {/* Right: action buttons grouped */}
-            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              <AISuggestionPanel jobId={jobId} />
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:shrink-0">
+              <div className="flex-1 sm:flex-none">
+                <AISuggestionPanel jobId={jobId} />
+              </div>
               {parsedData && jobDetails && (
-                <GenerateReportButton
-                  jobId={jobId}
-                  steps={jobDetails.steps}
-                  parsedSteps={parsedData.steps}
-                />
+                <div className="flex-1 sm:flex-none *:whitespace-nowrap *:w-full">
+                  <GenerateReportButton
+                    jobId={jobId}
+                    steps={jobDetails.steps}
+                    parsedSteps={parsedData.steps}
+                  />
+                </div>
               )}
             </div>
           </motion.div>

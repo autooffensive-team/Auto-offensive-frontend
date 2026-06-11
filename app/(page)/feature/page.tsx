@@ -4,9 +4,11 @@ import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import { useRef, useEffect, useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useTheme } from "@/components/theme-provider";
 import { HeroBackground } from "@/components/shared/HeroBackground";
 import AnimatedCta from "@/components/pages/homepage/animated-cta";
+import { toDocsUrl } from "@/lib/utils";
 import webAutomationImage from "../../../public/document/card_icon_web_automation_dark.webp";
 
 import {
@@ -108,20 +110,20 @@ export default function PlatformCapabilities() {
 
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const heroTitleFontFamily = isKhmer
-    ? "var(--font-hanuman), var(--font-noto-khmer), sans-serif"
+    ? "var(--font-hanuman), var(--font-kantumruy-pro), sans-serif"
     : displayFontFamily;
   const descriptionTextClass = "text-[16px] md:text-[18px] lg:text-[20px]";
   const sectionTitleFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const sectionDescriptionFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
+    ? "var(--font-kantumruy-pro), sans-serif"
     : "var(--font-google-sans), sans-serif";
   const sectionDescriptionClass =
     "text-[16px] md:text-[18px] lg:text-[20px] leading-[1.7]";
@@ -239,7 +241,8 @@ export default function PlatformCapabilities() {
               custom={3}
               className="flex w-full flex-row flex-nowrap items-center justify-center gap-2 sm:gap-4"
             >
-              <button
+              <Link
+                href="/api/guest/start"
                 className={`${primaryButtonClass}`}
               >
                 <span className="relative z-10 inline-flex items-center justify-center gap-2">
@@ -247,14 +250,15 @@ export default function PlatformCapabilities() {
                   <span className="hidden sm:inline">{t("hero.primaryCta")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </span>
-              </button>
-              <button
+              </Link>
+              <Link
+                href={toDocsUrl('/getting-started')}
                 className={`${secondaryButtonClass}`}
               >
                 <span className="sm:hidden">Read the Docs</span>
                 <span className="hidden sm:inline">{t("hero.secondaryCta")}</span>
                 <ExternalLink className="w-4 h-4" />
-              </button>
+              </Link>
             </motion.div>
           </div>
         </div>
@@ -324,7 +328,7 @@ export default function PlatformCapabilities() {
               </p>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/webui"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -377,7 +381,7 @@ export default function PlatformCapabilities() {
 
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/ai"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -435,7 +439,7 @@ export default function PlatformCapabilities() {
               </div>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/cicd"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -470,7 +474,7 @@ export default function PlatformCapabilities() {
               </div>
               <AnimatedCta
                 as="a"
-                href="#"
+                href="/feature/cli"
                 className="inline-flex w-fit rounded-lg border-2 border-[#01509e] bg-[#01509e] text-[13px] font-semibold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88] transition-all duration-200"
                 iconClassName="bg-white text-[#01509e] shadow-[0.1em_0.1em_0.6em_0.2em_rgba(1,80,158,0.18)] dark:bg-white dark:text-[#00BCA1]"
                 icon={ctaArrowIcon}
@@ -538,18 +542,22 @@ export default function PlatformCapabilities() {
                 ))}
               </motion.div>
 
-              <motion.button
+              <motion.div
                 variants={fadeUp}
                 initial="hidden"
                 animate={reportInView ? "visible" : "hidden"}
                 custom={4}
-                className={`${primaryButtonClass} w-fit`}
               >
-                <span className="relative z-10 inline-flex items-center justify-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  <span>{t("common.viewDocumentation")}</span>
-                </span>
-              </motion.button>
+                <Link
+                  href={toDocsUrl('/getting-started')}
+                  className={`${primaryButtonClass} w-fit`}
+                >
+                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    <span>{t("common.viewDocumentation")}</span>
+                  </span>
+                </Link>
+              </motion.div>
             </div>
 
             <div className="relative flex items-center justify-center p-10 sm:p-12 lg:p-14
@@ -702,20 +710,21 @@ export default function PlatformCapabilities() {
           custom={4}
           className="mt-12 flex flex-row flex-wrap items-center justify-center gap-4"
         >
-          <button
-            className={`${primaryButtonClass} bg-[#00BCA1] text-white hover:bg-[#0AAE98] px-6`}
+          <Link
+            href="/api/guest/start"
+            className={`${primaryButtonClass} bg-[#00BCA1] text-black hover:bg-[#0AAE98] px-6`}
           >
             <span>{t("workflow.primaryCta")}</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
-          <a
-            href="/resources"
+          </Link>
+          <Link
+            href={toDocsUrl('/getting-started')}
             className="group inline-flex items-center gap-2 text-sm font-semibold text-[#52525B] dark:text-[#A1A1AA]
               transition-all duration-300 hover:-translate-y-0.5 hover:text-[#18181B] dark:hover:text-white"
           >
             <span>{t("workflow.secondaryCta")}</span>
             <ExternalLink className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
-          </a>
+          </Link>
         </motion.div>
       </section>
     </div>

@@ -3,7 +3,9 @@
 import { motion, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import { GridBackground } from "@/components/shared/GridBackground";
+import { toDocsUrl } from "@/lib/utils";
 import {
   ArrowRight,
   ExternalLink,
@@ -47,8 +49,8 @@ const fadeInScale = {
 /* ─── Reusable Docs Button ───────────────────────── */
 function DocsButton({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
-    <a
-      href="#"
+    <Link
+      href={toDocsUrl('/scanning')}
       className="group relative inline-flex h-[2.55em] w-fit items-center justify-start overflow-hidden rounded-xl border border-[#E2DDD5] bg-white px-[0.95em] pr-[2.2em] text-[13px] font-semibold text-[#01509E] transition-[transform,background-color,color,border-color] duration-300 hover:-translate-y-px hover:border-[#01509E] hover:bg-[#01509E] hover:text-white dark:border-white/10 dark:bg-[#111113] dark:text-[#7AAEF7] dark:hover:border-[#00BCA1] dark:hover:bg-[#00BCA1] dark:hover:text-[#09090B] sm:h-[2.8em] sm:px-[1.2em] sm:pr-[3.3em]"
     >
       <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-[#09090B]">
@@ -57,7 +59,7 @@ function DocsButton({ children, icon }: { children: React.ReactNode; icon?: Reac
       <span className="pointer-events-none absolute right-[0.25em] top-1/2 z-0 flex h-[1.75em] w-[1.75em] -translate-y-1/2 items-center justify-center overflow-hidden rounded-[0.55em] bg-[#01509E] text-white transition-[width,transform,background-color,color] duration-300 group-hover:w-[calc(100%-0.45em)] group-hover:bg-[#01509E] group-hover:text-white dark:bg-[#7AAEF7] dark:text-[#09090B] dark:group-hover:w-[calc(100%-0.45em)] dark:group-hover:bg-[#00BCA1] dark:group-hover:text-[#09090B] sm:right-[0.3em] sm:h-[2.2em] sm:w-[2.2em] sm:rounded-[0.7em] sm:group-hover:w-[calc(100%-0.6em)]">
         {icon ?? <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />}
       </span>
-    </a>
+    </Link>
   );
 }
 
@@ -199,13 +201,13 @@ export default function WebUIFeature() {
   const isKhmer = locale === "km";
 
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFont = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const heroTitleFont = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
+    ? 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif'
     : displayFont;
   const heroTitleLineHeight = isKhmer ? 1.2 : 1.1;
   const heroTitleLetterSpacing = isKhmer ? "0" : "-0.025em";
@@ -532,16 +534,16 @@ export default function WebUIFeature() {
                 custom={3}
                 className="flex flex-row gap-3 sm:gap-4 mb-8 lg:justify-start"
               >
-                <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
+                <Link href="/api/guest/start" className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
                   <span className="relative z-10 inline-flex items-center justify-center gap-2">
                     <Scan className="w-4 h-4" />
                     <span className="whitespace-nowrap">{webuiLabels.heroPrimary}</span>
                   </span>
-                </button>
-                <button className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
+                </Link>
+                <Link href={toDocsUrl('/scanning')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{webuiLabels.heroSecondary}</span>
-                </button>
+                </Link>
               </motion.div>
 
               {/* Stats Cards */}
@@ -983,16 +985,16 @@ export default function WebUIFeature() {
                 custom={3}
                 className="flex flex-row gap-3 justify-center lg:justify-start"
               >
-                <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
+                <Link href="/api/guest/start" className="group relative inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-[#00BCA1] bg-[#00BCA1] px-3 py-3 sm:px-7.5 sm:py-3.5 text-[14px] sm:text-[15px] font-black leading-none text-black transition-transform duration-200 hover:-translate-y-px before:pointer-events-none before:absolute before:inset-0 before:translate-y-full before:rounded-xl before:bg-[linear-gradient(90deg,rgba(0,122,104,0.22)_25%,transparent_0,transparent_50%,rgba(0,122,104,0.22)_0,rgba(0,122,104,0.22)_75%,transparent_0)] before:transition-transform before:duration-200 before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:-translate-y-full after:rounded-xl after:bg-[linear-gradient(90deg,transparent_0,transparent_25%,rgba(0,122,104,0.36)_0,rgba(0,122,104,0.36)_50%,transparent_0,transparent_75%,rgba(0,122,104,0.28)_0)] after:transition-transform after:duration-200 after:content-[''] hover:before:translate-y-0 hover:after:translate-y-0">
                   <span className="relative z-10 inline-flex items-center justify-center gap-2">
                     <Rocket className="w-4 h-4" />
                     <span className="whitespace-nowrap">{webuiLabels.ctaPrimary}</span>
                   </span>
-                </button>
-                <button className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
+                </Link>
+                <Link href={toDocsUrl('/scanning')} className="ripple-button inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(0,208,178,0.28)] dark:border-[rgba(0,208,178,0.2)] bg-white dark:bg-[rgba(0,208,178,0.06)] px-4 py-3 sm:px-6.5 sm:py-3.5 text-[14px] sm:text-[15px] font-medium text-black dark:text-white backdrop-blur-sm duration-200 cursor-pointer hover:bg-white/80">
                   <ExternalLink className="w-4 h-4" />
                   <span className="whitespace-nowrap">{webuiLabels.ctaSecondary}</span>
-                </button>
+                </Link>
               </motion.div>
             </div>
 

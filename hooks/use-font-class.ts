@@ -4,25 +4,25 @@ import { useLocale } from "next-intl";
 
 export function useFontClass() {
   const locale = useLocale();
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   
   return {
     isKhmer,
     bodyClass: isKhmer ? "font-khmer" : "",
-    headingClass: isKhmer ? "display-font" : "",
+    headingClass: isKhmer ? "font-khmer-hero" : "display-font",
   };
 }
 
 export function getFontClass(locale: string) {
-  const isKhmer = locale === "kh";
+  const isKhmer = locale === "km";
   return {
     isKhmer,
     bodyClass: isKhmer ? "font-khmer" : "",
-    headingClass: isKhmer ? "display-font" : "",
+    headingClass: isKhmer ? "font-khmer-hero" : "display-font",
   };
 }
 
 export function useIsKhmer() {
   const locale = useLocale();
-  return locale === "kh";
+  return locale === "km";
 }

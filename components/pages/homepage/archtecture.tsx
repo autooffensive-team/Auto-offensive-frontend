@@ -222,8 +222,8 @@ function PathBadge({
 }
 
 export function Architecture() {
-  const bodyFontFamily = 'var(--font-google-sans), var(--font-noto-khmer), sans-serif'
-  const displayFontFamily = 'var(--font-hackdaddy), var(--font-noto-khmer), sans-serif'
+const bodyFontFamily = 'var(--font-google-sans), var(--font-kantumruy-pro), sans-serif'
+   const displayFontFamily = 'var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif'
   const copy = {
         titleLine1: 'Branded Data Paths,',
         titleLine2: 'Real-Time System Flow',

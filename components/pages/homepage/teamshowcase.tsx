@@ -11,11 +11,11 @@ export default function TeamShowcase() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const imageRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -50,7 +50,7 @@ export default function TeamShowcase() {
           <AnimatedCta
             as="a"
             href="about-us"
-            className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-white dark:hover:bg-[#009d88]"
+            className="w-auto rounded-xl border-2 border-[#01509e] bg-[#01509e] text-[15px] font-bold tracking-wide text-white hover:bg-[#004b92] dark:border-[#00BCA1] dark:bg-[#00BCA1] dark:text-black dark:hover:bg-[#009d88]"
             iconClassName="bg-white text-[#01509e] dark:bg-white dark:text-[#00BCA1]"
             icon={
               <svg className="h-3 w-3 flex-none" width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -166,25 +166,6 @@ export default function TeamShowcase() {
               </div>
             </div>
           </div>
-
-          {/* Premium Established Badge */}
-          {/* <div className="absolute -right-3 bottom-10 z-30">
-            <div
-              className="rounded-2xl border-2 border-white/90 px-6 py-4 dark:border-white/15"
-              style={{
-                background:
-                  "linear-gradient(135deg, #01509e 0%, #0047a3 100%)",
-              }}
-            >
-              <p className="m-0 text-[8px] font-bold uppercase tracking-[0.15em] text-white/90">
-                {t("established")}
-              </p>
-              <p className="m-0 text-2xl font-black text-white">
-                2026
-              </p>
-            </div>
-          </div> */}
-
           {/* Decorative Top Right Accent */}
           <div
             className="absolute -top-1 -right-1 w-24 h-24 z-5 opacity-60 pointer-events-none"

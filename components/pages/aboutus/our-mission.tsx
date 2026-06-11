@@ -164,7 +164,7 @@ function TerminalVisual({ lines }: { lines: string[] }) {
   return (
     <div
       className="w-full max-w-[320px] overflow-hidden rounded-[10px] border border-[rgba(0,208,178,.14)] bg-[rgba(10,31,26,.06)] dark:bg-[rgba(0,0,0,.5)]"
-      style={{ fontFamily: "var(--font-google-sans), var(--font-noto-khmer), sans-serif" }}
+      style={{ fontFamily: "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif" }}
     >
       <div className="flex items-center border-b border-[rgba(0,208,178,.14)] bg-[rgba(0,208,178,.04)] px-3.5 py-2">
         <span className="inline-block h-2 w-2 rounded-full bg-[#ff5f57]" />
@@ -312,11 +312,11 @@ export default function OurMission() {
   const isKhmer = locale === "km";
   const slides = isKhmer ? SLIDES_KH : SLIDES_EN;
   const bodyFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), monospace"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), monospace";
+    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), monospace"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
 
   const copy = isKhmer
     ? {

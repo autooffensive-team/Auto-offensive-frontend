@@ -28,30 +28,42 @@
   },
   "footer": {
     "product": "ផលិតផល",
-    "features": "លក្ខណៈពិសេស",
+    "features": "មុខងារ",
     "tools": "ឧបករណ៍",
-    "pricing": "តម្លៃប្រាក់",
+    "pricing": "តម្លៃ",
     "integrations": "ការរួមបញ្ចូល",
-    "resources": "ធនធាននិងទំនាក់ទំនង",
-    "documentation": "ឯកសារលម្អិត",
+    "resources": "ធនធាន",
+    "documentation": "ឯកសារ",
     "apiReference": "ឯកសារយោង API",
     "cliGuide": "មគ្គុទ្ទេស CLI",
     "blog": "ប្លក",
     "company": "ក្រុមហ៊ុន",
-    "aboutUs": "អំពីក្រុមហ៊ុនយើង",
+    "aboutUs": "អំពីយើង",
     "careers": "ឱកាសការងារ",
-    "contactUs": "ទំនាក់ទំនងយើង",
-    "legal": "ច្បាប់និងលក្ខណៈ",
+    "contactUs": "ទំនាក់ទំនង",
+    "legal": "ផ្នែកច្បាប់",
     "privacyPolicy": "គោលការណ៍ភាពឯកជន",
     "termsOfService": "លក្ខខណ្ឌសេវាកម្ម",
     "security": "សុវត្ថិភាព",
-    "community": "សហគមន៍",
+    "community": "FAQ",
     "discord": "Discord",
     "twitter": "Twitter",
     "github": "GitHub",
-    "allRightsReserved": "រក្សាសិទ្ធិគ្រប់យ៉ាង",
-    "builtWith": "ត្រូវបានបង្កើតដោយ",
-    "sponsoredBy": "រៀបចំ និងឧបត្ថម្ភដោយ"
+    "allRightsReserved": "រក្សាសិទ្ធិគ្រប់យ៉ាង។",
+    "builtWith": "បង្កើតដោយ",
+    "sponsoredBy": "រៀបចំ និងឧបត្ថម្ភដោយ",
+    "description": "ជាវេទិកា penetration testing ស្វ័យប្រវត្តិសម្រាប់អ្នកអភិវឌ្ឍន៍ security engineers និងក្រុម DevSecOps។ បង្កើតឡើងដើម្បីរកឃើញភាពងាយរងគ្រោះ មុនពេលអ្នកវាយប្រហាររកឃើញ។",
+    "tagline": "Your recon stack, without the stack.",
+    "sponsorName": "វិទ្យាស្ថាន​ សាយអិនស៍ អេន ថេកណឡជីអ៊ែតវ៉ានស៍ ឌីវេឡុបម៉ិន",
+    "aiSecurity": "សុវត្ថិភាពដោយ AI",
+    "webUi": "ផ្ទាំងគ្រប់គ្រង Web",
+    "introduction": "ការណែនាំ",
+    "platformFeatures": "មុខងារវេទិកា",
+    "developerReference": "ឯកសារយោងសម្រាប់ Developer",
+    "faq": "សំណួរញឹកញាប់",
+    "help": "ជំនួយ",
+    "termsAndConditions": "លក្ខខណ្ឌ និងកិច្ចព្រមព្រៀង",
+    "builtFor": "បង្កើតសម្រាប់វិស្វករសុវត្ថិភាព និង Pentesters"
   },
   "featuresPage": {
     "common": {
@@ -133,9 +145,9 @@
   "featurePages": {
     "ai": {
       "hero": {
-        "badge": "របាយការណ៍ដោយ AI",
-        "titleLine1": "របាយការណ៍",
-        "titleLine2": "ជំនួយដោយ AI។",
+        "badge": "ការវិភាគភាពងាយរងគ្រោះដោយ AI",
+        "titleLine1": "ការវិភាគភាពងាយរងគ្រោះ",
+        "titleLine2": "ដោយ AI។",
         "subtitle": "បម្លែងទិន្នន័យភាពងាយរងគ្រោះដើមទៅជាព័ត៌មានឆ្លាតវៃសម្រាប់ថ្នាក់ដឹកនាំ។ AI របស់យើងស្វ័យប្រវត្តិកម្មការវិភាគ ការរៀបរាប់ និងយុទ្ធសាស្ត្រកែសម្រួល។",
         "primaryCta": "បង្កើតរបាយការណ៍",
         "secondaryCta": "មើលដេម៉ូ",
@@ -1160,159 +1172,160 @@
     "heroDescription": "ទិន្នន័យរបស់អ្នកនៅតែជារបស់អ្នក។ យើងបានបង្កើត Auto-Offensive ដោយមានគោលការណ៍ភាពឯកជនជាមុនសិទ្ធិ — គ្មានការលក់ទិន្នន័យ គ្មានការតាមដានលាក់កំបាំង គ្រាន់តែការធ្វើតេស្តសុវត្ថិភាពដោយសុវត្ថិភាព។",
     "tagNoDataSelling": "គ្មានការលក់ទិន្នន័យ",
     "tagFreePlatform": "វេទិកាឥតគិតថ្លៃ",
+    "sectionsLabel": "ផ្នែក",
+    "footerLine1": "គោលការណ៍ភាពឯកជន v2.0 · មីនា 2026",
+    "footerLine2": "វេទិកាឥតគិតថ្លៃ · គាំទ្រ Open Source",
     "nav": {
-      "collect": "What We Collect",
-      "gdpr": "GDPR & Legal Compliance",
-      "use": "How We Use It",
-      "scan": "Your Scan Data",
-      "limits": "Free Tier Limits",
-      "sharing": "Who We Share With",
-      "retention": "Data Retention",
-      "rights": "Your Rights",
-      "security": "Security",
-      "contact": "Contact"
+      "collect": "អ្វីដែលយើងប្រមូល",
+      "gdpr": "GDPR និងការអនុលោមតាមច្បាប់",
+      "use": "របៀបដែលយើងប្រើវា",
+      "scan": "ទិន្នន័យស្កេនរបស់អ្នក",
+      "limits": "ដែនកំណត់គម្រោងឥតគិតថ្លៃ",
+      "sharing": "អ្នកដែលយើងចែករំលែកជាមួយ",
+      "retention": "ការរក្សាទុកទិន្នន័យ",
+      "rights": "សិទ្ធិរបស់អ្នក",
+      "security": "សុវត្ថិភាព",
+      "contact": "ទំនាក់ទំនង"
     },
     "accordion": {
       "collect": {
-        "title": "What We Collect",
-        "lead": "We only collect what's needed to run the platform and keep your account secure.",
+        "title": "អ្វីដែលយើងប្រមូល",
+        "lead": "យើងប្រមូលតែទិន្នន័យដែលចាំបាច់សម្រាប់ដំណើរការវេទិកា និងរក្សាសុវត្ថិភាពគណនីរបស់អ្នកប៉ុណ្ណោះ។",
         "items": {
-          "account": "Account",
-          "accountVal": "Email, username, bcrypt-hashed password, encrypted API tokens",
-          "scanData": "Scan Data",
-          "scanDataVal": "Targets, findings, logs, metadata — isolated to your account",
-          "usageSignals": "Usage Signals",
-          "usageSignalsVal": "Features used, scan frequency, tool selection, login history",
-          "technical": "Technical",
-          "technicalVal": "IP address, browser/OS, device type — for security & abuse prevention"
+          "account": "គណនី",
+          "accountVal": "អ៊ីមែល ឈ្មោះអ្នកប្រើ ពាក្យសម្ងាត់ដែលបាន hash ដោយ bcrypt និង API tokens ដែលបានអ៊ិនគ្រីប",
+          "scanData": "ទិន្នន័យស្កេន",
+          "scanDataVal": "គោលដៅ លទ្ធផលរកឃើញ កំណត់ហេតុ និង metadata — ត្រូវបានបំបែកសម្រាប់គណនីរបស់អ្នក",
+          "usageSignals": "សញ្ញានៃការប្រើប្រាស់",
+          "usageSignalsVal": "មុខងារដែលបានប្រើ ភាពញឹកញាប់នៃការស្កេន ការជ្រើសរើសឧបករណ៍ និងប្រវត្តិចូលប្រើ",
+          "technical": "ទិន្នន័យបច្ចេកទេស",
+          "technicalVal": "IP address, browser/OS និងប្រភេទឧបករណ៍ — សម្រាប់សុវត្ថិភាព និងការពារការបំពាន"
         },
-        "notice": "Repository scanning is opt-in. We only access GitHub/GitLab when you explicitly authorize it."
+        "notice": "ការស្កេន repository គឺជាជម្រើស opt-in។ យើងចូលប្រើ GitHub/GitLab តែពេលអ្នកអនុញ្ញាតយ៉ាងច្បាស់ប៉ុណ្ណោះ។"
       },
       "gdpr": {
-        "title": "GDPR & Legal Compliance",
-        "lead": "Auto-Offensive is fully compliant with the General Data Protection Regulation (GDPR) and other international data protection laws.",
+        "title": "GDPR និងការអនុលោមតាមច្បាប់",
+        "lead": "Auto-Offensive អនុលោមតាម General Data Protection Regulation (GDPR) និងច្បាប់ការពារទិន្នន័យអន្តរជាតិផ្សេងៗ។",
         "items": {
-          "compliance": "Compliance",
+          "compliance": "ការអនុលោម",
           "complianceVal": "GDPR (EU/UK), CCPA (California), LGPD (Brazil)",
-          "dataController": "Data Controller",
+          "dataController": "អ្នកគ្រប់គ្រងទិន្នន័យ",
           "dataControllerVal": "Auto-Offensive Technologies Ltd.",
-          "dpoContact": "DPO Contact",
+          "dpoContact": "ទំនាក់ទំនង DPO",
           "dpoContactVal": "dpo@auto-offensive.com",
-          "dataProtection": "Data Protection",
-          "dataProtectionVal": "SHA-256 encryption, annual audits"
+          "dataProtection": "ការការពារទិន្នន័យ",
+          "dataProtectionVal": "ការអ៊ិនគ្រីប SHA-256 និងការត្រួតពិនិត្យប្រចាំឆ្នាំ"
         },
-        "notice": "Your data stays yours. We are committed to data sovereignty — your scan data is stored in your designated region unless you choose otherwise.",
+        "notice": "ទិន្នន័យរបស់អ្នកនៅតែជារបស់អ្នក។ យើងប្តេជ្ញាចំពោះអធិបតេយ្យភាពទិន្នន័យ — ទិន្នន័យស្កេនរបស់អ្នកត្រូវបានរក្សាទុកក្នុងតំបន់ដែលអ្នកកំណត់ លុះត្រាតែអ្នកជ្រើសរើសផ្សេង។",
         "rights": {
-          "lawfulBasis": "Lawful Basis: Performance of contract (service delivery) and legitimate interests (security)",
-          "rightToAccess": "Right to Access: Get a copy of all personal data we hold within 30 days",
-          "rightToRectification": "Right to Rectification: Correct inaccurate personal data instantly",
-          "rightToErasure": "Right to Erasure: Request deletion (\"right to be forgotten\") with no delay",
-          "dataPortability": "Data Portability: Receive your data in machine-readable format (JSON/CSV)",
-          "rightToObject": "Right to Object: Opt out of processing for marketing or legitimate interests",
-          "internationalTransfers": "International Transfers: Protected by Standard Contractual Clauses (SCCs)",
-          "crossBorderTransfers": "Cross-Border Transfers: GDPR-compliant via EU-US Data Privacy Framework"
+          "lawfulBasis": "មូលដ្ឋានស្របច្បាប់៖ ការអនុវត្តកិច្ចសន្យា (ការផ្តល់សេវា) និងផលប្រយោជន៍ស្របច្បាប់ (សុវត្ថិភាព)",
+          "rightToAccess": "សិទ្ធិចូលប្រើ៖ ទទួលបានច្បាប់ចម្លងទិន្នន័យផ្ទាល់ខ្លួនទាំងអស់ដែលយើងរក្សាទុកក្នុងរយៈពេល 30 ថ្ងៃ",
+          "rightToRectification": "សិទ្ធិកែតម្រូវ៖ កែទិន្នន័យផ្ទាល់ខ្លួនដែលមិនត្រឹមត្រូវបានភ្លាមៗ",
+          "rightToErasure": "សិទ្ធិលុបចោល៖ ស្នើសុំលុប (\"right to be forgotten\") ដោយមិនពន្យារពេល",
+          "dataPortability": "ការផ្ទេរទិន្នន័យ៖ ទទួលទិន្នន័យរបស់អ្នកជាទ្រង់ទ្រាយដែលម៉ាស៊ីនអាចអានបាន (JSON/CSV)",
+          "rightToObject": "សិទ្ធិជំទាស់៖ បដិសេធការដំណើរការសម្រាប់ទីផ្សារ ឬផលប្រយោជន៍ស្របច្បាប់",
+          "internationalTransfers": "ការផ្ទេរអន្តរជាតិ៖ ត្រូវបានការពារដោយ Standard Contractual Clauses (SCCs)",
+          "crossBorderTransfers": "ការផ្ទេរឆ្លងដែន៖ អនុលោមតាម GDPR តាមរយៈ EU-US Data Privacy Framework"
         },
-        "gdprFooter": "For GDPR data requests, email dpo@auto-offensive.com — we respond within 72 hours as required by Article 12."
+        "gdprFooter": "សម្រាប់សំណើទិន្នន័យ GDPR សូមអ៊ីមែលទៅ dpo@auto-offensive.com — យើងឆ្លើយតបក្នុងរយៈពេល 72 ម៉ោង តាមដែល Article 12 កំណត់។"
       },
       "use": {
-        "title": "How We Use It",
+        "title": "របៀបដែលយើងប្រើវា",
         "items": {
-          "runScans": "Run and store your scans, display results in your dashboard",
-          "auth": "Manage authentication and account security",
-          "limits": "Enforce fair usage limits (3 scans/day on free tier)",
-          "abuse": "Detect and prevent platform abuse or DDoS misuse",
-          "anonymized": "anonymized scan patterns to improve vulnerability detection",
-          "alerts": "Send scan completion alerts and security notifications",
-          "sellData": "Sell, rent, or trade your data to anyone",
-          "sellDataNo": true,
-          "commercial": "Use your personal scan results for commercial purposes",
-          "commercialNo": true
+          "runScans": "ដំណើរការ និងរក្សាទុកការស្កេនរបស់អ្នក ព្រមទាំងបង្ហាញលទ្ធផលក្នុង dashboard",
+          "auth": "គ្រប់គ្រងការផ្ទៀងផ្ទាត់អត្តសញ្ញាណ និងសុវត្ថិភាពគណនី",
+          "limits": "អនុវត្តដែនកំណត់ការប្រើប្រាស់យុត្តិធម៌ (3 ការស្កេន/ថ្ងៃ សម្រាប់គម្រោងឥតគិតថ្លៃ)",
+          "abuse": "រកឃើញ និងទប់ស្កាត់ការបំពានវេទិកា ឬការប្រើប្រាស់ DDoS ខុសបំណង",
+          "anonymized": "ប្រើលំនាំស្កេនដែលបានលាក់អត្តសញ្ញាណ ដើម្បីកែលម្អការរកឃើញភាពងាយរងគ្រោះ",
+          "alerts": "ផ្ញើការជូនដំណឹងពេលស្កេនបញ្ចប់ និងការជូនដំណឹងសុវត្ថិភាព",
+          "sellData": "លក់ ជួល ឬដោះដូរទិន្នន័យរបស់អ្នកទៅអ្នកណាម្នាក់",
+          "commercial": "ប្រើលទ្ធផលស្កេនផ្ទាល់ខ្លួនរបស់អ្នកសម្រាប់គោលបំណងពាណិជ្ជកម្ម"
         }
       },
       "scan": {
-        "title": "Your Scan Data",
-        "lead": "You own it entirely. Scan configs, findings, reports, history — all yours. Each account is fully isolated at the database level.",
-        "notice": "On AI training: We may use anonymized, aggregated patterns to improve detection models. We never identify your org, expose specific findings, or use raw data commercially.",
-        "export": "Export your data anytime in JSON, CSV, or PDF from the dashboard."
+        "title": "ទិន្នន័យស្កេនរបស់អ្នក",
+        "lead": "អ្នកជាម្ចាស់ទាំងស្រុង។ ការកំណត់ស្កេន លទ្ធផលរកឃើញ របាយការណ៍ និងប្រវត្តិ — សុទ្ធតែជារបស់អ្នក។ គណនីនីមួយៗត្រូវបានបំបែកពេញលេញនៅកម្រិត database។",
+        "notice": "អំពីការបណ្តុះបណ្តាល AI៖ យើងអាចប្រើលំនាំដែលបានលាក់អត្តសញ្ញាណ និងប្រមូលផ្តុំ ដើម្បីកែលម្អម៉ូដែលរកឃើញ។ យើងមិនបង្ហាញអត្តសញ្ញាណអង្គការរបស់អ្នក មិនបង្ហាញលទ្ធផលជាក់លាក់ និងមិនប្រើទិន្នន័យដើមសម្រាប់ពាណិជ្ជកម្មទេ។",
+        "export": "អ្នកអាច export ទិន្នន័យរបស់អ្នកបានគ្រប់ពេលជា JSON, CSV ឬ PDF ពី dashboard។"
       },
       "limits": {
-        "title": "Free Tier Limits",
+        "title": "ដែនកំណត់គម្រោងឥតគិតថ្លៃ",
         "items": {
-          "dailyScans": "Daily scans",
-          "dailyScansVal": "3 scans / day",
-          "maxScanDuration": "Max scan duration",
-          "maxScanDurationVal": "30 minutes",
-          "concurrentScans": "Concurrent scans",
-          "concurrentScansVal": "1 at a time",
-          "targetScope": "Target scope",
-          "targetScopeVal": "Single domain per scan",
-          "storage": "Storage",
-          "storageVal": "100 GB scan history",
-          "toolsAvailable": "Tools available",
-          "toolsAvailableVal": "All 14+ tools"
+          "dailyScans": "ការស្កេនប្រចាំថ្ងៃ",
+          "dailyScansVal": "3 ការស្កេន / ថ្ងៃ",
+          "maxScanDuration": "រយៈពេលស្កេនអតិបរមា",
+          "maxScanDurationVal": "30 នាទី",
+          "concurrentScans": "ការស្កេនក្នុងពេលតែមួយ",
+          "concurrentScansVal": "មួយដងបាន 1",
+          "targetScope": "វិសាលភាពគោលដៅ",
+          "targetScopeVal": "Domain តែមួយក្នុងមួយការស្កេន",
+          "storage": "ទំហំផ្ទុក",
+          "storageVal": "ប្រវត្តិស្កេន 100 GB",
+          "toolsAvailable": "ឧបករណ៍ដែលអាចប្រើបាន",
+          "toolsAvailableVal": "ឧបករណ៍ 14+ ទាំងអស់"
         },
-        "notice": "Accounts that abuse free resources (e.g. mass automated scanning of targets you don't own) may be suspended. Legitimate learning and testing is always welcome."
+        "notice": "គណនីដែលបំពានធនធានឥតគិតថ្លៃ (ឧ. ស្កេនដោយស្វ័យប្រវត្តិច្រើនលើគោលដៅដែលអ្នកមិនមែនជាម្ចាស់) អាចត្រូវបានផ្អាក។ ការរៀន និងការធ្វើតេស្តស្របច្បាប់តែងតែត្រូវបានស្វាគមន៍។"
       },
       "sharing": {
-        "title": "Who We Share With",
-        "lead": "We share the minimum necessary with trusted providers who help us operate.",
-        "providers": ["AWS — Hosting", "SendGrid — Email", "Google Analytics — Aggregated metrics", "GitHub / GitLab — If you authorize", "Intercom — Support"],
-        "notice": "All providers are contractually required to protect your data and use it only for the specified purpose. We may disclose data to authorities when required by law — and we'll notify you when legally permitted to do so."
+        "title": "អ្នកដែលយើងចែករំលែកជាមួយ",
+        "lead": "យើងចែករំលែកតែអ្វីដែលចាំបាច់បំផុតជាមួយអ្នកផ្តល់សេវាដែលទុកចិត្តបាន ដែលជួយឲ្យយើងដំណើរការ។",
+        "providers": ["AWS — Hosting", "SendGrid — អ៊ីមែល", "Google Analytics — ស្ថិតិប្រមូលផ្តុំ", "GitHub / GitLab — ប្រសិនបើអ្នកអនុញ្ញាត", "Intercom — គាំទ្រ"],
+        "notice": "អ្នកផ្តល់សេវាទាំងអស់ត្រូវបានកំណត់តាមកិច្ចសន្យាឲ្យការពារទិន្នន័យរបស់អ្នក និងប្រើវាសម្រាប់គោលបំណងដែលបានកំណត់ប៉ុណ្ណោះ។ យើងអាចបង្ហាញទិន្នន័យទៅអាជ្ញាធរ ពេលច្បាប់តម្រូវ — ហើយយើងនឹងជូនដំណឹងអ្នក ពេលច្បាប់អនុញ្ញាត។"
       },
       "retention": {
-        "title": "Data Retention",
+        "title": "ការរក្សាទុកទិន្នន័យ",
         "items": {
-          "accountDeleted": "Account deleted",
-          "accountDeletedVal": "Credentials removed immediately",
-          "scanResults": "Scan results",
-          "scanResultsVal": "Deleted within 7 days",
+          "accountDeleted": "ពេលគណនីត្រូវបានលុប",
+          "accountDeletedVal": "ព័ត៌មានចូលប្រើត្រូវបានលុបភ្លាមៗ",
+          "scanResults": "លទ្ធផលស្កេន",
+          "scanResultsVal": "លុបក្នុងរយៈពេល 7 ថ្ងៃ",
           "backups": "Backups",
-          "backupsVal": "Purged within 30 days",
-          "anonymizedAnalytics": "Anonymized analytics",
-          "anonymizedAnalyticsVal": "Up to 90 days",
-          "securityLogs": "Security logs",
-          "securityLogsVal": "Up to 1 year (abuse prevention)"
+          "backupsVal": "លុបចោលក្នុងរយៈពេល 30 ថ្ងៃ",
+          "anonymizedAnalytics": "Analytics ដែលបានលាក់អត្តសញ្ញាណ",
+          "anonymizedAnalyticsVal": "រហូតដល់ 90 ថ្ងៃ",
+          "securityLogs": "កំណត់ហេតុសុវត្ថិភាព",
+          "securityLogsVal": "រហូតដល់ 1 ឆ្នាំ (ការពារការបំពាន)"
         },
-        "notice": "Heads up: Download your data before deleting your account — deletion is permanent."
+        "notice": "សូមចំណាំ៖ ទាញយកទិន្នន័យរបស់អ្នកមុនលុបគណនី — ការលុបគឺអចិន្ត្រៃយ៍។"
       },
       "rights": {
-        "title": "Your Rights",
+        "title": "សិទ្ធិរបស់អ្នក",
         "items": {
-          "viewData": "View and download all your account data anytime",
-          "editData": "Edit or correct your account information in settings",
-          "exportData": "Request full data export in portable format (within 30 days)",
-          "deleteAccount": "Delete your account and all associated data permanently",
-          "unsubscribe": "Unsubscribe from non-essential emails at any time",
-          "optOutAnalytics": "Opt out of analytics via browser \"Do Not Track\" or account settings",
-          "complaint": "File a complaint with your local data protection authority"
+          "viewData": "មើល និងទាញយកទិន្នន័យគណនីរបស់អ្នកទាំងអស់បានគ្រប់ពេល",
+          "editData": "កែ ឬធ្វើឲ្យព័ត៌មានគណនីរបស់អ្នកត្រឹមត្រូវក្នុង settings",
+          "exportData": "ស្នើសុំ export ទិន្នន័យពេញលេញជាទ្រង់ទ្រាយងាយផ្ទេរ (ក្នុង 30 ថ្ងៃ)",
+          "deleteAccount": "លុបគណនី និងទិន្នន័យពាក់ព័ន្ធទាំងអស់ជាអចិន្ត្រៃយ៍",
+          "unsubscribe": "ឈប់ទទួលអ៊ីមែលដែលមិនចាំបាច់បានគ្រប់ពេល",
+          "optOutAnalytics": "បដិសេធ analytics តាម browser \"Do Not Track\" ឬ account settings",
+          "complaint": "ដាក់ពាក្យបណ្តឹងទៅអាជ្ញាធរការពារទិន្នន័យក្នុងតំបន់របស់អ្នក"
         }
       },
       "security": {
-        "title": "Security",
+        "title": "សុវត្ថិភាព",
         "items": {
-          "inTransit": "In Transit",
-          "inTransitVal": "HTTPS / TLS 256-bit encryption on all connections",
-          "atRest": "At Rest",
-          "atRestVal": "AES-256 for sensitive data, bcrypt for passwords",
-          "access": "Access",
-          "accessVal": "Role-based controls, MFA available, session timeouts",
-          "monitoring": "Monitoring",
-          "monitoringVal": "24/7 intrusion detection, WAF, DDoS protection on AWS"
+          "inTransit": "ពេលផ្ទេរ",
+          "inTransitVal": "HTTPS / TLS 256-bit encryption លើការតភ្ជាប់ទាំងអស់",
+          "atRest": "ពេលរក្សាទុក",
+          "atRestVal": "AES-256 សម្រាប់ទិន្នន័យសំខាន់ៗ និង bcrypt សម្រាប់ពាក្យសម្ងាត់",
+          "access": "ការចូលប្រើ",
+          "accessVal": "ការគ្រប់គ្រងតាមតួនាទី មាន MFA និង session timeouts",
+          "monitoring": "ការត្រួតពិនិត្យ",
+          "monitoringVal": "រកឃើញការលួចចូល 24/7, WAF និងការពារ DDoS លើ AWS"
         },
-        "lead": "If we detect a breach, we notify you within 48 hours with details and protective steps."
+        "lead": "ប្រសិនបើយើងរកឃើញការបំពានសុវត្ថិភាព យើងនឹងជូនដំណឹងអ្នកក្នុងរយៈពេល 48 ម៉ោង ជាមួយព័ត៌មានលម្អិត និងជំហានការពារ។"
       },
       "contact": {
-        "title": "Contact",
-        "lead": "Questions about your data? We respond to all privacy requests within 7 business days, security issues within 24 hours.",
-        "privacy": "Privacy",
+        "title": "ទំនាក់ទំនង",
+        "lead": "មានសំណួរអំពីទិន្នន័យរបស់អ្នកមែនទេ? យើងឆ្លើយតបសំណើភាពឯកជនទាំងអស់ក្នុង 7 ថ្ងៃធ្វើការ និងបញ្ហាសុវត្ថិភាពក្នុង 24 ម៉ោង។",
+        "privacy": "ភាពឯកជន",
         "privacyEmail": "privacy@auto-offensive.com",
-        "privacyNote": "Within 7 business days",
+        "privacyNote": "ក្នុង 7 ថ្ងៃធ្វើការ",
         "dpo": "DPO (GDPR)",
         "dpoEmail": "dpo@auto-offensive.com",
-        "dpoNote": "Within 72 hours",
-        "security": "Security",
+        "dpoNote": "ក្នុង 72 ម៉ោង",
+        "security": "សុវត្ថិភាព",
         "securityEmail": "security@auto-offensive.com",
-        "securityNote": "Within 24 hours"
+        "securityNote": "ក្នុង 24 ម៉ោង"
       }
     }
   },

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import HolographicPlanetLazy from "./holographic-planet-lazy";
 import FocusWord from "@/components/ui/focus-word";
+import { authClient } from "@/lib/auth-client";
 
 // ─── Hex geometry ────────────────────────────────────────────────────
 const hexPoints = "28,0 56,16 56,48 28,64 0,48 0,16";
@@ -268,10 +269,15 @@ function setupMagneticHover(svgEl: SVGSVGElement | null) {
 }
 
 // ─── Main hero component ─────────────────────────────────────────────
+const docsAppUrl = process.env.NEXT_PUBLIC_DOCS_URL;
+const toDocsUrl = (path: string) => docsAppUrl ? `${docsAppUrl}${path}` : `/docs${path}`;
+
 export default function HomeHero() {
   const t       = useTranslations("homepage.hero");
   const locale  = useLocale();
   const isKhmer = locale === "km";
+  const { data: session } = authClient.useSession();
+  const scanHref = session ? "/userdashboard/scan" : "/api/guest/start";
 
   const titleLine3           = t("titleLine3");
   const titleLine3FocusMatch = titleLine3.match(/^(.*?)(hacker)(.*)$/iu);
@@ -602,8 +608,8 @@ export default function HomeHero() {
         "
         style={{
           fontFamily: isKhmer
-            ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-            : "var(--font-google-sans), var(--font-noto-khmer), sans-serif",
+            ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+            : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif",
         }}
       >
 
@@ -769,7 +775,7 @@ export default function HomeHero() {
                             {index < array.length - 1 ? (
                               <span
                                 style={{
-                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif',
+                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif',
                                   fontWeight: 800,
                                 }}
                               >
@@ -811,7 +817,7 @@ export default function HomeHero() {
           >
             {/* Primary */}
             <Link
-              href="/userdashboard"
+              href={scanHref}
               className="
                 group relative inline-flex w-full min-w-0 items-center justify-center
                 overflow-hidden rounded-xl border-2 border-primary bg-primary
@@ -837,7 +843,7 @@ export default function HomeHero() {
             </Link>
 
             {/* Secondary */}
-            <button className="
+            <a href={toDocsUrl('/cli')} className="
               ripple-button
               bg-white dark:bg-[rgba(0,208,178,0.06)]
               text-black dark:text-white
@@ -850,10 +856,12 @@ export default function HomeHero() {
               backdrop-blur-sm duration-200
             ">
               <svg className="text-black dark:text-white" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
               <span className="min-w-0 whitespace-nowrap text-center text-black dark:text-white">{t("secondaryCta")}</span>
-            </button>
+            </a>
           </motion.div>
 
           {/* Stats */}

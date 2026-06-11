@@ -604,13 +604,13 @@ function CardRow({
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const labelFontFamily = isKhmer
-    ? "var(--font-noto-khmer), sans-serif"
+    ? "var(--font-kantumruy-pro), sans-serif"
     : "var(--font-hackdaddy), sans-serif";
   const { reverse, gapLeft, gapRight } = card;
   const isTablet = mode === "tablet";
@@ -850,8 +850,8 @@ export default function Features() {
     .replace(/\s*(Auto Offensive|Reffensive)\s*$/i, "")
     .trim();
   const displayFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-hackdaddy), sans-serif"
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const cards = locale === "km" ? CARDS : EN_CARDS;
   // FIX: scrollPct is now used by ProgressBar
   const [scrollPct, setScrollPct] = useState(0);

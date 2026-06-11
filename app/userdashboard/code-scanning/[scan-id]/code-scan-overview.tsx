@@ -309,11 +309,31 @@ function OverviewMetricCell({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-xl border border-slate-200 bg-white p-3 sm:rounded-2xl sm:p-4 dark:border-slate-800 dark:bg-slate-950",
+        "relative flex flex-col bg-white p-3 sm:p-4 dark:bg-slate-950",
         className,
       )}
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
-      <div className="flex items-start justify-between gap-2">
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+
+      <div className="relative z-10 flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-2.5">
           <div
             className={cn(
@@ -344,6 +364,7 @@ function OverviewMetricCell({
         )}
       </div>
 
+      <div className="relative z-10 flex flex-col flex-1">
       {graphSegments && graphSegments.length > 0 ? (
         <div className="my-3 space-y-2">
           <div className="flex h-2 overflow-hidden rounded-full bg-[#e8edf6] dark:bg-slate-800">
@@ -416,6 +437,7 @@ function OverviewMetricCell({
         <span className="text-[9px] text-slate-500 sm:text-[10px] dark:text-slate-400">
           {title}
         </span>
+      </div>
       </div>
     </div>
   );
@@ -502,8 +524,15 @@ interface TopStatCardProps {
   value: string;
   helper: string;
   accent: "teal" | "emerald" | "amber" | "slate";
-  icon: ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 }
+
+const accentColor: Record<string, string> = {
+  teal: "#14b8a6",
+  emerald: "#10b981",
+  amber: "#f59e0b",
+  slate: "#94a3b8",
+};
 
 function TopStatCard({
   label,
@@ -517,9 +546,34 @@ function TopStatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 backdrop-blur-sm transition-all duration-300 hover:border-slate-300 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 dark:hover:border-slate-700"
+      className="group relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all duration-300"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+      }}
     >
-      <div className="flex items-start justify-between gap-3 sm:gap-4">
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+          `,
+          opacity: 0.45,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
+      {/* Half-bleed icon */}
+      <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
+        <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: accentColor[accent], opacity: 0.12 }}>
+          <Icon className="w-full h-full" strokeWidth={1.5} />
+        </div>
+      </div>
+      <div className="relative z-10">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-500">
             {label}
@@ -531,21 +585,6 @@ function TopStatCard({
           <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
             {helper}
           </p>
-        </div>
-        <div
-          className={cn(
-            "flex shrink-0 size-9 items-center justify-center rounded-lg transition-all duration-300 sm:size-10 sm:rounded-xl md:size-11",
-            accent === "teal" &&
-              "bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300",
-            accent === "emerald" &&
-              "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-            accent === "amber" &&
-              "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
-            accent === "slate" &&
-              "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-          )}
-        >
-          <Icon className="size-4 sm:size-5" />
         </div>
       </div>
     </motion.div>

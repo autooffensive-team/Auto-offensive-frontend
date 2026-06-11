@@ -12,8 +12,8 @@ export default function LiveScanMediumPage() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
-    ? "var(--font-noto-khmer), var(--font-google-sans), sans-serif"
-    : "var(--font-google-sans), var(--font-noto-khmer), sans-serif";
+    ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
+    : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   return (
     <div className="flex min-h-screen bg-white text-black dark:bg-black dark:text-white transition-colors" style={{ fontFamily: bodyFontFamily }}>

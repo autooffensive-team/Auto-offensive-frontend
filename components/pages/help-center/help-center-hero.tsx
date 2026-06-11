@@ -23,8 +23,8 @@ export default function HelpCenterHero() {
   const locale = useLocale();
   const isKhmer = locale === "km";
   const titleFontFamily = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-noto-khmer), sans-serif'
-    : "var(--font-hackdaddy), var(--font-noto-khmer), sans-serif";
+    ? 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif'
+    : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const titleLineHeight = isKhmer ? 1.2 : 1;
   const titleLetterSpacing = isKhmer ? "0" : "-0.03em";
 

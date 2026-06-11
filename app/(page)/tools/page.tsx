@@ -5,6 +5,8 @@ import { motion, cubicBezier } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/theme-provider';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 import {
   fetchCategories,
   type Category,
@@ -395,12 +397,14 @@ const ToolCard = memo(function ToolCard({
   primaryCta,
   descriptionTextClass,
   subtitleTextClass,
+  onTryForFree,
 }: {
   tool: Tool;
   p: PaletteEntry;
   primaryCta: string;
   descriptionTextClass: string;
   subtitleTextClass: string;
+  onTryForFree: (toolId: string) => void;
 }) {
   const presets = tool.scan_config?.basic?.presets ?? [];
   const mediumCount = tool.scan_config?.medium?.options?.length ?? 0;
@@ -489,12 +493,16 @@ const ToolCard = memo(function ToolCard({
 
       {/* CTA footer */}
       <div className="px-6 py-4 border-t border-black/9 dark:border-white/9 bg-[#FAFAF9] dark:bg-[#0E0E10]">
-        <a href="#" className={`${p.cta} text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all`}>
+        <button
+          type="button"
+          onClick={() => onTryForFree(tool.tool_id)}
+          className={`${p.cta} text-sm font-semibold inline-flex items-center gap-1.5 group-hover:gap-3 transition-all`}
+        >
           {primaryCta}
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        </a>
+        </button>
       </div>
     </motion.div>
   );
@@ -511,6 +519,7 @@ const CategorySection = memo(function CategorySection({
   primaryCta,
   descriptionTextClass,
   subtitleTextClass,
+  onTryForFree,
 }: {
   category: Category;
   tools: Tool[];
@@ -519,6 +528,7 @@ const CategorySection = memo(function CategorySection({
   primaryCta: string;
   descriptionTextClass: string;
   subtitleTextClass: string;
+  onTryForFree: (toolId: string) => void;
 }) {
   const { ref, isInView } = useInView();
   const sectionId = `${category.name.toLowerCase().replace(/\s+/g, '-')}-section`;
@@ -623,6 +633,7 @@ const CategorySection = memo(function CategorySection({
               primaryCta={primaryCta}
               descriptionTextClass={descriptionTextClass}
               subtitleTextClass={subtitleTextClass}
+              onTryForFree={onTryForFree}
             />
           ))}
         </motion.div>
@@ -749,8 +760,8 @@ export default function ToolsPage() {
 
   const isKhmer = locale === 'km';
   const bodyFontFamily = isKhmer
-    ? 'var(--font-noto-khmer), sans-serif'
-    : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
+    ? 'var(--font-kantumruy-pro), sans-serif'
+    : 'var(--font-google-sans), var(--font-kantumruy-pro), sans-serif';
   const descriptionTextClass = 'text-[16px] md:text-[18px] lg:text-[20px]';
   const subtitleTextClass = 'text-[16px] md:text-[17px] lg:text-[18px]';
 
@@ -782,6 +793,22 @@ export default function ToolsPage() {
       ? 'linear-gradient(to bottom, transparent, rgba(9,9,11,0.85))'
       : 'linear-gradient(to bottom, transparent, rgba(247,245,240,0.9))',
   }), [isDark]);
+
+  // ── Auth-aware "Try for Free" handler ────────────────────────────────────
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
+  const handleTryForFree = useCallback((toolId: string) => {
+    const scanPath = `/userdashboard/scan?tool=${encodeURIComponent(toolId)}`;
+    if (session) {
+      // Logged-in user → go to authenticated scan page with tool pre-selected
+      router.push(scanPath);
+    } else {
+      // No session — create a guest session on the fly and land on the scan page
+      // /api/guest/start sets the cookie then redirects to the given path
+      router.push(`/api/guest/start?redirect=${encodeURIComponent(scanPath)}`);
+    }
+  }, [session, router]);
 
   return (
     <motion.div
@@ -906,6 +933,7 @@ export default function ToolsPage() {
           primaryCta={t('primaryCta')}
           descriptionTextClass={descriptionTextClass}
           subtitleTextClass={subtitleTextClass}
+          onTryForFree={handleTryForFree}
         />
       ))}
     </motion.div>
