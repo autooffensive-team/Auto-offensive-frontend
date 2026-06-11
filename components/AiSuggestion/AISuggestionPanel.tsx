@@ -897,23 +897,13 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Switch to a mode.
-  // On first click: check backend for an existing result first.
-  // Only calls POST /generate if no saved suggestion exists yet (404).
+  // Called only from the explicit "Generate" button.
+  // generateSuggestion handles 409 (already exists) by fetching the saved result.
   const handleGenerate = async (mode: Mode) => {
-    setActiveMode(mode);
     setError(null);
-    // Already in local state — display immediately.
-    if (results[mode]) return;
+    if (results[mode]) return; // Already in local state — nothing to do.
     setLoading(true);
     try {
-      // 1. Try fetching the already-saved result from the backend.
-      const existing = await fetchSuggestionByJob(jobId, mode).catch(() => null);
-      if (existing) {
-        setResults((prev) => ({ ...prev, [mode]: existing }));
-        return;
-      }
-      // 2. No saved result — generate a new one (one-time per job+mode).
       const data = await generateSuggestion(jobId, mode);
       setResults((prev) => ({ ...prev, [mode]: data }));
     } catch (err) {
@@ -923,7 +913,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
-  // Re-fetch a saved suggestion by (job_id, mode) — no new LLM call.
+  // Called only from the explicit Re-fetch button — no LLM call.
   const handleRefetchByJob = async (job_id: string, mode: Mode) => {
     setError(null);
     setLoading(true);
@@ -937,16 +927,11 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
     }
   };
 
-  // Retry after an error: check if a result was saved before attempting a new generation.
+  // Called only from the explicit "Retry" button after an error.
   const handleRetry = async (mode: Mode) => {
     setError(null);
     setLoading(true);
     try {
-      const existing = await fetchSuggestionByJob(jobId, mode).catch(() => null);
-      if (existing) {
-        setResults((prev) => ({ ...prev, [mode]: existing }));
-        return;
-      }
       const data = await generateSuggestion(jobId, mode);
       setResults((prev) => ({ ...prev, [mode]: data }));
     } catch (err) {
@@ -1038,7 +1023,7 @@ export default function AISuggestionPanel({ jobId }: AISuggestionPanelProps) {
             <button
               key={m}
               className={`ai-mode-tab${activeMode === m ? " active" : ""}`}
-              onClick={() => handleGenerate(m)}
+              onClick={() => setActiveMode(m)}
             >
               {m === "analysis" ? <AnalystIcon /> : <BulbIcon />}
               {m === "analysis" ? "Analyst" : "Suggestion"}
