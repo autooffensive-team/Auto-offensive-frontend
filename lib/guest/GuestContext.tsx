@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { GUEST_ALLOWED_SCAN_MODES } from "./guest-config";
+import { GUEST_ALLOWED_SCAN_MODES, GUEST_MAX_SCANS } from "./guest-config";
 
 type GuestSessionState = {
   isGuest: boolean;
@@ -52,6 +52,7 @@ const LOCKED_FEATURES = new Set([
 ]);
 
 const GUEST_SCAN_STORAGE_KEY = "guest_scan_state";
+const GUEST_SCAN_STORAGE_VERSION = 2; // Bump version to invalidate old data
 
 type PersistedGuestState = {
   scansUsed: number;
@@ -60,6 +61,7 @@ type PersistedGuestState = {
   limitReached: boolean;
   resetAt: number | null;
   savedAt: number;
+  version?: number;
 };
 
 function loadPersistedState(): Partial<PersistedGuestState> | null {
@@ -68,6 +70,14 @@ function loadPersistedState(): Partial<PersistedGuestState> | null {
     const raw = localStorage.getItem(GUEST_SCAN_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as PersistedGuestState;
+    
+    // Clear data if version mismatch (migration) or if it's stale
+    const storedVersion = parsed.version ?? 1;
+    if (storedVersion !== GUEST_SCAN_STORAGE_VERSION) {
+      localStorage.removeItem(GUEST_SCAN_STORAGE_KEY);
+      return null;
+    }
+    
     // Expire persisted state after 24 hours
     if (Date.now() - parsed.savedAt > 24 * 60 * 60 * 1000) {
       localStorage.removeItem(GUEST_SCAN_STORAGE_KEY);
@@ -89,6 +99,7 @@ function persistState(state: GuestSessionState) {
       limitReached: state.limitReached,
       resetAt: state.resetAt,
       savedAt: Date.now(),
+      version: GUEST_SCAN_STORAGE_VERSION,
     };
     localStorage.setItem(GUEST_SCAN_STORAGE_KEY, JSON.stringify(toSave));
   } catch { /* ignore quota errors */ }
@@ -99,8 +110,8 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     isGuest: true,
     sessionId: null,
     scansUsed: 0,
-    scansRemaining: 20,
-    maxScans: 20,
+    scansRemaining: GUEST_MAX_SCANS,
+    maxScans: GUEST_MAX_SCANS,
     resetAt: null,
     limitReached: false,
     loading: true,

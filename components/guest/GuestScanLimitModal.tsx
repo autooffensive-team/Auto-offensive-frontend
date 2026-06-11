@@ -56,7 +56,7 @@ export function GuestScanLimitModal({ isOpen, onClose }: GuestScanLimitModalProp
 
                 {/* Description */}
                 <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
-                  You&apos;ve used all 3 free guest scans. Create a free account to get
+                  You&apos;ve used all 5 free guest scans. Create a free account to get
                   unlimited scans, access to advanced tools, saved scan history, and
                   detailed vulnerability reports.
                 </p>
