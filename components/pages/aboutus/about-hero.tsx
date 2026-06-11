@@ -35,7 +35,7 @@ export default function AboutHero() {
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-hanuman), var(--font-kantumruy-pro), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
   const titleLineHeight = isKhmer ? 1.2 : 1.08;
   const titleTracking = isKhmer ? "-0.02em" : "-0.04em";

@@ -199,7 +199,7 @@ export default function TeamAndFooter() {
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), monospace"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
 
   const copy = isKhmer
@@ -403,7 +403,7 @@ export default function TeamAndFooter() {
         <div className="relative z-10 w-full h-px bg-linear-to-r from-transparent via-[rgba(0,208,177,0.45)] to-transparent" />
 
         <div className="relative z-10 tf-intro px-[6%] pt-23 pb-10 text-center overflow-hidden">
-          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace" }} ref={heroTitleRef}>
+          <h2 className="text-[clamp(2rem,3.6vw,3.2rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0a1f1a] dark:text-white mb-[0.9rem]" style={{ fontFamily: titleFont }} ref={heroTitleRef}>
             {copy.heroLine1}<br />
             {copy.heroLine2Lead}{" "}
             <FocusWord startAnimation={heroAnimStarted}>
@@ -415,7 +415,7 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-6 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace" }} ref={mentorsTitleRef}>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }} ref={mentorsTitleRef}>
               {copy.mentorsLead}{" "}
               <FocusWord startAnimation={mentorsAnimStarted}>
                 <em className="text-primary not-italic">{copy.mentorsAccent}</em>
@@ -454,7 +454,7 @@ export default function TeamAndFooter() {
 
         <div className="relative z-10 px-[6%] pt-2 pb-3">
           <div className="mb-4">
-            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace" }} ref={teamTitleRef}>
+            <h2 className="text-[clamp(1.5rem,2.4vw,2.1rem)] font-bold tracking-[-0.03em] text-[#0a1f1a] dark:text-white mb-[0.35rem]" style={{ fontFamily: titleFont }} ref={teamTitleRef}>
               {copy.teamLead}{" "}
               <FocusWord startAnimation={teamAnimStarted}>
                 <em className="text-primary not-italic">{copy.teamAccent}</em>

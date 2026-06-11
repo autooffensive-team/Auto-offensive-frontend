@@ -384,7 +384,7 @@
         ? "font-[var(--font-kantumruy-pro),sans-serif]"
         : "font-[var(--font-google-sans),var(--font-kantumruy-pro),sans-serif]";
     const titleFontFamily = isKhmer
-      ? 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif'
+      ? 'var(--font-hanuman), sans-serif'
       : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
     const titleLineHeight = isKhmer ? 1.2 : 1.08;
     const titleLetterSpacing = isKhmer ? "0" : "-0.02em";

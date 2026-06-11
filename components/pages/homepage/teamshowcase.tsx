@@ -14,7 +14,7 @@ export default function TeamShowcase() {
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const imageRef = useRef<HTMLDivElement>(null);
 

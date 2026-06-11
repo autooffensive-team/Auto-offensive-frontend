@@ -12,7 +12,7 @@ export default function AiBanner() {
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const [hasEnteredView, setHasEnteredView] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);

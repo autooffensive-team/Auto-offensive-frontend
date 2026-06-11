@@ -544,6 +544,8 @@ function ProgressBar({ widthPct }: { widthPct: number }) {
 
 function Ticker({ colors }: { colors: typeof CONFIG.DARK }) {
   const locale = useLocale();
+  const displayFontFamily =
+    locale === "km" ? "var(--font-hanuman), sans-serif" : "var(--font-hackdaddy), sans-serif";
   const items = locale === "km" ? TICKER_ITEMS : EN_TICKER_ITEMS;
   const doubled = [...items, ...items];
   return (
@@ -563,7 +565,7 @@ function Ticker({ colors }: { colors: typeof CONFIG.DARK }) {
             key={i}
             className="flex items-center gap-5 px-8 whitespace-nowrap"
             style={{
-              fontFamily: "var(--font-hackdaddy), sans-serif",
+              fontFamily: displayFontFamily,
               color: colors.textMuted,
               fontSize: FONT_SIZES.xs.desktop,
               letterSpacing: "0.15em",
@@ -607,7 +609,7 @@ function CardRow({
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const labelFontFamily = isKhmer
     ? "var(--font-kantumruy-pro), sans-serif"
@@ -850,7 +852,7 @@ export default function Features() {
     .replace(/\s*(Auto Offensive|Reffensive)\s*$/i, "")
     .trim();
   const displayFontFamily = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
   const cards = locale === "km" ? CARDS : EN_CARDS;
   // FIX: scrollPct is now used by ProgressBar

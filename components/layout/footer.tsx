@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebook, FaLinkedin, FaTelegram, FaYoutube } from "@/components/icons/social-icons";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const socialLinks = [
   { icon: FaFacebook,  href: "https://www.facebook.com/share/1DMqBN53KR/?mibextid=wwXIfr", label: "Facebook",  color: "hover:bg-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_0_4px_rgba(24,119,242,0.2)]" },
@@ -14,6 +14,9 @@ const socialLinks = [
 
 export function Footer() {
   const t = useTranslations('footer');
+  const locale = useLocale();
+  const displayFontFamily =
+    locale === "km" ? "var(--font-hanuman), sans-serif" : "var(--font-hackdaddy), monospace";
 
   const DOCS_HOST = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
   const toDocsUrl = (path: string) => `${DOCS_HOST}/docs/${path.replace(/^\//, '')}`;
@@ -52,7 +55,7 @@ export function Footer() {
         <h1
           className="font-black tracking-tighter whitespace-nowrap"
           style={{
-            fontFamily: "var(--font-hackdaddy), monospace",
+            fontFamily: displayFontFamily,
             fontSize: "clamp(2rem, 12vw, 15rem)",
             transform: "translateY(25%)",
             background:

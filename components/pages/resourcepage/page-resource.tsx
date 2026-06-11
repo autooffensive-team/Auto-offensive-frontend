@@ -119,15 +119,15 @@ export default function ResourceComponent() {
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   const displayFontFamily = isKhmer
-    ? 'var(--font-kantumruy-pro), "Kantumruy Pro", sans-serif'
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
 
   const heroTitleFontFamily = isKhmer
-    ? 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif'
+    ? 'var(--font-hanuman), sans-serif'
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
 
   const featureTitleFontFamily = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
 
   /* ── Hero bg computed styles ── */

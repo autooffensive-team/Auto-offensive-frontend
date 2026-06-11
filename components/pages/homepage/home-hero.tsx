@@ -775,7 +775,7 @@ export default function HomeHero() {
                             {index < array.length - 1 ? (
                               <span
                                 style={{
-                                  fontFamily: 'var(--font-hanuman), "Hanuman", var(--font-kantumruy-pro), sans-serif',
+                                  fontFamily: "var(--font-hanuman), sans-serif",
                                   fontWeight: 800,
                                 }}
                               >

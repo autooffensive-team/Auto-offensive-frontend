@@ -378,7 +378,7 @@ const ThreeCards: React.FC = () => {
       : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const displayFontFamily =
     locale === "km"
-      ? "var(--font-kantumruy-pro), var(--font-hackdaddy), sans-serif"
+      ? "var(--font-hanuman), sans-serif"
       : "var(--font-hackdaddy), var(--font-kantumruy-pro), sans-serif";
 
   const cards = getCards(t);

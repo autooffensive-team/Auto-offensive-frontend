@@ -75,7 +75,7 @@ export default function Values() {
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
     : "var(--font-google-sans), var(--font-kantumruy-pro), sans-serif";
   const titleFont = isKhmer
-    ? "var(--font-kantumruy-pro), var(--font-hackdaddy), monospace"
+    ? "var(--font-hanuman), sans-serif"
     : "var(--font-hackdaddy), var(--font-kantumruy-pro), monospace";
 
   const ui = isKhmer
