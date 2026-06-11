@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaFacebook, FaLinkedin, FaTelegram, FaYoutube } from "@/components/icons/social-icons";
 import { useTranslations } from "next-intl";
+import { useTheme } from "../theme-provider";
 
 const socialLinks = [
   { icon: FaFacebook,  href: "https://www.facebook.com/share/1DMqBN53KR/?mibextid=wwXIfr", label: "Facebook",  color: "hover:bg-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_0_4px_rgba(24,119,242,0.2)]" },
@@ -13,7 +14,18 @@ const socialLinks = [
 ];
 
 export function Footer() {
-  const t = useTranslations("footer");
+  const t = useTranslations('footer');
+  const { resolvedTheme } = useTheme();
+
+  const DOCS_HOST = (process.env.NEXT_PUBLIC_DOCS_APP_URL || '').replace(/\/$/, '');
+  const toDocsUrl = (path: string) => `${DOCS_HOST}/docs/${path.replace(/^\//, '')}`;
+
+  const logoSrc =
+    resolvedTheme === "dark"
+      ? "/Auto_Offensive_Dark-mode.png"
+      : "/Auto_Offensive_Light-mode.png";
+
+  const istadLogoSrc = resolvedTheme === "dark" ? "/istad-logo-white.png" : "/istad_logo.png";
 
   return (
     <footer suppressHydrationWarning className="relative mt-auto w-full overflow-hidden border-t border-zinc-200 bg-white text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
@@ -254,38 +266,25 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Overview
+                <a href={toDocsUrl('/')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Introduction
                 </a>
               </li>
               <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Scanning
+                <a href={toDocsUrl('/scanning')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Platform Features
                 </a>
               </li>
               <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  Dashboard &amp; Analytics
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  REST API
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  CLI Reference
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-zinc-600 transition-colors duration-150 hover:text-black dark:text-zinc-400 dark:hover:text-white">
-                  CI/CD Integration
+                <a href={toDocsUrl('/api')} className="text-base text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-150">
+                  Developer Reference
                 </a>
               </li>
             </ul>
           </div>
 
+
+          {/* Company */}
           <div>
             <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
               {t("company")}

@@ -46,7 +46,8 @@ type ResourceItem = {
   title: string;
   description?: string;
   href: string;
-  icon: string;
+  icon?: string;
+  subLinks?: { title: string; href: string; icon?: string }[];
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
@@ -76,6 +77,35 @@ const featureLinks: FeatureItem[] = [
 
 const resourceDocLinks: ResourceItem[] = [
   { title: 'Document', description: ' All documentation for the platform', href: toDocsUrl('/getting-started'), icon: '/icons/res-cli.webp' },
+  { 
+      title: 'Introduction', 
+      href: toDocsUrl('/getting-started'),
+      subLinks: [
+          { title: 'Getting Started', href: toDocsUrl('/getting-started') },
+      ]
+  },
+  { 
+      title: 'Platform Features', 
+      href: toDocsUrl('/scanning'),
+      subLinks: [
+          { title: 'Scanning', href: toDocsUrl('/scanning') },
+          { title: 'AI Analysis', href: toDocsUrl('/ai-analysis') },
+          { title: 'Code Scanning(SAST)', href: toDocsUrl('/code-scanning') },
+          { title: 'Reports', href: toDocsUrl('/reports') },
+          { title: 'Dashboard & Analysis', href: toDocsUrl('/dashboard') },
+
+      ]
+  },
+  { 
+      title: 'Developer Reference', 
+      href: toDocsUrl('/tools'),
+      subLinks: [
+          { title: 'REST API', href: toDocsUrl('/api') },
+          { title: 'CLI Reference', href: toDocsUrl('/cli')},
+          { title: 'CI/CD Integration', href: toDocsUrl('/ci-cd')},
+          { title: 'Tool Tactics', href: toDocsUrl('/tools') },
+      ]
+  },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
@@ -296,36 +326,113 @@ function ResourceDocItem({
   description,
   href,
   icon,
+  subLinks,
   onClick,
   asMenuLink = false,
-}: ResourceItem & { asMenuLink?: boolean }) {
-  const content = (
-    <a
+  isMobile = false,
+  expandedItem,
+  setExpandedItem,
+}: ResourceItem & { asMenuLink?: boolean; isMobile?: boolean; expandedItem?: string; setExpandedItem?: (val: string) => void }) {
+  const isSubItem = !icon;
+  const linkContent = (
+    <Link
       href={href}
       onClick={onClick}
-      className="flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
+      className={cn(
+        "flex items-start gap-2.5 rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group",
+        isSubItem && "ml-[48px] py-1.5 -mt-1.5"
+      )}
     >
-      <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
-        <Image
-          src={icon}
-          alt={title}
-          width={26}
-          height={26}
-          className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
-        />
-      </div>
+      {!isSubItem && icon && (
+        <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
+          <Image
+            src={icon}
+            alt={title}
+            width={26}
+            height={26}
+            className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
+          />
+        </div>
+      )}
       <div>
-        <p className="text-[12.5px] font-semibold text-foreground leading-snug">
+        <p className={cn(
+          "leading-snug transition-colors",
+          isSubItem 
+              ? "text-[12px] font-medium text-muted-foreground group-hover:text-primary relative before:absolute before:content-[''] before:w-1 before:h-1 before:rounded-full before:bg-muted-foreground/40 before:-left-3.5 before:top-1.5" 
+              : "text-[12.5px] font-semibold text-foreground"
+        )}>
           {title}
         </p>
         {description && (
           <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{description}</p>
         )}
       </div>
-    </a>
+    </Link>
   );
 
-  return asMenuLink ? <NavigationMenuLink asChild>{content}</NavigationMenuLink> : content;
+  if (isMobile && subLinks && subLinks.length > 0) {
+    const isOpen = expandedItem === title;
+    return (
+      <details className="group/details" open={isOpen}>
+        <summary 
+          className={cn(
+            "flex items-center justify-between cursor-pointer list-none rounded-[8px] p-2 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group",
+            isSubItem && "ml-[48px] py-1.5 -mt-1.5"
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            if (setExpandedItem) {
+              setExpandedItem(isOpen ? '' : title);
+            }
+          }}
+        >
+          <div className="flex items-start gap-2.5">
+            {!isSubItem && icon && (
+              <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
+                <Image src={icon} alt={title} width={26} height={26} className="h-6.5 w-6.5 object-contain md:h-7 md:w-7" />
+              </div>
+            )}
+            <div>
+              <p className={cn(
+                "leading-snug transition-colors",
+                isSubItem 
+                    ? "text-[12px] font-medium text-muted-foreground group-hover:text-primary relative before:absolute before:content-[''] before:w-1 before:h-1 before:rounded-full before:bg-muted-foreground/40 before:-left-3.5 before:top-1.5" 
+                    : "text-[12.5px] font-semibold text-foreground"
+              )}>
+                {title}
+              </p>
+            </div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("opacity-50 transition-transform", isOpen && "rotate-180")}>
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </summary>
+        <div className="flex flex-col gap-1 border-l border-black/10 dark:border-white/10 ml-[58px] mb-2 pl-3">
+          {subLinks.map((sub, idx) => (
+            <Link 
+              key={idx} 
+              href={sub.href} 
+              onClick={onClick} 
+              className="flex items-center gap-2 text-[11.5px] text-muted-foreground hover:text-primary transition-colors py-1 group/sublink"
+            >
+              {sub.icon && (
+                <Image 
+                  src={sub.icon} 
+                  alt={sub.title} 
+                  width={16} 
+                  height={16} 
+                  className="h-4 w-4 object-contain opacity-70 group-hover/sublink:opacity-100 transition-opacity" 
+                />
+              )}
+              {sub.title}
+            </Link>
+          ))}
+        </div>
+      </details>
+    );
+  }
+
+  return asMenuLink ? <NavigationMenuLink asChild>{linkContent}</NavigationMenuLink> : linkContent;
 }
 
 // ── Resource Misc Item ────────────────────────────────────────────────────────
@@ -342,15 +449,17 @@ function ResourceMiscItem({
       onClick={onClick}
       className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 hover:bg-[#F7F5F0] dark:hover:bg-[#1C1C1A] transition-colors group"
     >
-      <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
-        <Image
-          src={icon}
-          alt={title}
-          width={26}
-          height={26}
-          className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
-        />
-      </div>
+      {icon && (
+        <div className={cn(iconBoxCls, 'size-10 md:size-11')}>
+          <Image
+            src={icon}
+            alt={title}
+            width={26}
+            height={26}
+            className="h-6.5 w-6.5 object-contain md:h-7 md:w-7"
+          />
+        </div>
+      )}
       <span className="text-[12.5px] font-medium text-foreground">{title}</span>
     </Link>
   );
@@ -452,9 +561,11 @@ export function Header() {
     ? 'var(--font-noto-khmer), var(--font-google-sans), sans-serif'
     : 'var(--font-google-sans), var(--font-noto-khmer), sans-serif';
   const [open, setOpen] = React.useState(false);
+  const [expandedMobileItem, setExpandedMobileItem] = React.useState<string>('');
   const scrolled = useScroll(10);
 
   React.useEffect(() => {
+    if (!open) setExpandedMobileItem('');
     if (open) {
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
@@ -766,7 +877,14 @@ export function Header() {
           </div>
           <div className="grid grid-cols-1 gap-0.5">
             {resourceDocLinks.map((link, i) => (
-              <ResourceDocItem key={i} {...link} onClick={() => setOpen(false)} />
+              <ResourceDocItem 
+                key={i} 
+                {...link} 
+                onClick={() => setOpen(false)} 
+                isMobile={true} 
+                expandedItem={expandedMobileItem}
+                setExpandedItem={setExpandedMobileItem}
+              />
             ))}
             {resourceMiscLinks.map((link, i) => (
               <ResourceMiscItem key={i} {...link} onClick={() => setOpen(false)} />
