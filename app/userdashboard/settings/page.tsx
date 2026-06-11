@@ -39,25 +39,28 @@ function StatChip({
   variant?: "default" | "active" | "revoked";
 }) {
   const styles = {
-    default: "text-gray-900 dark:text-white border-gray-200 dark:border-white/10 bg-white dark:bg-white/5",
+    default:
+      "border-gray-200 bg-white text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
     active:
-      "text-[#00D0B2] border-[#00D0B2]/30 bg-[#00D0B2]/6",
+      "border-gray-200 bg-white text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
     revoked:
-      "text-gray-400 dark:text-gray-500 border-gray-200 dark:border-white/8 bg-gray-50 dark:bg-white/4",
+      "border-gray-200 bg-gray-50 text-gray-500 shadow-sm dark:border-white/10 dark:bg-white/4 dark:text-gray-500",
   };
 
   return (
     <div
-      className={`flex items-baseline gap-2 px-3.5 py-2 border text-sm ${styles[variant]}`}
-      style={{
-        clipPath:
-          "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
-      }}
+      className={`relative overflow-hidden rounded-xl border px-4 py-3 text-base lg:text-lg ${styles[variant]}`}
     >
-      <span className="text-[22px] font-bold leading-none tabular-nums">{value}</span>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">
-        {label}
-      </span>
+      <div className="flex items-end justify-between gap-4 pl-2">
+        <div className="min-w-0">
+          <span className="block text-[11px] lg:text-xs font-semibold uppercase tracking-[0.22em] opacity-70">
+            {label}
+          </span>
+          <span className="mt-1 block text-[28px] lg:text-[32px] font-bold leading-none tabular-nums">
+            {value}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -85,17 +88,17 @@ function EmptyKeys({ onAdd }: { onAdd: () => void }) {
       >
         <KeyRound size={22} className="text-[#00D0B2]/70" />
       </div>
-      <p className="text-[16px] font-semibold text-gray-900 dark:text-white">
+      <p className="text-xl lg:text-2xl font-semibold text-gray-900 dark:text-white">
         No API keys yet
       </p>
-      <p className="mt-2 text-[13px] text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
+      <p className="mt-2 text-sm lg:text-base text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
         Generate a key to authenticate CI/CD pipelines, scripts, and integrations with this project.
       </p>
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
         onClick={onAdd}
-        className="mt-6 flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-gray-900 bg-[#00D0B2] hover:bg-[#00b89e] transition-colors shadow-sm shadow-[#00D0B2]/20 rounded-xl"
+        className="mt-6 flex items-center gap-2 px-4 py-2.5 text-base lg:text-[16px] font-bold text-gray-900 bg-[#00D0B2] hover:bg-[#00b89e] transition-colors shadow-sm shadow-[#00D0B2]/20 rounded-xl"
       >
         <Plus size={14} />
         Generate First Key
@@ -115,10 +118,10 @@ function NoProjectPrompt() {
       className="py-12 flex flex-col items-center text-center"
     >
       <FolderGit2 size={28} className="text-gray-300 dark:text-gray-700 mb-3" />
-      <p className="text-[14px] font-semibold text-gray-500 dark:text-gray-400">
+      <p className="text-lg lg:text-xl font-semibold text-gray-500 dark:text-gray-400">
         No projects found
       </p>
-      <p className="mt-1 text-[12px] text-gray-400 dark:text-gray-600">
+      <p className="mt-1 text-sm lg:text-base text-gray-400 dark:text-gray-600">
         Create a project first, then manage its API keys here.
       </p>
     </motion.div>
@@ -178,10 +181,10 @@ export default function ApiKeysPage() {
               Account / API Access
             </span>
           </div>
-          <h1 className="text-[28px] sm:text-[32px] font-bold text-gray-900 dark:text-white leading-none tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-none tracking-tight">
             API Keys
           </h1>
-          <p className="mt-2 text-sm sm:text-[15px] md:text-[17px] text-gray-500 dark:text-gray-400 leading-relaxed">
+          <p className="mt-2 text-base sm:text-lg lg:text-xl text-gray-500 dark:text-gray-400 leading-relaxed">
             Authenticate CI/CD pipelines and integrations · Keys are scoped per project
           </p>
         </div>
@@ -212,7 +215,7 @@ export default function ApiKeysPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowCreateModal(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold text-gray-900 bg-[#00D0B2] hover:bg-[#00b89e] transition-colors shadow-sm shadow-[#00D0B2]/25 rounded-xl"
+                  className="flex items-center gap-2 px-4 py-2.5 text-base lg:text-[16px] font-bold text-gray-900 bg-[#00D0B2] hover:bg-[#00b89e] transition-colors shadow-sm shadow-[#00D0B2]/25 rounded-xl"
                 >
                   <Plus size={15} />
                   New Key
@@ -271,10 +274,10 @@ export default function ApiKeysPage() {
                   <FolderGit2 size={13} className="text-[#00D0B2]" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-semibold text-gray-900 dark:text-white">
+                  <p className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">
                     Project scope
                   </p>
-                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">
                     Keys belong to one project
                   </p>
                 </div>
@@ -299,7 +302,7 @@ export default function ApiKeysPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="px-4 py-3.5 rounded-xl border border-dashed border-gray-200 dark:border-white/8 text-[12px] text-gray-400 dark:text-gray-500 leading-relaxed space-y-2"
+            className="px-4 py-3.5 rounded-xl border border-dashed border-gray-200 dark:border-white/8 text-sm lg:text-base text-gray-400 dark:text-gray-500 leading-relaxed space-y-2"
             >
               <p className="flex items-center gap-2">
                 <Zap size={11} className="text-[#00D0B2] shrink-0" />
@@ -376,7 +379,7 @@ export default function ApiKeysPage() {
                   >
                     <button
                       onClick={() => setShowRevoked((v) => !v)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/25 transition-all rounded-lg"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm lg:text-[16px] font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/25 transition-all rounded-lg"
                     >
                       {showRevoked ? <EyeOff size={12} /> : <Eye size={12} />}
                       {showRevoked
@@ -393,7 +396,7 @@ export default function ApiKeysPage() {
                       size={20}
                       className="animate-spin text-[#00D0B2]"
                     />
-                    <p className="text-[13px] text-gray-500 dark:text-gray-400">
+                    <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">
                       Loading API keys…
                     </p>
                   </div>
@@ -402,7 +405,7 @@ export default function ApiKeysPage() {
                 {/* Error */}
                 {keysError && !keysLoading && (
                   <div
-                    className="flex items-center justify-between gap-3 px-4 py-3 text-[13px]"
+                    className="flex items-center justify-between gap-3 px-4 py-3 text-sm lg:text-base"
                     style={{
                       clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
                       background: "rgba(239,68,68,0.06)",
@@ -416,7 +419,7 @@ export default function ApiKeysPage() {
                     <button
                       onClick={() => refetchKeys()}
                       disabled={keysFetching}
-                      className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-red-600 dark:text-red-400 border border-red-300 dark:border-red-500/30 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
+                      className="flex items-center gap-1.5 px-2.5 py-1 text-sm lg:text-base font-semibold text-red-600 dark:text-red-400 border border-red-300 dark:border-red-500/30 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
                     >
                       <RefreshCw size={10} className={keysFetching ? "animate-spin" : ""} />
                       Retry
@@ -449,7 +452,7 @@ export default function ApiKeysPage() {
                       <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center text-[11px] text-gray-400 dark:text-gray-600 flex items-center justify-center gap-1.5"
+                        className="text-center text-sm lg:text-base text-gray-400 dark:text-gray-600 flex items-center justify-center gap-1.5"
                       >
                         <ShieldOff size={11} />
                         {revokedKeys.length} revoked{" "}

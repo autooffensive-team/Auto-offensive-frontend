@@ -404,18 +404,18 @@ export default function ScanPage() {
 
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
-              <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+              <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
+              <p className="mt-1 sm:mt-1.5 text-sm sm:text-base lg:text-xl text-gray-500 dark:text-gray-400 leading-relaxed">
                 {isGuest ? (
                   <>
-                    Launch Basic, Medium, or Advanced scans and watch live logs as they run.
+                    Start Basic, Medium, or Advanced scans and monitor live execution logs in real time.
                     <span className="ml-2 inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
                       <Lock size={10} />
                       Limited to {maxScans} scans in guest mode
                     </span>
                   </>
                 ) : (
-                  "Launch Basic, Medium, or Advanced scans and watch live logs as they run."
+                  "Start Basic, Medium, or Advanced scans and monitor live execution logs in real time."
                 )}
               </p>
             </div>

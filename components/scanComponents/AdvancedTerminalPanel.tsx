@@ -1005,7 +1005,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-center min-w-0">
                 <span className="status-dot h-2 w-2 rounded-full shrink-0 inline-block" style={{ backgroundColor: themeAccent.at(0.8) }} />
-                <span className="font-(family-name:--font-fira-code) text-[10px] sm:text-xs font-semibold tracking-wider truncate" style={{ color: themeAccent.at(1) }}>
+                <span className="font-(family-name:--font-fira-code) text-xs lg:text-sm font-semibold tracking-wider truncate" style={{ color: themeAccent.at(1) }}>
                   {isMobile
                     ? (selectedProject ? `${selectedProject.name}` : "auto-offensive")
                     : (selectedProject ? `${selectedProject.name}@auto-offensive` : "auto-offensive")} :: ADVANCED_SCAN
@@ -1015,7 +1015,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
             <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {isSubmitting && (
                 <span
-                  className="rounded-md px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold flex items-center gap-1.5"
+                  className="rounded-md px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold flex items-center gap-1.5"
                   style={{
                     border: `1px solid ${themeAccent.at(0.4)}`,
                     backgroundColor: themeAccent.at(0.1),
@@ -1032,7 +1032,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={() => setShowSettings((v) => !v)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold transition-all duration-200"
                 style={{
                   borderColor: showSettings ? themeAccent.at(0.7) : themeAccent.at(0.3),
                   backgroundColor: showSettings ? themeAccent.at(0.2) : "rgba(0,0,0,0.6)",
@@ -1051,7 +1051,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                 onClick={handleReset}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-2 sm:px-3 py-1 text-[9px] sm:text-xs font-bold transition-all duration-300"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border bg-black/80 px-2 sm:px-3 py-1 text-xs lg:text-sm font-bold transition-all duration-300"
                 style={{ borderColor: themeAccent.at(0.4), color: themeAccent.at(1) }}
               >
                 <RotateCcw size={10} />
@@ -1063,7 +1063,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   onClick={() => setSidebarOpen((v) => !v)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[9px] sm:text-xs font-bold transition-all duration-200"
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs lg:text-sm font-bold transition-all duration-200"
                   style={{
                     borderColor: themeAccent.at(sidebarOpen ? 0.6 : 0.3),
                     backgroundColor: themeAccent.at(sidebarOpen ? 0.15 : 0),
@@ -1082,7 +1082,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative m-3 sm:m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-xs font-(family-name:--font-fira-code)"
+            className="relative m-3 sm:m-4 rounded-lg border-2 border-red-500/60 bg-red-950/40 backdrop-blur p-3 sm:p-4 text-sm lg:text-base font-(family-name:--font-fira-code)"
             style={{ boxShadow: "0 0 15px rgba(255,0,0,0.3)" }}
           >
             <span className="text-red-400 font-bold">⚠ ERROR:</span>{" "}
@@ -1100,7 +1100,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
               className="absolute z-50 right-2 sm:right-4 top-13 bg-black/95 backdrop-blur-md border border-green-500/25 rounded-lg overflow-hidden"
             >
               <div className="px-3 py-1.5 border-b border-green-500/15">
-                <span className="text-[9px] font-(family-name:--font-fira-code) text-green-500/40 tracking-[0.2em] uppercase">Configuration</span>
+                <span className="text-xs lg:text-sm font-(family-name:--font-fira-code) text-green-500/40 tracking-[0.2em] uppercase">Configuration</span>
               </div>
               <div className="px-3 py-2">
                 <LogToolbar
@@ -1224,14 +1224,14 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
 
             <div className="relative z-10">
               <motion.h3
-                className="text-base sm:text-lg font-bold font-(family-name:--font-fira-code) text-red-400 tracking-wider"
+                className="text-lg lg:text-xl font-bold font-(family-name:--font-fira-code) text-red-400 tracking-wider"
                 animate={{ textShadow: ["0 0 10px #ff0000","0 0 20px #ff0000"] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 ⚠ CRITICAL_ACTION
               </motion.h3>
 
-              <p className="mt-3 text-xs sm:text-sm font-(family-name:--font-fira-code) text-red-300/80">
+              <p className="mt-3 text-sm lg:text-base font-(family-name:--font-fira-code) text-red-300/80">
                 Scan termination requested. This operation is{" "}
                 <span className="text-red-400 font-bold animate-pulse">IRREVERSIBLE</span>.
                 <br />
@@ -1244,7 +1244,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   onClick={handleDismissCancel}
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(59,130,246,0.2)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold font-(family-name:--font-fira-code) text-blue-400 transition-all hover:border-blue-500/80"
+                  className="rounded-md border-2 border-blue-500/40 bg-blue-950/30 px-3 sm:px-4 py-2 text-sm lg:text-base font-bold font-(family-name:--font-fira-code) text-blue-400 transition-all hover:border-blue-500/80"
                 >
                   [ABORT]
                 </motion.button>
@@ -1254,7 +1254,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
                   onClick={handleConfirmCancel}
                   whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,0,0,0.5)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold font-(family-name:--font-fira-code) text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
+                  className="rounded-md border-2 border-red-500/80 bg-red-950/40 px-3 sm:px-4 py-2 text-sm lg:text-base font-bold font-(family-name:--font-fira-code) text-red-400 transition-all hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(255,0,0,0.5)]"
                 >
                   [CONFIRM_TERMINATION]
                 </motion.button>

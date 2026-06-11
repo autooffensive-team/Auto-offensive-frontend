@@ -95,7 +95,7 @@ export function BasicScanForm({
                 onChange={(e) => onTargetChange(e.target.value)}
                 placeholder="example.com, https://example.com, 10.0.0.0/24"
                 disabled={disabled}
-                className="font-mono text-sm sm:text-base"
+                className="font-mono text-base lg:text-lg"
               />
             </Field>
           </div>
@@ -183,9 +183,9 @@ export function BasicScanForm({
                 "color-mix(in srgb, var(--color-primary) 55%, transparent)",
             }}
           />
-          <span
-            className="text-xs"
-            style={{
+            <span
+              className="text-sm lg:text-base"
+              style={{
               color:
                 "color-mix(in srgb, var(--color-primary) 55%, transparent)",
             }}
@@ -199,7 +199,7 @@ export function BasicScanForm({
             variant="ghost"
             size="sm"
             onClick={() => setLayout([...DEFAULT_LAYOUT])}
-            className="h-7 gap-1.5 text-xs hover:text-white"
+            className="h-7 gap-1.5 text-sm hover:text-white"
             style={{
               color:
                 "color-mix(in srgb, var(--color-primary) 70%, transparent)",
@@ -385,7 +385,7 @@ function PresetSelector({
         className="rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-100/20 dark:bg-gray-800/20 p-6 text-center"
         role="status"
       >
-        <p className="text-sm sm:text-base text-gray-400 dark:text-gray-500">
+        <p className="text-base lg:text-lg text-gray-400 dark:text-gray-500">
           No presets available for this tool.
         </p>
       </div>
@@ -434,7 +434,7 @@ function PresetSelector({
               )}
               <div className="relative flex items-center justify-between gap-3">
                 <span
-                  className="text-sm sm:text-base font-semibold"
+                  className="text-base lg:text-lg font-semibold"
                   style={{
                     color: isSelected ? "var(--color-primary)" : undefined,
                   }}
@@ -453,7 +453,7 @@ function PresetSelector({
               </div>
 
               {p.description && (
-                <p className="relative mt-1.5 text-xs sm:text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="relative mt-1.5 text-sm lg:text-base leading-relaxed text-gray-500 dark:text-gray-400">
                   {p.description}
                 </p>
               )}
@@ -463,7 +463,7 @@ function PresetSelector({
                   {p.flags.map((flag) => (
                     <code
                       key={flag}
-                      className="rounded px-1.5 py-0.5 font-mono text-xs sm:text-sm"
+                      className="rounded px-1.5 py-0.5 font-mono text-sm lg:text-base"
                       style={{
                         background: isSelected
                           ? "color-mix(in srgb, var(--color-primary) 12%, transparent)"

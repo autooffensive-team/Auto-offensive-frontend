@@ -68,14 +68,14 @@ export function GuestOverview() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4 sm:p-5 dark:border-amber-800/50 dark:from-amber-950/30 dark:to-orange-950/20"
+        className="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50 p-4 sm:p-5 dark:border-amber-800/50 dark:from-amber-950/30 dark:to-orange-950/20"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
               Welcome, Guest
             </h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-base lg:text-xl text-gray-600 dark:text-gray-400">
               You&apos;re using Auto Offensive in guest mode. You have access to Basic,
               Medium, and Advanced scans with a limit of {guest?.maxScans ?? 20} total scans.
               Create a free account to unlock all features.
@@ -96,7 +96,7 @@ export function GuestOverview() {
 
       {/* Quick actions */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <h3 className="mb-3 text-base lg:text-lg font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Quick Actions
         </h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,10 +116,10 @@ export function GuestOverview() {
                     <Lock size={10} className="absolute -right-1 -top-1 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <p className="text-base lg:text-lg font-semibold text-gray-700 dark:text-gray-300">
                       {action.label}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                    <p className="mt-0.5 text-sm lg:text-base text-gray-400 dark:text-gray-500">
                       {action.description}
                     </p>
                   </div>
@@ -142,10 +142,10 @@ export function GuestOverview() {
                     <action.icon size={20} className="text-teal-600 dark:text-teal-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <p className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">
                       {action.label}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-0.5 text-sm lg:text-base text-gray-500 dark:text-gray-400">
                       {action.description}
                     </p>
                   </div>
@@ -198,23 +198,23 @@ export function GuestOverview() {
         transition={{ delay: 0.3 }}
         className="rounded-2xl border border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 p-4 sm:p-5 text-center dark:border-gray-800 dark:from-gray-900 dark:to-slate-900"
       >
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+        <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
           Ready for more?
         </h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-base lg:text-lg text-gray-500 dark:text-gray-400">
           Create a free account to unlock unlimited scans, advanced tools, and full dashboard access.
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/register"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:brightness-105"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-base lg:text-lg font-semibold text-slate-950 transition hover:brightness-105"
           >
             <UserPlus size={16} />
             Create Free Account
           </Link>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-base lg:text-lg font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
           >
             <LogIn size={16} />
             Login
