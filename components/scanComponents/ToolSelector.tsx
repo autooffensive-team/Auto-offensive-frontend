@@ -51,6 +51,7 @@ export function ToolSelector({
             id={id}
             placeholder={isEmpty ? "No tools available" : `Select ${label.toLowerCase()}`}
             showTrigger
+            openOnClick
             className={cn(
               "w-full [&_button[data-slot=combobox-trigger]:hover]:bg-teal-50 dark:[&_button[data-slot=combobox-trigger]:hover]:bg-teal-500/10 [&_button[data-slot=combobox-trigger]:hover]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover]:text-teal-400 [&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-600 dark:[&_button[data-slot=combobox-trigger]:hover_svg]:text-teal-400",
               isEmpty && "text-gray-500 dark:text-gray-400"
@@ -74,8 +75,9 @@ export function ToolSelector({
                   value={tool.tool_id}
                   aria-selected={tool.tool_id === value}
                   className={cn(
-                    "rounded-none border-b border-gray-200/30 dark:border-gray-800/30 last:border-b-0",
-                    index % 2 === 0 ? "bg-gray-100/20 dark:bg-gray-800/20" : "bg-transparent"
+                    "rounded-none border-b border-gray-200/30 dark:border-gray-800/30 last:border-b-0 font-normal data-[selected=true]:font-bold data-[selected=true]:text-black hover:text-black",
+                    index % 2 === 0 ? "bg-gray-100/20 dark:bg-gray-800/20" : "bg-transparent",
+                    "hover:bg-primary/10 data-[selected=true]:bg-primary/12"
                   )}
                 >
                   <div className="flex flex-col items-start gap-0.5 py-0.5">

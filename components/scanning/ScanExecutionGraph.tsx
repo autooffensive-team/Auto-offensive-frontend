@@ -47,6 +47,12 @@ const nodeTypes: NodeTypes = {
     pipeline: PipelineNode,
 };
 
+/** Scales backbone/pipeline coordinates so fitView fills the viewport better. */
+const GRAPH_LAYOUT = {
+    xScale: 0.72,
+    yScale: 1.35,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Inner component (needs ReactFlowProvider context for useReactFlow)
 // ---------------------------------------------------------------------------
@@ -60,7 +66,20 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
     useScanStream(run, logs, errors);
 
     const { fitView } = useReactFlow();
-    const initialFitDone = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const lastPipelineCount = useRef(0);
+
+    const fitGraphToContainer = useCallback(
+        (duration = 300) => {
+            fitView({
+                padding: 0.06,
+                duration,
+                minZoom: 0.4,
+                maxZoom: 2,
+            });
+        },
+        [fitView],
+    );
 
     // Subscribe to raw store state (primitive/reference-stable values)
     const backboneAnimating = useGraphStore((s) => s.backboneAnimating);
@@ -75,7 +94,10 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
         const backbone: Node<BackboneNodeData>[] = BACKBONE_NODES.map((cfg) => ({
             id: cfg.id,
             type: "backbone",
-            position: { x: cfg.x, y: cfg.y },
+            position: {
+                x: cfg.x * GRAPH_LAYOUT.xScale,
+                y: cfg.y * GRAPH_LAYOUT.yScale,
+            },
             data: {
                 label: cfg.label,
                 status: backboneAnimating ? "ACTIVE" : "IDLE",
@@ -85,14 +107,14 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
 
         // Pipeline tools connect to Docker/gVisor — position them below it
         // Docker/gVisor is at x:800, y:0. Tools fan out below.
-        const dockerX = 800;
+        const dockerX = 800 * GRAPH_LAYOUT.xScale;
         const dockerY = 0;
         const pipeline: Node<PipelineNodeData>[] = pipelineNodes.map((pn, index) => ({
             id: pn.nodeConfig.id,
             type: "pipeline",
             position: {
-                x: dockerX - ((pipelineNodes.length - 1) * 80) + index * 160,
-                y: dockerY + 100 + Math.abs(index - (pipelineNodes.length - 1) / 2) * 20,
+                x: dockerX - ((pipelineNodes.length - 1) * 58) + index * 116,
+                y: dockerY + 120 * GRAPH_LAYOUT.yScale + Math.abs(index - (pipelineNodes.length - 1) / 2) * 24,
             },
             data: {
                 label: pn.toolName,
@@ -176,13 +198,34 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
         setEdges(storeEdges);
     }, [storeEdges, setEdges]);
 
-    // Fit view on initial render once nodes are ready
+    // Fit view when nodes load or pipeline steps change
     useEffect(() => {
-        if (!initialFitDone.current && nodes.length > 0) {
-            setTimeout(() => fitView({ padding: 0.3, duration: 300 }), 50);
-            initialFitDone.current = true;
-        }
-    }, [nodes, fitView]);
+        if (nodes.length === 0) return;
+
+        const pipelineCount = pipelineNodes.length;
+        const pipelineChanged = pipelineCount !== lastPipelineCount.current;
+        lastPipelineCount.current = pipelineCount;
+
+        const timer = window.setTimeout(
+            () => fitGraphToContainer(pipelineChanged ? 300 : 0),
+            50,
+        );
+        return () => window.clearTimeout(timer);
+    }, [nodes.length, pipelineNodes.length, fitGraphToContainer]);
+
+    // Refit when the graph container is resized (e.g. sidebar collapse, breakpoints)
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+
+        const observer = new ResizeObserver(() => {
+            if (nodes.length > 0) {
+                fitGraphToContainer(0);
+            }
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [nodes.length, fitGraphToContainer]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -195,11 +238,12 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
     const handleReset = useCallback(() => {
         setNodes(storeNodes);
         setEdges(storeEdges);
-        setTimeout(() => fitView({ padding: 0.3, duration: 400 }), 50);
-    }, [storeNodes, storeEdges, setNodes, setEdges, fitView]);
+        setTimeout(() => fitGraphToContainer(400), 50);
+    }, [storeNodes, storeEdges, setNodes, setEdges, fitGraphToContainer]);
 
     return (
         <div
+            ref={containerRef}
             className="relative w-full rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
             style={{ height: 350, background: "var(--background, #0f172a)" }}
             data-testid="scan-execution-graph"
@@ -232,7 +276,7 @@ const ScanExecutionGraphInner: React.FC<ScanExecutionGraphProps> = ({
                 onEdgesChange={onEdgesChange}
                 nodeTypes={nodeTypes}
                 fitView
-                fitViewOptions={{ padding: 0.3 }}
+                fitViewOptions={{ padding: 0.06, minZoom: 0.4, maxZoom: 2 }}
                 proOptions={{ hideAttribution: true }}
                 minZoom={0.3}
                 maxZoom={2}

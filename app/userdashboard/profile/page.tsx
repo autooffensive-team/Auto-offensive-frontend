@@ -102,7 +102,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen">
       {/* Hero Banner */}
       <div className="relative h-60 overflow-hidden bg-[#F7F5F0] dark:bg-[#111113]">
         {/* Gradient orbs — same vibe as ai-banner */}

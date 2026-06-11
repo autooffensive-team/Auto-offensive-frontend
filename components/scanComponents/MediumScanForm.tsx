@@ -1,8 +1,8 @@
 "use client";
 
-import { Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
+import { AlertCircle, Plus, Trash2, ChevronsRight, GripVertical, RotateCcw, LayoutGrid } from "lucide-react";
 import { useState } from "react";
-import { Tool, MediumStepState } from "@/types/scan";
+import { Tool, MediumStepState, WordlistAsset } from "@/types/scan";
 import { Field } from "./Field";
 import { ToolSelector } from "./ToolSelector";
 import { ToolOptionField } from "./ToolOptionsField";
@@ -26,6 +26,7 @@ interface MediumScanFormProps {
   onAddStep: () => void;
   onRemoveStep: (id: string) => void;
   tools: Tool[];
+  wordlists?: WordlistAsset[];
   disabled: boolean;
   onSubmit: () => void;
 }
@@ -39,6 +40,7 @@ export function MediumScanForm({
   onAddStep,
   onRemoveStep,
   tools,
+  wordlists = [],
   disabled,
   onSubmit,
 }: MediumScanFormProps) {
@@ -163,6 +165,7 @@ export function MediumScanForm({
               index={index}
               totalSteps={steps.length}
               tools={tools}
+              wordlists={wordlists}
               onChange={onStepChange}
               onOptionChange={onOptionChange}
               onRemove={onRemoveStep}
@@ -197,6 +200,14 @@ export function MediumScanForm({
 
   return (
     <div className="space-y-2">
+      {/* Info banner about 4-tool limit */}
+      <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
+        <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+        <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
+          Medium scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
+        </p>
+      </div>
+
       {/* Layout customization toolbar */}
       <div className="flex items-center justify-between rounded-lg border border-gray-200/50 dark:border-gray-800/50 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
         <div className="flex items-center gap-2">
@@ -296,6 +307,7 @@ interface PipelineStepProps {
   index: number;
   totalSteps: number;
   tools: Tool[];
+  wordlists: WordlistAsset[];
   onChange: (id: string, patch: Partial<MediumStepState>) => void;
   onOptionChange: (stepId: string, key: string, value: string | boolean) => void;
   onRemove: (id: string) => void;
@@ -308,6 +320,7 @@ function PipelineStep({
   index,
   totalSteps,
   tools,
+  wordlists,
   onChange,
   onOptionChange,
   onRemove,
@@ -404,6 +417,7 @@ function PipelineStep({
                 key={option.key}
                 option={option}
                 value={step.options[option.key]}
+                wordlists={wordlists}
                 onChange={(value) => onOptionChange(step.id, option.key, value)}
               />
             ))}

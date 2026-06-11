@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 /* ─── Types ─────────────────────────────────── */
 interface AccordionItem {
@@ -336,23 +337,41 @@ const accordionItems: AccordionItem[] = [
 ];
 
 const navItems = [
-  { href: "collect", label: "What We Collect" },
-  { href: "gdpr", label: "GDPR & Legal Compliance" },
-  { href: "use", label: "How We Use It" },
-  { href: "scan", label: "Your Scan Data" },
-  { href: "limits", label: "Free Tier Limits" },
-  { href: "sharing", label: "Who We Share With" },
-  { href: "retention", label: "Data Retention" },
-  { href: "rights", label: "Your Rights" },
-  { href: "security", label: "Security" },
-  { href: "contact", label: "Contact" },
-];
+    { href: "collect", label: "What We Collect" },
+    { href: "gdpr", label: "GDPR & Legal Compliance" },
+    { href: "use", label: "How We Use It" },
+    { href: "scan", label: "Your Scan Data" },
+    { href: "limits", label: "Free Tier Limits" },
+    { href: "sharing", label: "Who We Share With" },
+    { href: "retention", label: "Data Retention" },
+    { href: "rights", label: "Your Rights" },
+    { href: "security", label: "Security" },
+    { href: "contact", label: "Contact" },
+  ];
 
-/* ─── Main Export ────────────────────────────── */
-export default function PrivacyContent() {
-  const [openId, setOpenId] = useState<string>("collect");
-  const [activeNav, setActiveNav] = useState<string>("collect");
-  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const khmerNavItems = [
+    { href: "collect", label: "អ្វីដែលយើងទទួលយក" },
+    { href: "gdpr", label: "ការប្រឆាំងនីតិសាធិ និងការអប់រំ" },
+    { href: "use", label: "យើងប្រើវាយ៉រៀប" },
+    { href: "scan", label: "ទិន្នន័យសកម្មភាពរបស់អ្នក" },
+    { href: "limits", label: "កម្រិតដែលអ្នកអាចប្រើ" },
+    { href: "sharing", label: "ដែលយើងចែករំលែក" },
+    { href: "retention", label: "ការរក្សាទុកទិន្នន័យ" },
+    { href: "rights", label: "សិទ្ធិរបស់អ្នក" },
+    { href: "security", label: "សុវត្ថិភាព" },
+    { href: "contact", label: "ទំនាក់ទំនង" },
+  ];
+
+  /* ─── Main Export ────────────────────────────── */
+  export default function PrivacyContent() {
+    const locale = useLocale();
+    const isKhmer = locale === "km";
+    const t = useTranslations("privacy");
+    const [openId, setOpenId] = useState<string>("collect");
+    const [activeNav, setActiveNav] = useState<string>("collect");
+    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+    const currentNavItems = isKhmer ? khmerNavItems : navItems;
 
   /* Scroll spy */
   useEffect(() => {

@@ -19,11 +19,17 @@ export function StreamLogsPanel({
   title = "auto-offensive - stream logs",
 }: StreamLogsPanelProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   const { themeKey, sizeKey, theme, size, setTheme, setSize, resetToDefault } = useLogPreferences();
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Throttle + avoid smooth scrolling (smooth can be expensive on rapid updates).
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      logEndRef.current?.scrollIntoView({ behavior: "auto" });
+      rafRef.current = null;
+    });
   }, [logs]);
 
   return (
@@ -73,7 +79,7 @@ export function StreamLogsPanel({
       {/* Logs Container */}
       <div
         className={cn(
-          "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-[20rem]",
+          "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-80",
           theme.html.bg,
           size.className,
           size.lineHeight

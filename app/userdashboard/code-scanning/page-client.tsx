@@ -2,13 +2,16 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Activity,
   AlertCircle,
+  AlertTriangle,
   ChevronLeft,
   ChevronRight,
+  Eye,
   ExternalLink,
   FolderGit2,
   GitBranch,
-  Layers,
+  KeyRound,
   LoaderCircle,
   Plus,
   RefreshCw,
@@ -196,12 +199,14 @@ function HexStatCard({
   variant = "default",
   badge,
   index,
+  icon,
 }: {
   value: number;
   label: string;
   variant?: StatVariant;
   badge: string;
   index: number;
+  icon?: React.ReactNode;
 }) {
   const { stroke, fill, label: labelColor } = HEX_CONFIGS[variant];
 
@@ -218,7 +223,7 @@ function HexStatCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4.5 lg:px-5.5 lg:py-4.5 dark:border-slate-800 dark:bg-slate-900"
+      className="relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4 lg:px-5 lg:py-4 dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Subtle corner gradient */}
       <span
@@ -274,6 +279,15 @@ function HexStatCard({
           {badge}
         </span>
       </div>
+
+      {/* Half Icon Design on the right */}
+      {icon && (
+        <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: 'translateX(40%)' }}>
+          <div style={{ color: stroke, opacity: 0.12 }} className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]">
+            {icon}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -325,37 +339,37 @@ function ScanProjectCard({
       />
 
       {/* ── Card body ── */}
-      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-[18px]">
+      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4.5">
         {/* Row 1: avatar + meta + badge + external */}
-        <div className="mb-3 flex items-center justify-between gap-2 sm:mb-[14px]">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-[10px]">
+        <div className="mb-3 flex items-center justify-between gap-2 sm:mb-3.5">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#1a1a1a] sm:h-10 sm:w-10 dark:bg-white/10">
               {provider === "github" ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" className="sm:h-[22px] sm:w-[22px]" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" className="sm:h-5.5 sm:w-5.5" aria-hidden="true">
                   <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                 </svg>
               ) : provider === "gitlab" ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="sm:h-[22px] sm:w-[22px]" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="sm:h-5.5 sm:w-5.5" aria-hidden="true">
                   <path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 01-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 014.93 2a.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.49h8.86l2.44-7.51a.42.42 0 01.12-.18.43.43 0 01.58 0 .42.42 0 01.12.18l2.44 7.51L23 13.45a.84.84 0 01-.35.94z" fill="#E24329" />
                   <path d="M12 22.13L16.93 9.67H7.07L12 22.13z" fill="#FC6D26" />
                   <path d="M12 22.13L7.07 9.67H1.35L12 22.13z" fill="#FCA326" />
                   <path d="M12 22.13l4.93-12.46h5.72L12 22.13z" fill="#FCA326" />
                 </svg>
               ) : (
-                <FolderGit2 size={20} className="text-white sm:h-[22px] sm:w-[22px]" />
+                <FolderGit2 size={20} className="text-white sm:h-5.5 sm:w-5.5" />
               )}
             </div>
             <div className="min-w-0">
               <p className="truncate text-[11px] font-medium text-[#555] sm:text-[12px] dark:text-white/70">
                 {providerLabel} · Repository
               </p>
-              <p className="mt-[2px] text-[10px] text-[#999] sm:text-[11px] dark:text-white/40">
+              <p className="mt-0.5 text-[10px] text-[#999] sm:text-[11px] dark:text-white/40">
                 {project.scanCount} recorded scan{project.scanCount !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-[7px]">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-1.75">
             {(() => {
               const statusLabel = status
                 ? status.toLowerCase().split("_").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" ")
@@ -368,8 +382,8 @@ function ScanProjectCard({
               const textColor = isFailed ? "text-red-600 dark:text-red-400" : isRunning ? "text-amber-600 dark:text-amber-400" : "text-[#01509e] dark:text-[#00d0b2]";
 
               return (
-                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-[3px] text-[10px] font-medium sm:gap-[5px] sm:px-[10px] sm:py-[4px] sm:text-[12px] ${textColor}`} style={{ borderColor }}>
-                  <span className="inline-block h-[5px] w-[5px] rounded-full sm:h-[6px] sm:w-[6px]" style={{ backgroundColor: dotColor }} />
+                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.75 text-[10px] font-medium sm:gap-1.25 sm:px-2.5 sm:py-1 sm:text-[12px] ${textColor}`} style={{ borderColor }}>
+                  <span className="inline-block h-1.25 w-1.25 rounded-full sm:h-1.5 sm:w-1.5" style={{ backgroundColor: dotColor }} />
                   {statusLabel}
                 </span>
               );
@@ -383,7 +397,7 @@ function ScanProjectCard({
               aria-label="Open externally"
               className="relative z-20 flex h-6 w-6 cursor-pointer items-center justify-center rounded-[6px] border border-[#ccc] bg-transparent text-[#999] transition-colors hover:bg-[#f0f0f0] sm:h-7 sm:w-7 sm:rounded-[7px] dark:border-white/20 dark:text-white/50 dark:hover:bg-white/10"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[14px] sm:w-[14px]" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-3.5 sm:w-3.5" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                 <polyline points="15 3 21 3 21 9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
@@ -402,9 +416,9 @@ function ScanProjectCard({
 
         {/* Footer: tags + open button */}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-1.5 sm:gap-[6px]">
-            <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e6faf8] px-2 py-[3px] text-[10px] font-medium text-[#01509e] sm:gap-[4px] sm:px-[10px] sm:py-[4px] sm:text-[12px] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[13px] sm:w-[13px]" aria-hidden="true">
+          <div className="flex flex-wrap gap-1.5 sm:gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e6faf8] px-2 py-0.75 text-[10px] font-medium text-[#01509e] sm:gap-1 sm:px-2.5 sm:py-1 sm:text-[12px] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-3.25 sm:w-3.25" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
                 <rect x="14" y="14" width="7" height="7" />
@@ -414,15 +428,15 @@ function ScanProjectCard({
             </span>
           </div>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onOpen(project.projectKey);
-              window.location.href = href;
-            }}
-            className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-[#01509e] px-3 py-[6px] text-[11px] font-medium text-white transition-colors hover:bg-[#00d0b2] hover:text-black active:scale-[0.98] sm:gap-[6px] sm:px-4 sm:py-[7px] sm:text-[13px]"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-[14px] sm:w-[14px]" aria-hidden="true">
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpen(project.projectKey);
+                window.location.href = href;
+              }}
+              className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-primary px-3 py-1.5 text-[11px] font-medium text-black transition-colors hover:bg-primary/80 hover:text-black active:scale-[0.98] sm:gap-1.5 sm:px-4 sm:py-1.75 sm:text-[13px]"
+            >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:h-3.5 sm:w-3.5" aria-hidden="true">
               <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
             </svg>
             Open
@@ -650,8 +664,8 @@ export default function CodeScanningPageClient() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
       {/* ── Code Scan Tour ── */}
       <CodeScanTour />
@@ -660,15 +674,9 @@ export default function CodeScanningPageClient() {
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
       >
         <div>
-          <div className="mb-1 flex items-center gap-2">
-            <Layers size={14} className="text-teal-500 dark:text-teal-400" />
-            <span className="text-xs font-bold uppercase tracking-[0.18em] text-teal-600 sm:text-sm dark:text-teal-400">
-              Repository Scanner
-            </span>
-          </div>
           <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
             Code Scanning
           </h1>
@@ -679,6 +687,13 @@ export default function CodeScanningPageClient() {
 
         <div className="flex shrink-0 items-center gap-2 sm:pt-1">
           <CodeScanTourTriggerButton />
+          <Link
+            href="/userdashboard/code-scanning/integrations"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:text-white"
+          >
+            <KeyRound size={14} />
+            CI/CD Tokens
+          </Link>
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
@@ -725,16 +740,56 @@ export default function CodeScanningPageClient() {
       ) : null}
 
       {/* ── Hex Stat Cards – 2×2 mobile, 4 col tablet+ ── */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-4">
-        <HexStatCard value={uniqueProjectCount} label="Tracked Projects" variant="default" badge={uniqueProjectCount === 0 ? "None" : "Active"} index={0} />
-        <HexStatCard value={totalScans}         label="Recorded Scans"   variant="teal"    badge={totalScans === 0 ? "None" : "Active"}         index={1} />
-        <HexStatCard value={filtered.length}    label="Visible Results"  variant="amber"   badge={filtered.length === 0 ? "None" : "Active"}    index={2} />
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3 md:grid-cols-4 lg:gap-3">
+        <HexStatCard 
+          value={uniqueProjectCount} 
+          label="Tracked Projects" 
+          variant="default" 
+          badge={uniqueProjectCount === 0 ? "No Projects" : `${uniqueProjectCount} ${uniqueProjectCount === 1 ? "Project" : "Projects"}`} 
+          index={0}
+          icon={<FolderGit2 className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={totalScans} 
+          label="Recorded Scans" 
+          variant="teal" 
+          badge={totalScans === 0 ? "No Scans" : `${totalScans} Total`} 
+          index={1}
+          icon={<Activity className="w-full h-full" strokeWidth={1.5} />}
+        />
+        <HexStatCard 
+          value={filtered.length} 
+          label="Visible Results" 
+          variant="amber" 
+          badge={
+            filtered.length === 0 
+              ? "No Results" 
+              : filtered.length === scanProjects.length 
+                ? "All Shown" 
+                : "Filtered"
+          } 
+          index={2}
+          icon={<Eye className="w-full h-full" strokeWidth={1.5} />}
+        />
         <HexStatCard
           value={totalIssues}
           label="Issues Found"
           variant="red"
-          badge={issueSummaryState.isLoading ? "Syncing" : totalIssues === 0 ? "None" : "Active"}
+          badge={
+            issueSummaryState.isLoading 
+              ? "Syncing..." 
+              : totalIssues === 0 
+                ? "Clean" 
+                : totalIssues >= 100
+                  ? "Critical"
+                  : totalIssues >= 50
+                    ? "High"
+                    : totalIssues >= 20
+                      ? "Medium"
+                      : "Low"
+          }
           index={3}
+          icon={<AlertTriangle className="w-full h-full" strokeWidth={1.5} />}
         />
       </div>
 
@@ -787,7 +842,7 @@ export default function CodeScanningPageClient() {
       </AnimatePresence>
 
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop / 4 col wide ── */}
-      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
+      <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && scanProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
             <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />

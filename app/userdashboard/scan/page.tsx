@@ -1,6 +1,7 @@
 "use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
-import { Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
+import { motion } from "framer-motion";
+import { AlertCircle, ArrowRight, BarChart3, Lock, RotateCcw, Scan, ScanLine, Wrench } from "lucide-react";
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
@@ -331,6 +332,7 @@ export default function ScanPage() {
     setMediumTarget,
     mediumSteps,
     mediumTools,
+    wordlists,
     isSubmitting,
     basicRun,
     basicLogs,
@@ -343,6 +345,7 @@ export default function ScanPage() {
     advancedErrors,
     selectedProject,
     resetRun,
+    openJobReport,
     submitBasic,
     submitMedium,
     submitAdvanced,
@@ -368,17 +371,20 @@ export default function ScanPage() {
     activeRun.status !== "idle" &&
     !/completed|failed|cancelled|partial/i.test(activeRun.status)
   );
+  const showViewResults =
+    activeRun.status !== "idle" &&
+    /completed|cancelled|partial/i.test(activeRun.status);
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
+      <div className="min-h-screen">
+        <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
           {/* ── Guest Scan Tour (auto-starts for first-time guest visitors) ── */}
           {isGuest && <GuestScanTour />}
           {!isGuest && <AuthUserScanTour />}
 
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">New Scan</h1>
               <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -430,8 +436,8 @@ export default function ScanPage() {
             )}
           </div>
 
-          <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
-            <div className="space-y-3 sm:space-y-4 md:space-y-5">
+          <div className={cn("grid gap-3", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
+            <div className="space-y-3 sm:space-y-4">
               <ScanModeTabs value={activeTab} onChange={handleTabChange} />
 
               <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
@@ -468,6 +474,7 @@ export default function ScanPage() {
                   onAddStep={addMediumStep}
                   onRemoveStep={removeMediumStep}
                   tools={mediumTools}
+                  wordlists={wordlists}
                   disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
                   onSubmit={() => guardedSubmit(submitMedium)}
                 />
@@ -475,20 +482,29 @@ export default function ScanPage() {
 
               {activeTab === "advanced" && (
                 <>
+                  {/* Info banner about 4-tool limit */}
+                  <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 p-3 sm:p-4 flex items-start gap-3">
+                    <AlertCircle size={18} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-400 font-medium">
+                      Advanced scans are limited to <strong>4 tools per scan</strong> to ensure optimal performance and manageable execution time.
+                    </p>
+                  </div>
+
+                  <AdvancedTerminalPanel
+                    projectId={isGuest ? "guest-advanced-scan" : projectId}
+                    selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
+                  logs={advancedLogs}
+                  run={advancedRun}
+                  errors={advancedErrors}
+                  isSubmitting={isSubmitting}
+                  onSubmit={submitAdvanced}
+                  onReset={() => resetRun("advanced")}
+                />
+
                   <ScanExecutionGraph
                     run={advancedRun}
                     logs={advancedLogs}
                     errors={advancedErrors}
-                  />
-                  <AdvancedTerminalPanel
-                    projectId={isGuest ? "guest-advanced-scan" : projectId}
-                    selectedProject={isGuest ? { name: "guest", project_key: "guest-advanced-scan" } as any : selectedProject}
-                    logs={advancedLogs}
-                    run={advancedRun}
-                    errors={advancedErrors}
-                    isSubmitting={isSubmitting}
-                    onSubmit={submitAdvanced}
-                    onReset={() => resetRun("advanced")}
                   />
                 </>
               )}
@@ -627,6 +643,43 @@ export default function ScanPage() {
             </div>
           )}
         </div>
+
+        {showViewResults && (
+          <motion.div 
+            className="fixed bottom-8 right-8 z-[60]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.button
+              type="button"
+              onClick={() => openJobReport(activeRun.jobId)}
+              className="pointer-events-auto rounded-xl"
+              whileHover={{ scale: 1.03, y: -1, boxShadow: "0 10px 24px rgba(0, 208, 178, 0.22)" }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "10px",
+                border: "0",
+                backgroundColor: "#00d0b2",
+                padding: "12px 18px",
+                fontSize: "14px",
+                fontWeight: 700,
+                color: "#0f172a",
+                boxShadow: "0 8px 18px rgba(0, 208, 178, 0.24)",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
+            >
+              <BarChart3 size={16} className="pointer-events-none" />
+              View Results
+              <motion.div animate={{ x: [0, 3, 0] }} transition={{ duration: 1.4, repeat: Infinity }}>
+                <ArrowRight size={16} className="pointer-events-none" />
+              </motion.div>
+            </motion.button>
+          </motion.div>
+        )}
       </div>
 
       {/* Guest modals */}

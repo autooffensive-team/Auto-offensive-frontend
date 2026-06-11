@@ -15,7 +15,6 @@ import {
   Radar,
   Scan,
   Code,
-  ShieldAlert,
   FileText,
   User,
   Settings,
@@ -31,7 +30,6 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { useMounted } from "@/hooks/use-mounted";
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
-import GoToTop from "@/components/ui/go-to-top";
 import { MobileScreenWarning } from "@/components/shared/MobileScreenWarning";
 import { GuestLockModal } from "@/components/guest/GuestLockModal";
 import { GuestScanLimitBar } from "@/components/guest/GuestScanLimitBar";
@@ -70,7 +68,6 @@ const mainNavItems: NavItem[] = [
   { label: "Projects", path: "/userdashboard/projects", icon: FolderGit2, description: "Engagement tracking", guestAllowed: false },
   { label: "Tools Scan", path: "/userdashboard/scan", icon: Radar, description: "Run assessments", guestAllowed: true },
   { label: "Code Scan", path: "/userdashboard/code-scanning", icon: Code, description: "Repository analysis", guestAllowed: false },
-  { label: "Findings", path: "/userdashboard/findings", icon: ShieldAlert, description: "Risk triage", guestAllowed: false },
   { label: "Reports", path: "/userdashboard/reports", icon: FileText, description: "Evidence exports", guestAllowed: false },
 ];
 
@@ -265,7 +262,7 @@ export default function UserDashboardShell({
           </div>
         </div>
 
-        <div className={`px-4 py-3 ${collapsed ? "md:px-1.5" : ""}`}>
+        <div className={`px-4 py-2.5 ${collapsed ? "md:px-1.5" : ""}`}>
           <Link
             href="/userdashboard/scan"
             onClick={closeOverlays}
@@ -278,7 +275,7 @@ export default function UserDashboardShell({
         </div>
 
         <nav className={`flex-1 overflow-y-auto px-3 pb-4 ${collapsed ? "md:px-1.5" : ""}`}>
-          <div className={`mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
+          <div className={`mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
             Workspace
           </div>
           <ul className="space-y-1">
@@ -294,15 +291,15 @@ export default function UserDashboardShell({
                       type="button"
                       onClick={() => handleLockedClick(item.label)}
                       title={collapsed ? `${item.label} (Locked)` : undefined}
-                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
                     >
                       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
                         <item.icon size={16} strokeWidth={1.8} />
                         <Lock size={8} className="absolute -right-1 -top-1 text-amber-500" />
                       </div>
                       <div className={collapsed ? "md:hidden" : ""}>
-                        <p className="font-medium text-left">{item.label}</p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-600 text-left">
+                        <p className="font-medium leading-tight text-left">{item.label}</p>
+                        <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-600 text-left">
                           {item.description}
                         </p>
                       </div>
@@ -321,7 +318,7 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
+                    className={`group flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 shadow-inner shadow-black/5 dark:bg-white/10 dark:text-white dark:shadow-white/5"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
                       }`}
@@ -335,8 +332,8 @@ export default function UserDashboardShell({
                       <item.icon size={16} strokeWidth={active ? 2.2 : 1.8} />
                     </div>
                     <div className={collapsed ? "md:hidden" : ""}>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                      <p className="font-medium leading-tight">{item.label}</p>
+                      <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-500">
                         {item.description}
                       </p>
                     </div>
@@ -346,7 +343,7 @@ export default function UserDashboardShell({
             })}
           </ul>
 
-          <div className={`mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
+          <div className={`mb-2 mt-5 px-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500 ${collapsed ? "md:hidden" : ""}`}>
             Account
           </div>
           <ul className="space-y-1">
@@ -361,7 +358,7 @@ export default function UserDashboardShell({
                       type="button"
                       onClick={() => handleLockedClick(item.label)}
                       title={collapsed ? `${item.label} (Locked)` : undefined}
-                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
+                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-slate-400 opacity-60 hover:opacity-80 dark:text-slate-500`}
                     >
                       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 dark:border-white/10 dark:text-slate-500">
                         <item.icon size={16} strokeWidth={1.8} />
@@ -384,7 +381,7 @@ export default function UserDashboardShell({
                     href={item.path}
                     onClick={closeOverlays}
                     title={collapsed ? item.label : undefined}
-                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
+                    className={`flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} ${active
                         ? "bg-black/10 text-slate-950 dark:bg-white/10 dark:text-white"
                         : "text-slate-500 hover:bg-black/6 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/6 dark:hover:text-white"
                       }`}
@@ -408,7 +405,7 @@ export default function UserDashboardShell({
                   onClick={handleLogoutClick}
                   disabled={isLoggingOut}
                   title={collapsed ? "Logout" : undefined}
-                  className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-rose-600 hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10`}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm transition ${collapsed ? "md:justify-center md:px-0 md:py-2.5" : ""} text-rose-600 hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-70 dark:text-rose-400 dark:hover:bg-rose-500/10`}
                 >
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-rose-200 text-rose-500 dark:border-rose-800 dark:text-rose-400">
                     <LogOut size={16} strokeWidth={1.8} />
@@ -463,7 +460,7 @@ export default function UserDashboardShell({
 
       <div className={`transition-all duration-300 ${desktopContentOffset}`}>
         <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
-          <div className="mx-auto flex max-w-400 items-center justify-between gap-4 px-4 py-4 md:px-8">
+          <div className="mx-auto flex max-w-400 items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -477,7 +474,7 @@ export default function UserDashboardShell({
                 <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${isGuest ? "text-amber-600 dark:text-amber-400" : "text-teal-600 dark:text-teal-300"}`}>
                   {isGuest ? "Guest Dashboard" : "User Dashboard"}
                 </p>
-                <h1 className="truncate text-xl font-semibold text-slate-950 dark:text-white">
+                <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
                   {pageLabel}
                 </h1>
               </div>
@@ -584,7 +581,7 @@ export default function UserDashboardShell({
           </div>
         </header>
 
-        <main className={`mx-auto max-w-400 px-4 py-6 md:px-8 md:py-8 ${isGuest ? "pb-20" : ""}`}>
+        <main className={`mx-auto max-w-400 px-3 py-4 sm:px-4 sm:py-5 md:px-5 md:py-5 ${isGuest ? "pb-20" : ""}`}>
           {children}
         </main>
       </div>
@@ -650,8 +647,6 @@ export default function UserDashboardShell({
           </>
         )}
       </AnimatePresence>
-
-      <GoToTop />
     </div>
   );
 }

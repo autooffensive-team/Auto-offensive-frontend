@@ -12,7 +12,6 @@ import {
   RefreshCw,
   LoaderCircle,
   X,
-  Layers,
 } from "lucide-react";
 import { useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -161,26 +160,26 @@ function ProjectCard({
       className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white dark:border-white/10 dark:bg-[#101828]"
     >
       {/* ── Card body ── */}
-      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-[18px]">
+      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4.5">
         {/* Row 1: avatar + meta + badge + edit */}
-        <div className="mb-3 flex items-center justify-between sm:mb-[14px]">
-          <div className="flex items-center gap-2 sm:gap-[10px]">
+        <div className="mb-3 flex items-center justify-between sm:mb-3.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#1a1a1a] sm:h-10 sm:w-10 dark:bg-white/10">
-              <FolderGit2 size={20} className="text-white sm:h-[22px] sm:w-[22px]" />
+              <FolderGit2 size={20} className="text-white sm:h-5.5 sm:w-5.5" />
             </div>
             <div>
               <p className="text-[12px] font-medium text-[#555] dark:text-white/70">
                 Project · Repository
               </p>
-              <p className="mt-[2px] text-[11px] text-[#999] dark:text-white/40">
+              <p className="mt-0.5 text-[11px] text-[#999] dark:text-white/40">
                 Created {formatProjectDate(project.created_at)}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-[7px]">
-            <span className="inline-flex items-center gap-[5px] rounded-full border border-[#00d0b2] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:text-[#00d0b2]">
-              <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00d0b2]" />
+          <div className="flex items-center gap-1.75">
+            <span className="inline-flex items-center gap-1.25 rounded-full border border-[#00d0b2] px-2.5 py-1 text-[12px] font-medium text-[#01509e] dark:text-[#00d0b2]">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#00d0b2]" />
               Active
             </span>
             <button
@@ -203,18 +202,18 @@ function ProjectCard({
 
         {/* Footer: tags + actions */}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-[6px]">
-            <span className="inline-flex items-center gap-[4px] rounded-[6px] bg-[#e6faf8] px-[10px] py-[4px] text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
+          <div className="flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e6faf8] px-2.5 py-1 text-[12px] font-medium text-[#01509e] dark:bg-[#01509e]/10 dark:text-[#00d0b2]">
               <Clock size={13} />
               {formatProjectDate(project.last_modified)}
             </span>
           </div>
 
-          <div className="flex items-center gap-[6px]">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => onDelete(project.project_id)}
               disabled={isDeleting}
-              className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-[#ccc] bg-transparent text-[#999] transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:border-white/20 dark:text-white/50 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              className="flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-[7px] border border-[#ccc] bg-transparent text-[#999] transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:border-white/20 dark:text-white/50 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
             >
               {isDeleting ? (
                 <LoaderCircle size={13} className="animate-spin" />
@@ -222,10 +221,10 @@ function ProjectCard({
                 <Trash2 size={13} />
               )}
             </button>
-            <button
-              onClick={() => onOpen(project)}
-              className="inline-flex cursor-pointer items-center gap-[6px] rounded-lg border-none bg-[#01509e] px-4 py-[7px] text-[13px] font-medium text-white transition-colors hover:bg-[#00d0b2] active:scale-[0.98]"
-            >
+              <button
+                onClick={() => onOpen(project)}
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-primary px-4 py-1.75 text-[13px] font-medium text-black transition-colors hover:bg-primary/80 hover:text-black active:scale-[0.98]"
+              >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
               </svg>
@@ -281,10 +280,10 @@ function AddProjectModal({
       >
         <div className="flex items-start justify-between p-6 pb-0">
           <div>
-            <h2 className="text-[18px] font-bold text-gray-900 dark:text-white">
+            <h2 className="text-[20px] sm:text-[22px] font-bold text-gray-900 dark:text-white leading-tight">
               Add New Project
             </h2>
-            <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="mt-1 text-[14px] sm:text-[15px] leading-relaxed text-gray-500 dark:text-gray-400">
               Create a new project for code scanning
             </p>
           </div>
@@ -298,7 +297,7 @@ function AddProjectModal({
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
               Project Name
             </label>
             <input
@@ -307,12 +306,12 @@ function AddProjectModal({
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="my-repository"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
               Description{" "}
               <span className="normal-case tracking-normal font-normal text-gray-400 dark:text-gray-600">
                 (optional)
@@ -323,12 +322,12 @@ function AddProjectModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the project..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
             />
           </div>
 
           {submitError && (
-            <div className="flex items-center gap-2 text-[13px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3.5 py-2.5">
+            <div className="flex items-center gap-2 text-[14px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3.5 py-2.5">
               <AlertCircle size={14} />
               {submitError}
             </div>
@@ -338,7 +337,7 @@ function AddProjectModal({
         <div className="flex gap-2.5 px-6 pb-6">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[14px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[15px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             Cancel
           </button>
@@ -347,7 +346,7 @@ function AddProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[15px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -426,10 +425,10 @@ function UpdateProjectModal({
       >
         <div className="flex items-start justify-between p-6 pb-0">
           <div>
-            <h2 className="text-[18px] font-bold text-gray-900 dark:text-white">
+            <h2 className="text-[20px] sm:text-[22px] font-bold text-gray-900 dark:text-white leading-tight">
               Update Project
             </h2>
-            <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="mt-1 text-[14px] sm:text-[15px] leading-relaxed text-gray-500 dark:text-gray-400">
               Edit project name and description
             </p>
           </div>
@@ -443,7 +442,7 @@ function UpdateProjectModal({
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
               Project Name
             </label>
             <input
@@ -452,12 +451,12 @@ function UpdateProjectModal({
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="my-repository"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            <label className="block text-[12px] font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
               Description{" "}
               <span className="normal-case tracking-normal font-normal text-gray-400 dark:text-gray-600">
                 (optional)
@@ -468,12 +467,12 @@ function UpdateProjectModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the project..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[14px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-[15px] sm:text-[16px] focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
             />
           </div>
 
           {submitError && (
-            <div className="flex items-center gap-2 text-[13px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3.5 py-2.5">
+            <div className="flex items-center gap-2 text-[14px] text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3.5 py-2.5">
               <AlertCircle size={14} />
               {submitError}
             </div>
@@ -483,7 +482,7 @@ function UpdateProjectModal({
         <div className="flex gap-2.5 px-6 pb-6">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[14px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[15px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             Cancel
           </button>
@@ -492,7 +491,7 @@ function UpdateProjectModal({
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={isLoading || !name.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[15px] transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             {isLoading ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -576,26 +575,20 @@ export default function ProjectsPageClient({
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-[1920px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6 xl:px-10 xl:py-8">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-5">
 
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Layers size={13} className="text-teal-500 dark:text-teal-400" />
-            <span className="text-xs sm:text-sm md:text-sm lg:text-base font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
-              Repository Scanner
-            </span>
-          </div>
-          <h1 className="mt-1.5 sm:mt-2 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
             Projects
           </h1>
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm md:text-sm lg:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-            Manage repositories connected for code scanning
+            Manage project connected for Tools scanning
           </p>
         </div>
 
@@ -678,7 +671,7 @@ export default function ProjectsPageClient({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-4 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && projects.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />

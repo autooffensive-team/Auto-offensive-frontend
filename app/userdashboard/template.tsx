@@ -32,7 +32,6 @@ function getFeatureNameFromPath(pathname: string): string {
     assets: "Assets",
     projects: "Projects",
     "code-scanning": "Code Scanning",
-    findings: "Findings",
     reports: "Reports",
     profile: "Profile",
     settings: "Settings",

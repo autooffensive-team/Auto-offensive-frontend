@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   useGetDependencySummaryQuery,
@@ -40,9 +40,12 @@ import { CodeScanDependencies } from "./code-scan-dependencies";
 import { CodeScanHotspots } from "./code-scan-hotspots";
 
 const SEEN_PROJECTS_STORAGE_KEY = "code-scanning-seen-projects";
+const SEEN_SECTION_COUNTS_STORAGE_KEY = "code-scanning-seen-section-counts";
 
 type ProjectView = "overview" | "issues" | "dependencies" | "hotspots";
 type GradeTone = "green" | "lime" | "red" | "muted";
+type UnreadCounts = Partial<Record<Exclude<ProjectView, "overview">, number>>;
+type BadgeView = Exclude<ProjectView, "overview">;
 
 type NavItem = {
   id: ProjectView;
@@ -66,7 +69,13 @@ const sectionMotion = {
 // ─── Play notification sound ──────────────────────────────────────────────────
 function playScanCompleteSound(): void {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextConstructor =
+      window.AudioContext ||
+      (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextConstructor) {
+      return;
+    }
+    const audioContext = new AudioContextConstructor();
 
     // Two-tone success chime (more noticeable)
     const playTone = (frequency: number, startTime: number, duration: number) => {
@@ -319,6 +328,58 @@ function markProjectAsSeen(projectKey: string): void {
   }
 }
 
+function readSeenSectionCounts(scanId: string): UnreadCounts {
+  if (typeof window === "undefined" || !scanId.trim()) {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_SECTION_COUNTS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+
+    const counts = (parsed as Record<string, unknown>)[scanId];
+    if (!counts || typeof counts !== "object" || Array.isArray(counts)) {
+      return {};
+    }
+
+    return {
+      issues: Number((counts as Record<string, unknown>).issues) || 0,
+      dependencies: Number((counts as Record<string, unknown>).dependencies) || 0,
+      hotspots: Number((counts as Record<string, unknown>).hotspots) || 0,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function writeSeenSectionCounts(scanId: string, counts: UnreadCounts): void {
+  if (typeof window === "undefined" || !scanId.trim()) {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SEEN_SECTION_COUNTS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+    const current =
+      parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : {};
+
+    window.localStorage.setItem(
+      SEEN_SECTION_COUNTS_STORAGE_KEY,
+      JSON.stringify({
+        ...current,
+        [scanId]: counts,
+      }),
+    );
+  } catch {
+    // Ignore storage failures and keep navigation working.
+  }
+}
+
 // GitHub SVG Icon
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -563,9 +624,11 @@ function AlertSection({
 function ProjectNav({
   activeView,
   onViewChange,
+  unreadCounts,
 }: {
   activeView: ProjectView;
   onViewChange: (view: ProjectView) => void;
+  unreadCounts: UnreadCounts;
 }) {
   return (
     <motion.section
@@ -575,6 +638,7 @@ function ProjectNav({
       {projectNavItems.map((item) => {
         const Icon = item.icon;
         const active = activeView === item.id;
+        const unreadCount = item.id === "overview" ? 0 : unreadCounts[item.id] ?? 0;
         return (
           <button
             key={item.id}
@@ -588,7 +652,14 @@ function ProjectNav({
             )}
           >
             <Icon className="size-3.5 sm:size-4" />
-            {item.label}
+            <span className="relative inline-flex">
+              <span>{item.label}</span>
+              {unreadCount > 0 && (
+                <span className="absolute -right-3 -top-2.5 inline-flex min-w-4 items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[9px] font-bold leading-4 text-white shadow-sm shadow-red-500/30 dark:border-slate-900 dark:bg-red-400 dark:text-red-950">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </span>
           </button>
         );
       })}
@@ -604,7 +675,11 @@ export default function CodeScanningDetailPageClient({
 }) {
   const router = useRouter();
   const hasTriggeredCompletionRefresh = useRef(false);
+  const hasObservedRunningScan = useRef(false);
   const [activeView, setActiveView] = useState<ProjectView>("overview");
+  const [seenSectionCountsByScan, setSeenSectionCountsByScan] = useState<
+    Record<string, UnreadCounts>
+  >({});
   const [typeFilter, setTypeFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
   const [issuesPage, setIssuesPage] = useState(1);
@@ -632,8 +707,11 @@ export default function CodeScanningDetailPageClient({
       refetchScanSummary(),
       refetchDependencySummary(),
       refetchDependencies(),
+      refetchAllDependencies(),
       refetchIssues(),
+      refetchAllIssues(),
       refetchHotspots(),
+      refetchAllHotspots(),
       routeProjectScansQuery.refetch(),
     ]);
     router.refresh();
@@ -658,6 +736,7 @@ export default function CodeScanningDetailPageClient({
   const resolvedScanId = routeUsesScanId
     ? routeIdentifier
     : routeProjectScansQuery.data?.scans[0]?.scan_id;
+  const badgeStorageScanId = resolvedScanId ?? "";
 
   const {
     data: scanDetail,
@@ -708,7 +787,7 @@ export default function CodeScanningDetailPageClient({
       }
     );
 
-  const { data: allDependenciesResponse } = useListDependenciesQuery(
+  const { data: allDependenciesResponse, refetch: refetchAllDependencies } = useListDependenciesQuery(
     {
       scan_id: resolvedScanId ?? "",
       page: 1,
@@ -735,7 +814,7 @@ export default function CodeScanningDetailPageClient({
       }
     );
 
-  const { data: allIssuesResponse } = useListIssuesQuery(
+  const { data: allIssuesResponse, refetch: refetchAllIssues } = useListIssuesQuery(
     {
       scan_id: resolvedScanId ?? "",
       page: 1,
@@ -760,6 +839,18 @@ export default function CodeScanningDetailPageClient({
         refetchOnMountOrArgChange: true,
       }
     );
+
+  const { data: allHotspotsResponse, refetch: refetchAllHotspots } = useListHotspotsQuery(
+    {
+      scan_id: resolvedScanId ?? "",
+      page: 1,
+      page_size: 100,
+    },
+    {
+      skip: !resolvedScanId,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const { data: projectHistory } = useListCurrentUserScansQuery(
     scanDetail?.project_key
@@ -796,6 +887,10 @@ export default function CodeScanningDetailPageClient({
     () => hotspotsResponse?.hotspots ?? [],
     [hotspotsResponse?.hotspots]
   );
+  const allHotspots = useMemo(
+    () => allHotspotsResponse?.hotspots ?? [],
+    [allHotspotsResponse?.hotspots]
+  );
   const totalHotspots = hotspotsResponse?.total ?? 0;
 
   const totalIssues = issueResponse?.total ?? 0;
@@ -814,6 +909,37 @@ export default function CodeScanningDetailPageClient({
   const openIssues = allIssues.filter((issue) =>
     ["OPEN", "TO_REVIEW"].includes(issue.status.toUpperCase())
   ).length;
+  const unreadDependencies = allDependencies.filter(
+    (dependency) =>
+      dependency.is_vulnerable ||
+      dependency.is_outdated ||
+      dependency.has_license_issue
+  ).length;
+  const unreadHotspots = allHotspots.filter(
+    (hotspot) => hotspot.status.toUpperCase() === "TO_REVIEW"
+  ).length;
+  const storedSeenSectionCounts = useMemo(
+    () => readSeenSectionCounts(badgeStorageScanId),
+    [badgeStorageScanId],
+  );
+  const seenSectionCounts =
+    seenSectionCountsByScan[badgeStorageScanId] ?? storedSeenSectionCounts;
+  const visibleUnreadCounts = {
+    issues:
+      activeView === "issues"
+        ? 0
+        : Math.max(openIssues - (seenSectionCounts.issues ?? 0), 0),
+    dependencies: Math.max(
+      activeView === "dependencies"
+        ? 0
+        : unreadDependencies - (seenSectionCounts.dependencies ?? 0),
+      0,
+    ),
+    hotspots:
+      activeView === "hotspots"
+        ? 0
+        : Math.max(unreadHotspots - (seenSectionCounts.hotspots ?? 0), 0),
+  };
   const acceptedIssues = Math.max(allIssues.length - openIssues, 0);
   const qualityGateMessage =
     qualityGate === "WARN"
@@ -821,6 +947,45 @@ export default function CodeScanningDetailPageClient({
       : qualityGate === "ERROR"
         ? "The latest analysis failed the quality gate."
         : null;
+  const markSectionAsSeen = useCallback(
+    (view: ProjectView) => {
+      if (view === "overview" || !badgeStorageScanId) {
+        return;
+      }
+
+      const section = view as BadgeView;
+      const currentCount =
+        section === "issues"
+          ? openIssues
+          : section === "dependencies"
+            ? unreadDependencies
+            : unreadHotspots;
+
+      setSeenSectionCountsByScan((currentByScan) => {
+        const current = currentByScan[badgeStorageScanId] ?? storedSeenSectionCounts;
+        if ((current[section] ?? 0) === currentCount) {
+          return currentByScan;
+        }
+
+        const next = {
+          ...current,
+          [section]: currentCount,
+        };
+        writeSeenSectionCounts(badgeStorageScanId, next);
+        return {
+          ...currentByScan,
+          [badgeStorageScanId]: next,
+        };
+      });
+    },
+    [
+      badgeStorageScanId,
+      openIssues,
+      storedSeenSectionCounts,
+      unreadDependencies,
+      unreadHotspots,
+    ],
+  );
 
   useEffect(() => {
     if (scanDetail?.project_key) {
@@ -834,11 +999,12 @@ export default function CodeScanningDetailPageClient({
       normalizedProgress >= 100 || status === "SUCCESS";
 
     if (isRunning) {
+      hasObservedRunningScan.current = true;
       hasTriggeredCompletionRefresh.current = false;
       return;
     }
 
-    if (isComplete && !hasTriggeredCompletionRefresh.current) {
+    if (isComplete && hasObservedRunningScan.current && !hasTriggeredCompletionRefresh.current) {
       hasTriggeredCompletionRefresh.current = true;
       playScanCompleteSound();
       // Refetch ALL data when scan completes — including issues and hotspots
@@ -848,13 +1014,16 @@ export default function CodeScanningDetailPageClient({
         refetchScanSummary(),
         refetchDependencySummary(),
         refetchDependencies(),
+        refetchAllDependencies(),
         refetchIssues(),
+        refetchAllIssues(),
         refetchHotspots(),
+        refetchAllHotspots(),
       ]).finally(() => {
         router.refresh();
       });
     }
-  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary, refetchDependencies, refetchIssues, refetchHotspots]);
+  }, [isRunning, progress, router, status, refetchScanStatus, refetchScanDetail, refetchScanSummary, refetchDependencySummary, refetchDependencies, refetchAllDependencies, refetchIssues, refetchAllIssues, refetchHotspots, refetchAllHotspots]);
 
   const isResolvingRoute = !routeUsesScanId && routeProjectScansQuery.isLoading;
   const routeResolutionFailed =
@@ -946,7 +1115,15 @@ export default function CodeScanningDetailPageClient({
         qualityGateMessage={qualityGateMessage}
       />
 
-      <ProjectNav activeView={activeView} onViewChange={setActiveView} />
+      <ProjectNav
+        activeView={activeView}
+        onViewChange={(view) => {
+          markSectionAsSeen(activeView);
+          setActiveView(view);
+          markSectionAsSeen(view);
+        }}
+        unreadCounts={visibleUnreadCounts}
+      />
 
       {activeView === "overview" && (
         <CodeScanOverview

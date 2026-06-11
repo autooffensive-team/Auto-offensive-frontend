@@ -63,12 +63,12 @@ export function GuestOverview() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-5">
       {/* Welcome banner */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6 dark:border-amber-800/50 dark:from-amber-950/30 dark:to-orange-950/20"
+        className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4 sm:p-5 dark:border-amber-800/50 dark:from-amber-950/30 dark:to-orange-950/20"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -96,10 +96,10 @@ export function GuestOverview() {
 
       {/* Quick actions */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Quick Actions
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action) => {
             if (action.locked) {
               return (
@@ -109,7 +109,7 @@ export function GuestOverview() {
                   onClick={() => handleLockedClick(action.label)}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="relative flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-5 text-left opacity-60 transition hover:opacity-80 dark:border-gray-800 dark:bg-gray-900"
+                  className="relative flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 text-left opacity-60 transition hover:opacity-80 dark:border-gray-800 dark:bg-gray-900"
                 >
                   <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
                     <action.icon size={20} className="text-gray-400" />
@@ -136,7 +136,7 @@ export function GuestOverview() {
               >
                 <Link
                   href={action.href!}
-                  className="flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-5 transition hover:border-primary/50 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary/50"
+                  className="flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-primary/50 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary/50"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 dark:bg-teal-500/10">
                     <action.icon size={20} className="text-teal-600 dark:text-teal-400" />
@@ -158,10 +158,10 @@ export function GuestOverview() {
 
       {/* Locked features preview */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Premium Features
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { label: "Vulnerability Dashboard", icon: TrendingUp, desc: "Real-time security metrics and trends" },
             { label: "Scan History", icon: Activity, desc: "Access all past scan results and reports" },
@@ -196,7 +196,7 @@ export function GuestOverview() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="rounded-2xl border border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 p-6 text-center dark:border-gray-800 dark:from-gray-900 dark:to-slate-900"
+        className="rounded-2xl border border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 p-4 sm:p-5 text-center dark:border-gray-800 dark:from-gray-900 dark:to-slate-900"
       >
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">
           Ready for more?

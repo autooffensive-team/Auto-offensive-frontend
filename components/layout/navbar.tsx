@@ -75,7 +75,7 @@ const featureLinks: FeatureItem[] = [
 ];
 
 const resourceDocLinks: ResourceItem[] = [
-  { title: 'Document', description: ' All documentation for the platform', href: toDocsUrl('/'), icon: '/icons/res-cli.webp' },
+  { title: 'Document', description: ' All documentation for the platform', href: toDocsUrl('/getting-started'), icon: '/icons/res-cli.webp' },
 ];
 
 const resourceMiscLinks: ResourceItem[] = [
@@ -93,15 +93,12 @@ const iconBoxCls =
 
 // ── Logo ─────────────────────────────────────────────────────────────────────
 function Logo() {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="h-10 w-25 md:h-auto md:w-25 shrink-0" />;
-  const src = theme === 'dark'
+  const { resolvedTheme } = useTheme();
+  const src = resolvedTheme === 'dark'
     ? '/Auto_Offensive_Dark-mode.png'
     : '/Auto_Offensive_Light-mode.png';
   return (
-    <Link href="/" className="cursor-pointer shrink-0">
+    <Link href="/" className="cursor-pointer shrink-0" suppressHydrationWarning>
       <Image
         src={src}
         alt="Auto-Offensive"
@@ -119,8 +116,13 @@ function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="size-10 shrink-0 rounded-full" />;
+  
   const isDark = (theme === 'system' ? resolvedTheme : theme) === 'dark';
+  
+  if (!mounted) {
+    return <div className="size-10 shrink-0 rounded-full" />;
+  }
+  
   return (
     <button
       type="button"
@@ -178,9 +180,11 @@ function LanguageToggle() {
     { value: 'km', flagSrc: '/flags/en.png', code: 'EN' },
   ];
 
-  if (!mounted) return <div className="h-10 w-23 shrink-0 rounded-full" />;
-
   const current = options.find(o => o.value === currentLocale) || options[0];
+  
+  if (!mounted) {
+    return <div className="h-10 w-23 shrink-0 rounded-full" />;
+  }
 
   return (
     <button
@@ -724,7 +728,7 @@ export function Header() {
           {/* Documentation */}
           <div className="mt-2">
             <a
-              href={toDocsUrl('/')}
+              href={toDocsUrl('/getting-started')}
               className="flex items-center justify-between rounded-[8px] border border-primary/20 dark:border-primary/30 bg-primary/5 dark:bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 dark:hover:bg-primary/20"
             >
               <span>{isKhmer ? 'ឯកសារណែនាំ' : 'Documentation'}</span>

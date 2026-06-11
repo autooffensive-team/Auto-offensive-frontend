@@ -35,14 +35,125 @@ export function parseJsonMaybe(value: string) {
   }
 }
 
+function extractErrorMessage(detail: unknown): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        if (item && typeof item === "object") {
+          const data = item as Record<string, unknown>;
+          const msg = data.msg ?? data.message;
+          return typeof msg === "string" ? msg : String(item);
+        }
+        return String(item);
+      })
+      .join(", ");
+  }
+  if (detail && typeof detail === "object") {
+    const data = detail as Record<string, unknown>;
+    const nested = data.detail ?? data.error ?? data.message ?? data.msg;
+    if (nested !== undefined) return extractErrorMessage(nested);
+    return JSON.stringify(data);
+  }
+  return String(detail ?? "");
+}
+
 export function formatPayloadLine(payload: unknown) {
   if (payload && typeof payload === "object") {
     const data = payload as Record<string, unknown>;
-    const line = data.line ?? data.message ?? data.error ?? data.status ?? data.type;
-    if (typeof line === "string") return line;
+    const line = data.line ?? data.message ?? data.error ?? data.detail ?? data.status ?? data.type;
+    if (typeof line === "string" && line.trim()) return line.trim();
+    if (line != null && typeof line !== "object") return String(line);
     return JSON.stringify(data);
   }
-  return String(payload ?? "");
+  const text = String(payload ?? "").trim();
+  return text;
+}
+
+/** Normalize FastAPI / gRPC error bodies into a single readable string. */
+export function formatApiErrorDetail(detail: unknown): string {
+  if (detail == null) return "Request failed.";
+  if (typeof detail === "string") {
+    return (
+      detail
+        .replace(/^invalid tools payload:\s*/i, "")
+        .replace(/^rpc error: code = \w+ desc = /i, "")
+        .replace(/^desc = /i, "")
+        .trim() || "Request failed."
+    );
+  }
+  if (Array.isArray(detail)) {
+    const parts = detail
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object") {
+          const row = item as Record<string, unknown>;
+          const loc = Array.isArray(row.loc) ? row.loc.join(".") + ": " : "";
+          return loc + String(row.msg ?? row.message ?? row.detail ?? JSON.stringify(row));
+        }
+        return String(item);
+      })
+      .filter(Boolean);
+    return parts.join("; ") || "Request failed.";
+  }
+  if (typeof detail === "object") {
+    const row = detail as Record<string, unknown>;
+    if (typeof row.message === "string" && row.message.trim()) return row.message.trim();
+    if (typeof row.error === "string" && row.error.trim()) return row.error.trim();
+    if (typeof row.detail === "string" && row.detail.trim()) return formatApiErrorDetail(row.detail);
+    if (row.detail != null) return formatApiErrorDetail(row.detail);
+  }
+  return String(detail);
+}
+
+/** Extract a user-facing error from SSE payloads or thrown values. */
+export function formatScanError(error: unknown): string {
+  if (error instanceof Error) {
+    return formatApiErrorDetail(error.message);
+  }
+  if (typeof error === "string") {
+    return formatApiErrorDetail(error);
+  }
+  if (error && typeof error === "object") {
+    const row = error as Record<string, unknown>;
+    if (row.detail != null) return formatApiErrorDetail(row.detail);
+    if (row.error != null) return formatApiErrorDetail(row.error);
+    if (row.message != null) return formatApiErrorDetail(row.message);
+    const fromPayload = formatPayloadLine(error);
+    if (fromPayload && fromPayload !== "{}" && fromPayload !== "[object Object]") {
+      return fromPayload;
+    }
+  }
+  return "An unexpected error occurred.";
+}
+
+export function formatStepFailureMessage(step: {
+  tool_name?: string;
+  error_message?: string | null;
+  exit_code?: number;
+}): string {
+  const tool = step.tool_name?.trim() || "Scan step";
+  const reason = step.error_message?.trim();
+  if (reason) {
+    return `${tool}: ${reason}`;
+  }
+  if (typeof step.exit_code === "number" && step.exit_code !== 0) {
+    return `${tool} exited with code ${step.exit_code}`;
+  }
+  return `${tool} failed`;
+}
+
+/** Pull actionable failure text from streamed system log payloads. */
+export function extractStreamFailureLine(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const data = payload as Record<string, unknown>;
+  const source = String(data.source ?? "");
+  const line = String(data.line ?? "").trim();
+  if (!line) return null;
+  const isSystem = /system|LOG_SOURCE_SYSTEM/i.test(source);
+  const looksLikeFailure =
+    /(?:^scan step failed:|policy rejected|invalid custom flag|tool exited with non-zero)/i.test(line);
+  return isSystem && looksLikeFailure ? line : null;
 }
 
 export function logFromPayload(mode: ScanMode | "system", event: string, payload: unknown): LogLine {
@@ -299,8 +410,8 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const detail = body?.detail ?? body?.error ?? response.statusText;
-    throw new Error(Array.isArray(detail) ? detail.map((item: any) => item.msg ?? String(item)).join(", ") : String(detail));
+    const detail = body?.detail ?? body?.error ?? body?.message ?? response.statusText;
+    throw new Error(formatApiErrorDetail(detail));
   }
 
   return response.json() as Promise<T>;

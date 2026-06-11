@@ -1159,7 +1159,162 @@
     "heroTitleHighlight": "ភាពឯកជន",
     "heroDescription": "ទិន្នន័យរបស់អ្នកនៅតែជារបស់អ្នក។ យើងបានបង្កើត Auto-Offensive ដោយមានគោលការណ៍ភាពឯកជនជាមុនសិទ្ធិ — គ្មានការលក់ទិន្នន័យ គ្មានការតាមដានលាក់កំបាំង គ្រាន់តែការធ្វើតេស្តសុវត្ថិភាពដោយសុវត្ថិភាព។",
     "tagNoDataSelling": "គ្មានការលក់ទិន្នន័យ",
-    "tagFreePlatform": "វេទិកាឥតគិតថ្លៃ"
+    "tagFreePlatform": "វេទិកាឥតគិតថ្លៃ",
+    "nav": {
+      "collect": "What We Collect",
+      "gdpr": "GDPR & Legal Compliance",
+      "use": "How We Use It",
+      "scan": "Your Scan Data",
+      "limits": "Free Tier Limits",
+      "sharing": "Who We Share With",
+      "retention": "Data Retention",
+      "rights": "Your Rights",
+      "security": "Security",
+      "contact": "Contact"
+    },
+    "accordion": {
+      "collect": {
+        "title": "What We Collect",
+        "lead": "We only collect what's needed to run the platform and keep your account secure.",
+        "items": {
+          "account": "Account",
+          "accountVal": "Email, username, bcrypt-hashed password, encrypted API tokens",
+          "scanData": "Scan Data",
+          "scanDataVal": "Targets, findings, logs, metadata — isolated to your account",
+          "usageSignals": "Usage Signals",
+          "usageSignalsVal": "Features used, scan frequency, tool selection, login history",
+          "technical": "Technical",
+          "technicalVal": "IP address, browser/OS, device type — for security & abuse prevention"
+        },
+        "notice": "Repository scanning is opt-in. We only access GitHub/GitLab when you explicitly authorize it."
+      },
+      "gdpr": {
+        "title": "GDPR & Legal Compliance",
+        "lead": "Auto-Offensive is fully compliant with the General Data Protection Regulation (GDPR) and other international data protection laws.",
+        "items": {
+          "compliance": "Compliance",
+          "complianceVal": "GDPR (EU/UK), CCPA (California), LGPD (Brazil)",
+          "dataController": "Data Controller",
+          "dataControllerVal": "Auto-Offensive Technologies Ltd.",
+          "dpoContact": "DPO Contact",
+          "dpoContactVal": "dpo@auto-offensive.com",
+          "dataProtection": "Data Protection",
+          "dataProtectionVal": "SHA-256 encryption, annual audits"
+        },
+        "notice": "Your data stays yours. We are committed to data sovereignty — your scan data is stored in your designated region unless you choose otherwise.",
+        "rights": {
+          "lawfulBasis": "Lawful Basis: Performance of contract (service delivery) and legitimate interests (security)",
+          "rightToAccess": "Right to Access: Get a copy of all personal data we hold within 30 days",
+          "rightToRectification": "Right to Rectification: Correct inaccurate personal data instantly",
+          "rightToErasure": "Right to Erasure: Request deletion (\"right to be forgotten\") with no delay",
+          "dataPortability": "Data Portability: Receive your data in machine-readable format (JSON/CSV)",
+          "rightToObject": "Right to Object: Opt out of processing for marketing or legitimate interests",
+          "internationalTransfers": "International Transfers: Protected by Standard Contractual Clauses (SCCs)",
+          "crossBorderTransfers": "Cross-Border Transfers: GDPR-compliant via EU-US Data Privacy Framework"
+        },
+        "gdprFooter": "For GDPR data requests, email dpo@auto-offensive.com — we respond within 72 hours as required by Article 12."
+      },
+      "use": {
+        "title": "How We Use It",
+        "items": {
+          "runScans": "Run and store your scans, display results in your dashboard",
+          "auth": "Manage authentication and account security",
+          "limits": "Enforce fair usage limits (3 scans/day on free tier)",
+          "abuse": "Detect and prevent platform abuse or DDoS misuse",
+          "anonymized": "anonymized scan patterns to improve vulnerability detection",
+          "alerts": "Send scan completion alerts and security notifications",
+          "sellData": "Sell, rent, or trade your data to anyone",
+          "sellDataNo": true,
+          "commercial": "Use your personal scan results for commercial purposes",
+          "commercialNo": true
+        }
+      },
+      "scan": {
+        "title": "Your Scan Data",
+        "lead": "You own it entirely. Scan configs, findings, reports, history — all yours. Each account is fully isolated at the database level.",
+        "notice": "On AI training: We may use anonymized, aggregated patterns to improve detection models. We never identify your org, expose specific findings, or use raw data commercially.",
+        "export": "Export your data anytime in JSON, CSV, or PDF from the dashboard."
+      },
+      "limits": {
+        "title": "Free Tier Limits",
+        "items": {
+          "dailyScans": "Daily scans",
+          "dailyScansVal": "3 scans / day",
+          "maxScanDuration": "Max scan duration",
+          "maxScanDurationVal": "30 minutes",
+          "concurrentScans": "Concurrent scans",
+          "concurrentScansVal": "1 at a time",
+          "targetScope": "Target scope",
+          "targetScopeVal": "Single domain per scan",
+          "storage": "Storage",
+          "storageVal": "100 GB scan history",
+          "toolsAvailable": "Tools available",
+          "toolsAvailableVal": "All 14+ tools"
+        },
+        "notice": "Accounts that abuse free resources (e.g. mass automated scanning of targets you don't own) may be suspended. Legitimate learning and testing is always welcome."
+      },
+      "sharing": {
+        "title": "Who We Share With",
+        "lead": "We share the minimum necessary with trusted providers who help us operate.",
+        "providers": ["AWS — Hosting", "SendGrid — Email", "Google Analytics — Aggregated metrics", "GitHub / GitLab — If you authorize", "Intercom — Support"],
+        "notice": "All providers are contractually required to protect your data and use it only for the specified purpose. We may disclose data to authorities when required by law — and we'll notify you when legally permitted to do so."
+      },
+      "retention": {
+        "title": "Data Retention",
+        "items": {
+          "accountDeleted": "Account deleted",
+          "accountDeletedVal": "Credentials removed immediately",
+          "scanResults": "Scan results",
+          "scanResultsVal": "Deleted within 7 days",
+          "backups": "Backups",
+          "backupsVal": "Purged within 30 days",
+          "anonymizedAnalytics": "Anonymized analytics",
+          "anonymizedAnalyticsVal": "Up to 90 days",
+          "securityLogs": "Security logs",
+          "securityLogsVal": "Up to 1 year (abuse prevention)"
+        },
+        "notice": "Heads up: Download your data before deleting your account — deletion is permanent."
+      },
+      "rights": {
+        "title": "Your Rights",
+        "items": {
+          "viewData": "View and download all your account data anytime",
+          "editData": "Edit or correct your account information in settings",
+          "exportData": "Request full data export in portable format (within 30 days)",
+          "deleteAccount": "Delete your account and all associated data permanently",
+          "unsubscribe": "Unsubscribe from non-essential emails at any time",
+          "optOutAnalytics": "Opt out of analytics via browser \"Do Not Track\" or account settings",
+          "complaint": "File a complaint with your local data protection authority"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "items": {
+          "inTransit": "In Transit",
+          "inTransitVal": "HTTPS / TLS 256-bit encryption on all connections",
+          "atRest": "At Rest",
+          "atRestVal": "AES-256 for sensitive data, bcrypt for passwords",
+          "access": "Access",
+          "accessVal": "Role-based controls, MFA available, session timeouts",
+          "monitoring": "Monitoring",
+          "monitoringVal": "24/7 intrusion detection, WAF, DDoS protection on AWS"
+        },
+        "lead": "If we detect a breach, we notify you within 48 hours with details and protective steps."
+      },
+      "contact": {
+        "title": "Contact",
+        "lead": "Questions about your data? We respond to all privacy requests within 7 business days, security issues within 24 hours.",
+        "privacy": "Privacy",
+        "privacyEmail": "privacy@auto-offensive.com",
+        "privacyNote": "Within 7 business days",
+        "dpo": "DPO (GDPR)",
+        "dpoEmail": "dpo@auto-offensive.com",
+        "dpoNote": "Within 72 hours",
+        "security": "Security",
+        "securityEmail": "security@auto-offensive.com",
+        "securityNote": "Within 24 hours"
+      }
+    }
   },
   "homepage": {
     "hero": {
