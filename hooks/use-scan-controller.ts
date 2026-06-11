@@ -386,7 +386,7 @@ export function useScanController(initialProjectId?: string, options?: { guestMo
         const [projectData, toolData, wordlistData] = await Promise.all([
           fetchJson<Project[]>("/projects").catch(() => [] as Project[]),
           fetchJson<Tool[]>("/tools?active_only=true"),
-          fetchJson<WordlistAsset[]>("/wordlists").catch(() => [] as WordlistAsset[]),
+          fetchJson<WordlistAsset[]>("/api/v1/wordlists").catch(() => [] as WordlistAsset[]),
         ]);
 
         if (cancelled) return;
