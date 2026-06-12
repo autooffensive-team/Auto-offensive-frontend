@@ -462,12 +462,12 @@ export type LogSizeConfig = {
 };
 
 export const LOG_SIZES: Record<LogSizeKey, LogSizeConfig> = {
-  xs: { label: "XS", className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-[1.15]", terminalLineHeight: 1.15 },
-  sm: { label: "S", className: "text-[16px]", xtermFontSize: 17, lineHeight: "leading-[1.2]", terminalLineHeight: 1.2 },
-  md: { label: "M", className: "text-[18px]", xtermFontSize: 19, lineHeight: "leading-[1.25]", terminalLineHeight: 1.25 },
-  lg: { label: "L", className: "text-[21px]", xtermFontSize: 20, lineHeight: "leading-[1.2]", terminalLineHeight: 1.2 },
-  xl: { label: "XL", className: "text-[24px]", xtermFontSize: 22, lineHeight: "leading-[1.25]", terminalLineHeight: 1.25 },
-  xxl: { label: "XXL", className: "text-[28px]", xtermFontSize: 24, lineHeight: "leading-[1.35]", terminalLineHeight: 1.35 },
+  xs: { label: "XS", className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-[1.6]", terminalLineHeight: 1.6 },
+  sm: { label: "S", className: "text-[16px]", xtermFontSize: 17, lineHeight: "leading-[1.7]", terminalLineHeight: 1.7 },
+  md: { label: "M", className: "text-[18px]", xtermFontSize: 19, lineHeight: "leading-[1.75]", terminalLineHeight: 1.75 },
+  lg: { label: "L", className: "text-[21px]", xtermFontSize: 20, lineHeight: "leading-[1.8]", terminalLineHeight: 1.8 },
+  xl: { label: "XL", className: "text-[24px]", xtermFontSize: 22, lineHeight: "leading-[1.9]", terminalLineHeight: 1.9 },
+  xxl: { label: "XXL", className: "text-[28px]", xtermFontSize: 24, lineHeight: "leading-[2.0]", terminalLineHeight: 2.0 },
 };
 
 /** Default theme key */
