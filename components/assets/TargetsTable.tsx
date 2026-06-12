@@ -23,7 +23,6 @@ import {
 } from "@/lib/redux/services/userdashboard/assets/assets-api";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import type { Target, TargetWithMeta, JobSummary } from "@/types/assets";
-import StatusBadge from "./StatusBadge";
 import PaginationControls from "./PaginationControls";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -386,19 +385,16 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
             <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[35%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[38%]">
                     Target
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[22%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[26%]">
                     Project
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[13%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[16%]">
                     Type
                   </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[14%]">
-                    Status
-                  </th>
-                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[12%]">
+                  <th className="px-4 md:px-6 py-3.5 text-left text-[10px] md:text-xs lg:text-sm font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-[16%]">
                     Last Scan
                   </th>
                   <th className="px-4 md:px-6 py-3.5 w-[4%]" />
@@ -436,7 +432,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                       style={{ height: ROW_H }}
                     >
                       {/* Target name */}
-                      <td className="px-4 md:px-6 w-[35%]">
+                      <td className="px-4 md:px-6 w-[38%]">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-teal-50 dark:group-hover:bg-teal-950/40 transition-colors">
                             {getTypeIcon(target.type)}
@@ -447,7 +443,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                         </div>
                       </td>
                       {/* Project */}
-                      <td className="px-4 md:px-6 w-[22%]">
+                      <td className="px-4 md:px-6 w-[26%]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <FolderOpen size={12} className="shrink-0 text-slate-400 dark:text-slate-500" />
                           <span className="text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 truncate">
@@ -456,17 +452,13 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                         </div>
                       </td>
                       {/* Type */}
-                      <td className="px-4 md:px-6 w-[13%]">
+                      <td className="px-4 md:px-6 w-[16%]">
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] sm:text-[10px] lg:text-xs font-semibold uppercase tracking-wide whitespace-nowrap ${getTypePillClass(target.type)}`}>
                           {target.type}
                         </span>
                       </td>
-                      {/* Status */}
-                      <td className="px-4 md:px-6 w-[14%]">
-                        <StatusBadge status={target.status} />
-                      </td>
                       {/* Last scan */}
-                      <td className="px-4 md:px-6 w-[12%]">
+                      <td className="px-4 md:px-6 w-[16%]">
                         <div className="flex items-center gap-1.5">
                           <Clock size={11} className="shrink-0 text-slate-400 dark:text-slate-500" />
                           <span className="text-xs sm:text-sm lg:text-base tabular-nums text-slate-500 dark:text-slate-400 whitespace-nowrap">
@@ -488,7 +480,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                       className="border-b border-slate-50 dark:border-slate-800/30"
                       style={{ height: ROW_H }}
                     >
-                      <td colSpan={6} />
+                      <td colSpan={5} />
                     </tr>
                   ))}
                 </tbody>
@@ -544,7 +536,6 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <StatusBadge status={target.status} />
                     <ChevronRight size={13} className="text-slate-300 dark:text-slate-600" />
                   </div>
                 </motion.div>
@@ -593,9 +584,9 @@ function TargetsTableSkeleton({ pageSize = 10, rowH = 56 }: { pageSize?: number;
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/50">
-                {["35%", "22%", "13%", "14%", "12%", "4%"].map((w, i) => (
+                {["38%", "26%", "16%", "16%", "4%"].map((w, i) => (
                   <th key={i} className="px-4 md:px-6 py-3.5" style={{ width: w }}>
-                    {i < 5 && <div className="h-3 w-16 rounded bg-slate-200 dark:bg-slate-700 animate-pulse" />}
+                    {i < 4 && <div className="h-3 w-16 rounded bg-slate-200 dark:bg-slate-700 animate-pulse" />}
                   </th>
                 ))}
               </tr>
@@ -615,7 +606,6 @@ function TargetsTableSkeleton({ pageSize = 10, rowH = 56 }: { pageSize?: number;
                   </td>
                   <td className="px-4 md:px-6"><div className="h-4 w-28 rounded bg-slate-100 dark:bg-slate-800" /></td>
                   <td className="px-4 md:px-6"><div className="h-5 w-16 rounded-full bg-slate-100 dark:bg-slate-800" /></td>
-                  <td className="px-4 md:px-6"><div className="h-4 w-20 rounded bg-slate-100 dark:bg-slate-800" /></td>
                   <td className="px-4 md:px-6"><div className="h-4 w-14 rounded bg-slate-100 dark:bg-slate-800" /></td>
                   <td className="px-4 md:px-6" />
                 </tr>
