@@ -4,7 +4,7 @@
  */
 
 /** Maximum number of scans a guest user can perform */
-export const GUEST_MAX_SCANS = 20;
+export const GUEST_MAX_SCANS = 5;
 
 /** Cookie name for the guest session token */
 export const GUEST_SESSION_COOKIE = "guest_session_id";

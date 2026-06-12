@@ -205,7 +205,7 @@ export default function UserDashboardShell({
       </AnimatePresence>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${mobileMenuOpen ? "translate-x-0" : ""
+        className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${mobileMenuOpen ? "translate-x-0" : ""
           }`}
       >
         <div className={`relative border-b border-black/10 px-4 py-5 dark:border-white/10 ${collapsed ? "md:px-2 md:py-4" : ""}`}>
@@ -458,8 +458,8 @@ export default function UserDashboardShell({
         </div>
       </aside>
 
-      <div className={`transition-all duration-300 overflow-x-hidden min-w-0 ${desktopContentOffset}`}>
-        <header className="sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
+      <div className={`dashboard-content-shell transition-all duration-300 overflow-x-hidden min-w-0 ${desktopContentOffset}`}>
+        <header className="dashboard-topbar sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
           <div className="flex w-full items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button

@@ -46,7 +46,7 @@ export function useGuestScanGuard() {
       // Guest user — check limit
       if (guest.scansRemaining <= 0) {
         toast.error(
-          "You've used all 3 guest scans. Please create an account to continue scanning.",
+          "You've used all 5 guest scans. Please create an account to continue scanning.",
           {
             duration: 5000,
             action: {
@@ -64,7 +64,7 @@ export function useGuestScanGuard() {
       const allowed = await guest.validateScan();
       if (!allowed) {
         toast.error(
-          "You've used all 3 guest scans. Please create an account to continue scanning.",
+          "You've used all 5 guest scans. Please create an account to continue scanning.",
           {
             duration: 5000,
             action: {

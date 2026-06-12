@@ -37,7 +37,7 @@ function MainContent() {
                   Today&Apos;s Usage
                 </p>
                 <p className="text-2xl lg:text-4xl font-semibold text-gray-900 dark:text-white">
-                  0/3 Scans Used
+                  0/5 Scans Used
                 </p>
               </div>
             </div>

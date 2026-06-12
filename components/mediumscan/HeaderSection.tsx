@@ -15,7 +15,7 @@ export default function HeaderSection() {
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Today’s Usage</p>
-          <p className="font-bold">0/3 Scans Used Today</p>
+          <p className="font-bold">0/5 Scans Used Today</p>
         </div>
       </div>
     </div>
