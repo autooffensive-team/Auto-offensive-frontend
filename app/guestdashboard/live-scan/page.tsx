@@ -1,13 +1,9 @@
 "use client";
 
-import FeatureCards from "@/components/GuestDashboard/FeatureCards";
-import ScanSection from "@/components/GuestDashboard/ScanSection";
 import ActionBar from "@/components/live-scan-medium/ActionBar";
 import BottomActions from "@/components/live-scan-medium/BottomActions";
 import HeaderSection from "@/components/live-scan-medium/HeaderSection";
 import ToolChain from "@/components/live-scan-medium/ToolChain";
-import RecentScans from "@/components/mediumscan/RecentScans";
-import ToolLibrary from "@/components/mediumscan/ToolLibrary";
 import { Terminal } from "lucide-react";
 
 export default function GuestLiveScanPage() {
