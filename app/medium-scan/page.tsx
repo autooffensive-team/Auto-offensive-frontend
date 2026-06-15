@@ -4,8 +4,6 @@ import Sidebar from "@/components/Sidebar";
 import {
   Activity,
   AlertCircle,
-  ArrowRight,
-  BarChart3,
   CheckCircle2,
   Clock3,
   Database,
@@ -16,10 +14,8 @@ import {
   ShieldAlert,
   Terminal,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 
@@ -227,7 +223,6 @@ function normalizeLogPayload(event: string, payload: unknown): Pick<LogEntry, "m
 
 export default function MediumScanPage() {
   const locale = useLocale();
-  const router = useRouter();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
@@ -839,45 +834,6 @@ export default function MediumScanPage() {
                   </>
                 )}
               </div>
-
-              {/* ── View Scan Results button (Floating) ── */}
-              {/completed|failed|cancelled|partial/i.test(status) && (
-                <motion.div 
-                  className="fixed bottom-8 right-8 z-50"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <motion.button
-                    type="button"
-                    onClick={() => router.push("/userdashboard/assets")}
-                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      borderRadius: "8px",
-                      border: "2px solid #00ff00",
-                      backgroundColor: "#000000",
-                      padding: "12px 24px",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      color: "#00ff00",
-                      textShadow: "0 0 10px #00ff00",
-                      boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease"
-                    }}
-                  >
-                    <BarChart3 size={20} />
-                    View Results
-                    <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                      <ArrowRight size={20} />
-                    </motion.div>
-                  </motion.button>
-                </motion.div>
-              )}
             </div>
           </section>
 

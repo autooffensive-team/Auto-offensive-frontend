@@ -17,7 +17,7 @@ export function GuestScanLimitBar() {
   const progressPercent = Math.min((scansUsed / maxScans) * 100, 100);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95 md:left-72">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95 md:left-72 guest-scan-limit-bar">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 md:px-8">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 dark:bg-teal-500/10">
           <Scan size={16} className="text-teal-600 dark:text-teal-400" />

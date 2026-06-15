@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowRight, BarChart3, RotateCcw, ScanLine, Wrench } from "lucide-react";
-import { motion } from "framer-motion";
+import { RotateCcw, ScanLine, Wrench } from "lucide-react";
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -192,7 +191,6 @@ function colorizeLogText(text: string, isLightTheme = false): React.ReactNode {
 
 export default function BasicScanPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const initialMode = (searchParams.get("mode") as ScanMode) || "basic";
   const [activeTab, setActiveTab] = useState<ScanMode>(initialMode);
   const initialProjectId = searchParams.get("project") || undefined;
@@ -402,45 +400,6 @@ export default function BasicScanPage() {
                 onReset={() => resetRun("advanced")}
               />
             )}
-
-            {/* ── Advanced tab: View Results button (Floating) ── */}
-            {activeTab === "advanced" && /completed|failed|cancelled|partial/i.test(advancedRun.status) && (
-              <motion.div 
-                className="fixed bottom-8 right-8 z-50"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <motion.button
-                  type="button"
-                  onClick={() => router.push("/userdashboard/assets")}
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    borderRadius: "8px",
-                    border: "2px solid #00ff00",
-                    backgroundColor: "#000000",
-                    padding: "12px 24px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    color: "#00ff00",
-                    textShadow: "0 0 10px #00ff00",
-                    boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  <BarChart3 size={20} />
-                  View Results
-                  <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                    <ArrowRight size={20} />
-                  </motion.div>
-                </motion.button>
-              </motion.div>
-            )}
           </div>
 
           {activeTab !== "advanced" && (
@@ -557,45 +516,6 @@ export default function BasicScanPage() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* ── View Scan Results button (Floating) ── */}
-        {activeTab !== "advanced" && /completed|failed|cancelled|partial/i.test(activeRun.status) && (
-          <motion.div 
-            className="fixed bottom-8 right-8 z-50"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.button
-              type="button"
-              onClick={() => router.push("/userdashboard/assets")}
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 255, 0, 0.8)" }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "12px",
-                borderRadius: "8px",
-                border: "2px solid #00ff00",
-                backgroundColor: "#000000",
-                padding: "12px 24px",
-                fontSize: "16px",
-                fontWeight: "bold",
-                color: "#00ff00",
-                textShadow: "0 0 10px #00ff00",
-                boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)",
-                cursor: "pointer",
-                transition: "all 0.3s ease"
-              }}
-            >
-              <BarChart3 size={20} />
-              View Results
-              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ArrowRight size={20} />
-              </motion.div>
-            </motion.button>
-          </motion.div>
         )}
       </div>
     </div>

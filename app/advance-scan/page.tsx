@@ -1,12 +1,9 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
-import { motion } from "framer-motion";
 import {
   Activity,
   AlertCircle,
-  ArrowRight,
-  BarChart3,
   Database,
   FileJson,
   LoaderCircle,
@@ -16,7 +13,6 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useLogPreferences } from "@/hooks/use-log-preferences";
 import { LogToolbar } from "@/components/scanComponents/LogToolbar";
 
@@ -159,7 +155,6 @@ function normalizeLogPayload(event: string, payload: unknown): Pick<LogEntry, "m
 
 export default function AdvanceScanPage() {
   const locale = useLocale();
-  const router = useRouter();
   const isKhmer = locale === "km";
   const bodyFontFamily = isKhmer
     ? "var(--font-kantumruy-pro), var(--font-google-sans), sans-serif"
@@ -922,33 +917,6 @@ export default function AdvanceScanPage() {
                   </div>
                 ) : null}
               </div>
-
-              {/* ── View Scan Results button (Floating) ── */}
-              {/completed|failed|cancelled|partial/i.test(status) && (
-                <motion.div 
-                  className="fixed bottom-8 right-8 z-50"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <motion.button
-                    type="button"
-                    onClick={() => router.push("/userdashboard/assets")}
-                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(16, 185, 129, 0.8)" }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-3 rounded-2xl border-2 border-emerald-400 bg-linear-to-r from-emerald-950 to-emerald-950/80 px-6 py-3.5 text-sm font-bold text-emerald-300 shadow-lg hover:shadow-emerald-500/40 transition-all duration-300"
-                    style={{
-                      boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)",
-                    }}
-                  >
-                    <BarChart3 size={20} />
-                    View Results
-                    <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                      <ArrowRight size={20} />
-                    </motion.div>
-                  </motion.button>
-                </motion.div>
-              )}
             </div>
           </section>
         </div>
