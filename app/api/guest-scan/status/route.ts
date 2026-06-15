@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
     const scansUsed = maxScans != null && scansRemaining != null ? maxScans - scansRemaining : null;
 
     return NextResponse.json({
-      maxScans: null,
-      scansUsed: null,
-      scansRemaining: null,
-      resetAt: null,
-      limitReached: false,
+      maxScans,
+      scansUsed,
+      scansRemaining,
+      resetAt: reset != null ? Number(reset) : null,
+      limitReached: scansRemaining != null ? scansRemaining <= 0 : false,
     });
   }
 
