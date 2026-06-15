@@ -283,7 +283,8 @@ const glitchAnimation = `
   }
 
   body.terminal-fullscreen-active .dashboard-topbar,
-  body.terminal-fullscreen-active .dashboard-sidebar {
+  body.terminal-fullscreen-active .dashboard-sidebar,
+  body.terminal-fullscreen-active .guest-scan-limit-bar {
     display: none !important;
   }
 
