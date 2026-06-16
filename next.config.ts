@@ -15,11 +15,12 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://www.youtube.com https://s.ytimg.com;
       style-src 'self' 'unsafe-inline';
-      img-src 'self' data: blob: https://images.unsplash.com https://s3.auto-offensive.org;
+      img-src 'self' data: blob: https://images.unsplash.com https://s3.auto-offensive.org https://i.ytimg.com;
       font-src 'self' data:;
       connect-src 'self' https:;
+      frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
