@@ -113,12 +113,14 @@ export const scannerApi = baseApi.injectEndpoints({
     }),
     getScanDetail: builder.query<ScanDetailResponse, string>({
       query: (scan_id) => buildScannerUrl(["scans", scan_id]),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, scan_id) => [
         { type: "Scan" as const, id: scan_id },
       ],
     }),
     getScanStatus: builder.query<ScanStatusResponse, string>({
       query: (scan_id) => buildScannerUrl(["scans", scan_id, "status"]),
+      keepUnusedDataFor: 60, // status changes — shorter cache
       providesTags: (_result, _error, scan_id) => [
         { type: "Scan" as const, id: scan_id },
       ],
@@ -136,6 +138,7 @@ export const scannerApi = baseApi.injectEndpoints({
     }),
     getScanSummary: builder.query<ScanSummaryResponse, string>({
       query: (scan_id) => buildScannerUrl(["scans", scan_id, "summary"]),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, scan_id) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `SUMMARY:${scan_id}` },
@@ -149,6 +152,7 @@ export const scannerApi = baseApi.injectEndpoints({
           page,
           page_size,
         }),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, { scan_id }) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `ISSUES:${scan_id}` },
@@ -157,6 +161,7 @@ export const scannerApi = baseApi.injectEndpoints({
     getIssueDetail: builder.query<IssueDetailResponse, GetIssueDetailRequest>({
       query: ({ scan_id, issue_key }) =>
         buildScannerUrl(["scans", scan_id, "issues", issue_key]),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, { scan_id, issue_key }) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `ISSUE:${issue_key}` },
@@ -190,6 +195,7 @@ export const scannerApi = baseApi.injectEndpoints({
           page,
           page_size,
         }),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, { scan_id }) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `DEPENDENCIES:${scan_id}` },
@@ -197,6 +203,7 @@ export const scannerApi = baseApi.injectEndpoints({
     }),
     getDependencySummary: builder.query<DependencySummaryResponse, string>({
       query: (scan_id) => buildScannerUrl(["scans", scan_id, "dependencies", "summary"]),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, scan_id) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `DEPENDENCY_SUMMARY:${scan_id}` },
@@ -209,6 +216,7 @@ export const scannerApi = baseApi.injectEndpoints({
           page: args?.page,
           page_size: args?.page_size,
         }),
+      keepUnusedDataFor: 300,
       providesTags: (result) => [
         { type: "Scan" as const, id: "LIST" },
         ...(result?.scans.map((scan) => ({ type: "Scan" as const, id: scan.scan_id })) ?? []),
@@ -221,6 +229,7 @@ export const scannerApi = baseApi.injectEndpoints({
           page: args?.page,
           page_size: args?.page_size,
         }),
+      keepUnusedDataFor: 300,
       providesTags: [{ type: "Scan" as const, id: "LIST" }],
     }),
     listProjectScans: builder.query<ProjectScansResponse, ListProjectScansRequest>({
@@ -241,6 +250,7 @@ export const scannerApi = baseApi.injectEndpoints({
           page,
           page_size,
         }),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, { scan_id }) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `HOTSPOTS:${scan_id}` },
@@ -249,6 +259,7 @@ export const scannerApi = baseApi.injectEndpoints({
     getHotspotDetail: builder.query<HotspotDetailResponse, GetHotspotDetailRequest>({
       query: ({ scan_id, hotspot_key }) =>
         buildScannerUrl(["scans", scan_id, "hotspots", hotspot_key]),
+      keepUnusedDataFor: 300,
       providesTags: (_result, _error, { scan_id, hotspot_key }) => [
         { type: "Scan" as const, id: scan_id },
         { type: "Report" as const, id: `HOTSPOT:${hotspot_key}` },

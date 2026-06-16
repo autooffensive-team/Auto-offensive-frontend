@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -28,7 +28,7 @@ export function Footer() {
   const istadLogoSrc = resolvedTheme === "dark" ? "/istad-logo-white.png" : "/istad_logo.png";
 
   return (
-    <footer suppressHydrationWarning className="relative mt-auto w-full overflow-hidden border-t border-zinc-200 bg-white text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
+    <footer suppressHydrationWarning className="relative mt-auto w-full overflow-hidden border-t border-zinc-200 bg-[#FCFCFA] text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
       <div
         className="absolute inset-0 opacity-[0.08] dark:opacity-0"
         style={{
@@ -123,7 +123,7 @@ export function Footer() {
                   key={index}
                   href={social.href}
                   aria-label={social.label}
-                  className={`group flex h-12 w-12 items-center justify-center rounded-full border border-zinc-200 bg-white transition-all duration-300 dark:border-zinc-700 dark:bg-zinc-900 ${social.color}`}
+                  className={`group flex h-12 w-12 items-center justify-center rounded-full border border-zinc-200 bg-[#FCFCFA] transition-all duration-300 dark:border-zinc-700 dark:bg-zinc-900 ${social.color}`}
                 >
                   <social.icon className="text-xl text-zinc-600 transition-colors duration-300 group-hover:text-white dark:text-zinc-300 dark:group-hover:text-white" />
                 </Link>
@@ -200,7 +200,7 @@ export function Footer() {
                 key={index}
                 href={social.href}
                 aria-label={social.label}
-                className={`group flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white transition-all duration-300 dark:border-zinc-700 dark:bg-zinc-900 ${social.color}`}
+                className={`group flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-[#FCFCFA] transition-all duration-300 dark:border-zinc-700 dark:bg-zinc-900 ${social.color}`}
               >
                 <social.icon className="text-lg text-zinc-600 transition-colors duration-300 group-hover:text-white dark:text-zinc-300 dark:group-hover:text-white" />
               </Link>

@@ -69,13 +69,14 @@ const FUTURE_STYLES = `
 :root {
   --lc-neon:          #00d0b2;
   --lc-neon-rgb:      0,208,178;
+  --lc-neon-fg:       #007a69;
   --lc-neon2:         #00aaff;
   --lc-neon3:         #ff3cac;
   --lc-red:           #ef4444;
   --lc-amber:         #f59e0b;
 
   --lc-bg:            transparent;
-  --lc-panel-bg:      rgba(248,250,252,0.98);
+  --lc-panel-bg:      rgba(252,252,250,0.98);
   --lc-panel-border:  rgba(0,208,178,0.28);
   --lc-panel-hot:     rgba(0,208,178,0.55);
   --lc-toolbar-bg:    rgba(241,245,249,0.97);
@@ -84,7 +85,7 @@ const FUTURE_STYLES = `
   --lc-grid-line:     rgba(0,208,178,0.055);
   --lc-scan-beam:     rgba(0,208,178,0.055);
   --lc-shimmer:       rgba(0,208,178,0.1);
-  --lc-label:         rgba(15,23,42,0.42);
+  --lc-label:         rgba(15,23,42,0.75);
   --lc-text:          #0f172a;
   --lc-text-muted:    rgba(15,23,42,0.5);
   --lc-text-dim:      rgba(15,23,42,0.3);
@@ -114,7 +115,7 @@ const FUTURE_STYLES = `
   --lc-text-dim:      rgba(226,232,240,0.32);
   --lc-neon:          #00d0b2;
   --lc-neon-rgb:      0,208,178;
-  --lc-metric-val:    #00d0b2;
+  --lc-neon-fg:       #00d0b2;
   --lc-metric-bg:     rgba(0,208,178,0.06);
   --lc-radial:        rgba(0,208,178,0.04);
   --lc-stream-line:   rgba(0,208,178,0.65);
@@ -199,7 +200,7 @@ const FUTURE_STYLES = `
   font-family: var(--lc-font-ui);
   font-size: 12px; font-weight: 700;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--lc-text-muted);
+  color: var(--lc-text);
 }
 .lc-hd-spacer { flex: 1; }
 .lc-grip { color: var(--lc-text-dim); transition: color 0.2s; flex-shrink: 0; }
@@ -307,10 +308,10 @@ const FUTURE_STYLES = `
   clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
   flex-shrink: 0;
 }
-.lc-step-num-current { background: rgba(var(--lc-neon-rgb),0.14); color: var(--lc-neon); }
-.lc-step-num-done    { background: rgba(16,185,129,0.14); color: #10b981; }
+.lc-step-num-current { background: rgba(var(--lc-neon-rgb),0.14); color: var(--lc-neon-fg); }
+.lc-step-num-done    { background: rgba(16,185,129,0.18); color: #064e3b; }
 .lc-step-num-failed  { background: rgba(239,68,68,0.14); color: var(--lc-red); }
-.lc-step-num-idle    { background: rgba(100,116,139,0.1); color: #64748b; }
+.lc-step-num-idle    { background: rgba(100,116,139,0.1); color: #334155; }
 
 .lc-step-status {
   font-family: var(--lc-font-ui);
@@ -319,10 +320,10 @@ const FUTURE_STYLES = `
   padding: 3px 8px;
   clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
 }
-.lc-step-status-current { background: rgba(var(--lc-neon-rgb),0.1); color: var(--lc-neon); animation: lc-status-glow 1.5s ease-in-out infinite; }
-.lc-step-status-done    { background: rgba(16,185,129,0.1); color: #10b981; }
+.lc-step-status-current { background: rgba(var(--lc-neon-rgb),0.1); color: var(--lc-neon-fg); animation: lc-status-glow 1.5s ease-in-out infinite; }
+.lc-step-status-done    { background: rgba(16,185,129,0.18); color: #064e3b; }
 .lc-step-status-failed  { background: rgba(239,68,68,0.1); color: var(--lc-red); }
-.lc-step-status-idle    { background: rgba(100,116,139,0.07); color: #64748b; }
+.lc-step-status-idle    { background: rgba(100,116,139,0.07); color: #334155; }
 
 /* ── Spinner ── */
 .lc-spin {
@@ -824,7 +825,7 @@ function DraggablePanel({
           }} />
         )}
         <GripVertical size={13} className="lc-grip" />
-        {icon && <span style={{ color: "var(--lc-text-muted)" }}>{icon}</span>}
+        {icon && <span style={{ color: "var(--lc-neon-fg)" }}>{icon}</span>}
         <span className="lc-hd-label">{label}</span>
         {badge && <span style={{ marginLeft: 4 }}>{badge}</span>}
         <span className="lc-hd-spacer" />
@@ -977,7 +978,7 @@ export function LiveConsole({
                     <span className={cn("lc-step-num", numCls)}>{i + 1}</span>
                     <span style={{
                       fontFamily: "var(--lc-font-mono)", fontSize: 13, fontWeight: 600,
-                      color: isCurrent ? "var(--lc-neon)" : isDone ? "#10b981" : isFailed ? "var(--lc-red)" : "#64748b",
+                      color: isCurrent ? "var(--lc-neon-fg)" : isDone ? "#064e3b" : isFailed ? "var(--lc-red)" : "#334155",
                     }}>
                       {step.tool_name}
                     </span>

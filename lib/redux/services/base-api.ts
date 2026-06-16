@@ -78,5 +78,6 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: proxyBaseQueryWithReauth,
   tagTypes: ["Auth", "Gateway", "Project", "Scan", "Report", "Git", "ApiKey"],
+  keepUnusedDataFor: 300, // keep cache for 5 minutes — pages re-render instantly on back navigation
   endpoints: () => ({}),
 });

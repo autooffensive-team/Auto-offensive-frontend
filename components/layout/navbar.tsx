@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
@@ -117,7 +117,7 @@ const resourceMiscLinks: ResourceItem[] = [
 // ── Shared icon box class ────────────────────────────────────────────────────
 const iconBoxCls =
   'flex shrink-0 items-center justify-center rounded-[8px] ' +
-  'bg-white dark:bg-[#1C1C1A] ' +
+  'bg-[#FCFCFA] dark:bg-[#1C1C1A] ' +
   'border border-black/[0.045] dark:border-white/[0.09] ' +
   'shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)]';
 
@@ -244,7 +244,7 @@ function LanguageToggle() {
     >
       <span
         className={cn(
-          'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-black/9 dark:border-white/9 bg-white dark:bg-zinc-900 transition-all duration-300 ease-out',
+          'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-black/9 dark:border-white/9 bg-[#FCFCFA] dark:bg-zinc-900 transition-all duration-300 ease-out',
           isEnglish ? 'left-1.25' : 'left-[calc(100%-2rem)]',
         )}
       >
@@ -596,7 +596,7 @@ export function Header() {
   // Shared dropdown panel styles
   const dropdownPanelCls =
     'rounded-[13px] border border-black/[0.045] dark:border-white/[0.09] ' +
-    'bg-white dark:bg-[#111110] ' +
+    'bg-[#FCFCFA] dark:bg-[#111110] ' +
     'shadow-[0_4px_24px_rgba(0,0,0,0.07),0_1px_4px_rgba(0,0,0,0.04)] ' +
     'dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),0_1px_4px_rgba(0,0,0,0.3)] p-3';
   const authAction = isSessionPending ? (

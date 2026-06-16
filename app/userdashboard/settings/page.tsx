@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -40,9 +40,9 @@ function StatChip({
 }) {
   const styles = {
     default:
-      "border-gray-200 bg-white text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
+      "border-gray-200 bg-[#FCFCFA] text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
     active:
-      "border-gray-200 bg-white text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
+      "border-gray-200 bg-[#FCFCFA] text-gray-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white",
     revoked:
       "border-gray-200 bg-gray-50 text-gray-500 shadow-sm dark:border-white/10 dark:bg-white/4 dark:text-gray-500",
   };
@@ -72,7 +72,7 @@ function EmptyKeys({ onAdd }: { onAdd: () => void }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="relative overflow-hidden py-16 flex flex-col items-center text-center rounded-2xl border border-dashed border-[#00D0B2]/30 bg-white dark:bg-gray-900"
+      className="relative overflow-hidden py-16 flex flex-col items-center text-center rounded-2xl border border-dashed border-[#00D0B2]/30 bg-[#FCFCFA] dark:bg-gray-900"
     >
       {/* Subtle teal tint in top-left corner */}
       <span
@@ -238,7 +238,7 @@ export default function ApiKeysPage() {
         >
           {/* Project selector card */}
           <div
-            className="relative overflow-hidden bg-white dark:bg-[#0f0f0f] p-5"
+            className="relative overflow-hidden bg-[#FCFCFA] dark:bg-[#0f0f0f] p-5"
             style={{
               clipPath:
                 "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",

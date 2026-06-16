@@ -309,12 +309,13 @@ function OverviewMetricCell({
   return (
     <div
       className={cn(
-        "relative flex flex-col bg-white p-3 sm:p-4 dark:bg-slate-950",
+        "relative flex flex-col bg-[#FCFCFA] p-3 sm:p-4 dark:bg-slate-950",
         className,
       )}
       style={{
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+        outline: "1px solid",
+        outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
       }}
     >
       {/* Corner accent triangles */}
@@ -325,10 +326,10 @@ function OverviewMetricCell({
           position: "absolute",
           inset: 0,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -344,10 +345,10 @@ function OverviewMetricCell({
             <Icon className={cn("size-3.5 sm:size-4", iconStyle.icon)} />
           </div>
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[10px] dark:text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px] dark:text-slate-500">
               Metric
             </p>
-            <h3 className="mt-0.5 text-xs font-medium text-slate-900 sm:text-[13px] md:text-sm dark:text-slate-100">
+            <h3 className="mt-0.5 text-sm font-medium text-slate-900 sm:text-sm md:text-base dark:text-slate-100">
               {title}
             </h3>
           </div>
@@ -355,7 +356,7 @@ function OverviewMetricCell({
         {statusLabel && (
           <span
             className={cn(
-              "mt-0.5 inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide sm:px-2 sm:text-[9px]",
+              "mt-0.5 inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide sm:px-2.5 sm:text-xs",
               statusStyle,
             )}
           >
@@ -387,7 +388,7 @@ function OverviewMetricCell({
             {graphSegments.map((seg, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] font-medium text-[#52648f] dark:bg-slate-900/80 dark:text-slate-300"
+                 className="inline-flex items-center gap-1 rounded-full bg-white/80 px-1.5 py-0.5 text-xs font-medium text-[#52648f] dark:bg-slate-900/80 dark:text-slate-300"
               >
                 <span
                   className="inline-block size-1.5 rounded-full"
@@ -420,21 +421,21 @@ function OverviewMetricCell({
       )}
 
       {primaryDetail && (
-        <p className="text-[10px] text-slate-500 sm:text-[11px] dark:text-slate-400">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           {primaryDetail}
         </p>
       )}
       {secondaryDetail && (
-        <p className="mt-1 text-[10px] leading-5 text-slate-500 sm:text-[11px] dark:text-slate-400">
+        <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">
           {secondaryDetail}
         </p>
       )}
 
       <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-2 dark:border-slate-800">
-        <span className="text-[9px] text-slate-400 sm:text-[10px] dark:text-slate-500">
+        <span className="text-xs text-slate-400 dark:text-slate-500">
           Latest scan snapshot
         </span>
-        <span className="text-[9px] text-slate-500 sm:text-[10px] dark:text-slate-400">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
           {title}
         </span>
       </div>
@@ -547,10 +548,11 @@ function TopStatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all duration-300"
+      className="group relative overflow-hidden p-3 sm:p-4 md:p-5 bg-[#FCFCFA] dark:bg-gray-950 transition-all duration-300"
       style={{
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+        outline: "1px solid",
+        outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
       }}
     >
       {/* Corner accent triangles */}
@@ -561,10 +563,10 @@ function TopStatCard({
           position: "absolute",
           inset: 0,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -576,14 +578,14 @@ function TopStatCard({
       </div>
       <div className="relative z-10">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-xs dark:text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-sm dark:text-slate-500">
             {label}
           </p>
           {/* FIX: truncate long values gracefully on small screens */}
-          <p className="mt-2 truncate text-xl font-bold text-slate-900 sm:mt-3 sm:text-2xl md:text-3xl dark:text-white">
+          <p className="mt-2 truncate text-2xl font-bold text-slate-900 sm:mt-3 sm:text-3xl md:text-4xl dark:text-white">
             {value}
           </p>
-          <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs md:text-sm dark:text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-500 sm:mt-2 sm:text-sm md:text-base dark:text-slate-400">
             {helper}
           </p>
         </div>
@@ -687,10 +689,10 @@ function DonutChart({
             <span className="font-mono text-lg font-bold leading-none text-[#17233f] dark:text-white">
               {hovered.count}
             </span>
-            <span className="mt-0.5 max-w-15 text-[8px] font-semibold leading-tight text-[#52648f] dark:text-slate-400">
+            <span className="mt-0.5 max-w-15 text-[9px] font-semibold leading-tight text-[#52648f] dark:text-slate-400">
               {hovered.label}
             </span>
-            <span className="mt-0.5 text-[10px] font-bold text-[#00d0b2]">
+            <span className="mt-0.5 text-xs font-bold text-[#00d0b2]">
               {total > 0 ? Math.round((hovered.count / total) * 100) : 0}%
             </span>
           </>
@@ -699,7 +701,7 @@ function DonutChart({
             <span className="font-mono text-xl font-bold leading-none text-[#17233f] dark:text-white">
               {total}
             </span>
-            <span className="mt-0.5 text-[9px] font-semibold text-[#52648f] dark:text-slate-400">
+            <span className="mt-0.5 text-[10px] font-semibold text-[#52648f] dark:text-slate-400">
               total
             </span>
           </>
@@ -842,7 +844,7 @@ function RadialRingCard({
     >
       <div className="mb-3 sm:mb-4">
         <p className="text-xs font-bold text-slate-900 sm:text-sm dark:text-slate-100">{title}</p>
-        <p className="mt-0.5 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">{subtitle}</p>
+        <p className="mt-0.5 text-xs text-slate-500 sm:text-xs dark:text-slate-400">{subtitle}</p>
       </div>
 
       {/* FIX: limit chart width so it doesn't stretch on mobile, center it */}
@@ -860,16 +862,16 @@ function RadialRingCard({
                 className="inline-block size-2 rounded-full sm:size-2.5"
                 style={{ backgroundColor: ring.color }}
               />
-              <span className="text-[10px] font-medium text-slate-500 sm:text-[11px] dark:text-slate-400">
+              <span className="text-xs font-medium text-slate-500 sm:text-[11px] dark:text-slate-400">
                 {ring.label}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] font-bold text-slate-900 sm:text-[11px] dark:text-white">
+              <span className="font-mono text-xs font-bold text-slate-900 sm:text-[11px] dark:text-white">
                 {ring.count}
               </span>
               <span
-                className="min-w-7 text-right text-[9px] font-semibold sm:text-[10px]"
+                className="min-w-7 text-right text-xs font-semibold sm:text-[10px]"
                 style={{ color: ring.color }}
               >
                 {ring.percent}%
@@ -880,10 +882,10 @@ function RadialRingCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-2.5 sm:mt-4 sm:pt-3 dark:border-slate-800">
-        <span className="text-[10px] text-slate-500 sm:text-[11px] dark:text-slate-400">{totalLabel}</span>
+        <span className="text-xs text-slate-500 sm:text-[11px] dark:text-slate-400">{totalLabel}</span>
         <span
           className={cn(
-            "inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold sm:px-2.5 sm:text-[10px]",
+            "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:text-[10px]",
             badgeStyle,
           )}
         >
@@ -1074,7 +1076,7 @@ function DependencyRiskChart({
                 <span className="inline-block size-3 rounded" style={{ backgroundColor: cat.color }} />
                 <span className="text-xs font-medium text-[#17233f] dark:text-slate-200">{cat.label}</span>
                 <span className="font-mono text-xs font-bold text-[#17233f] dark:text-white">{cat.value}</span>
-                <span className="text-[10px] text-[#8fa0bf] dark:text-slate-500">{pct}%</span>
+                <span className="text-xs text-[#8fa0bf] dark:text-slate-500">{pct}%</span>
               </div>
             );
           })}
@@ -1117,15 +1119,15 @@ function DependencyRiskChart({
             {hoveredArc ? (
               <>
                 <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{hoveredArc.value}</span>
-                <span className="mt-0.5 text-[9px] font-medium text-[#52648f] dark:text-slate-400">{hoveredArc.label}</span>
-                <span className="text-[10px] font-bold text-[#00d0b2]">
+                <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-slate-400">{hoveredArc.label}</span>
+                <span className="text-xs font-bold text-[#00d0b2]">
                   {total > 0 ? Math.round((hoveredArc.value / total) * 100) : 0}%
                 </span>
               </>
             ) : (
               <>
                 <span className="font-mono text-xl font-bold text-[#17233f] dark:text-white">{total}</span>
-                <span className="mt-0.5 text-[10px] font-medium text-[#52648f] dark:text-slate-400">total</span>
+                <span className="mt-0.5 text-xs font-medium text-[#52648f] dark:text-slate-400">total</span>
               </>
             )}
           </div>
@@ -1193,7 +1195,7 @@ function RadarChartCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: delay ?? 0 }}
-      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       <div className="mb-2">
         <p className="text-sm font-bold text-[#17233f] dark:text-slate-100">{title}</p>
@@ -1272,7 +1274,7 @@ function RadarChartCard({
         <span className="text-[11px] text-[#52648f] dark:text-slate-400">{totalLabel}</span>
         <span
           className={cn(
-            "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+                 "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
             badgeStyle,
           )}
         >
@@ -1487,7 +1489,7 @@ export function CodeScanOverview({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+          className="rounded-xl border border-[#e4eaf4] bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-3 sm:p-4 md:p-5 dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
         >
           <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
             <div>
@@ -1498,7 +1500,7 @@ export function CodeScanOverview({
             </div>
             <span
               className={cn(
-                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+            "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
                 depCritical > 0
                   ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
                   : depHigh > 0

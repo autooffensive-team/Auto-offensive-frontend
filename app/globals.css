@@ -407,6 +407,6 @@ html[lang="km"] .about-hero .about-hero-title {
   background-color: rgba(156, 163, 175, 0.65);
 }
 
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FileText, FileJson, FileSpreadsheet, FileType2 } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -75,7 +75,7 @@ export default function FormatCard({ format, onSelect }: FormatCardProps) {
       className={[
         "group flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-xl mx-1 my-0.5",
         "border border-transparent transition-all duration-150",
-        "bg-white dark:bg-slate-900/60",
+        "bg-[#FCFCFA] dark:bg-slate-900/60",
         "hover:bg-slate-50 dark:hover:bg-slate-800/80",
         meta.borderHover,
         "focus:bg-slate-50 dark:focus:bg-slate-800/80",

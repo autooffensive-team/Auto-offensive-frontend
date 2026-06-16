@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import {
@@ -134,15 +134,21 @@ export default function ProfilePage() {
             </div>
 
             {/* Name & meta */}
-            <div className="pb-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+            <div className="pb-1 min-w-0">
+              <h1
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight truncate max-w-xs sm:max-w-sm lg:max-w-md"
+                title={user ? displayName : undefined}
+              >
                 {user ? displayName : (
-                  <span className="inline-block h-7 w-36 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                  <span className="inline-block h-7 w-36 rounded-lg bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 animate-pulse" />
                 )}
               </h1>
-              <p className="text-base sm:text-lg lg:text-xl text-gray-500 dark:text-gray-400 mt-0.5">
+              <p
+                className="text-base sm:text-lg lg:text-xl text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-xs sm:max-w-sm lg:max-w-md"
+                title={user?.email}
+              >
                 {user?.email ?? (
-                  <span className="inline-block h-4 w-48 rounded-md bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                  <span className="inline-block h-4 w-48 rounded-md bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 animate-pulse" />
                 )}
               </p>
             </div>
@@ -178,7 +184,7 @@ export default function ProfilePage() {
             custom={0} variants={fadeUp} initial="hidden" animate="show"
             className="lg:col-span-1 space-y-5"
           >
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
+            <div className="bg-[#FCFCFA] dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
               {/* Teal top accent */}
               <div  />
               <div className="p-5 space-y-4">
@@ -225,7 +231,7 @@ export default function ProfilePage() {
             {/* Account Information */}
             <motion.div
               custom={1} variants={fadeUp} initial="hidden" animate="show"
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
+              className="bg-[#FCFCFA] dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
             >
               <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">
@@ -261,7 +267,7 @@ export default function ProfilePage() {
             {/* Change Password */}
             <motion.div
               custom={2} variants={fadeUp} initial="hidden" animate="show"
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
+              className="bg-[#FCFCFA] dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
             >
               <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center">
@@ -311,7 +317,7 @@ export default function ProfilePage() {
             {/* Danger Zone */}
             <motion.div
               custom={3} variants={fadeUp} initial="hidden" animate="show"
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-red-100 dark:border-red-900/40 shadow-sm overflow-hidden"
+              className="bg-[#FCFCFA] dark:bg-gray-900 rounded-2xl border border-red-100 dark:border-red-900/40 shadow-sm overflow-hidden"
             >
               <div className="px-6 py-4 border-b border-red-100 dark:border-red-900/40 flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/50 flex items-center justify-center">
@@ -347,7 +353,7 @@ function fieldClass(editing: boolean) {
   return [
     "w-full pl-9 pr-4 py-2.5 text-base lg:text-lg rounded-xl border transition-all outline-none",
     editing
-      ? "border-teal-300 dark:border-teal-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+      ? "border-teal-300 dark:border-teal-700 bg-[#FCFCFA] dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
       : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 cursor-not-allowed opacity-70",
   ].join(" ");
 }
@@ -387,16 +393,30 @@ function StatRow({
   value: string;
   loading?: boolean;
 }) {
+  // Detect long values (e.g. email-style usernames) to stack vertically
+  const isLong = value.length > 20;
+
   return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
-      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm lg:text-base">
+    <div
+      className={`py-2 border-b border-gray-50 dark:border-gray-800 last:border-0 ${
+        isLong ? "flex flex-col gap-1" : "flex items-center justify-between"
+      }`}
+    >
+      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm lg:text-base shrink-0">
         {icon}
         {label}
       </div>
       {loading ? (
-        <span className="h-3.5 w-20 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        <span className="h-3.5 w-20 rounded bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 animate-pulse" />
       ) : (
-        <span className="text-sm lg:text-base font-medium text-gray-900 dark:text-white">{value}</span>
+        <span
+          className={`text-sm lg:text-base font-medium text-gray-900 dark:text-white ${
+            isLong ? "break-all" : ""
+          }`}
+          title={value}
+        >
+          {value}
+        </span>
       )}
     </div>
   );

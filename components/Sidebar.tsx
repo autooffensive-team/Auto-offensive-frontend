@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -25,7 +25,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen shrink-0 transition-colors">
+    <aside className="w-56 bg-[#FCFCFA] dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen shrink-0 transition-colors">
       <div className="px-3 pt-4 mb-4">
         <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

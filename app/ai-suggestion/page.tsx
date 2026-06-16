@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Sidebar from "@/components/Sidebar";
 import { useLocale } from "next-intl";
@@ -157,7 +157,7 @@ export default function AISuggestionPage() {
 
   return (
     <div
-      className="flex min-h-screen bg-white text-gray-900 transition-colors dark:bg-black dark:text-white"
+      className="flex min-h-screen bg-[#FCFCFA] text-gray-900 transition-colors dark:bg-black dark:text-white"
       style={{ fontFamily: bodyFontFamily }}
     >
       <aside className="hidden w-64 border-r border-gray-200 dark:border-gray-900 md:block">
@@ -167,7 +167,7 @@ export default function AISuggestionPage() {
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
           <section className="grid gap-6 xl:grid-cols-[1.05fr_1.35fr]">
-            <div className="space-y-6 rounded-[1.75rem] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+            <div className="space-y-6 rounded-[1.75rem] border border-gray-200 bg-[#FCFCFA] p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium uppercase tracking-[0.22em] text-teal-600 dark:text-teal-300">
@@ -186,7 +186,7 @@ export default function AISuggestionPage() {
                 <input
                   value={jobId}
                   onChange={(event) => setJobId(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-teal-400 focus:bg-white dark:border-gray-800 dark:bg-gray-900 dark:focus:border-teal-500"
+                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-teal-400 focus:bg-[#FCFCFA] dark:border-gray-800 dark:bg-gray-900 dark:focus:border-teal-500"
                   placeholder="Enter scan job UUID"
                 />
               </label>
@@ -204,7 +204,7 @@ export default function AISuggestionPage() {
                         className={`rounded-2xl border p-4 text-left transition ${
                           active
                             ? "border-teal-400 bg-teal-50 shadow-sm dark:border-teal-500 dark:bg-teal-500/10"
-                            : "border-gray-200 bg-white hover:border-teal-200 hover:bg-teal-50/40 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-teal-500/40 dark:hover:bg-teal-500/5"
+                            : "border-gray-200 bg-[#FCFCFA] hover:border-teal-200 hover:bg-teal-50/40 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-teal-500/40 dark:hover:bg-teal-500/5"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-3">
@@ -239,7 +239,7 @@ export default function AISuggestionPage() {
               </button>
             </div>
 
-            <div className="space-y-6 rounded-[1.75rem] border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+            <div className="space-y-6 rounded-[1.75rem] border border-gray-200 bg-[#FCFCFA] p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <p className="text-sm font-medium uppercase tracking-[0.22em] text-teal-600 dark:text-teal-300">

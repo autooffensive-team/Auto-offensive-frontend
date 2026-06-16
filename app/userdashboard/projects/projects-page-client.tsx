@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -12,9 +12,16 @@ import {
   RefreshCw,
   LoaderCircle,
   X,
+  ScanLine,
+  Wrench,
+  SquareTerminal,
+  History,
+  ChevronRight,
+  ArrowLeft,
+  CheckCircle2,
 } from "lucide-react";
-import { useState, startTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, startTransition, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 import {
@@ -24,6 +31,10 @@ import {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } from "@/lib/redux/services/userdashboard/project/project-api";
+import {
+  useGetToolsQuery,
+  type Tool,
+} from "@/lib/redux/services/tools-list/tools-list";
 
 function formatProjectDate(value: string): string {
   if (!value) return "Unavailable";
@@ -116,10 +127,9 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, ease: "easeOut" }}
-      className="relative p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-900 transition-all"
+      className="relative p-3 sm:p-4 md:p-5 bg-[#FCFCFA] border border-[#005F5F]/60 dark:bg-gray-900 transition-all"
       style={{
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
       }}
     >
       {/* Corner accent triangles */}
@@ -130,10 +140,10 @@ function StatCard({
           position: "absolute",
           inset: 0,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -156,6 +166,313 @@ function StatCard({
   );
 }
 
+// ─── ProjectScanModal ─────────────────────────────────────────────────────────
+// Multi-step modal: Step 1 → pick scan type, Step 2 → pick tool (basic/medium)
+
+type ScanType = "basic" | "medium" | "advanced";
+
+const SCAN_OPTIONS: {
+  id: ScanType;
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  showToolPicker: boolean;
+}[] = [
+  {
+    id: "basic",
+    label: "Basic Scan",
+    description: "Quick scan using presets — pick a tool and go.",
+    icon: ScanLine,
+    showToolPicker: true,
+  },
+  {
+    id: "medium",
+    label: "Medium Scan",
+    description: "Customizable pipeline — chain tools with specific options.",
+    icon: Wrench,
+    showToolPicker: true,
+  },
+  {
+    id: "advanced",
+    label: "Advanced Scan",
+    description: "Full terminal control — write raw commands.",
+    icon: SquareTerminal,
+    showToolPicker: false,
+  },
+];
+
+function ProjectScanModal({
+  project,
+  onClose,
+  onNavigate,
+}: {
+  project: UserProject;
+  onClose: () => void;
+  onNavigate: (url: string) => void;
+}) {
+  const [step, setStep] = useState<"type" | "tool">("type");
+  const [selectedType, setSelectedType] = useState<ScanType | null>(null);
+  const [selectedToolId, setSelectedToolId] = useState<string>("");
+
+  const { data: tools = [], isLoading: toolsLoading } = useGetToolsQuery(true);
+
+  // Tools relevant per scan type
+  const eligibleTools =
+    selectedType === "basic"
+      ? tools.filter((t) => (t.scan_config?.basic?.presets?.length ?? 0) > 0)
+      : tools; // medium uses all tools
+
+  function handleTypeSelect(type: ScanType) {
+    setSelectedType(type);
+    setSelectedToolId("");
+    if (SCAN_OPTIONS.find((o) => o.id === type)?.showToolPicker) {
+      setStep("tool");
+    } else {
+      // Advanced — navigate immediately
+      onNavigate(`/userdashboard/scan?project=${project.project_id}&mode=advanced`);
+    }
+  }
+
+  function handleStartScan() {
+    if (!selectedType) return;
+    const params = new URLSearchParams({
+      project: project.project_id,
+      mode: selectedType,
+    });
+    if (selectedToolId) params.set("tool", selectedToolId);
+    onNavigate(`/userdashboard/scan?${params.toString()}`);
+  }
+
+  function handleViewHistory() {
+    onNavigate(`/userdashboard/assets?project=${project.project_id}`);
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+        transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.25 }}
+        className="w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 shadow-2xl overflow-hidden"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between px-6 pt-6 pb-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {step === "tool" && (
+              <button
+                onClick={() => { setStep("type"); setSelectedToolId(""); }}
+                className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Back to scan type selection"
+              >
+                <ArrowLeft size={15} />
+              </button>
+            )}
+            <div className="min-w-0">
+              <h2 className="text-[18px] sm:text-[20px] font-bold text-gray-900 dark:text-white leading-tight truncate">
+                {step === "type" ? "Open Project" : `${SCAN_OPTIONS.find((o) => o.id === selectedType)?.label} — Select Tool`}
+              </h2>
+              <p className="mt-0.5 text-[13px] sm:text-[14px] leading-relaxed text-gray-500 dark:text-gray-400 truncate">
+                <span
+                  className="font-medium"
+                  style={{ fontFamily: "'SF Mono', 'Fira Code', monospace" }}
+                >
+                  {project.name}
+                </span>
+                {step === "type" && " — choose what to do"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 ml-2 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {/* ── Step 1: Choose type ── */}
+          {step === "type" && (
+            <motion.div
+              key="type-step"
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 16 }}
+              transition={{ duration: 0.18 }}
+              className="p-6 space-y-2.5"
+            >
+              {SCAN_OPTIONS.map((option) => {
+                const Icon = option.icon;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => handleTypeSelect(option.id)}
+                    className="group w-full flex items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 px-4 py-3.5 text-left transition-all hover:border-[#00d0b2] dark:hover:border-[#00d0b2]/60 hover:bg-[#e6faf8]/60 dark:hover:bg-[#00d0b2]/5 active:scale-[0.99]"
+                  >
+                    <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700/80 group-hover:bg-[#00d0b2]/15 dark:group-hover:bg-[#00d0b2]/15 transition-colors">
+                      <Icon size={18} className="text-gray-500 dark:text-gray-400 group-hover:text-[#00a891] dark:group-hover:text-[#00d0b2] transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-gray-900 dark:text-white leading-snug">
+                        {option.label}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-gray-500 dark:text-gray-400 leading-snug">
+                        {option.description}
+                      </p>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      className="shrink-0 text-gray-300 dark:text-gray-600 group-hover:text-[#00d0b2] transition-colors"
+                    />
+                  </button>
+                );
+              })}
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 py-1">
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wider">
+                  or
+                </span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              </div>
+
+              {/* View history */}
+              <button
+                onClick={handleViewHistory}
+                className="group w-full flex items-center gap-4 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 px-4 py-3 text-left transition-all hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:scale-[0.99]"
+              >
+                <div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+                  <History size={16} className="text-gray-400 dark:text-gray-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-gray-600 dark:text-gray-300 leading-snug">
+                    View Scan History
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-gray-400 dark:text-gray-500 leading-snug">
+                    Browse past results and assets for this project
+                  </p>
+                </div>
+                <ChevronRight size={16} className="shrink-0 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors" />
+              </button>
+            </motion.div>
+          )}
+
+          {/* ── Step 2: Pick tool ── */}
+          {step === "tool" && (
+            <motion.div
+              key="tool-step"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.18 }}
+              className="flex flex-col"
+            >
+              <div className="px-6 pt-4 pb-3">
+                <p className="text-[12px] text-gray-500 dark:text-gray-400">
+                  Select the tool to use for this scan. You can change it on the scan page too.
+                </p>
+              </div>
+
+              {/* Tool list */}
+              <div className="px-6 pb-2 max-h-[280px] overflow-y-auto space-y-1.5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+                {toolsLoading ? (
+                  <div className="flex flex-col gap-1.5 py-2">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="h-14 w-full animate-pulse rounded-xl bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8"
+                      />
+                    ))}
+                  </div>
+                ) : eligibleTools.length === 0 ? (
+                  <div className="py-8 text-center text-[13px] text-gray-400 dark:text-gray-500">
+                    No tools available
+                  </div>
+                ) : (
+                  eligibleTools.map((tool: Tool) => {
+                    const isSelected = selectedToolId === tool.tool_id;
+                    return (
+                      <button
+                        key={tool.tool_id}
+                        onClick={() =>
+                          setSelectedToolId(isSelected ? "" : tool.tool_id)
+                        }
+                        className={[
+                          "w-full flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left transition-all active:scale-[0.99]",
+                          isSelected
+                            ? "border-[#00d0b2] bg-[#e6faf8]/60 dark:border-[#00d0b2]/60 dark:bg-[#00d0b2]/8"
+                            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-[#00d0b2]/60 dark:hover:border-[#00d0b2]/40 hover:bg-[#e6faf8]/30 dark:hover:bg-[#00d0b2]/5",
+                        ].join(" ")}
+                      >
+                        <div
+                          className={[
+                            "shrink-0 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-colors",
+                            isSelected
+                              ? "border-[#00d0b2] bg-[#00d0b2]/10"
+                              : "border-gray-200 dark:border-gray-600",
+                          ].join(" ")}
+                        >
+                          {isSelected && (
+                            <CheckCircle2
+                              size={13}
+                              className="text-[#00a891] dark:text-[#00d0b2]"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">
+                            {tool.tool_name}
+                          </p>
+                          {tool.tool_description && (
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                              {tool.tool_description}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Footer actions */}
+              <div className="flex gap-2.5 px-6 py-4 border-t border-gray-100 dark:border-gray-800 mt-1">
+                <button
+                  onClick={() => { setStep("type"); setSelectedToolId(""); }}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-[14px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Back
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleStartScan}
+                  disabled={!selectedToolId && eligibleTools.length > 0}
+                  className="flex-1 py-2.5 rounded-xl bg-[#00d0b2] hover:bg-[#00b89e] disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 font-semibold text-[14px] transition-colors flex items-center justify-center gap-2 shadow-sm"
+                >
+                  {selectedType === "basic" ? <ScanLine size={15} /> : <Wrench size={15} />}
+                  Start {SCAN_OPTIONS.find((o) => o.id === selectedType)?.label}
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── ProjectCard ──────────────────────────────────────────────────────────────
+
 function ProjectCard({
   project,
   index,
@@ -177,7 +494,7 @@ function ProjectCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ delay: index * 0.06, ease: "easeOut" }}
-      className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white dark:border-white/10 dark:bg-[#101828]"
+      className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-[#FCFCFA] dark:border-white/10 dark:bg-[#101828]"
     >
       {/* ── Card body ── */}
       <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4.5">
@@ -296,7 +613,7 @@ function AddProjectModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 12 }}
         transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.25 }}
-        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 shadow-2xl"
       >
         <div className="flex items-start justify-between p-6 pb-0">
           <div>
@@ -441,7 +758,7 @@ function UpdateProjectModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 12 }}
         transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.25 }}
-        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 shadow-2xl"
       >
         <div className="flex items-start justify-between p-6 pb-0">
           <div>
@@ -532,11 +849,24 @@ export default function ProjectsPageClient({
   initialProjects: UserProject[];
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProject, setEditingProject] = useState<UserProject | null>(null);
+  const [openingProject, setOpeningProject] = useState<UserProject | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showRefreshWarning, setShowRefreshWarning] = useState(false);
+
+  // Auto-open create modal when navigated with ?action=new (e.g. from Overview "New Project" button)
+  useEffect(() => {
+    if (searchParams.get("action") === "new") {
+      setShowAddModal(true);
+      // Clean the param from the URL without a full navigation
+      const url = new URL(window.location.href);
+      url.searchParams.delete("action");
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, [searchParams]);
 
   const {
     data: projects = initialProjects,
@@ -619,7 +949,7 @@ export default function ProjectsPageClient({
             onClick={handleRefresh}
             disabled={isFetching}
             title="Refresh"
-            className="p-2 sm:p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-40 transition-all"
+            className="p-2 sm:p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-40 transition-all"
           >
             <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
           </motion.button>
@@ -652,7 +982,7 @@ export default function ProjectsPageClient({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search projects..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[14px] lg:text-base focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
+          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[14px] lg:text-base focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
         />
         <AnimatePresence>
           {searchTerm && (
@@ -693,7 +1023,7 @@ export default function ProjectsPageClient({
 
       <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && projects.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-16">
+          <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 py-16">
             <LoaderCircle size={22} className="animate-spin text-teal-500 dark:text-teal-400" />
             <p className="text-[14px] text-gray-500 dark:text-gray-400">
               Loading projects...
@@ -708,7 +1038,7 @@ export default function ProjectsPageClient({
                 index={i}
                 onEdit={setEditingProject}
                 onDelete={handleDelete}
-                onOpen={(p) => router.push(`/userdashboard/assets?project=${p.project_id}`)}
+                onOpen={(p) => setOpeningProject(p)}
                 isDeleting={deletingId === project.project_id}
               />
             ))}
@@ -717,7 +1047,7 @@ export default function ProjectsPageClient({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 py-16 text-center"
+            className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-[#FCFCFA] dark:bg-gray-900 py-16 text-center"
           >
             <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
               <FolderGit2 size={22} className="text-gray-400 dark:text-gray-500" />
@@ -760,6 +1090,19 @@ export default function ProjectsPageClient({
             project={editingProject}
             onClose={() => setEditingProject(null)}
             onUpdated={refreshRouteData}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {openingProject && (
+          <ProjectScanModal
+            project={openingProject}
+            onClose={() => setOpeningProject(null)}
+            onNavigate={(url) => {
+              setOpeningProject(null);
+              router.push(url);
+            }}
           />
         )}
       </AnimatePresence>

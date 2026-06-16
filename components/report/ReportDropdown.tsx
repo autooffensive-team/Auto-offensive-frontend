@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FileDown } from "lucide-react";
 import { DropdownMenuContent } from "@/components/ui/dropdown-menu";
@@ -70,7 +70,7 @@ export default function ReportDropdown({
           </div>
           <button
             onClick={() => refetch()}
-            className="self-start rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+            className="self-start rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
           >
             Try again
           </button>
@@ -106,7 +106,7 @@ export default function ReportDropdown({
     <DropdownMenuContent
       align="end"
       sideOffset={8}
-      className="w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-xl dark:border-slate-700/60 dark:bg-slate-900"
+      className="w-80 overflow-hidden rounded-2xl border border-slate-200 bg-[#FCFCFA] p-0 shadow-xl dark:border-slate-700/60 dark:bg-slate-900"
     >
       {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-slate-100 px-4 py-3 dark:border-slate-800">

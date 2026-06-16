@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import * as ReactDOM from "react-dom"
@@ -252,7 +252,7 @@ function ComboboxContent({
         // position:fixed so it's relative to viewport, not any parent
         "fixed z-9999 overflow-hidden rounded-lg shadow-md ring-1",
         // Light mode
-        "bg-white text-gray-900 ring-gray-200",
+        "bg-[#FCFCFA] text-gray-900 ring-gray-200",
         // Dark mode
         "dark:bg-gray-900 dark:text-gray-100 dark:ring-gray-700",
         className

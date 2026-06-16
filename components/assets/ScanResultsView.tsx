@@ -165,7 +165,7 @@ function StepSection({ step }: { step: StepSummary }) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+    <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       {/* Step header */}
       <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-col sm:flex-row sm:items-center gap-3">
         <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white shrink-0">
@@ -181,7 +181,7 @@ function StepSection({ step }: { step: StepSummary }) {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 maxLength={200}
-                className="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+                className="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-[#FCFCFA] dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
                 aria-label={`Search results for step ${step.step_order}`}
               />
             </div>
@@ -226,7 +226,7 @@ function StepSection({ step }: { step: StepSummary }) {
             className={`relative overflow-x-auto ${rows.length === 0 ? "min-h-40" : ""}`}
           >
             {isFetching && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 dark:bg-slate-900/60">
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#FCFCFA]/60 dark:bg-slate-900/60">
                 <Loader2 size={28} className="animate-spin text-teal-500" />
               </div>
             )}
@@ -302,7 +302,7 @@ export default function ScanResultsView({ jobId, hideReportButton }: ScanResults
 
   if (isError) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-red-200 dark:border-red-800 p-6 flex flex-col items-center gap-3">
+      <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-red-200 dark:border-red-800 p-6 flex flex-col items-center gap-3">
         <AlertCircle size={28} className="text-red-500" />
         <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">
           Failed to load scan results. Please try again.
@@ -396,7 +396,7 @@ export default function ScanResultsView({ jobId, hideReportButton }: ScanResults
 
       {/* Step sections */}
       {sortedSteps.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-10 flex flex-col items-center gap-2">
+        <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-10 flex flex-col items-center gap-2">
           <FileX2 size={28} className="text-slate-400 dark:text-slate-500" />
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
             No parsed results available for this job.

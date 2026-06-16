@@ -117,8 +117,8 @@ export function ToolSelector({
 export function ToolSelectorSkeleton() {
   return (
     <div className="space-y-2" aria-busy="true" aria-label="Loading tool selector">
-      <div className="h-4 w-12 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-      <div className="h-10 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+      <div className="h-4 w-12 animate-pulse rounded bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8" />
+      <div className="h-10 w-full animate-pulse rounded bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8" />
     </div>
   );
 }

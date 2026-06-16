@@ -106,7 +106,7 @@ function ConfirmDeleteDialog({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 8 }}
         transition={{ duration: 0.15 }}
-        className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-5 sm:p-6"
+        className="relative w-full max-w-md bg-[#FCFCFA] dark:bg-gray-900 rounded-2xl border border-[#005F5F]/50 dark:border-gray-800 shadow-2xl p-5 sm:p-6"
       >
         {/* Icon */}
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto mb-4">
@@ -187,8 +187,28 @@ function ReportCard({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
-      className="flex items-start justify-between gap-3 p-4 border-b border-gray-200 dark:border-gray-800 last:border-b-0"
+      className="relative p-4 border-b border-gray-200 dark:border-gray-800 last:border-b-0 bg-[#FCFCFA] dark:bg-gray-900 transition-all"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        outline: "1px solid rgba(0,95,95,0.5)",
+      }}
     >
+      {/* Corner accent triangles */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: `
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
+          `,
+          opacity: 0.5,
+          clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        }}
+      />
       {/* Left: icon + info */}
       <div className="flex items-start gap-3 min-w-0">
         <div className="w-9 h-9 shrink-0 rounded-xl bg-teal-500/10 flex items-center justify-center mt-0.5">
@@ -385,7 +405,7 @@ export default function ReportsPage() {
                   : { duration: 0.2 }
               }
             >
-              <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <RefreshCw size={16} className="sm:w-4.5 sm:h-4.5" />
             </motion.span>
             Refresh
           </motion.button>
@@ -408,7 +428,7 @@ export default function ReportsPage() {
           <div className="sm:hidden">
             {/* Total — full width on mobile */}
             <div
-              className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 w-full"
+              className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 w-full border border-[#005F5F]/60"
               style={{
                 clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
                 outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
@@ -433,10 +453,10 @@ export default function ReportsPage() {
           {/* Mobile 2×2 format cards */}
           <div className="grid grid-cols-2 gap-2 sm:hidden">
             {/* PDF */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-3" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-3 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[72px] h-[72px]" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-18 h-18" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
@@ -445,10 +465,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* DOCX */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-3" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-3 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[72px] h-[72px]" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-18 h-18" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
@@ -457,10 +477,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* Excel */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-3" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-3 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[72px] h-[72px]" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-18 h-18" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
@@ -469,10 +489,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* JSON */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-3" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-3 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[72px] h-[72px]" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-18 h-18" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
@@ -485,10 +505,10 @@ export default function ReportsPage() {
           {/* Tablet (sm–lg): 3-col first row, 2-col second row */}
           <div className="hidden sm:grid grid-cols-3 gap-3">
             {/* Total */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 md:p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 md:p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]" style={{ color: "#14b8a6", opacity: 0.12 }}><FileText className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-25 h-25 md:w-30 md:h-30" style={{ color: "#14b8a6", opacity: 0.12 }}><FileText className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Reports</p>
@@ -497,10 +517,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* PDF */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 md:p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 md:p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-25 h-25 md:w-30 md:h-30" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
@@ -509,10 +529,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* DOCX */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 md:p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 md:p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-25 h-25 md:w-30 md:h-30" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
@@ -523,10 +543,10 @@ export default function ReportsPage() {
           </div>
           <div className="hidden sm:grid grid-cols-2 gap-3">
             {/* Excel */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 md:p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 md:p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-25 h-25 md:w-30 md:h-30" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
@@ -535,10 +555,10 @@ export default function ReportsPage() {
               </div>
             </div>
             {/* JSON */}
-            <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-4 md:p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+            <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-4 md:p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
               <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
               <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
+                <div className="w-25 h-25 md:w-30 md:h-30" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
               </div>
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
@@ -552,10 +572,10 @@ export default function ReportsPage() {
         {/* Desktop (lg+): original single 5-col row */}
         <div className="hidden lg:grid grid-cols-5 gap-3">
           {/* Total */}
-          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+             <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
             <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
             <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-              <div className="w-[140px] h-[140px]" style={{ color: "#14b8a6", opacity: 0.12 }}><FileText className="w-full h-full" strokeWidth={1.5} /></div>
+              <div className="w-35 h-35" style={{ color: "#14b8a6", opacity: 0.12 }}><FileText className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
               <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Reports</p>
@@ -564,10 +584,10 @@ export default function ReportsPage() {
             </div>
           </div>
           {/* PDF */}
-          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+             <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
             <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
             <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-              <div className="w-[140px] h-[140px]" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
+              <div className="w-35 h-35" style={{ color: "#ef4444", opacity: 0.12 }}><File className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
               <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PDF</p>
@@ -576,10 +596,10 @@ export default function ReportsPage() {
             </div>
           </div>
           {/* DOCX */}
-          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+             <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
             <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
             <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-              <div className="w-[140px] h-[140px]" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
+              <div className="w-35 h-35" style={{ color: "#3b82f6", opacity: 0.12 }}><FilePlus className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
               <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">DOCX</p>
@@ -588,10 +608,10 @@ export default function ReportsPage() {
             </div>
           </div>
           {/* Excel */}
-          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+             <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
             <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
             <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-              <div className="w-[140px] h-[140px]" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
+              <div className="w-35 h-35" style={{ color: "#22c55e", opacity: 0.12 }}><FileSpreadsheet className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
               <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Excel</p>
@@ -600,10 +620,10 @@ export default function ReportsPage() {
             </div>
           </div>
           {/* JSON */}
-          <div className="relative overflow-hidden bg-white dark:bg-gray-900 p-5" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))", outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)" }}>
+             <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-slate-900 p-5 border border-[#005F5F]/60" style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
             <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
             <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-              <div className="w-[140px] h-[140px]" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
+              <div className="w-35 h-35" style={{ color: "#f59e0b", opacity: 0.12 }}><FileJson className="w-full h-full" strokeWidth={1.5} /></div>
             </div>
             <div className="relative z-10">
               <p className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">JSON</p>
@@ -614,7 +634,7 @@ export default function ReportsPage() {
         </div>
 
         {/* ── Format Tabs ── */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 overflow-x-auto scrollbar-hide">
+        <div className="bg-[#FCFCFA] dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 overflow-x-auto scrollbar-hide">
           <div className="flex items-center gap-1 sm:gap-2 min-w-max">
             {formatTabs.map((tab) => (
               <button
@@ -626,7 +646,7 @@ export default function ReportsPage() {
                     : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
-                <tab.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <tab.icon size={16} className="sm:w-4.5 sm:h-4.5" />
                 <span>{tab.label}</span>
                 <span
                   className={`ml-0.5 sm:ml-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-[12px] ${
@@ -657,12 +677,12 @@ export default function ReportsPage() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 text-[14px] sm:text-[15px] lg:text-[17px] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 text-[14px] sm:text-[15px] lg:text-[17px] rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
 
         {/* ── Reports Table / Cards ── */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="bg-[#FCFCFA] dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           {/* Loading */}
           {isLoading && (
             <div className="p-10 sm:p-14 text-center">
@@ -736,7 +756,7 @@ export default function ReportsPage() {
                               <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
                                 <FileText size={20} className="text-teal-500" />
                               </div>
-                              <p className="text-[15px] lg:text-[17px] font-semibold text-gray-900 dark:text-white max-w-[260px] truncate">
+                              <p className="text-[15px] lg:text-[17px] font-semibold text-gray-900 dark:text-white max-w-65 truncate">
                                 {report.file_name}
                               </p>
                             </div>
@@ -852,7 +872,7 @@ export default function ReportsPage() {
                             <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0">
                               <FileText size={16} className="text-teal-500" />
                             </div>
-                            <p className="text-[13px] font-semibold text-gray-900 dark:text-white max-w-[180px] md:max-w-[240px] truncate">
+                            <p className="text-[13px] font-semibold text-gray-900 dark:text-white max-w-45 md:max-w-60 truncate">
                               {report.file_name}
                             </p>
                           </div>

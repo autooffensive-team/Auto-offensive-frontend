@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from "framer-motion";
 
@@ -84,7 +84,7 @@ function SmallCardSkeleton() {
 
 function ReportSectionSkeleton() {
   return (
-    <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60">
+    <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900/60">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
         <div className="p-8 sm:p-10 lg:p-12">
           <div className="h-6 w-32 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-full mb-5 animate-pulse" />
@@ -99,7 +99,7 @@ function ReportSectionSkeleton() {
           <div className="h-12 w-44 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-xl animate-pulse" />
         </div>
         <div className="p-8 sm:p-12 bg-slate-50 dark:bg-slate-800/40 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex items-center justify-center">
-          <div className="w-48 sm:w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-5 relative">
+          <div className="w-48 sm:w-56 bg-[#FCFCFA] dark:bg-slate-900 rounded-2xl shadow-xl p-5 relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-5 bg-amber-400 rounded-t-lg" />
             <div className="flex items-center justify-center mb-4 mt-2">
               <div className="w-6 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
@@ -124,7 +124,7 @@ function ReportSectionSkeleton() {
 
 function WorkflowStepSkeleton() {
   return (
-    <div className="rounded-2xl p-6 text-center border bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800">
+    <div className="rounded-2xl p-6 text-center border bg-[#FCFCFA] dark:bg-slate-900/60 border-slate-200 dark:border-slate-800">
       <div className="flex justify-between items-start mb-4">
         <div className="w-11 h-11 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-xl animate-pulse" />
         <div className="h-4 w-6 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded animate-pulse" />
@@ -141,7 +141,7 @@ export default function FeatureSkeleton() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-white dark:bg-[#030712]"
+      className="min-h-screen bg-[#FCFCFA] dark:bg-[#030712]"
     >
       <HeroSkeleton />
 

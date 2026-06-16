@@ -209,14 +209,14 @@ export function MediumScanForm({
   return (
     <div className="space-y-2">
       {/* Layout customization toolbar */}
-      <div
-        className="flex items-center justify-between px-3 py-2"
-        style={{
-          background: "var(--lc-panel-bg)",
-          outline: "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)",
-          clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
-        }}
-      >
+    <div
+      className="flex items-center justify-between px-3 py-2"
+      style={{
+        background: "var(--lc-panel-bg)",
+        outline: "1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)",
+        clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
+      }}
+    >
         <div className="flex items-center gap-2">
           <LayoutGrid className="h-3.5 w-3.5" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }} />
           <span className="text-xs" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }}>
@@ -320,10 +320,10 @@ function DraggableWidget({
           inset: 0,
           zIndex: 1,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -336,7 +336,7 @@ function DraggableWidget({
         <GripVertical className="h-4 w-4 transition-colors"
           style={{ color: "color-mix(in srgb, var(--color-primary) 40%, transparent)" }} />
         <span className="text-xs font-semibold uppercase tracking-widest"
-          style={{ color: "color-mix(in srgb, var(--color-primary) 100%, black 40%)", letterSpacing: "0.18em" }}>
+          style={{ color: "#005F5F", letterSpacing: "0.18em" }}>
           {label}
         </span>
         {isDragOver && !isDragging && (

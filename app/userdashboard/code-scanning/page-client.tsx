@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -222,10 +222,9 @@ function HexStatCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex items-center gap-2 bg-white px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4 lg:px-5 lg:py-4 dark:bg-slate-900"
+      className="relative flex items-center gap-2 border border-[#005F5F]/60 bg-[#FCFCFA] px-2.5 py-2.5 sm:gap-3 sm:px-3.5 sm:py-3.5 md:gap-3.5 md:px-4 md:py-4 lg:gap-4 lg:px-5 lg:py-4 dark:border-[#1675B1] dark:bg-slate-900"
       style={{
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
       }}
     >
       {/* Corner accent triangles */}
@@ -236,10 +235,10 @@ function HexStatCard({
           position: "absolute",
           inset: 0,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -283,11 +282,11 @@ function HexStatCard({
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider sm:text-xs sm:tracking-widest md:text-sm lg:text-base" style={{ color: labelColor }}>
+        <p className="text-xs font-semibold uppercase tracking-wider sm:text-sm sm:tracking-widest md:text-base lg:text-lg" style={{ color: labelColor }}>
           {label}
         </p>
         <span
-          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2.5 sm:text-[10px] md:text-xs"
+          className="mt-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold sm:mt-1 sm:gap-1.5 sm:px-2.5 sm:text-xs md:text-sm"
           style={{
             background: fill,
             color: stroke,
@@ -338,12 +337,12 @@ function ScanProjectCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.15 } }}
       transition={{ delay: index * 0.055, ease: "easeOut" }}
-      className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white dark:border-white/10 dark:bg-[#101828]"
+      className="group relative w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-[#FCFCFA] dark:border-white/10 dark:bg-[#101828]"
     >
       {/* New badge */}
       {isNew ? (
         <div className="pointer-events-none absolute -right-1 -top-1 z-30 inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#FCFCFA]" />
           New
         </div>
       ) : null}
@@ -446,12 +445,11 @@ function ScanProjectCard({
               Overview
             </span>
           </div>
-          <button
+          <Link
+              href={href}
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 onOpen(project.projectKey);
-                window.location.href = href;
               }}
               className="relative z-20 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-primary px-3 py-1.5 text-[11px] font-medium text-black transition-colors hover:bg-primary/80 hover:text-black active:scale-[0.98] sm:gap-1.5 sm:px-4 sm:py-1.75 sm:text-[13px]"
             >
@@ -459,7 +457,7 @@ function ScanProjectCard({
               <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
             </svg>
             Open
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -488,7 +486,7 @@ export default function CodeScanningPageClient() {
     refetch,
     isFetching,
   } = useListCurrentUserScanIdsQuery(undefined, {
-    refetchOnMountOrArgChange: false,
+    refetchOnMountOrArgChange: 60, // serve cache instantly; re-fetch only if data older than 60s
   });
 
   const banner = useMemo(() => {
@@ -712,7 +710,7 @@ export default function CodeScanningPageClient() {
             onClick={handleRefresh}
             disabled={isFetching}
             title="Refresh"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition-all hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
           >
             <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
           </motion.button>
@@ -813,7 +811,7 @@ export default function CodeScanningPageClient() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search project keys..."
-          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-base lg:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
+          className="w-full rounded-lg border border-slate-200 bg-[#FCFCFA] py-2 pl-9 pr-8 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:pl-10 sm:pr-9 sm:text-base lg:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
         />
         <AnimatePresence>
           {searchTerm ? (
@@ -855,8 +853,8 @@ export default function CodeScanningPageClient() {
 
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop / 4 col wide ── */}
       <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
-        {isLoading && scanProjects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
+        {isLoading && !scanRefsResponse ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
             <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />
             <p className="text-sm text-slate-500 sm:text-base dark:text-slate-400">Loading projects…</p>
           </div>
@@ -877,7 +875,7 @@ export default function CodeScanningPageClient() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl md:rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 2xl:col-span-4 dark:border-slate-700 dark:bg-slate-900"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl md:rounded-2xl border border-dashed border-slate-300 bg-[#FCFCFA] py-12 text-center sm:col-span-2 sm:py-14 lg:col-span-3 2xl:col-span-4 dark:border-slate-700 dark:bg-slate-900"
           >
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 sm:mb-4 sm:h-12 sm:w-12 dark:border-slate-700 dark:bg-slate-800">
               <FolderGit2 size={20} className="text-slate-400 dark:text-slate-500" />
@@ -909,7 +907,7 @@ export default function CodeScanningPageClient() {
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
           >
             <ChevronLeft size={16} />
           </button>
@@ -920,7 +918,7 @@ export default function CodeScanningPageClient() {
               className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[13px] font-medium transition-colors ${
                 page === currentPage
                   ? "bg-[#01509e] text-white"
-                  : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+                  : "border border-slate-200 bg-[#FCFCFA] text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
               }`}
             >
               {page}
@@ -929,7 +927,7 @@ export default function CodeScanningPageClient() {
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
           >
             <ChevronRight size={16} />
           </button>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useId, useRef, useState, useCallback } from "react";
 import { Camera, ImagePlus, LoaderCircle, Upload, User, X, Crop } from "lucide-react";
@@ -394,7 +394,7 @@ export function UploadProfile({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-900"
+            className="relative w-full max-w-lg rounded-3xl bg-[#FCFCFA] p-6 shadow-2xl dark:bg-gray-900"
           >
             <button
               type="button"
@@ -492,7 +492,7 @@ export function UploadProfile({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-900"
+                className="relative w-full max-w-sm rounded-3xl bg-[#FCFCFA] p-6 shadow-2xl dark:bg-gray-900"
               >
                 <button
                   type="button"
