@@ -15,9 +15,9 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com;
       style-src 'self' 'unsafe-inline';
-      img-src 'self' data: blob: https://images.unsplash.com;
+      img-src 'self' data: blob: https://images.unsplash.com https://s3.auto-offensive.org;
       font-src 'self' data:;
       connect-src 'self' https:;
       frame-ancestors 'none';
@@ -67,6 +67,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.auto-offensive.org',
         pathname: '/**',
       },
     ],
