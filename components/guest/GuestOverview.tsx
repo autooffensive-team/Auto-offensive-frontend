@@ -109,7 +109,7 @@ export function GuestOverview() {
                   onClick={() => handleLockedClick(action.label)}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="relative flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 text-left opacity-60 transition hover:opacity-80 dark:border-gray-800 dark:bg-gray-900"
+                  className="relative flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-[#FCFCFA] p-4 text-left opacity-60 transition hover:opacity-80 dark:border-gray-800 dark:bg-gray-900"
                 >
                   <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
                     <action.icon size={20} className="text-gray-400" />

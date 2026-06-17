@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { findings } from "@/app/vulnerabilities/data/vulnerabilities";
@@ -79,7 +79,7 @@ export default function FindingsTable() {
       {findings.map((f, i) => (
         <div
           key={i}
-          className={`grid ${COL_WIDTHS} items-center px-6 py-4 border-b border-teal-100 bg-white last:border-b-0`}
+          className={`grid ${COL_WIDTHS} items-center px-6 py-4 border-b border-teal-100 bg-[#FCFCFA] last:border-b-0`}
         >
           {/* Status */}
           <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export default function FindingsTable() {
       ))}
 
       {/* ── Pagination ────────────────────────────────── */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white">
+      <div className="flex items-center justify-between px-6 py-4 bg-[#FCFCFA]">
         <span className="text-gray-400" style={{ fontSize: "12px" }}>
           Showing 4 of 12 critical findings
         </span>

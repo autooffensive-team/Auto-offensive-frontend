@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 function StepSectionSkeleton() {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+    <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       {/* Step header */}
       <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
         <div className="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />

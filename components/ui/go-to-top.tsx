@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
@@ -23,9 +23,9 @@ export default function GoToTop() {
       aria-label="Go to top"
       className={cn(
         "fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full",
-        "bg-white text-slate-900 shadow-lg ring-1 ring-black/10",
+        "bg-[#FCFCFA] text-slate-900 shadow-lg ring-1 ring-black/10",
         "transition-all duration-300 hover:bg-slate-900 hover:text-white hover:shadow-xl hover:ring-slate-900",
-        "dark:bg-slate-900 dark:text-white dark:ring-white/10 dark:hover:bg-white dark:hover:text-slate-900",
+        "dark:bg-slate-900 dark:text-white dark:ring-white/10 dark:hover:bg-[#FCFCFA] dark:hover:text-slate-900",
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       )}
     >

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { use } from "react";
 import { motion } from "framer-motion";
@@ -41,13 +41,13 @@ export default function ScanResultsPage({ params }: PageProps) {
 
   if (isErrorJob) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen">
         <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 lg:px-7 lg:py-6 space-y-4">
           <Breadcrumb segments={breadcrumbSegments} />
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-red-200 dark:border-red-800/50 p-6 sm:p-8 flex flex-col items-center gap-3"
+            className="bg-[#FCFCFA] dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-red-200 dark:border-red-800/50 p-6 sm:p-8 flex flex-col items-center gap-3"
           >
             <AlertCircle size={28} className="text-red-500" />
             <p className="text-sm sm:text-base text-red-600 dark:text-red-400 font-medium text-center">
@@ -84,7 +84,7 @@ export default function ScanResultsPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 lg:px-7 lg:py-6">
         <motion.div
           variants={containerVariants}

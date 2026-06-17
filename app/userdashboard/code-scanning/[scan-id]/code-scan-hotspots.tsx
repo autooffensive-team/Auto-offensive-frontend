@@ -103,7 +103,7 @@ function FilterChips({
 }) {
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 sm:text-sm dark:text-slate-300">
+      <label className="flex items-center gap-2 text-base font-semibold text-slate-700 md:text-lg dark:text-slate-300">
         <Filter className="size-4" />
         {label}
       </label>
@@ -118,12 +118,94 @@ function FilterChips({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                "rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm",
+                "rounded-lg px-2.5 py-1.5 text-base font-medium transition-all duration-200 sm:px-3 sm:py-2 md:text-lg",
                 active
                   ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
-                  : "border border-slate-200 bg-white text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
+                  : "border border-slate-200 bg-[#FCFCFA] text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-teal-500/20 dark:hover:bg-teal-500/10 dark:hover:text-teal-300",
               )}
             >
+              {option.label}
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Probability color map — matches the donut chart colors (High=red, Medium=amber, Low=blue)
+const PROBABILITY_CHIP: Record<string, { bg: string; border: string; text: string; dot: string; activeBg: string; activeText: string; activeBorder: string }> = {
+  HIGH:   { bg: "bg-red-50   dark:bg-red-950/60",   border: "border-red-300   dark:border-red-700",   text: "text-red-700   dark:text-red-300",   dot: "bg-red-500",   activeBg: "bg-red-500",   activeText: "text-white", activeBorder: "border-red-500" },
+  MEDIUM: { bg: "bg-amber-50 dark:bg-amber-950/60", border: "border-amber-300 dark:border-amber-700", text: "text-amber-700 dark:text-amber-300", dot: "bg-amber-500", activeBg: "bg-amber-500", activeText: "text-white", activeBorder: "border-amber-500" },
+  LOW:    { bg: "bg-blue-50  dark:bg-blue-950/60",  border: "border-blue-300  dark:border-blue-700",  text: "text-blue-700  dark:text-blue-300",  dot: "bg-blue-500",  activeBg: "bg-blue-500",  activeText: "text-white", activeBorder: "border-blue-500" },
+};
+
+// Status color map — To review=amber, Reviewed=emerald
+const STATUS_CHIP: Record<string, { bg: string; border: string; text: string; dot: string; activeBg: string; activeText: string; activeBorder: string }> = {
+  TO_REVIEW: { bg: "bg-amber-50  dark:bg-amber-950/60",  border: "border-amber-300  dark:border-amber-700",  text: "text-amber-700  dark:text-amber-300",  dot: "bg-amber-500",  activeBg: "bg-amber-500",  activeText: "text-white", activeBorder: "border-amber-500" },
+  REVIEWED:  { bg: "bg-emerald-50 dark:bg-emerald-950/60", border: "border-emerald-300 dark:border-emerald-700", text: "text-emerald-700 dark:text-emerald-300", dot: "bg-emerald-500", activeBg: "bg-emerald-500", activeText: "text-white", activeBorder: "border-emerald-500" },
+};
+
+function ColoredFilterChips({
+  label,
+  options,
+  selected,
+  colorMap,
+  onChange,
+}: {
+  label: string;
+  options: FilterOption[];
+  selected: string;
+  colorMap: Record<string, { bg: string; border: string; text: string; dot: string; activeBg: string; activeText: string; activeBorder: string }>;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <label className="flex items-center gap-2 text-base font-semibold text-slate-700 md:text-lg dark:text-slate-300">
+        <Filter className="size-4" />
+        {label}
+      </label>
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+        {options.map((option) => {
+          const active = selected === option.value;
+          const colors = option.value ? colorMap[option.value] : null;
+
+          if (!colors) {
+            // "All" neutral chip
+            return (
+              <motion.button
+                key="all"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => onChange("")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-base font-medium transition-all duration-200 sm:px-3 sm:py-2 md:text-lg",
+                  active
+                    ? "border-slate-700 bg-slate-700 text-white dark:border-slate-300 dark:bg-slate-300 dark:text-slate-900"
+                    : "border-slate-200 bg-[#FCFCFA] text-slate-700 hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-500",
+                )}
+              >
+                All
+              </motion.button>
+            );
+          }
+
+          return (
+            <motion.button
+              key={option.value}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-base font-medium transition-all duration-200 sm:px-3 sm:py-2 md:text-lg",
+                active
+                  ? cn(colors.activeBg, colors.activeText, colors.activeBorder)
+                  : cn(colors.bg, colors.border, colors.text),
+              )}
+            >
+              <span className={cn("inline-block h-2 w-2 shrink-0 rounded-full", colors.dot)} />
               {option.label}
             </motion.button>
           );
@@ -153,7 +235,7 @@ function ProbabilityDistribution({ hotspots }: { hotspots: HotspotResponse[] }) 
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <h3 className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">Probability distribution</h3>
+      <h3 className="text-lg font-semibold text-slate-900 md:text-xl dark:text-white">Probability distribution</h3>
       <SeverityDonutChart
         items={severityItems}
         total={total}
@@ -180,7 +262,7 @@ function HotspotCard({
       onClick={() => onClick(hotspot.key)}
       className={cn(
         "block p-3 rounded-lg border transition-all duration-200 cursor-pointer sm:p-4",
-        "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800",
+        "bg-[#FCFCFA] dark:bg-slate-950 border-slate-200 dark:border-slate-800",
         "hover:border-teal-200 dark:hover:border-teal-500/20 hover:bg-teal-50/40 dark:hover:bg-teal-500/5",
       )}
     >
@@ -194,12 +276,12 @@ function HotspotCard({
                 probabilityColors.dot,
               )}
             >
-              <span className="text-[9px] font-bold sm:text-xs">
+              <span className="text-xs font-bold sm:text-xs">
                 {hotspot.vulnerability_probability.charAt(0)}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-xs font-semibold text-slate-900 truncate sm:text-sm dark:text-white">
+              <h4 className="text-base font-semibold text-slate-900 truncate md:text-lg dark:text-white">
                 {hotspot.message}
               </h4>
             </div>
@@ -210,7 +292,7 @@ function HotspotCard({
         </div>
 
         {/* File path and location */}
-        <div className="text-[10px] text-slate-500 font-mono truncate sm:text-xs dark:text-slate-400">
+          <div className="text-sm text-slate-500 font-mono truncate md:text-base dark:text-slate-400">
           {hotspot.file_path}
           {hotspot.line > 0 ? `:${hotspot.line}` : ""}
         </div>
@@ -218,16 +300,16 @@ function HotspotCard({
         {/* Tags and metadata */}
         <div className="flex flex-wrap gap-1 sm:gap-1.5">
           <span className={cn(
-            "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:py-1 sm:text-xs",
+            "inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium sm:px-2 sm:py-1 md:text-base",
             getStatusTone(hotspot.status),
           )}>
             {formatLabel(hotspot.status)}
           </span>
-          <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium bg-sky-50 text-sky-700 sm:px-2 sm:py-1 sm:text-xs dark:bg-sky-500/10 dark:text-sky-300">
+          <span className="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium bg-sky-50 text-sky-700 sm:px-2 sm:py-1 md:text-base dark:bg-sky-500/10 dark:text-sky-300">
             {formatSecurityCategory(hotspot.security_category)}
           </span>
           <span className={cn(
-            "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:py-1 sm:text-xs",
+            "inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium sm:px-2 sm:py-1 md:text-base",
             probabilityColors.text,
             probabilityColors.bg,
           )}>
@@ -309,21 +391,22 @@ export function CodeScanHotspots({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0 }}
-          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-[#FCFCFA] dark:bg-gray-950 transition-all"
           style={{
             clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            outline: "1px solid",
+            outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
           }}
         >
-          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat", opacity: 0.5, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
           <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
             <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#14b8a6", opacity: 0.12 }}>
               <Flame className="w-full h-full" strokeWidth={1.5} />
             </div>
           </div>
           <div className="relative z-10">
-            <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Total hotspots</div>
-            <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{total}</div>
+            <div className="text-base font-medium text-slate-500 mb-1.5 md:text-lg dark:text-slate-400">Total hotspots</div>
+            <div className="text-2xl font-bold text-slate-900 md:text-3xl lg:text-4xl dark:text-white">{total}</div>
           </div>
         </motion.div>
 
@@ -331,13 +414,14 @@ export function CodeScanHotspots({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-[#FCFCFA] dark:bg-gray-950 transition-all"
           style={{
             clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            outline: "1px solid",
+            outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
           }}
         >
-          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat", opacity: 0.5, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
           <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
             <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#ef4444", opacity: 0.12 }}>
               <Flame className="w-full h-full" strokeWidth={1.5} />
@@ -345,8 +429,8 @@ export function CodeScanHotspots({
           </div>
           <div className="relative z-10">
             <div>
-              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">High</div>
-              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.HIGH}</div>
+              <div className="text-base font-medium text-slate-500 mb-1.5 md:text-lg dark:text-slate-400">High</div>
+              <div className="text-2xl font-bold text-slate-900 md:text-3xl lg:text-4xl dark:text-white">{stats.HIGH}</div>
             </div>
           </div>
         </motion.div>
@@ -355,13 +439,14 @@ export function CodeScanHotspots({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-[#FCFCFA] dark:bg-gray-950 transition-all"
           style={{
             clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            outline: "1px solid",
+            outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
           }}
         >
-          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat", opacity: 0.5, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
           <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
             <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#f59e0b", opacity: 0.12 }}>
               <Flame className="w-full h-full" strokeWidth={1.5} />
@@ -369,8 +454,8 @@ export function CodeScanHotspots({
           </div>
           <div className="relative z-10">
             <div>
-              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Medium</div>
-              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.MEDIUM}</div>
+              <div className="text-base font-medium text-slate-500 mb-1.5 md:text-lg dark:text-slate-400">Medium</div>
+              <div className="text-2xl font-bold text-slate-900 md:text-3xl lg:text-4xl dark:text-white">{stats.MEDIUM}</div>
             </div>
           </div>
         </motion.div>
@@ -379,13 +464,14 @@ export function CodeScanHotspots({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-white dark:bg-gray-950 transition-all"
+          className="relative overflow-hidden p-3 sm:p-4 md:p-5 bg-[#FCFCFA] dark:bg-gray-950 transition-all"
           style={{
             clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-            outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+            outline: "1px solid",
+            outlineColor: "color-mix(in srgb, #005F5F 60%, transparent)",
           }}
         >
-          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 12px 12px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 12px 12px no-repeat", opacity: 0.45, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
+          <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat, linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat", opacity: 0.5, clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }} />
           <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
             <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: "#3b82f6", opacity: 0.12 }}>
               <Flame className="w-full h-full" strokeWidth={1.5} />
@@ -393,8 +479,8 @@ export function CodeScanHotspots({
           </div>
           <div className="relative z-10">
             <div>
-              <div className="text-[10px] text-slate-500 font-medium mb-1.5 sm:text-xs sm:mb-2 dark:text-slate-400">Low</div>
-              <div className="text-lg font-bold text-slate-900 sm:text-xl md:text-2xl dark:text-white">{stats.LOW}</div>
+              <div className="text-base font-medium text-slate-500 mb-1.5 md:text-lg dark:text-slate-400">Low</div>
+              <div className="text-2xl font-bold text-slate-900 md:text-3xl lg:text-4xl dark:text-white">{stats.LOW}</div>
             </div>
           </div>
         </motion.div>
@@ -413,11 +499,11 @@ export function CodeScanHotspots({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldAlert className="size-4 text-slate-600 sm:size-5 dark:text-slate-400" />
-              <h2 className="text-sm font-semibold text-slate-900 sm:text-base md:text-lg dark:text-white">
+              <h2 className="text-lg font-semibold text-slate-900 md:text-xl dark:text-white">
                 Security Hotspots
               </h2>
             </div>
-            <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
+            <span className="text-sm text-slate-500 md:text-base dark:text-slate-400">
               {filteredHotspots.length} of {total}
             </span>
           </div>
@@ -430,7 +516,7 @@ export function CodeScanHotspots({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search hotspots by message, file, category..."
-              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 sm:text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
+               className="w-full rounded-lg border border-slate-200 bg-[#FCFCFA] py-2 pl-9 pr-8 text-base text-slate-900 placeholder-slate-400 transition-all focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 sm:py-2.5 md:text-lg dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-teal-500"
             />
             <AnimatePresence>
               {searchTerm && (
@@ -449,14 +535,14 @@ export function CodeScanHotspots({
 
           {/* Loading state */}
           {isLoading ? (
-            <div className="p-6 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-2 sm:gap-3 sm:p-8">
-              <div className="w-2 h-2 bg-slate-400 dark:bg-slate-600 rounded-full animate-pulse" />
-              <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">Loading security hotspots...</span>
+            <div className="p-6 rounded-lg bg-[#FCFCFA] dark:bg-[#101828] border border-[#00D0B2]/20 dark:border-white/10 flex items-center justify-center gap-2 sm:gap-3 sm:p-8">
+              <div className="w-2 h-2 bg-[#00D0B2]/40 dark:bg-[#00D0B2]/40 rounded-full animate-pulse" />
+              <span className="text-base text-slate-500 md:text-lg dark:text-slate-400">Loading security hotspots...</span>
             </div>
           ) : filteredHotspots.length === 0 ? (
             <div className="p-6 rounded-lg bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 text-center sm:p-8">
               <ShieldAlert className="size-6 mx-auto mb-2 text-slate-400 sm:size-8 dark:text-slate-600" />
-              <p className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
+              <p className="text-base text-slate-500 md:text-lg dark:text-slate-400">
                 {searchTerm ? "No hotspots matched your search." : "No security hotspots found for the current filters."}
               </p>
             </div>
@@ -474,7 +560,7 @@ export function CodeScanHotspots({
               <button
                 onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
               </button>
@@ -503,7 +589,7 @@ export function CodeScanHotspots({
                       className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[13px] font-medium transition-colors ${
                         item === page
                           ? "bg-[#01509e] text-white"
-                          : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+                          : "border border-slate-200 bg-[#FCFCFA] text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
                       }`}
                     >
                       {item}
@@ -513,7 +599,7 @@ export function CodeScanHotspots({
               <button
                 onClick={() => onPageChange(Math.min(Math.ceil(total / pageSize), page + 1))}
                 disabled={page >= Math.ceil(total / pageSize)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-white"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
               </button>
@@ -532,10 +618,10 @@ export function CodeScanHotspots({
           <div className="rounded-lg border border-slate-200 bg-linear-to-br from-white to-[#f7fbfb] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:to-gray-950">
             <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-200 pb-3 sm:mb-5 sm:pb-4 dark:border-slate-800">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px] dark:text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 md:text-sm dark:text-slate-400">
                   Filters
                 </p>
-                <h3 className="mt-1 text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
+                <h3 className="mt-1 text-base font-semibold text-slate-900 md:text-lg dark:text-white">
                   Refine hotspot results
                 </h3>
               </div>
@@ -543,17 +629,19 @@ export function CodeScanHotspots({
             </div>
 
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
-              <FilterChips
+              <ColoredFilterChips
                 label="Review status"
                 options={statusFilterOptions}
                 selected={statusFilter}
+                colorMap={STATUS_CHIP}
                 onChange={onStatusFilterChange}
               />
               <div className="border-t border-slate-200 pt-4 sm:pt-5 md:pt-6 dark:border-slate-800">
-                <FilterChips
+                <ColoredFilterChips
                   label="Vulnerability probability"
                   options={probabilityFilterOptions}
                   selected={probabilityFilter}
+                  colorMap={PROBABILITY_CHIP}
                   onChange={setProbabilityFilter}
                 />
               </div>
@@ -570,10 +658,10 @@ export function CodeScanHotspots({
             <div className="flex items-start gap-2 sm:gap-3">
               <ShieldAlert className="mt-0.5 size-3.5 shrink-0 text-amber-500 sm:size-4" />
               <div>
-                <h3 className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">
+                <h3 className="text-base font-semibold text-slate-900 md:text-lg dark:text-white">
                   Review focus
                 </h3>
-                <p className="mt-1 text-[10px] leading-5 text-slate-500 sm:text-xs sm:leading-6 md:text-sm dark:text-slate-400">
+                <p className="mt-1 text-sm leading-6 text-slate-500 md:text-base dark:text-slate-400">
                   Prioritize high-probability hotspots first. Review each to determine if it represents a real vulnerability or is safe.
                 </p>
               </div>

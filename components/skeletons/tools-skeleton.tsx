@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { motion } from "framer-motion";
 
 function ToolsHeroSkeleton() {
   return (
-    <div className="bg-white dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
+    <div className="bg-[#FCFCFA] dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div>
@@ -27,7 +27,7 @@ function ToolsHeroSkeleton() {
 
 function ToolCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4">
+    <div className="bg-[#FCFCFA] dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between">
         <div className="w-11 h-11 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-xl animate-pulse" />
         <div className="flex gap-2">

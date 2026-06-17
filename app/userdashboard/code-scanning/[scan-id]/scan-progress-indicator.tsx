@@ -207,7 +207,7 @@ export function ScanProgressIndicator({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 dark:border-white/[0.08] dark:bg-slate-900"
+      className="relative overflow-hidden rounded-2xl border border-slate-200 bg-[#FCFCFA] p-6 dark:border-white/[0.08] dark:bg-slate-900"
     >
       {/* Subtle background gradient animation */}
       <motion.div

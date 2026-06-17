@@ -169,10 +169,6 @@ export function BasicScanForm({
         className="flex items-center justify-between px-3 py-2"
         style={{
           background: "var(--lc-panel-bg)",
-          outline:
-            "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)",
-          clipPath:
-            "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
         }}
       >
         <div className="flex items-center gap-2">
@@ -180,14 +176,14 @@ export function BasicScanForm({
             className="h-3.5 w-3.5"
             style={{
               color:
-                "color-mix(in srgb, var(--color-primary) 55%, transparent)",
+                "color-mix(in srgb, var(--color-primary) 70%, black)",
             }}
           />
             <span
               className="text-sm lg:text-base"
               style={{
               color:
-                "color-mix(in srgb, var(--color-primary) 55%, transparent)",
+                "color-mix(in srgb, var(--color-primary) 70%, black)",
             }}
           >
             Drag sections to reorder your layout
@@ -286,12 +282,12 @@ function DraggableWidget({
           position: "absolute",
           inset: 0,
           zIndex: 0,
-          background: "var(--lc-panel-bg)",
+          background: "var(--lc-widget-bg, #FCFCFA)",
           clipPath:
             "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-          // Border simulation via box-shadow on this layer
-          outline: `1px solid ${borderColor}`,
+          outline: "1px solid #005F5F99",
         }}
+        className="dark:[background:rgb(15_23_42)] dark:[outline-color:#1675B1]"
       />
 
       {/* ── Corner accent triangles ── */}
@@ -303,10 +299,10 @@ function DraggableWidget({
           inset: 0,
           zIndex: 1,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.2,
           clipPath:
             "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
@@ -319,8 +315,7 @@ function DraggableWidget({
           "active:cursor-grabbing",
         )}
         style={{
-          borderBottom:
-            "1px solid color-mix(in srgb, var(--color-primary) 15%, transparent)",
+          borderBottom: "1px solid #005F5F40",
         }}
       >
         <GripVertical
@@ -342,7 +337,7 @@ function DraggableWidget({
         <span
           className="text-xs font-semibold uppercase tracking-widest"
           style={{
-            color: "color-mix(in srgb, var(--color-primary) 100%, black 40%)",
+            color: "color-mix(in srgb, var(--color-primary) 60%, var(--muted-foreground))",
             letterSpacing: "0.18em",
           }}
         >
@@ -404,56 +399,38 @@ function PresetSelector({
                 "relative flex cursor-pointer flex-col p-3 sm:p-4 transition-all duration-150",
                 "focus-within:ring-2 focus-within:ring-offset-1",
                 disabled && "pointer-events-none opacity-50",
+                isSelected
+                  ? "dark:[background:color-mix(in_srgb,#1675B1_15%,rgb(15_23_42))] dark:[outline-color:#1675B1]"
+                  : "dark:[background:rgb(15_23_42)] dark:[outline-color:#1675B155]",
               )}
               style={{
                 background: isSelected
-                  ? "color-mix(in srgb, var(--color-primary) 8%, var(--lc-panel-bg))"
-                  : "var(--lc-panel-bg)",
+                  ? "color-mix(in srgb, var(--color-primary) 10%, #FCFCFA)"
+                  : "#FCFCFA",
                 outline: isSelected
-                  ? "1px solid color-mix(in srgb, var(--color-primary) 55%, transparent)"
-                  : "1px solid color-mix(in srgb, var(--color-primary) 18%, transparent)",
+                  ? "1.5px solid #005F5F"
+                  : "1px solid #005F5F99",
                 clipPath:
                   "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
               }}
             >
-              {/* corner accent when selected */}
-              {isSelected && (
-                <span
-                  aria-hidden="true"
-                  style={{
-                    pointerEvents: "none",
-                    position: "absolute",
-                    inset: 0,
-                    background: `
-                      linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 12px 12px no-repeat,
-                      linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 12px 12px no-repeat
-                    `,
-                    opacity: 0.5,
-                  }}
-                />
-              )}
               <div className="relative flex items-center justify-between gap-3">
-                <span
-                  className="text-base lg:text-lg font-semibold"
-                  style={{
-                    color: isSelected ? "var(--color-primary)" : undefined,
-                  }}
-                >
+                <span className="text-base lg:text-lg font-semibold">
                   {p.name}
                 </span>
                 {isSelected ? (
                   <CheckCircle2
-                    className="h-4 w-4 shrink-0"
-                    style={{ color: "var(--color-primary)" }}
+                    className="h-6 w-6 shrink-0"
+                    style={{ color: "color-mix(in srgb, var(--color-primary) 80%, var(--foreground))" }}
                     aria-hidden="true"
                   />
                 ) : (
-                  <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-200/60 dark:border-gray-700/60" />
+                  <span className="h-6 w-6 shrink-0 rounded-full border-2 border-black/20 dark:border-gray-600" />
                 )}
               </div>
 
               {p.description && (
-                <p className="relative mt-1.5 text-sm lg:text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="relative mt-1.5 text-sm lg:text-base leading-relaxed">
                   {p.description}
                 </p>
               )}
@@ -465,11 +442,8 @@ function PresetSelector({
                       key={flag}
                       className="rounded px-1.5 py-0.5 font-mono text-sm lg:text-base"
                       style={{
-                        background: isSelected
-                          ? "color-mix(in srgb, var(--color-primary) 12%, transparent)"
-                          : "color-mix(in srgb, var(--color-primary) 6%, transparent)",
-                        color:
-                          "color-mix(in srgb, var(--color-primary) 80%, var(--foreground))",
+                        background: "color-mix(in srgb, var(--color-primary) 6%, transparent)",
+                        color: "color-mix(in srgb, var(--color-primary) 80%, var(--foreground))",
                       }}
                     >
                       {flag}

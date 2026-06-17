@@ -1,13 +1,14 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
 // ─── Reusable shimmer block ──────────────────────────────────────────────────
+// Uses brand teal tint so it blends naturally with the #FAFAF7 / dark:black bg
 
 function Shimmer({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
-      className={`animate-pulse rounded-lg bg-slate-200/70 dark:bg-slate-800/70 ${className}`}
+      className={`animate-pulse rounded-lg bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 ${className}`}
       style={style}
     />
   );
@@ -36,7 +37,10 @@ function MetricCardSkeleton({ index }: { index: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.04 + index * 0.03 }}
-      className="rounded-xl md:rounded-2xl border border-slate-200 bg-white p-4 md:p-5 dark:border-slate-800 dark:bg-slate-900"
+      className="rounded-xl md:rounded-2xl border border-[#00D0B2]/15 dark:border-white/10 bg-[#FCFCFA] dark:bg-[#101828] p-4 md:p-5"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+      }}
     >
       <div className="flex items-start justify-between">
         <Shimmer className="h-4 w-20 rounded-md" />
@@ -62,9 +66,30 @@ function MetricGridSkeleton() {
 
 function VulnerabilityCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div
+      className="relative border border-[#00D0B2]/20 dark:border-white/10 bg-[#FCFCFA] dark:bg-[#101828]"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+      }}
+    >
+      {/* Corner accents */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, #00D0B2 0%, transparent 50%) top left / 20px 20px no-repeat,
+            linear-gradient(315deg, #00D0B2 0%, transparent 50%) bottom right / 20px 20px no-repeat
+          `,
+          opacity: 0.15,
+          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
       {/* Card header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 md:px-6 md:py-4 dark:border-slate-800">
+      <div className="relative flex items-center justify-between border-b border-[#00D0B2]/15 dark:border-white/8 px-4 py-3 md:px-6 md:py-4">
         <div>
           <Shimmer className="h-5 w-44 rounded-md" />
           <Shimmer className="mt-1.5 h-3.5 w-56 rounded-md" />
@@ -72,7 +97,7 @@ function VulnerabilityCardSkeleton() {
         <Shimmer className="h-7 w-20 rounded-lg" />
       </div>
 
-      <div className="px-4 py-4 md:px-6 md:py-5">
+      <div className="relative px-4 py-4 md:px-6 md:py-5">
         {/* Legend dots */}
         <div className="mb-4 flex flex-wrap items-center gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -116,9 +141,30 @@ function VulnerabilityCardSkeleton() {
 
 function ScanActivityCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div
+      className="relative border border-[#00D0B2]/20 dark:border-white/10 bg-[#FCFCFA] dark:bg-[#101828]"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+      }}
+    >
+      {/* Corner accents */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, #00D0B2 0%, transparent 50%) top left / 20px 20px no-repeat,
+            linear-gradient(315deg, #00D0B2 0%, transparent 50%) bottom right / 20px 20px no-repeat
+          `,
+          opacity: 0.15,
+          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
       {/* Card header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 md:px-6 md:py-4 dark:border-slate-800">
+      <div className="relative flex items-center justify-between border-b border-[#00D0B2]/15 dark:border-white/8 px-4 py-3 md:px-6 md:py-4">
         <div>
           <Shimmer className="h-5 w-32 rounded-md" />
           <Shimmer className="mt-1.5 h-3.5 w-48 rounded-md" />
@@ -126,12 +172,12 @@ function ScanActivityCardSkeleton() {
         <Shimmer className="h-8 w-8 rounded-lg" />
       </div>
 
-      <div className="flex flex-col items-center px-4 py-5 md:px-5 md:py-6">
+      <div className="relative flex flex-col items-center px-4 py-5 md:px-5 md:py-6">
         {/* Radial chart placeholder */}
         <div className="relative flex items-center justify-center">
           <Shimmer className="h-40 w-40 md:h-48 md:w-48 rounded-full" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-white dark:bg-slate-900" />
+            <div className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-[#FCFCFA] dark:bg-[#101828]" />
           </div>
         </div>
 
@@ -156,9 +202,30 @@ function ScanActivityCardSkeleton() {
 
 function AssetTrendCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div
+      className="relative border border-[#00D0B2]/20 dark:border-white/10 bg-[#FCFCFA] dark:bg-[#101828]"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+      }}
+    >
+      {/* Corner accents */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, #00D0B2 0%, transparent 50%) top left / 20px 20px no-repeat,
+            linear-gradient(315deg, #00D0B2 0%, transparent 50%) bottom right / 20px 20px no-repeat
+          `,
+          opacity: 0.15,
+          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
       {/* Card header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 md:px-6 md:py-4 dark:border-slate-800">
+      <div className="relative flex items-center justify-between border-b border-[#00D0B2]/15 dark:border-white/8 px-4 py-3 md:px-6 md:py-4">
         <div>
           <Shimmer className="h-5 w-44 rounded-md" />
           <Shimmer className="mt-1.5 h-3.5 w-64 rounded-md" />
@@ -167,7 +234,7 @@ function AssetTrendCardSkeleton() {
       </div>
 
       {/* Chart area */}
-      <div className="px-4 py-4 md:px-6 md:py-5">
+      <div className="relative px-4 py-4 md:px-6 md:py-5">
         <div className="flex items-end gap-1 h-36 md:h-44">
           {[45, 60, 35, 72, 50, 80, 42, 65, 55, 78, 40, 68, 52, 75, 48].map((h, i) => (
             <motion.div
@@ -193,9 +260,30 @@ function AssetTrendCardSkeleton() {
 
 function AssetsTableSkeleton() {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div
+      className="relative border border-[#00D0B2]/20 dark:border-white/10 bg-[#FCFCFA] dark:bg-[#101828]"
+      style={{
+        clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+      }}
+    >
+      {/* Corner accents */}
+      <span
+        aria-hidden="true"
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          inset: 0,
+          background: `
+            linear-gradient(135deg, #00D0B2 0%, transparent 50%) top left / 20px 20px no-repeat,
+            linear-gradient(315deg, #00D0B2 0%, transparent 50%) bottom right / 20px 20px no-repeat
+          `,
+          opacity: 0.15,
+          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
+        }}
+      />
+
       {/* Card header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 md:px-6 md:py-4 dark:border-slate-800">
+      <div className="relative flex items-center justify-between border-b border-[#00D0B2]/15 dark:border-white/8 px-4 py-3 md:px-6 md:py-4">
         <div>
           <Shimmer className="h-5 w-32 rounded-md" />
           <Shimmer className="mt-1.5 h-3.5 w-52 rounded-md" />
@@ -204,7 +292,7 @@ function AssetsTableSkeleton() {
       </div>
 
       {/* Table header */}
-      <div className="border-b border-slate-100 dark:border-slate-800">
+      <div className="relative border-b border-[#00D0B2]/10 dark:border-white/6">
         <div className="grid grid-cols-6 gap-4 px-4 py-3 md:px-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Shimmer key={i} className="h-3 w-full max-w-16 rounded-md" />
@@ -213,7 +301,7 @@ function AssetsTableSkeleton() {
       </div>
 
       {/* Table rows */}
-      <div className="divide-y divide-slate-50 dark:divide-slate-800/60">
+      <div className="relative divide-y divide-[#00D0B2]/8 dark:divide-white/5">
         {Array.from({ length: 5 }).map((_, rowIndex) => (
           <motion.div
             key={rowIndex}
@@ -255,7 +343,7 @@ export default function DashboardOverviewSkeleton() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen bg-slate-50 dark:bg-slate-950"
+      className="min-h-screen bg-[#FAFAF7] dark:bg-black"
       aria-busy="true"
       aria-label="Loading dashboard overview"
     >

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,7 +34,7 @@ export default function AssetsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 mt-2 md:mt-0 shrink-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 text-xs sm:text-xs md:text-sm font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-[#FCFCFA] px-2.5 py-1.5 sm:px-3 text-xs sm:text-xs md:text-sm font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap">
             <Globe size={14} className="text-teal-500" />
             Targets
           </span>

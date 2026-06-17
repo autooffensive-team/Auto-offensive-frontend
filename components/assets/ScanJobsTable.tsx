@@ -101,7 +101,7 @@ export default function ScanJobsTable({
 
   if (isError) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
+      <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
         <AlertCircle className="mx-auto h-10 w-10 text-red-400 mb-3" />
         <p className="text-slate-700 dark:text-slate-300 font-medium mb-4">
           Failed to load scan jobs
@@ -119,7 +119,7 @@ export default function ScanJobsTable({
 
   if (jobs.length === 0 && !isFetching) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
+      <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
         <Inbox className="mx-auto h-10 w-10 text-slate-400 mb-3" />
         <p className="text-slate-700 dark:text-slate-300 font-medium">
           No scan jobs have been run against this target
@@ -129,7 +129,7 @@ export default function ScanJobsTable({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+    <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
       {/* Desktop/tablet table view */}
       <div className="hidden sm:block overflow-x-auto">
         <table className="w-full">

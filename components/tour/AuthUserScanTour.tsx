@@ -25,6 +25,7 @@ function injectDriverCSS() {
       box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,208,178,0.1) !important;
       max-width: 400px !important;
       padding: 0 !important;
+      font-family: var(--font-google-sans), var(--font-noto-khmer), sans-serif !important;
     }
     .guest-tour-popover .driver-popover-title {
       font-size: 16px !important;
@@ -390,7 +391,7 @@ export function AuthTourTriggerButton() {
   return (
     <button
       onClick={handleClick}
-      className="inline-flex items-center gap-2 rounded-lg border border-teal-500/30 bg-teal-50 dark:bg-teal-500/10 px-3 py-1.5 text-xs font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-colors"
+      className="inline-flex items-center gap-2 rounded-lg border border-teal-500/30 bg-teal-50 dark:bg-teal-500/10 px-3 py-1.5 text-xs font-[var(--font-google-sans),var(--font-noto-khmer),sans-serif] font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-colors"
       title="Replay the guided tour"
     >
       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

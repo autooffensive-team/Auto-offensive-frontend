@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import AISuggestion from "@/components/AiSuggestion/AISuggestionPanel";
 import { GridBackground } from "@/components/shared/GridBackground";
 import { motion } from "framer-motion";
@@ -357,7 +357,26 @@ export default function ScanPage() {
     onGuestScanConsumed: updateRateLimitDirect,
   });
 
-  // Stable reset callback — inline `() => resetRun("advanced")` would create a
+  // ── Scroll-to-console on scan submit ─────────────────────────────────────
+  const consoleRef = useRef<HTMLDivElement>(null);
+
+  const scrollToConsole = useCallback(() => {
+    // Delay to let the execution graph render before scrolling past it
+    setTimeout(() => {
+      consoleRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }, []);
+
+  const handleSubmitBasic = useCallback(() => {
+    guardedSubmit(submitBasic);
+    scrollToConsole();
+  }, [guardedSubmit, submitBasic, scrollToConsole]);
+
+  const handleSubmitMedium = useCallback(() => {
+    guardedSubmit(submitMedium);
+    scrollToConsole();
+  }, [guardedSubmit, submitMedium, scrollToConsole]);
+
   // new function reference every render and defeat React.memo on AdvancedTerminalPanel
   const resetAdvanced = useCallback(() => resetRun("advanced"), [resetRun]);
 
@@ -560,7 +579,7 @@ export default function ScanPage() {
                   onPresetChange={setBasicPreset}
                   tools={basicTools}
                   disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
-                  onSubmit={() => guardedSubmit(submitBasic)}
+                  onSubmit={handleSubmitBasic}
                 />
               </ScanModePanel>
 
@@ -581,7 +600,7 @@ export default function ScanPage() {
                   tools={mediumTools}
                   wordlists={wordlists}
                   disabled={isSubmitting || (!projectId && !isGuest) || limitReached}
-                  onSubmit={() => guardedSubmit(submitMedium)}
+                  onSubmit={handleSubmitMedium}
                 />
               </ScanModePanel>
 
@@ -589,7 +608,7 @@ export default function ScanPage() {
                 <>
                   {/* Compact inline row: project selector + info banner side by side */}
                   <div className="flex flex-col sm:flex-row items-stretch gap-2">
-                    <div id="tour-project-selector" className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2.5">
+                    <div id="tour-project-selector" className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 px-3 py-2.5">
                       {isGuest ? (
                         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 h-full">
                           <Scan size={15} className="text-teal-500 shrink-0" />
@@ -680,7 +699,7 @@ export default function ScanPage() {
 
           {/* BOTTOM SECTION: Full-width stream logs terminal */}
           {activeTab !== "advanced" && (
-            <div id="tour-stream-logs" className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div id="tour-stream-logs" ref={consoleRef} className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900">
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="flex gap-1.5">
@@ -701,7 +720,7 @@ export default function ScanPage() {
                   <button
                     type="button"
                     onClick={() => resetRun(activeTab)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                   >
                     <RotateCcw size={12} />
                     Reset

@@ -160,7 +160,7 @@ function OperationalRingChart({
       {/* Hover tooltip */}
       {hoveredRing !== null && (
         <div
-          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
           style={{
             left: tooltipPos.x,
             top: tooltipPos.y - 50,
@@ -235,8 +235,8 @@ export function CodeScanOperationalMetrics({
   const mntGrade = getGrade(codeSmells, 10, 50);
 
   return (
-    <section className="rounded-xl sm:rounded-[28px] border border-[#dfe7f3] bg-linear-to-br from-[#fbfdff] via-white to-[#f5f8fd] p-3 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 sm:p-4 md:p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#e6edf7] px-1 pb-4 dark:border-slate-800">
+     <section className="rounded-xl sm:rounded-[28px] border border-slate-200 bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-3 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 sm:p-4 md:p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-1 pb-4 dark:border-slate-800">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7b8db2] dark:text-slate-500">
             Operational Metrics
@@ -246,7 +246,7 @@ export function CodeScanOperationalMetrics({
             Code quality and remediation posture
           </h2>
         </div>
-        <span className="inline-flex items-center rounded-full bg-[#eef4fb] px-3 py-1 text-[11px] font-medium text-[#4f6290] dark:bg-slate-900 dark:text-slate-300">
+        <span className="inline-flex items-center rounded-full bg-[#eef4fb] dark:bg-slate-900 px-3 py-1 text-[11px] font-medium text-[#4f6290] dark:text-slate-300">
           8 tracked indicators
         </span>
       </div>
@@ -263,10 +263,10 @@ export function CodeScanOperationalMetrics({
           ];
 
           return (
-            <div className="rounded-xl border border-[#e4eaf4] bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+            <div className="rounded-xl border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
               <div className="mb-4">
                 <p className="text-sm font-bold text-[#17233f] dark:text-slate-100">Code Quality</p>
-                <p className="mt-0.5 text-xs text-[#52648f] dark:text-slate-400">Security, reliability & maintainability</p>
+                <p className="mt-0.5 text-sm text-[#52648f] dark:text-slate-400">Security, reliability & maintainability</p>
               </div>
 
               {/* FIX: chart centered, capped width so it doesn't stretch */}
@@ -284,15 +284,15 @@ export function CodeScanOperationalMetrics({
                         className="inline-block size-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: ring.color }}
                       />
-                      <span className="truncate text-[11px] font-medium text-[#52648f] dark:text-slate-400">
+                      <span className="truncate text-sm font-medium text-[#52648f] dark:text-slate-400">
                         {ring.label}
                       </span>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
+                      <span className="font-mono text-sm font-bold text-[#17233f] dark:text-white">
                         {ring.value}
                       </span>
-                      <span className="text-[10px] text-[#8fa0bf] dark:text-slate-500">
+                      <span className="text-xs text-[#8fa0bf] dark:text-slate-500">
                         {ring.grade}
                       </span>
                     </div>
@@ -313,10 +313,10 @@ export function CodeScanOperationalMetrics({
           ];
 
           return (
-            <div className="rounded-xl border border-[#e4eaf4] bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+            <div className="rounded-xl border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
               <div className="mb-4">
                 <p className="text-sm font-bold text-[#17233f] dark:text-slate-100">Health & Scans</p>
-                <p className="mt-0.5 text-xs text-[#52648f] dark:text-slate-400">Coverage, duplication & reliability posture</p>
+                <p className="mt-0.5 text-sm text-[#52648f] dark:text-slate-400">Coverage, duplication & reliability posture</p>
               </div>
 
               {/* FIX: chart centered, capped width so it doesn't stretch */}
@@ -334,15 +334,15 @@ export function CodeScanOperationalMetrics({
                         className="inline-block size-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: ring.color }}
                       />
-                      <span className="truncate text-[11px] font-medium text-[#52648f] dark:text-slate-400">
+                      <span className="truncate text-sm font-medium text-[#52648f] dark:text-slate-400">
                         {ring.label}
                       </span>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold text-[#17233f] dark:text-white">
+                      <span className="font-mono text-sm font-bold text-[#17233f] dark:text-white">
                         {ring.value}
                       </span>
-                      <span className="text-[10px] text-[#8fa0bf] dark:text-slate-500">
+                      <span className="text-xs text-[#8fa0bf] dark:text-slate-500">
                         {ring.grade}
                       </span>
                     </div>

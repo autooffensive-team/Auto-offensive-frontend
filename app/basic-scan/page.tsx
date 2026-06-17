@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
-import { RotateCcw, ScanLine, Wrench } from "lucide-react";
+import { RotateCcw, ScanLine, Wrench, FolderGit2, ArrowRight } from "lucide-react";
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { AdvancedTerminalPanel } from "@/components/scanComponents/AdvancedTerminalPanel";
 import { ProjectSelector, ProjectSelectorSkeleton } from "@/components/scanComponents/ProjectSelector";
 import { ScanModeTabs, ScanModePanel, ScanModeHeader } from "@/components/scanComponents/ScanModeTabs";
@@ -330,7 +331,7 @@ export default function BasicScanPage() {
           </div>
         )}
 
-        <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4">
+        <div className="rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 p-3 sm:p-4">
           {loadingMeta ? (
             <ProjectSelectorSkeleton />
           ) : (
@@ -345,7 +346,39 @@ export default function BasicScanPage() {
         </div>
 
         <div className={cn("grid gap-3 sm:gap-4 md:gap-5", activeTab !== "advanced" && "xl:grid-cols-[minmax(0,1.25fr)_minmax(390px,0.75fr)]")}>
-          <div className="space-y-3 sm:space-y-4 md:space-y-5">
+          {/* ── Project gate: blur/lock the scan form until a project is selected ── */}
+          {!loadingMeta && !projectId && (
+            <div className="xl:col-span-2">
+              <div className="relative rounded-xl border border-dashed border-amber-300 dark:border-amber-700/60 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-8 sm:py-10 flex flex-col items-center justify-center gap-3 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700/50">
+                  <FolderGit2 size={22} className="text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-sm sm:text-base font-semibold text-amber-900 dark:text-amber-200">
+                    {projects.length === 0 ? "Create a project to start scanning" : "Select a project to start scanning"}
+                  </p>
+                  <p className="mt-1 text-xs sm:text-sm text-amber-700 dark:text-amber-400 max-w-sm mx-auto">
+                    {projects.length === 0
+                      ? "Scan results are saved under a project. Create one first, then come back to run your scan."
+                      : "Choose a project from the selector above. All scan results will be saved under that project."}
+                  </p>
+                </div>
+                {projects.length === 0 && (
+                  <Link
+                    href="/userdashboard/projects"
+                    className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-500 px-4 py-2 text-xs sm:text-sm font-semibold text-white transition-colors"
+                  >
+                    Go to Projects
+                    <ArrowRight size={14} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Scan form — only rendered when project is selected ── */}
+          {(!loadingMeta && projectId) && (
+            <div className="space-y-3 sm:space-y-4 md:space-y-5">
             <ScanModeTabs value={activeTab} onChange={setActiveTab} />
 
             <ScanModePanel mode="basic" isActive={activeTab === "basic"}>
@@ -401,8 +434,9 @@ export default function BasicScanPage() {
               />
             )}
           </div>
+          )}
 
-          {activeTab !== "advanced" && (
+          {(!loadingMeta && projectId) && activeTab !== "advanced" && (
             <div id="tour-terminal">
               <ScanExecutionGraph
                 run={activeRun}
@@ -414,7 +448,7 @@ export default function BasicScanPage() {
         </div>
 
         {activeTab !== "advanced" && (
-          <div className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div className="overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900">
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-3 py-2 sm:px-4 sm:py-2.5">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex gap-1.5">
@@ -435,7 +469,7 @@ export default function BasicScanPage() {
                 <button
                   type="button"
                   onClick={() => resetRun(activeTab)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-[#FCFCFA] dark:bg-gray-900 px-2 py-1 sm:px-2.5 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                 >
                   <RotateCcw size={12} />
                   Reset

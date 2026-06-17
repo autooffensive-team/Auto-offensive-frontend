@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { ChevronDown, Download, Loader2, X, FileText, FileJson, FileSpreadsheet, FileType2 } from "lucide-react";
@@ -116,7 +116,7 @@ export default function ExportConfigPanel({
   };
 
   return (
-    <div className="w-85 rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-700/60 dark:bg-slate-900 dark:text-slate-100 overflow-hidden">
+    <div className="w-85 rounded-2xl border border-slate-200 bg-[#FCFCFA] text-slate-900 shadow-2xl dark:border-slate-700/60 dark:bg-slate-900 dark:text-slate-100 overflow-hidden">
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5 dark:border-slate-800">
@@ -171,7 +171,7 @@ export default function ExportConfigPanel({
                       ? "border-teal-500 bg-teal-500"
                       : "border-slate-300 dark:border-slate-600",
                   )}>
-                    {active && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                    {active && <span className="h-1.5 w-1.5 rounded-full bg-[#FCFCFA]" />}
                   </span>
                   <input
                     type="radio"
@@ -211,7 +211,7 @@ export default function ExportConfigPanel({
                       "flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors",
                       checked
                         ? "bg-teal-50 dark:bg-teal-950/30"
-                        : "hover:bg-white dark:hover:bg-slate-800",
+                        : "hover:bg-[#FCFCFA] dark:hover:bg-slate-800",
                     )}
                   >
                     {/* Custom checkbox */}
@@ -287,7 +287,7 @@ export default function ExportConfigPanel({
                           key={col}
                           className={cn(
                             "flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors",
-                            checked ? "bg-teal-50 dark:bg-teal-950/30" : "hover:bg-white dark:hover:bg-slate-800",
+                            checked ? "bg-teal-50 dark:bg-teal-950/30" : "hover:bg-[#FCFCFA] dark:hover:bg-slate-800",
                           )}
                         >
                           <span className={cn(

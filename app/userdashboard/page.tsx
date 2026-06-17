@@ -10,8 +10,10 @@ import {
   Database,
   Download,
   FileText,
+  FolderGit2,
   Globe,
   Lock,
+  Plus,
   Radar,
   Server,
   TrendingUp,
@@ -20,6 +22,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import Link from "next/link";
 
 import { useGetAuthMeQuery } from "@/lib/redux/services/auth/auth-api";
 import {
@@ -316,10 +319,14 @@ function AuthenticatedDashboard() {
           </div>
 
           <div className="flex items-center gap-2 mt-2 md:mt-0 shrink-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 sm:px-3 text-xs sm:text-xs md:text-sm font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 whitespace-nowrap">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Live data
-            </span>
+            <Link
+              href="/userdashboard/projects?action=new"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-black transition-colors whitespace-nowrap shadow-sm"
+            >
+              <FolderGit2 size={15} />
+              New Project
+              <Plus size={13} />
+            </Link>
           </div>
         </motion.div>
 
@@ -363,7 +370,7 @@ function AuthenticatedDashboard() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
+            className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
           >
             {/* card header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
@@ -426,7 +433,7 @@ function AuthenticatedDashboard() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
+            className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
               <div className="min-w-0">
@@ -501,7 +508,7 @@ function AuthenticatedDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
+          className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
             <div className="min-w-0">
@@ -533,7 +540,7 @@ function AuthenticatedDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
+          className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] dark:border-slate-800 dark:bg-slate-900 overflow-hidden"
         >
           {/* Card header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 md:py-4 dark:border-slate-800 gap-2 sm:gap-3">
@@ -691,7 +698,7 @@ function AuthenticatedDashboard() {
                       disabled={safePage === 1}
                       onClick={() => setReportsPage((p) => Math.max(1, p - 1))}
                       aria-label="Previous page"
-                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
                     >
                       <ChevronLeft size={13} />
                     </button>
@@ -722,7 +729,7 @@ function AuthenticatedDashboard() {
                             className={`inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border text-[10px] sm:text-xs font-semibold transition ${
                               safePage === p
                                 ? "border-teal-500 bg-teal-50 text-teal-700 dark:border-teal-600 dark:bg-teal-950/40 dark:text-teal-300"
-                                : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                                : "border-slate-200 bg-[#FCFCFA] text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
                             }`}
                           >
                             {p}
@@ -736,7 +743,7 @@ function AuthenticatedDashboard() {
                       disabled={safePage === totalPages}
                       onClick={() => setReportsPage((p) => Math.min(totalPages, p + 1))}
                       aria-label="Next page"
-                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                      className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
                     >
                       <ChevronRight size={13} />
                     </button>
@@ -760,10 +767,9 @@ function MetricCard({ metric, index, total }: { metric: MetricCardData; index: n
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.04 + index * 0.04 }}
-      className="relative p-4 sm:p-5 md:p-6 lg:p-7 bg-white dark:bg-slate-900 transition-all"
+      className="relative p-4 sm:p-5 md:p-6 lg:p-7 bg-[#FCFCFA] border border-[#005F5F]/60 dark:border-[#1675B1] dark:bg-slate-900 transition-all"
       style={{
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        outline: "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
       }}
     >
       {/* Corner accent triangles */}
@@ -774,10 +780,10 @@ function MetricCard({ metric, index, total }: { metric: MetricCardData; index: n
           position: "absolute",
           inset: 0,
           background: `
-            linear-gradient(135deg, var(--color-primary) 0%, transparent 55%) top left / 14px 14px no-repeat,
-            linear-gradient(315deg, var(--color-primary) 0%, transparent 55%) bottom right / 14px 14px no-repeat
+            linear-gradient(135deg, var(--color-primary) 0%, transparent 50%) top left / 26px 26px no-repeat,
+            linear-gradient(315deg, var(--color-primary) 0%, transparent 50%) bottom right / 26px 26px no-repeat
           `,
-          opacity: 0.45,
+          opacity: 0.5,
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
@@ -1038,7 +1044,7 @@ function ReportRow({
           onClick={onDownload}
           disabled={isDownloading}
           aria-label={`Download ${report.file_name}`}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-slate-600 transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-teal-600 dark:hover:bg-teal-950/30 dark:hover:text-teal-300"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-[#FCFCFA] px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-slate-600 transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-teal-600 dark:hover:bg-teal-950/30 dark:hover:text-teal-300"
         >
           <Download size={12} />
           <span className="hidden sm:inline">Download</span>
@@ -1217,7 +1223,7 @@ function RadialChart({
       {/* Hover tooltip */}
       {hoveredRing !== null && (
         <div
-          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
           style={{
             left: tooltipPos.x,
             top: tooltipPos.y - 54,

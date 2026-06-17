@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { motion } from "framer-motion";
 
 function HeroSkeleton() {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
+    <div className="relative overflow-hidden bg-[#FCFCFA] dark:bg-[#111113] border-b border-black/9 dark:border-white/9">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         <div className="flex justify-center mb-6">
           <div className="h-6 w-36 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-full animate-pulse" />
@@ -18,7 +18,7 @@ function HeroSkeleton() {
 
 function DocCategorySkeleton() {
   return (
-    <div className="bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6">
+    <div className="bg-[#FCFCFA] dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6">
       <div className="flex items-start gap-4 mb-5">
         <div className="w-12 h-12 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-xl animate-pulse" />
         <div className="flex-1">
@@ -58,7 +58,7 @@ function QuickLinkSkeleton() {
 
 function FeaturedResourceSkeleton() {
   return (
-    <div className="bg-white dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6">
+    <div className="bg-[#FCFCFA] dark:bg-[#111113] border border-black/9 dark:border-white/9 rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <div className="h-5 w-14 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-md animate-pulse" />
         <div className="h-5 w-16 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-full animate-pulse" />
@@ -103,7 +103,7 @@ export default function ResourceSkeleton() {
         </div>
       </section>
 
-      <section className="bg-white dark:bg-[#111113] border-y border-black/9 dark:border-white/9">
+      <section className="bg-[#FCFCFA] dark:bg-[#111113] border-y border-black/9 dark:border-white/9">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="h-8 w-32 bg-[#F7F5F0] dark:bg-[#1A1A1A] rounded-xl mb-8 animate-pulse" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

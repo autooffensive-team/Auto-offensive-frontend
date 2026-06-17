@@ -239,7 +239,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
   // ── Error ─────────────────────────────────────────────────────────────────
   if (isError) {
     return (
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 text-center">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 p-10 text-center">
         <AlertTriangle size={28} className="mx-auto text-rose-400 mb-3" />
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">
           Failed to load target data.
@@ -257,7 +257,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
   // ── Empty (no targets at all) ─────────────────────────────────────────────
   if (allTargets.length === 0) {
     return (
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-10 text-center">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 p-10 text-center">
         <FolderOpen size={28} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
           No targets yet. Add targets to a project to get started.
@@ -270,7 +270,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
     <div className="space-y-3 sm:space-y-4">
 
       {/* ── Search + Filter bar ─────────────────────────────────────────────── */}
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
         <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -281,7 +281,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               maxLength={200}
-              className="w-full pl-9 pr-9 py-2 sm:py-2.5 text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
+              className="w-full pl-9 pr-9 py-2 sm:py-2.5 text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-[#FCFCFA] dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-colors"
               aria-label="Search targets"
             />
             {searchInput && (
@@ -308,7 +308,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[110px] sm:min-w-[130px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-[#FCFCFA] dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[110px] sm:min-w-[130px]"
                 aria-label="Filter by type"
               >
                 <option value="all">All Types</option>
@@ -326,7 +326,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
               <select
                 value={filterProject}
                 onChange={(e) => setFilterProject(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px] sm:min-w-[160px]"
+                className="appearance-none pl-3 pr-8 py-2 sm:py-2.5 text-xs sm:text-sm lg:text-base rounded-lg border border-slate-200 dark:border-slate-700 bg-[#FCFCFA] dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 cursor-pointer transition-colors hover:border-slate-300 dark:hover:border-slate-600 min-w-[130px] sm:min-w-[160px]"
                 aria-label="Filter by project"
               >
                 <option value="all">All Projects</option>
@@ -376,7 +376,7 @@ export default function TargetsTable({ onRowClick, initialProjectFilter }: Targe
       </div>
 
       {/* ── Table card ──────────────────────────────────────────────────────── */}
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 overflow-hidden">
 
         {/* ── Desktop/tablet table ── */}
         <div className="hidden sm:flex flex-col">
@@ -565,7 +565,7 @@ function TargetsTableSkeleton({ pageSize = 10, rowH = 56 }: { pageSize?: number;
   return (
     <div className="space-y-3 sm:space-y-4">
       {/* Filter bar skeleton */}
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4">
         <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3 animate-pulse">
           <div className="h-9 sm:h-10 flex-1 rounded-lg bg-slate-100 dark:bg-slate-800" />
           <div className="flex gap-2">
@@ -579,7 +579,7 @@ function TargetsTableSkeleton({ pageSize = 10, rowH = 56 }: { pageSize?: number;
       </div>
 
       {/* Table skeleton */}
-      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-900 overflow-hidden">
         <div className="hidden sm:block overflow-x-auto">
           <table className="w-full min-w-[640px]">
             <thead>

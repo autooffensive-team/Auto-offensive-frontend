@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { JSX, useState } from 'react'
 
@@ -157,7 +157,7 @@ export default function ToolsPage() {
     <div className="min-h-screen bg-[#f8fafc]" style={{ fontFamily: 'var(--font-google-sans), sans-serif' }}>
 
       {/* Page Header */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-[#FCFCFA] border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
@@ -191,7 +191,7 @@ export default function ToolsPage() {
                   className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                     activeCategory === cat
                       ? 'bg-[#00C896] text-white border-[#00C896] shadow-sm'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#00C896] hover:text-[#00C896]'
+                      : 'bg-[#FCFCFA] text-gray-600 border-gray-200 hover:border-[#00C896] hover:text-[#00C896]'
                   }`}
                 >
                   {cat}
@@ -223,7 +223,7 @@ export default function ToolsPage() {
             {filtered.map((tool) => (
               <div
                 key={tool.id}
-                className="group bg-white border border-gray-100 rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-lg hover:border-[#00C896]/40 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                className="group bg-[#FCFCFA] border border-gray-100 rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-lg hover:border-[#00C896]/40 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex items-start justify-between">
                   <div className="w-11 h-11 rounded-xl bg-linear-to-r from-[#f0fdf8] to-[#e6fff7] border border-[#00C896]/20 flex items-center justify-center text-[#00C896] group-hover:scale-105 transition-transform">

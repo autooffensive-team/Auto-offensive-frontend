@@ -111,7 +111,7 @@ function PreviousPageButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-1.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 sm:px-4 sm:py-2 sm:text-base dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
     >
       <ArrowLeft className="size-3.5 shrink-0 sm:size-4" />
       <span>Back to previous page</span>
@@ -463,7 +463,7 @@ function ProjectAvatar({
 
   if (host === "github") {
     return (
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-900 sm:size-12 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-slate-900 sm:size-12 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
         <GitHubIcon className="size-5 sm:size-6" />
       </div>
     );
@@ -471,7 +471,7 @@ function ProjectAvatar({
 
   if (host === "gitlab") {
     return (
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#fc6d26] sm:size-12 dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-[#FCFCFA] text-[#fc6d26] sm:size-12 dark:border-slate-700 dark:bg-slate-900">
         <GitLabIcon className="size-5 sm:size-6" />
       </div>
     );
@@ -488,7 +488,7 @@ function StatusPill({ status }: { status: string | null | undefined }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:py-1 sm:text-sm",
         status === "SUCCESS" &&
           "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
         status === "IN_PROGRESS" &&
@@ -518,7 +518,7 @@ function PlatformStatusPill({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:py-1 sm:text-sm",
         failed
           ? "bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20"
           : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
@@ -568,14 +568,14 @@ function PageHeader({
   return (
     <motion.section
       {...sectionMotion}
-      className="relative rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="relative rounded-lg border border-slate-200 bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-3 sm:rounded-xl sm:p-4 md:p-5 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       <div className="flex flex-col gap-3 sm:gap-4 md:gap-5">
         <div className="flex min-w-0 gap-3 sm:gap-4">
           <ProjectAvatar projectKey={projectKey} repoUrl={repoUrl} />
 
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
               <Link
                 href="/userdashboard/code-scanning"
                 className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
@@ -590,7 +590,7 @@ function PageHeader({
               {projectKey}
             </h1>
 
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[10px] text-slate-500 sm:mt-3 sm:gap-x-3 sm:gap-y-2 sm:text-xs md:text-sm dark:text-slate-400">
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-slate-500 sm:mt-3 sm:gap-x-3 sm:gap-y-2 sm:text-base dark:text-slate-400">
               <span className="inline-flex items-center gap-1.5">
                 <RepoHostIcon repoUrl={repoUrl} className="size-3 sm:size-3.5" />
                 {repoPath}
@@ -610,7 +610,7 @@ function PageHeader({
           {qualityGate ? (
             <span
               className={cn(
-                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:py-1 sm:text-sm",
                 getQualityGateTone(qualityGate)
               )}
             >
@@ -622,7 +622,7 @@ function PageHeader({
               href={repoUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-900 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-[#FCFCFA] px-2.5 py-1.5 text-sm font-semibold text-slate-900 sm:gap-2 sm:px-3 sm:py-2 sm:text-base dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
             >
               <ExternalLink className="size-3.5 sm:size-4" />
               Repository
@@ -646,7 +646,7 @@ function AlertSection({
     return (
       <motion.section
         {...sectionMotion}
-        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-base dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
       >
         <div className="flex items-start gap-2 sm:gap-3">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
@@ -660,7 +660,7 @@ function AlertSection({
     return (
       <motion.section
         {...sectionMotion}
-        className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+        className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-700 sm:rounded-xl sm:px-4 sm:py-3 sm:text-base dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
       >
         <div className="flex items-start gap-2 sm:gap-3">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0 sm:size-4" />
@@ -686,7 +686,7 @@ function ProjectNav({
   return (
     <motion.section
       {...sectionMotion}
-      className="flex gap-1.5 overflow-x-auto rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-1.5 sm:gap-2 sm:rounded-xl sm:p-2 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+      className="flex gap-1.5 overflow-x-auto rounded-lg border border-slate-200 bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-1.5 sm:gap-2 sm:rounded-xl sm:p-2 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
     >
       {projectNavItems.map((item) => {
         const Icon = item.icon;
@@ -698,7 +698,7 @@ function ProjectNav({
             type="button"
             onClick={() => onViewChange(item.id)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-base",
               active
                 ? "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
@@ -782,7 +782,7 @@ export default function CodeScanningDetailPageClient({
           page_size: 25,
         },
     {
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 30, // re-fetch if data is older than 30s
     }
   );
 
@@ -798,28 +798,30 @@ export default function CodeScanningDetailPageClient({
     error,
     refetch: refetchScanDetail,
   } = useGetScanDetailQuery(resolvedScanId ?? skipToken, {
-    refetchOnMountOrArgChange: true,
+    refetchOnMountOrArgChange: 30,
   });
 
   const { data: liveStatus, refetch: refetchScanStatus } = useGetScanStatusQuery(
     resolvedScanId ?? skipToken,
     {
-      pollingInterval: 5000,
-      refetchOnMountOrArgChange: true,
+      // Poll based on scan detail status; scanDetail is fetched before this
+      pollingInterval:
+        (scanDetail?.status === "PENDING" || scanDetail?.status === "IN_PROGRESS") ? 5000 : 0,
+      refetchOnMountOrArgChange: 30,
     }
   );
 
   const { data: scanSummary, refetch: refetchScanSummary } = useGetScanSummaryQuery(
     resolvedScanId ?? skipToken,
     {
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
   const { data: dependencySummaryResponse, refetch: refetchDependencySummary } = useGetDependencySummaryQuery(
     resolvedScanId ?? skipToken,
     {
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
@@ -836,7 +838,7 @@ export default function CodeScanningDetailPageClient({
       },
       {
         skip: !resolvedScanId,
-        refetchOnMountOrArgChange: true,
+        refetchOnMountOrArgChange: 60,
       }
     );
 
@@ -848,7 +850,7 @@ export default function CodeScanningDetailPageClient({
     },
     {
       skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
@@ -863,7 +865,7 @@ export default function CodeScanningDetailPageClient({
       },
       {
         skip: !resolvedScanId,
-        refetchOnMountOrArgChange: true,
+        refetchOnMountOrArgChange: 60,
       }
     );
 
@@ -875,7 +877,7 @@ export default function CodeScanningDetailPageClient({
     },
     {
       skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
@@ -889,7 +891,7 @@ export default function CodeScanningDetailPageClient({
       },
       {
         skip: !resolvedScanId,
-        refetchOnMountOrArgChange: true,
+        refetchOnMountOrArgChange: 60,
       }
     );
 
@@ -901,7 +903,7 @@ export default function CodeScanningDetailPageClient({
     },
     {
       skip: !resolvedScanId,
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
@@ -914,7 +916,7 @@ export default function CodeScanningDetailPageClient({
         }
       : skipToken,
     {
-      refetchOnMountOrArgChange: true,
+      refetchOnMountOrArgChange: 60,
     }
   );
 
@@ -1087,7 +1089,7 @@ export default function CodeScanningDetailPageClient({
   // Loading state
   if (isResolvingRoute || isLoading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] sm:rounded-xl dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <div       className="flex min-h-[70vh] items-center justify-center rounded-lg border border-slate-200 bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] sm:rounded-xl dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
         <div className="flex items-center gap-2 text-xs text-slate-500 sm:gap-3 sm:text-sm dark:text-slate-400">
           <LoaderCircle className="size-4 animate-spin text-teal-500 sm:size-5" />
           Loading project overview...
@@ -1099,7 +1101,7 @@ export default function CodeScanningDetailPageClient({
   // Error state
   if (routeResolutionFailed || isError || !scanDetail) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-linear-to-br from-white via-white to-[#f8fafd] p-6 text-center sm:gap-4 sm:rounded-xl sm:p-8 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-linear-to-br from-[#FCFCFA] via-[#FCFCFA] to-[#f8fafd] p-6 text-center sm:gap-4 sm:rounded-xl sm:p-8 dark:border-slate-800 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
         <AlertTriangle className="size-8 text-red-500 sm:size-10" />
         <div>
           <h1 className="text-lg font-bold text-slate-900 sm:text-xl dark:text-white">
@@ -1144,7 +1146,7 @@ export default function CodeScanningDetailPageClient({
         <button
           type="button"
           onClick={handleRefreshPage}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800"
         >
           <RefreshCw className="size-3.5 shrink-0 sm:size-4" />
           <span>Refresh</span>

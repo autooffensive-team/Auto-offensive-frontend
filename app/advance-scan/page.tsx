@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Sidebar from "@/components/Sidebar";
 import {
@@ -668,7 +668,7 @@ export default function AdvanceScanPage() {
                   onChange={(event) => setCommand(event.target.value)}
                   placeholder="nmap -sV -sC scanme.nmap.org"
                   rows={5}
-                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 font-mono text-sm outline-none transition duration-200 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-400/20 dark:border-emerald-900/60 dark:bg-[#07130b] dark:text-emerald-100 dark:placeholder:text-emerald-800 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
+                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 font-mono text-sm outline-none transition duration-200 focus:border-emerald-400 focus:bg-[#FCFCFA] focus:ring-2 focus:ring-emerald-400/20 dark:border-emerald-900/60 dark:bg-[#07130b] dark:text-emerald-100 dark:placeholder:text-emerald-800 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
                 />
               </div>
 
@@ -709,7 +709,7 @@ export default function AdvanceScanPage() {
                   type="button"
                   onClick={stopStream}
                   disabled={!isSubmitting && !isStreaming}
-                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 disabled:opacity-40 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 disabled:cursor-not-allowed dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
+                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-[#FCFCFA] hover:bg-gray-50 disabled:opacity-40 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 disabled:cursor-not-allowed dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
                 >
                   Stop Stream
                 </button>
@@ -718,7 +718,7 @@ export default function AdvanceScanPage() {
                   <button
                     type="button"
                     onClick={() => void fetchParsedData(stepId)}
-                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-300 hover:border-gray-400 bg-[#FCFCFA] hover:bg-gray-50 px-6 py-3 text-sm font-bold text-gray-700 transition duration-200 dark:border-emerald-700 dark:bg-[#031008] dark:text-emerald-100 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-600"
                   >
                     Refresh Results
                   </button>

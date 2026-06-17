@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useMemo, useState, useRef, useCallback } from "react";
@@ -146,7 +146,7 @@ export function SeverityDonutChart({
         {/* Hover tooltip */}
         {hoveredItem && (
           <div
-            className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+            className="pointer-events-none absolute z-50 rounded-lg border border-slate-200 bg-[#FCFCFA] px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
             style={{
               left: tooltipPos.x,
               top: tooltipPos.y - 54,

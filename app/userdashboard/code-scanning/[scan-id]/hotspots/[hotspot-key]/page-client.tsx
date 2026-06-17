@@ -237,15 +237,15 @@ function HotspotSidebar({
   total: number;
 }) {
   return (
-    <aside className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <aside className="overflow-hidden rounded-lg border border-slate-200 bg-[#FCFCFA] dark:border-slate-800 dark:bg-slate-950">
       <div className="border-b border-slate-200 px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-slate-800">
-        <p className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">{total} hotspots in this scan</p>
+        <p className="text-xs font-semibold text-slate-900 md:text-sm dark:text-white">{total} hotspots in this scan</p>
       </div>
 
       <div className="max-h-[calc(100vh-14rem)] overflow-y-auto">
         {groups.map((group) => (
           <div key={group.filePath} className="border-b border-slate-200 px-3 py-3 last:border-b-0 sm:px-4 sm:py-3.5 md:px-5 md:py-4 dark:border-slate-800">
-            <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wide sm:mb-3 sm:text-xs dark:text-slate-400">
+            <p className="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wide sm:mb-3 md:text-sm dark:text-slate-400">
               {group.filePath}
             </p>
             <div className="space-y-1 sm:space-y-1.5">
@@ -256,7 +256,7 @@ function HotspotSidebar({
                     key={hotspot.key}
                     href={`/userdashboard/code-scanning/${encodeURIComponent(scanId)}/hotspots/${encodeURIComponent(hotspot.key)}`}
                     className={cn(
-                      "block rounded px-2.5 py-1.5 text-[10px] font-medium transition-all duration-200 sm:px-3 sm:py-2 sm:text-xs",
+                      "block rounded px-2.5 py-1.5 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-2 md:text-sm",
                       active
                         ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
                         : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
@@ -295,14 +295,14 @@ function CodeSnippetPanel({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
-        <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] dark:bg-slate-950">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-slate-600 md:text-base dark:text-slate-400">
           <span className="font-mono font-medium truncate">{projectKey}</span>
           <span className="text-slate-400 dark:text-slate-600">/</span>
           <span className="font-mono truncate">{filePath}</span>
         </div>
-        <span className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
+        <span className="text-sm font-mono font-medium text-slate-600 md:text-base dark:text-slate-400">
           Line {hotspot.where_is_hotspot.line || startLine}
         </span>
       </div>
@@ -340,11 +340,11 @@ function CodeSnippetPanel({
 
       {/* Hotspot message */}
       <div className="border-t border-slate-200 dark:border-slate-800 px-4 py-4 bg-amber-50 dark:bg-amber-950">
-        <div className="rounded border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-950 px-4 py-3">
+        <div className="rounded border border-amber-200 dark:border-amber-800 bg-[#FCFCFA] dark:bg-slate-950 px-4 py-3">
           <div className="flex items-start gap-3">
             <Flame className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+              <p className="text-sm font-semibold text-amber-900 md:text-base dark:text-amber-200">
                 {hotspot.review.message}
               </p>
             </div>
@@ -375,7 +375,7 @@ function ReviewPanel({ hotspot }: { hotspot: HotspotDetailResponse }) {
   return (
     <div className="space-y-3 sm:space-y-4">
       {hasDescription && (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-[#FCFCFA] shadow-sm dark:border-slate-700 dark:bg-slate-950">
           <div className="border-b border-slate-200 bg-slate-50 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 dark:border-slate-700 dark:bg-slate-900/80">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
               Rule description
@@ -391,7 +391,7 @@ function ReviewPanel({ hotspot }: { hotspot: HotspotDetailResponse }) {
       )}
 
       {hasResolution && (
-        <div className="overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-sm dark:border-emerald-800 dark:bg-slate-950">
+        <div className="overflow-hidden rounded-xl border border-emerald-200 bg-[#FCFCFA] shadow-sm dark:border-emerald-800 dark:bg-slate-950">
           <div className="border-b border-emerald-200 bg-emerald-50 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 dark:border-emerald-800 dark:bg-emerald-950">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 dark:text-emerald-300">
               Resolution
@@ -409,7 +409,7 @@ function ReviewPanel({ hotspot }: { hotspot: HotspotDetailResponse }) {
       {enhancedSections.map((section) => (
         <div
           key={section.key}
-          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-950"
+          className="overflow-hidden rounded-xl border border-slate-200 bg-[#FCFCFA] shadow-sm dark:border-slate-700 dark:bg-slate-950"
         >
           <div className="border-b border-slate-200 bg-slate-50 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 dark:border-slate-700 dark:bg-slate-900/80">
             <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 dark:text-slate-400">
@@ -439,18 +439,18 @@ function ActivityPanel({ hotspot }: { hotspot: HotspotDetailResponse }) {
   return (
     <div className="space-y-3 sm:space-y-4">
       {comments.length > 0 && (
-        <section className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white p-3 sm:p-4 md:p-5 dark:bg-slate-950">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">Comments</h3>
+         <section className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:bg-slate-950">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-600 md:text-base dark:text-slate-400">Comments</h3>
           <div className="mt-3 space-y-3 sm:mt-4 sm:space-y-4">
             {comments.map((comment) => (
               <div key={`${comment.login}-${comment.created_at}`} className="rounded border border-slate-200 p-3 dark:border-slate-800">
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 md:text-base dark:text-slate-400">
                   <MessageSquare className="size-3.5" />
                   <span className="font-medium text-slate-900 dark:text-white">{comment.login}</span>
                   <span>{formatDate(comment.created_at)}</span>
                 </div>
                 <div
-                  className="mt-3 text-sm leading-6 text-slate-900 dark:text-slate-100 [&_a]:text-teal-600 [&_a]:underline-offset-2 hover:[&_a]:underline"
+                  className="mt-3 text-base leading-7 text-slate-900 dark:text-slate-100 [&_a]:text-teal-600 [&_a]:underline-offset-2 hover:[&_a]:underline"
                   dangerouslySetInnerHTML={{ __html: comment.html_text }}
                 />
               </div>
@@ -460,18 +460,18 @@ function ActivityPanel({ hotspot }: { hotspot: HotspotDetailResponse }) {
       )}
 
       {changelog.length > 0 && (
-        <section className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white p-3 sm:p-4 md:p-5 dark:bg-slate-950">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">Changelog</h3>
+         <section className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:bg-slate-950">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-600 md:text-base dark:text-slate-400">Changelog</h3>
           <div className="mt-3 space-y-3 sm:mt-4 sm:space-y-4">
             {changelog.map((change) => (
               <div key={`${change.user}-${change.created_at}`} className="rounded border border-slate-200 p-3 dark:border-slate-800">
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 md:text-base dark:text-slate-400">
                   <span className="font-medium text-slate-900 dark:text-white">{change.user}</span>
                   <span>{formatDate(change.created_at)}</span>
                 </div>
                 <div className="mt-3 space-y-2">
                   {change.diffs.map((diff) => (
-                    <div key={`${diff.key}-${diff.old_value}-${diff.new_value}`} className="rounded bg-slate-50 px-3 py-2 text-xs dark:bg-slate-900">
+                    <div key={`${diff.key}-${diff.old_value}-${diff.new_value}`} className="rounded bg-slate-50 px-3 py-2 text-sm md:text-base dark:bg-slate-900">
                       <span className="font-medium text-slate-900 dark:text-white">{formatLabel(diff.key)}:</span>{" "}
                       <span className="text-slate-600 dark:text-slate-400">{diff.old_value || "empty"}</span>{" "}
                       <span className="text-slate-600 dark:text-slate-400">→</span>{" "}
@@ -624,9 +624,9 @@ export default function CodeScanningHotspotDetailPageClient({
       <div className="min-h-screen">
         <div className="mx-auto space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 sm:py-4 md:space-y-5 md:px-5 md:py-5 lg:space-y-6 lg:px-7 lg:py-6">
           {/* Header */}
-          <motion.section {...sectionMotion} className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+          <motion.section {...sectionMotion} className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
             <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 md:text-sm dark:text-slate-400">
                 <Link href="/userdashboard/code-scanning" className="font-semibold text-teal-600 hover:underline dark:text-teal-400">
                   Code scanning
                 </Link>
@@ -646,7 +646,7 @@ export default function CodeScanningHotspotDetailPageClient({
                   <h1 className="truncate text-lg font-bold text-slate-900 sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
                     {hotspotDetail.review.message}
                   </h1>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-slate-500 sm:mt-3 sm:gap-x-4 sm:gap-y-2 sm:text-xs dark:text-slate-400">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-500 sm:mt-3 sm:gap-x-4 sm:gap-y-2 md:text-sm dark:text-slate-400">
                     <span className="inline-flex items-center gap-1">
                       <FolderGit2 className="size-3 sm:size-3.5" />
                       {repoPath}
@@ -661,7 +661,7 @@ export default function CodeScanningHotspotDetailPageClient({
 
                 <Link
                   href={buildCodeScanningProjectHref(scanDetail?.project_key || routeIdentifier)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm dark:border-slate-800 dark:text-slate-100 dark:hover:bg-slate-800"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 sm:gap-2 sm:px-4 sm:py-2 md:text-base dark:border-slate-800 dark:text-slate-100 dark:hover:bg-slate-800"
                 >
                   <ArrowLeft className="size-3.5 sm:size-4" />
                   Back to project
@@ -685,26 +685,26 @@ export default function CodeScanningHotspotDetailPageClient({
             {/* Main hotspot view */}
             <motion.section {...sectionMotion} className="space-y-3 sm:space-y-4 md:space-y-5">
               {/* Hotspot summary */}
-              <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+              <div className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
                 <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs", probabilityColors.text, probabilityColors.bg)}>
+                      <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold md:text-sm", probabilityColors.text, probabilityColors.bg)}>
                         {formatLabel(hotspotDetail.review.vulnerability_probability)} probability
                       </span>
-                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs", getStatusTone(hotspotDetail.review.status))}>
+                      <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold md:text-sm", getStatusTone(hotspotDetail.review.status))}>
                         {formatLabel(hotspotDetail.review.status)}
                       </span>
-                      <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-sky-500/10 dark:text-sky-300">
+                      <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 md:text-sm dark:bg-sky-500/10 dark:text-sky-300">
                         {formatSecurityCategory(hotspotDetail.review.security_category)}
                       </span>
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4">
-                      <span className="text-sm font-semibold text-slate-900 sm:text-base md:text-lg dark:text-white">
+                      <span className="text-base font-semibold text-slate-900 md:text-lg dark:text-white">
                         {hotspotDetail.review.rule_name}
                       </span>
-                      <span className="text-[10px] text-slate-500 sm:text-xs md:text-sm dark:text-slate-400">
+                      <span className="text-xs text-slate-500 md:text-sm dark:text-slate-400">
                         {hotspotDetail.review.rule_key}
                       </span>
                       {hotspotDetail.more_info.documentation_url && (
@@ -712,15 +712,15 @@ export default function CodeScanningHotspotDetailPageClient({
                           href={hotspotDetail.more_info.documentation_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] font-medium text-teal-600 hover:underline sm:text-xs dark:text-teal-400"
+                          className="inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:underline md:text-base dark:text-teal-400"
                         >
                           Documentation
-                          <ExternalLink className="size-2.5 sm:size-3" />
+                          <ExternalLink className="size-3 sm:size-3.5" />
                         </a>
                       )}
                     </div>
 
-                    <p className="mt-1.5 text-[10px] text-slate-500 sm:mt-2 sm:text-xs dark:text-slate-400">
+                    <p className="mt-1.5 text-xs text-slate-500 sm:mt-2 md:text-sm dark:text-slate-400">
                       {hotspotDetail.where_is_hotspot.file_path}:{hotspotDetail.where_is_hotspot.line || hotspotDetail.where_is_hotspot.text_range.start_line}
                     </p>
                   </div>
@@ -736,7 +736,7 @@ export default function CodeScanningHotspotDetailPageClient({
                         type="button"
                         onClick={() => setActiveTab(item.id)}
                         className={cn(
-                          "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all duration-200 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
+                          "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-all duration-200 sm:gap-2 sm:px-3 sm:py-2 md:text-base",
                           active
                             ? "bg-teal-50 text-teal-700 ring-1 ring-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:ring-teal-500/20"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
@@ -764,39 +764,39 @@ export default function CodeScanningHotspotDetailPageClient({
 
             {/* Right sidebar */}
             <motion.aside {...sectionMotion} className="space-y-3 sm:space-y-4">
-              <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Security category</p>
+              <div className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 md:text-sm dark:text-slate-400">Security category</p>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
-                  <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700 sm:px-2.5 sm:py-1 sm:text-xs dark:bg-sky-500/10 dark:text-sky-300">
+                  <span className="rounded-full bg-sky-50 px-2.5 py-1 text-sm font-semibold text-sky-700 md:text-base dark:bg-sky-500/10 dark:text-sky-300">
                     {formatSecurityCategory(hotspotDetail.review.security_category)}
                   </span>
-                  <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs", probabilityColors.text, probabilityColors.bg)}>
+                  <span className={cn("rounded-full px-2.5 py-1 text-sm font-semibold md:text-base", probabilityColors.text, probabilityColors.bg)}>
                     {formatLabel(hotspotDetail.review.vulnerability_probability)}
                   </span>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Review status</p>
+              <div className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 md:text-sm dark:text-slate-400">Review status</p>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
-                  <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs", getStatusTone(hotspotDetail.review.status))}>
+                  <span className={cn("rounded-full px-2.5 py-1 text-sm font-semibold md:text-base", getStatusTone(hotspotDetail.review.status))}>
                     {formatLabel(hotspotDetail.review.status)}
                   </span>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Location</p>
-                <div className="mt-3 space-y-1 text-[10px] text-slate-900 sm:mt-4 sm:text-xs dark:text-slate-100">
+              <div className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 md:text-sm dark:text-slate-400">Location</p>
+                <div className="mt-3 space-y-1 text-sm text-slate-900 sm:mt-4 md:text-base dark:text-slate-100">
                   <p className="break-all font-mono">{hotspotDetail.where_is_hotspot.component_key}</p>
                   <p className="break-all font-mono">{hotspotDetail.where_is_hotspot.file_path}</p>
                   <p className="font-mono">L{hotspotDetail.where_is_hotspot.line || hotspotDetail.where_is_hotspot.text_range.start_line}</p>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs dark:text-slate-400">Current scan</p>
-                <div className="mt-3 space-y-1 text-[10px] text-slate-900 sm:mt-4 sm:text-xs dark:text-slate-100">
+              <div className="rounded-lg border border-slate-200 bg-[#FCFCFA] p-3 sm:p-4 md:p-5 dark:border-slate-800 dark:bg-slate-950">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 md:text-sm dark:text-slate-400">Current scan</p>
+                <div className="mt-3 space-y-1 text-sm text-slate-900 sm:mt-4 md:text-base dark:text-slate-100">
                   <p className="font-mono">{projectKey}</p>
                   <p className="font-mono">{scanDetail?.branch || "main"}</p>
                   <p>{formatDate(scanDetail?.finished_at || scanDetail?.started_at || scanDetail?.created_at)}</p>

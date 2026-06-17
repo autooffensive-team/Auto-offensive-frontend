@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -188,7 +188,7 @@ export default function UserDashboardShell({
   const desktopContentOffset = collapsed ? "md:pl-[72px]" : "md:pl-72";
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-950 dark:bg-black dark:text-white">
+    <div className="min-h-screen overflow-x-clip bg-[#FAFAF7] text-gray-950 dark:bg-black dark:text-white">
       <MobileScreenWarning />
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -205,8 +205,7 @@ export default function UserDashboardShell({
       </AnimatePresence>
 
       <aside
-        className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-white text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${mobileMenuOpen ? "translate-x-0" : ""
-          }`}
+        className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-black/10 bg-[#FAFAF7] text-slate-950 transition-all duration-300 md:translate-x-0 dark:border-white/10 dark:bg-slate-950 dark:text-white ${desktopSidebarWidth} ${mobileMenuOpen ? "translate-x-0" : ""}`}
       >
         <div className={`relative border-b border-black/10 px-4 py-5 dark:border-white/10 ${collapsed ? "md:px-2 md:py-4" : ""}`}>
           <div className={`flex items-center ${collapsed ? "md:flex-col md:gap-2" : "justify-between"}`}>
@@ -298,8 +297,8 @@ export default function UserDashboardShell({
                         <Lock size={8} className="absolute -right-1 -top-1 text-amber-500" />
                       </div>
                       <div className={collapsed ? "md:hidden" : ""}>
-                        <p className="font-medium leading-tight text-left">{item.label}</p>
-                        <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-600 text-left">
+                        <p className="font-medium leading-tight text-left text-[17px]">{item.label}</p>
+                        <p className="mt-0.5 text-[15px] leading-tight text-slate-400 dark:text-slate-600 text-left">
                           {item.description}
                         </p>
                       </div>
@@ -332,8 +331,8 @@ export default function UserDashboardShell({
                       <item.icon size={16} strokeWidth={active ? 2.2 : 1.8} />
                     </div>
                     <div className={collapsed ? "md:hidden" : ""}>
-                      <p className="font-medium leading-tight">{item.label}</p>
-                      <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-500">
+                      <p className="font-medium leading-tight text-[17px]">{item.label}</p>
+                      <p className="mt-0.5 text-[15px] leading-tight text-slate-400 dark:text-slate-500">
                         {item.description}
                       </p>
                     </div>
@@ -441,7 +440,7 @@ export default function UserDashboardShell({
             <div className={`mt-2 flex gap-2 ${collapsed ? "md:flex-col md:items-center" : ""}`}>
               <Link
                 href="/login"
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 ${collapsed ? "md:h-10 md:w-10 md:flex-none md:rounded-lg md:px-0" : ""}`}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-[#FCFCFA] px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 ${collapsed ? "md:h-10 md:w-10 md:flex-none md:rounded-lg md:px-0" : ""}`}
               >
                 <LogIn size={14} />
                 <span className={collapsed ? "md:hidden" : ""}>Login</span>
@@ -458,14 +457,14 @@ export default function UserDashboardShell({
         </div>
       </aside>
 
-      <div className={`dashboard-content-shell transition-all duration-300 overflow-x-hidden min-w-0 ${desktopContentOffset}`}>
-        <header className="dashboard-topbar sticky top-0 z-30 border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
+      <div className={`dashboard-content-shell transition-all duration-300 overflow-x-clip min-w-0 ${desktopContentOffset}`}>
+        <header className="dashboard-topbar sticky top-0 z-30 border-b border-black/5 bg-[#FAFAF7]/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/45 shadow-none">
           <div className="flex w-full items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2.5">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-black/10 bg-white text-slate-900 shadow-sm md:hidden dark:border-white/10 dark:bg-white/5 dark:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-black/10 bg-[#FCFCFA] text-slate-900 shadow-sm md:hidden dark:border-white/10 dark:bg-white/5 dark:text-white"
                 aria-label="Open navigation"
               >
                 <Menu size={18} />
@@ -483,7 +482,7 @@ export default function UserDashboardShell({
               <Link
                 href="/resource"
                 onClick={closeOverlays}
-                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                className="hidden items-center gap-2 rounded-full border border-black/8 bg-white/80 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-[#FCFCFA] md:flex dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
               >
                 <BookOpen size={16} />
                 Docs
@@ -497,7 +496,7 @@ export default function UserDashboardShell({
                   </span>
                   <Link
                     href="/login"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-black/8 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-black/8 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-[#FCFCFA] dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                   >
                     <LogIn size={14} />
                     Login
@@ -540,7 +539,7 @@ export default function UserDashboardShell({
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
-                        className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-white dark:border-white/10 dark:bg-slate-900"
+                        className="absolute right-0 top-14 w-64 overflow-hidden rounded-3xl border border-black/8 bg-[#FCFCFA] dark:border-white/10 dark:bg-slate-900"
                       >
                         <div className="border-b border-black/6 px-5 py-4 dark:border-white/10">
                           <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -615,7 +614,7 @@ export default function UserDashboardShell({
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-[61] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+              <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-[#FCFCFA] p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-500/10">
                   <LogOut className="h-5 w-5 text-rose-600 dark:text-rose-400" />
                 </div>
@@ -629,7 +628,7 @@ export default function UserDashboardShell({
                   <button
                     type="button"
                     onClick={() => setLogoutConfirmOpen(false)}
-                    className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                    className="flex-1 rounded-xl border border-slate-200 bg-[#FCFCFA] px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                   >
                     Cancel
                   </button>

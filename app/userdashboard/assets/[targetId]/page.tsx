@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
@@ -87,9 +87,9 @@ export default function TargetScanJobsPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-        <div className="h-9 w-64 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-        <div className="h-5 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+        <div className="h-5 w-48 bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 rounded animate-pulse" />
+        <div className="h-9 w-64 bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 rounded animate-pulse" />
+        <div className="h-5 w-40 bg-[#00D0B2]/10 dark:bg-[#00D0B2]/8 rounded animate-pulse" />
         <ScanJobsTableSkeleton />
       </div>
     );
@@ -105,7 +105,7 @@ export default function TargetScanJobsPage() {
             { label: "Unknown Target" },
           ]}
         />
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
+        <div className="bg-[#FCFCFA] dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-sm">
           <AlertCircle className="mx-auto h-10 w-10 text-red-400 mb-3" />
           <p className="text-slate-700 dark:text-slate-300 font-medium mb-4">
             {isTargetError && !projectsError
@@ -125,7 +125,7 @@ export default function TargetScanJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 lg:px-7 lg:py-6">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -154,7 +154,7 @@ export default function TargetScanJobsPage() {
 
             <Link
               href="/userdashboard/assets"
-              className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm self-end sm:self-auto shrink-0 group"
+              className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl bg-[#FCFCFA] dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm self-end sm:self-auto shrink-0 group"
             >
               <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
               <span className="hidden sm:inline">Back to Assets</span>
