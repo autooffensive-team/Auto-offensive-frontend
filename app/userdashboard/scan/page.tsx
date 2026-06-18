@@ -743,9 +743,9 @@ export default function ScanPage() {
                 className={cn(
                   "h-64 sm:h-80 md:h-96 lg:h-110 overflow-y-auto rounded-lg font-[Consolas,monospace]",
                   theme.html.bg,
-                  size.className,
-                  size.lineHeight
+                  size.className
                 )}
+                style={{ lineHeight: size.htmlLineHeight }}
               >
                 {isIdle && !isScanRunning ? (
                   <div className="flex flex-col items-center h-full">
@@ -783,7 +783,7 @@ export default function ScanPage() {
                       {!isIdle && (
                         <div className="p-2 sm:p-3 flex-1 overflow-y-auto">
                           {activeLogs.map((line) => (
-                            <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word py-0.5">
+                            <div key={line.id} className="flex gap-1.5 sm:gap-2 wrap-break-word">
                               <span className={cn("shrink-0", theme.html.timestamp)}>
                                 {new Date(line.timestamp).toLocaleTimeString()}
                               </span>

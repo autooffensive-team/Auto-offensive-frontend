@@ -165,25 +165,18 @@ export function BasicScanForm({
   return (
     <div className="space-y-2">
       {/* Layout toolbar */}
-      <div
-        className="flex items-center justify-between px-3 py-2"
-        style={{
-          background: "var(--lc-panel-bg)",
-        }}
-      >
+      <div className="flex items-center justify-between px-3 py-2 bg-[var(--lc-panel-bg,#FCFCFA)] dark:bg-[rgb(15,23,42)]">
         <div className="flex items-center gap-2">
           <LayoutGrid
             className="h-3.5 w-3.5"
             style={{
-              color:
-                "color-mix(in srgb, var(--color-primary) 70%, black)",
+              color: "var(--color-primary)",
             }}
           />
             <span
               className="text-sm lg:text-base"
               style={{
-              color:
-                "color-mix(in srgb, var(--color-primary) 70%, black)",
+              color: "var(--color-primary)",
             }}
           >
             Drag sections to reorder your layout
@@ -197,8 +190,7 @@ export function BasicScanForm({
             onClick={() => setLayout([...DEFAULT_LAYOUT])}
             className="h-7 gap-1.5 text-sm hover:text-white"
             style={{
-              color:
-                "color-mix(in srgb, var(--color-primary) 70%, transparent)",
+              color: "var(--color-primary)",
             }}
           >
             <RotateCcw className="h-3 w-3" />
@@ -274,20 +266,21 @@ function DraggableWidget({
        * ── Decorative background layer ──────────────────────────────────────
        * clip-path lives ONLY on this absolutely-positioned layer.
        * It never clips the content above it.
+       * NOTE: background + outline must NOT be in style={} — dark: variants
+       * cannot override inline styles. We use a wrapper trick: set the bg via
+       * a className that has both light and dark values.
        */}
       <span
         aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-0 z-0",
+          "bg-[#FCFCFA] dark:bg-[rgb(15,23,42)]",
+          "outline outline-1 outline-[#005F5F99] dark:outline-[#1675B1]",
+        )}
         style={{
-          pointerEvents: "none",
-          position: "absolute",
-          inset: 0,
-          zIndex: 0,
-          background: "var(--lc-widget-bg, #FCFCFA)",
           clipPath:
             "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-          outline: "1px solid #005F5F99",
         }}
-        className="dark:[background:rgb(15_23_42)] dark:[outline-color:#1675B1]"
       />
 
       {/* ── Corner accent triangles ── */}
@@ -313,10 +306,8 @@ function DraggableWidget({
         className={cn(
           "relative z-10 flex cursor-grab select-none items-center gap-2 px-4 py-2.5",
           "active:cursor-grabbing",
+          "border-b border-[#005F5F40] dark:border-[#1675B130]",
         )}
-        style={{
-          borderBottom: "1px solid #005F5F40",
-        }}
       >
         <GripVertical
           className="h-4 w-4 transition-colors"
@@ -335,9 +326,8 @@ function DraggableWidget({
           </span>
         )}
         <span
-          className="text-xs font-semibold uppercase tracking-widest"
+          className="text-xs font-semibold uppercase tracking-widest text-[color-mix(in_srgb,var(--color-primary)_60%,#6b7280)] dark:text-[color-mix(in_srgb,var(--color-primary)_80%,#94a3b8)]"
           style={{
-            color: "color-mix(in srgb, var(--color-primary) 60%, var(--muted-foreground))",
             letterSpacing: "0.18em",
           }}
         >
@@ -400,22 +390,26 @@ function PresetSelector({
                 "focus-within:ring-2 focus-within:ring-offset-1",
                 disabled && "pointer-events-none opacity-50",
                 isSelected
-                  ? "dark:[background:color-mix(in_srgb,#1675B1_15%,rgb(15_23_42))] dark:[outline-color:#1675B1]"
-                  : "dark:[background:rgb(15_23_42)] dark:[outline-color:#1675B155]",
+                  ? [
+                      "bg-[color-mix(in_srgb,var(--color-primary)_10%,#FCFCFA)]",
+                      "outline outline-[1.5px] outline-[#005F5F]",
+                      "dark:bg-[color-mix(in_srgb,#1675B1_15%,rgb(15,23,42))]",
+                      "dark:outline-[#1675B1]",
+                    ]
+                  : [
+                      "bg-[#FCFCFA]",
+                      "outline outline-[1px] outline-[#005F5F99]",
+                      "dark:bg-[rgb(15,23,42)]",
+                      "dark:outline-[#1675B155]",
+                    ],
               )}
               style={{
-                background: isSelected
-                  ? "color-mix(in srgb, var(--color-primary) 10%, #FCFCFA)"
-                  : "#FCFCFA",
-                outline: isSelected
-                  ? "1.5px solid #005F5F"
-                  : "1px solid #005F5F99",
                 clipPath:
                   "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
               }}
             >
               <div className="relative flex items-center justify-between gap-3">
-                <span className="text-base lg:text-lg font-semibold">
+                <span className="text-base lg:text-lg font-semibold text-slate-900 dark:text-white">
                   {p.name}
                 </span>
                 {isSelected ? (
@@ -430,7 +424,7 @@ function PresetSelector({
               </div>
 
               {p.description && (
-                <p className="relative mt-1.5 text-sm lg:text-base leading-relaxed">
+                <p className="relative mt-1.5 text-sm lg:text-base leading-relaxed text-slate-600 dark:text-slate-400">
                   {p.description}
                 </p>
               )}
@@ -440,7 +434,7 @@ function PresetSelector({
                   {p.flags.map((flag) => (
                     <code
                       key={flag}
-                      className="rounded px-1.5 py-0.5 font-mono text-sm lg:text-base"
+                      className="rounded px-1.5 py-0.5 font-mono text-sm lg:text-base dark:bg-[color-mix(in_srgb,#1675B1_15%,transparent)] dark:text-[#5eead4]"
                       style={{
                         background: "color-mix(in srgb, var(--color-primary) 6%, transparent)",
                         color: "color-mix(in srgb, var(--color-primary) 80%, var(--foreground))",

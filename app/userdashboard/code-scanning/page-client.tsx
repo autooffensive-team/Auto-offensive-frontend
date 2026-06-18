@@ -11,7 +11,6 @@ import {
   ExternalLink,
   FolderGit2,
   GitBranch,
-  LoaderCircle,
   Plus,
   RefreshCw,
   Search,
@@ -199,6 +198,7 @@ function HexStatCard({
   badge,
   index,
   icon,
+  isLoading = false,
 }: {
   value: number;
   label: string;
@@ -206,6 +206,7 @@ function HexStatCard({
   badge: string;
   index: number;
   icon?: React.ReactNode;
+  isLoading?: boolean;
 }) {
   const { stroke, fill, label: labelColor } = HEX_CONFIGS[variant];
 
@@ -277,6 +278,21 @@ function HexStatCard({
           >
             {value}
           </text>
+          {isLoading && (
+            <>
+              {/* Pulsing shimmer rect over the number when loading */}
+              <rect
+                x={cx - 22}
+                y={cy - 18}
+                width={44}
+                height={22}
+                rx={6}
+                fill={stroke}
+                opacity={0.18}
+                className="animate-pulse"
+              />
+            </>
+          )}
         </svg>
       </div>
 
@@ -306,6 +322,45 @@ function HexStatCard({
           </div>
         </div>
       )}
+    </motion.div>
+  );
+}
+
+// ─── Skeleton Card ───────────────────────────────────────────────────────────
+
+function SkeletonProjectCard({ index }: { index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.055, ease: "easeOut" }}
+      className="w-full overflow-hidden rounded-2xl border border-[#e0e0e0] bg-[#FCFCFA] dark:border-white/10 dark:bg-[#101828]"
+    >
+      <div className="px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-4.5">
+        {/* Row 1: avatar + meta + status pill */}
+        <div className="mb-3 flex items-center justify-between gap-2 sm:mb-3.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Avatar */}
+            <div className="h-9 w-9 shrink-0 rounded-[10px] bg-slate-200 dark:bg-white/10 animate-pulse sm:h-10 sm:w-10" />
+            <div className="flex flex-col gap-1.5">
+              <div className="h-2.5 w-20 rounded-full bg-slate-200 dark:bg-white/10 animate-pulse" />
+              <div className="h-2 w-14 rounded-full bg-slate-100 dark:bg-white/[0.06] animate-pulse" />
+            </div>
+          </div>
+          {/* Status pill */}
+          <div className="h-5 w-16 rounded-full bg-slate-100 dark:bg-white/[0.06] animate-pulse sm:h-6 sm:w-20" />
+        </div>
+
+        {/* Project name */}
+        <div className="mb-1 h-4 w-3/4 rounded-full bg-slate-200 dark:bg-white/10 animate-pulse sm:h-5" />
+        <div className="mb-3 h-3 w-1/2 rounded-full bg-slate-100 dark:bg-white/[0.06] animate-pulse sm:mb-4" />
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <div className="h-6 w-20 rounded-md bg-slate-100 dark:bg-white/[0.06] animate-pulse sm:h-7 sm:w-24" />
+          <div className="h-7 w-16 rounded-lg bg-slate-200 dark:bg-white/10 animate-pulse sm:h-8 sm:w-20" />
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -401,7 +456,21 @@ function ScanProjectCard({
 
               return (
                 <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.75 text-[10px] font-medium sm:gap-1.25 sm:px-2.5 sm:py-1 sm:text-[12px] ${textColor}`} style={{ borderColor }}>
-                  <span className="inline-block h-1.25 w-1.25 rounded-full sm:h-1.5 sm:w-1.5" style={{ backgroundColor: dotColor }} />
+                  {isRunning ? (
+                    /* Ping animation for Pending / In Progress */
+                    <span className="relative inline-flex h-1.5 w-1.5 sm:h-2 sm:w-2 shrink-0">
+                      <span
+                        className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+                        style={{ backgroundColor: dotColor }}
+                      />
+                      <span
+                        className="relative inline-flex h-full w-full rounded-full"
+                        style={{ backgroundColor: dotColor }}
+                      />
+                    </span>
+                  ) : (
+                    <span className="inline-block h-1.25 w-1.25 rounded-full sm:h-1.5 sm:w-1.5" style={{ backgroundColor: dotColor }} />
+                  )}
                   {statusLabel}
                 </span>
               );
@@ -798,6 +867,7 @@ export default function CodeScanningPageClient() {
                       ? "Medium"
                       : "Low"
           }
+          isLoading={issueSummaryState.isLoading}
           index={3}
           icon={<AlertTriangle className="w-full h-full" strokeWidth={1.5} />}
         />
@@ -854,10 +924,11 @@ export default function CodeScanningPageClient() {
       {/* ── Project Cards: 1 col mobile / 2 col tablet / 3 col desktop / 4 col wide ── */}
       <div id="tour-project-list" className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
         {isLoading && !scanRefsResponse ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-lg sm:rounded-xl md:rounded-2xl border border-slate-200 bg-[#FCFCFA] py-12 sm:col-span-2 sm:py-16 lg:col-span-3 2xl:col-span-4 dark:border-slate-800 dark:bg-slate-900">
-            <LoaderCircle size={20} className="animate-spin text-teal-500 dark:text-teal-400" />
-            <p className="text-sm text-slate-500 sm:text-base dark:text-slate-400">Loading projects…</p>
-          </div>
+          <>
+            {Array.from({ length: 8 }, (_, i) => (
+              <SkeletonProjectCard key={i} index={i} />
+            ))}
+          </>
         ) : filtered.length > 0 ? (
           <AnimatePresence>
             {paginatedProjects.map((project, index) => (
