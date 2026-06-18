@@ -955,7 +955,7 @@ export const AdvancedTerminalPanel = React.memo(function AdvancedTerminalPanel({
     prevStatusRef.current = status;
 
     if (status === "submitting") {
-      term.write(`\x1b[36m→ Submitting scan…\x1b[0m\r\n`);
+      term.write(`\x1b[36m→  Submitting scan…\x1b[0m\r\n`);
     } else if (status.includes("COMPLETED")) {
       term.write(`\r\x1b[1m\x1b[32m✓ Scan completed — findings: ${run.findings}\x1b[0m\r\n`);
       isInputActiveRef.current = true; term.write(getPrompt());

@@ -909,7 +909,7 @@ export function Header() {
                 onClick={() => setOpen(false)}
                 className="w-full py-2 text-center"
               >
-                Try Free (3 scans)
+                Try Free (5 scans)
               </TryFreeButton>
               <Link
                 href="/register"

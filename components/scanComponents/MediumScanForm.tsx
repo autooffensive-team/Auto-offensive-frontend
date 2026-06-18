@@ -218,8 +218,8 @@ export function MediumScanForm({
       }}
     >
         <div className="flex items-center gap-2">
-          <LayoutGrid className="h-3.5 w-3.5" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }} />
-          <span className="text-xs" style={{ color: "color-mix(in srgb, var(--color-primary) 55%, transparent)" }}>
+          <LayoutGrid className="h-3.5 w-3.5" style={{ color: "var(--color-primary)" }} />
+          <span className="text-xs" style={{ color: "var(--color-primary)" }}>
             Drag sections to reorder your layout
           </span>
         </div>

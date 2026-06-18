@@ -455,19 +455,21 @@ export type LogSizeConfig = {
   className: string;
   /** Pixel value for xterm fontSize option */
   xtermFontSize: number;
-  /** Tailwind line-height class */
+  /** Tailwind line-height class (HTML panels) */
   lineHeight: string;
+  /** CSS line-height value for HTML log panels */
+  htmlLineHeight: number;
   /** Line-height multiplier used by xterm */
   terminalLineHeight: number;
 };
 
 export const LOG_SIZES: Record<LogSizeKey, LogSizeConfig> = {
-  xs: { label: "XS", className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-[1.6]", terminalLineHeight: 1.6 },
-  sm: { label: "S", className: "text-[16px]", xtermFontSize: 17, lineHeight: "leading-[1.7]", terminalLineHeight: 1.7 },
-  md: { label: "M", className: "text-[18px]", xtermFontSize: 19, lineHeight: "leading-[1.75]", terminalLineHeight: 1.75 },
-  lg: { label: "L", className: "text-[21px]", xtermFontSize: 20, lineHeight: "leading-[1.8]", terminalLineHeight: 1.8 },
-  xl: { label: "XL", className: "text-[24px]", xtermFontSize: 22, lineHeight: "leading-[1.9]", terminalLineHeight: 1.9 },
-  xxl: { label: "XXL", className: "text-[28px]", xtermFontSize: 24, lineHeight: "leading-[2.0]", terminalLineHeight: 2.0 },
+  xs:  { label: "XS",  className: "text-[14px]", xtermFontSize: 14, lineHeight: "leading-[1.75]", htmlLineHeight: 1.2,  terminalLineHeight: 1.9  },
+  sm:  { label: "S",   className: "text-[16px]", xtermFontSize: 17, lineHeight: "leading-[1.85]", htmlLineHeight: 1.25, terminalLineHeight: 1.95 },
+  md:  { label: "M",   className: "text-[18px]", xtermFontSize: 19, lineHeight: "leading-[1.9]",  htmlLineHeight: 1.3,  terminalLineHeight: 2.0  },
+  lg:  { label: "L",   className: "text-[21px]", xtermFontSize: 20, lineHeight: "leading-[1.95]", htmlLineHeight: 1.35, terminalLineHeight: 2.05 },
+  xl:  { label: "XL",  className: "text-[24px]", xtermFontSize: 22, lineHeight: "leading-[2.05]", htmlLineHeight: 1.4,  terminalLineHeight: 2.1  },
+  xxl: { label: "XXL", className: "text-[28px]", xtermFontSize: 24, lineHeight: "leading-[2.15]", htmlLineHeight: 1.45, terminalLineHeight: 2.2  },
 };
 
 /** Default theme key */

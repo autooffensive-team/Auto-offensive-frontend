@@ -526,6 +526,8 @@ interface TopStatCardProps {
   helper: string;
   accent: "teal" | "emerald" | "amber" | "red" | "slate";
   icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+  /** When true the card shows shimmer skeleton + spinning icon */
+  isLoading?: boolean;
 }
 
 const accentColor: Record<string, string> = {
@@ -542,7 +544,9 @@ function TopStatCard({
   helper,
   accent,
   icon: Icon,
+  isLoading = false,
 }: TopStatCardProps) {
+  const color = accentColor[accent];
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -570,18 +574,38 @@ function TopStatCard({
           clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         }}
       />
-      {/* Half-bleed icon */}
+
+      {/* Animated gradient sweep when loading */}
+      {isLoading && (
+        <motion.div
+          className="pointer-events-none absolute inset-0"
+          animate={{ opacity: [0.04, 0.10, 0.04] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background: `linear-gradient(120deg, transparent 30%, ${color} 50%, transparent 70%)`,
+            backgroundSize: "200% 100%",
+          }}
+        />
+      )}
+
+      {/* Half-bleed icon — spins when loading */}
       <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none" style={{ transform: "translateX(40%)" }}>
-        <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]" style={{ color: accentColor[accent], opacity: 0.12 }}>
+        <motion.div
+          className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px]"
+          style={{ color, opacity: isLoading ? 0.22 : 0.12 }}
+          animate={isLoading ? { rotate: 360 } : { rotate: 0 }}
+          transition={isLoading ? { duration: 6, repeat: Infinity, ease: "linear" } : { duration: 0 }}
+        >
           <Icon className="w-full h-full" strokeWidth={1.5} />
-        </div>
+        </motion.div>
       </div>
+
       <div className="relative z-10">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:text-sm dark:text-slate-500">
             {label}
           </p>
-          {/* FIX: truncate long values gracefully on small screens */}
+
           <p className="mt-2 truncate text-2xl font-bold text-slate-900 sm:mt-3 sm:text-3xl md:text-4xl dark:text-white">
             {value}
           </p>
@@ -1446,6 +1470,7 @@ export function CodeScanOverview({
                 ? ShieldCheck
                 : ShieldAlert
           }
+          isLoading={!qualityGate && isScanRunning}
         />
         <TopStatCard
           label="Scan Status"
@@ -1461,6 +1486,7 @@ export function CodeScanOverview({
           }
           accent={isScanRunning ? "teal" : platformFailed ? "red" : scanSummary ? "emerald" : "slate"}
           icon={normalizedScanProgress < 100 ? LoadingIcon : platformFailed ? ShieldAlert : scanSummary ? CheckCircle2 : RefreshCw}
+          isLoading={isScanRunning}
         />
         <TopStatCard
           label="Issues"

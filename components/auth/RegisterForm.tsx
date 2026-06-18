@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
-import { EyeOff, Lock, Mail, Rocket, UserRound } from "lucide-react";
+import { AlertCircle, CheckCircle2, EyeOff, Lock, Mail, Rocket, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -34,6 +34,7 @@ export default function RegisterForm() {
   const [agreed, setAgreed] = useState(false);
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorType, setErrorType] = useState<"conflict" | "validation" | "network" | "">("");
   const [successMessage, setSuccessMessage] = useState("");
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -53,6 +54,7 @@ export default function RegisterForm() {
 
     setPending(true);
     setErrorMessage("");
+    setErrorType("");
     setSuccessMessage("");
 
     try {
@@ -85,15 +87,39 @@ export default function RegisterForm() {
                   .join(", ")
               : "";
 
-        setErrorMessage(
-          detailText || payload?.message || "Unable to create account. Please try again.",
-        );
+        const rawMsg = (detailText || payload?.message || "").toLowerCase();
+
+        // Detect duplicate / conflict errors from the API
+        const isConflict =
+          response.status === 409 ||
+          rawMsg.includes("already exist") ||
+          rawMsg.includes("already taken") ||
+          rawMsg.includes("duplicate") ||
+          rawMsg.includes("in use");
+
+        if (isConflict) {
+          setErrorType("conflict");
+          if (rawMsg.includes("email")) {
+            setErrorMessage("email");
+          } else if (rawMsg.includes("username")) {
+            setErrorMessage("username");
+          } else {
+            setErrorMessage("account");
+          }
+        } else if (response.status === 422 || response.status === 400) {
+          setErrorType("validation");
+          setErrorMessage(detailText || payload?.message || "Please check your details and try again.");
+        } else {
+          setErrorType("");
+          setErrorMessage(detailText || payload?.message || "Unable to create account. Please try again.");
+        }
         return;
       }
 
       setSuccessMessage("Account created successfully. You can log in now.");
       setForm(initialFormState);
       setAgreed(false);
+      setErrorType("");
 
       const callbackUrl = searchParams.get("callbackUrl");
       const nextUrl =
@@ -105,6 +131,7 @@ export default function RegisterForm() {
         router.replace(nextUrl);
       }, 1200);
     } catch {
+      setErrorType("network");
       setErrorMessage("Unable to reach the registration service. Please try again.");
     } finally {
       setPending(false);
@@ -264,29 +291,113 @@ export default function RegisterForm() {
           </p>
         </div>
 
+        {/* ── Error banner ── */}
         {errorMessage ? (
-          <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
-            {errorMessage}
-          </p>
+          <div
+            role="alert"
+            className="flex gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 dark:border-rose-900/50 dark:bg-rose-950/40"
+          >
+            <AlertCircle
+              size={18}
+              className="mt-0.5 shrink-0 text-rose-500 dark:text-rose-400"
+              aria-hidden="true"
+            />
+            <div className="text-sm">
+              {errorType === "conflict" ? (
+                <>
+                  <p className="font-semibold text-rose-700 dark:text-rose-300">
+                    {errorMessage === "email"
+                      ? "Email already in use"
+                      : errorMessage === "username"
+                        ? "Username already taken"
+                        : "Account already exists"}
+                  </p>
+                  <p className="mt-0.5 text-rose-600 dark:text-rose-400">
+                    {errorMessage === "email"
+                      ? "This email address is linked to an existing account."
+                      : errorMessage === "username"
+                        ? "That username is already taken — try a different one."
+                        : "An account with these credentials already exists."}{" "}
+                    <Link
+                      href="/login?manual=1"
+                      className="font-semibold underline underline-offset-2 hover:text-rose-800 dark:hover:text-rose-200"
+                    >
+                      Sign in instead →
+                    </Link>
+                  </p>
+                </>
+              ) : errorType === "validation" ? (
+                <>
+                  <p className="font-semibold text-rose-700 dark:text-rose-300">Invalid details</p>
+                  <p className="mt-0.5 text-rose-600 dark:text-rose-400">{errorMessage}</p>
+                </>
+              ) : errorType === "network" ? (
+                <>
+                  <p className="font-semibold text-rose-700 dark:text-rose-300">Connection failed</p>
+                  <p className="mt-0.5 text-rose-600 dark:text-rose-400">
+                    Could not reach the server. Check your connection and try again.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-rose-700 dark:text-rose-300">Registration failed</p>
+                  <p className="mt-0.5 text-rose-600 dark:text-rose-400">{errorMessage}</p>
+                </>
+              )}
+            </div>
+          </div>
         ) : null}
 
+        {/* ── Success banner ── */}
         {successMessage ? (
-          <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
-            {successMessage}
-          </p>
+          <div
+            role="status"
+            className="flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 dark:border-emerald-900/50 dark:bg-emerald-950/40"
+          >
+            <CheckCircle2
+              size={18}
+              className="mt-0.5 shrink-0 text-emerald-500 dark:text-emerald-400"
+              aria-hidden="true"
+            />
+            <div className="text-sm">
+              <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                Account created successfully
+              </p>
+              <p className="mt-0.5 text-emerald-600 dark:text-emerald-400">
+                Welcome aboard. Redirecting you to the login page…
+              </p>
+            </div>
+          </div>
         ) : null}
 
         <div className="mt-4 flex items-start gap-3">
           <input
             type="checkbox"
+            id="terms-agreement"
             checked={agreed}
             onChange={(event) => setAgreed(event.target.checked)}
             className="mt-0.5 h-4 w-4 accent-primary"
           />
-          <label className="text-sm text-gray-500 dark:text-gray-400">
+          <label htmlFor="terms-agreement" className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer">
             I accept the{" "}
-            <span className="font-semibold text-primary">Security Protocols</span> and{" "}
-            <span className="font-semibold text-primary">Data Governance</span>.
+            <Link
+              href="/terms-of-service"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:text-teal-600 underline-offset-2 hover:underline"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:text-teal-600 underline-offset-2 hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            .
           </label>
         </div>
 
