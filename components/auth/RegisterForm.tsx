@@ -199,7 +199,7 @@ export default function RegisterForm() {
               name="username"
               value={form.username}
               onChange={handleChange}
-              placeholder="taluntun"
+              placeholder="Choose a username"
               required
               autoComplete="username"
               className="w-full rounded-xl bg-slate-100 px-4 py-3 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
@@ -218,7 +218,7 @@ export default function RegisterForm() {
               name="first_name"
               value={form.first_name}
               onChange={handleChange}
-              placeholder="Ta"
+              placeholder="Enter your first name"
               required
               autoComplete="given-name"
               className="w-full rounded-xl bg-slate-100 px-4 py-3 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
@@ -234,7 +234,7 @@ export default function RegisterForm() {
               name="last_name"
               value={form.last_name}
               onChange={handleChange}
-              placeholder="Tun"
+              placeholder="Enter your last name"
               required
               autoComplete="family-name"
               className="w-full rounded-xl bg-slate-100 px-4 py-3 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
@@ -252,7 +252,7 @@ export default function RegisterForm() {
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="example@gmail.com"
+              placeholder="your@email.com"
               required
               autoComplete="email"
               className="w-full rounded-xl bg-slate-100 px-4 py-3 pr-10 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-teal-400 dark:bg-gray-800 dark:text-gray-200"
@@ -271,7 +271,7 @@ export default function RegisterForm() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="Enter your password"
+              placeholder="••••••••"
               required
               minLength={8}
               autoComplete="new-password"
