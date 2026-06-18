@@ -81,9 +81,9 @@ export function StreamLogsPanel({
         className={cn(
           "m-3 sm:m-4 flex-1 overflow-y-auto rounded-lg p-2 sm:p-3 font-[Consolas,monospace] min-h-80",
           theme.html.bg,
-          size.className,
-          size.lineHeight
+          size.className
         )}
+        style={{ lineHeight: size.htmlLineHeight }}
       >
         {!logs.length ? (
           <p className={cn("py-2 text-center", theme.html.muted, size.className)}>
@@ -92,7 +92,7 @@ export function StreamLogsPanel({
         ) : (
           <>
             {logs.map((line) => (
-              <div key={line.id} className="flex gap-2 wrap-break-word py-0.5">
+              <div key={line.id} className="flex gap-2 wrap-break-word">
                 <span className={cn("shrink-0", theme.html.timestamp)}>
                   {new Date(line.timestamp).toLocaleTimeString()}
                 </span>
